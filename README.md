@@ -1,4 +1,4 @@
-# <span style="color:orange">Tagasaurus, your gateway to the semantic multiverse </span>
+# <span style="color:orange">Tagasaurus, your gateway to our semantic multiverse </span>
 ## <span style="color:red">"Tag the Planet!" </span>
 
 ### <span style="color:green">First step to have the tool allow a user to insert content and tag it as it enters the folder storage place</span>
