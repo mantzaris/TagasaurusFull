@@ -1,5 +1,5 @@
 # <span style="color:orange">Tagasaurus, the gateway to your semantic multiverse </span>
-## <span style="color:red">"Tag the Planet!" </span>
+## <span style="color:red">let's drop the '**U**' from '**URL**' and... "Tag the Planet!" </span>
 
 ### <span style="color:green">First step is to have the tool allow a user to insert content and tag it as it enters storage</span>
 
