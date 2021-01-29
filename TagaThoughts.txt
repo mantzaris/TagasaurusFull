@@ -1,0 +1,26 @@
+
+Tim Berners-Lee describes his motivation and thinking for the URL in his biographies which emphasize the emergence of the WWW. Those concepts have taken not only root but rest like the Turtle which supposedly held up the universe. Do URLs and URIs with their insistance or effort to make things unique not supporting our world? Our world has redundancy and the organic nature of life promotes that. Resources have duplicates and it is a natural occurance which is not truly embraced.
+
+This document, https://www.ietf.org/rfc/rfc3986.txt, describes in more detail the motivational mindset that continues on this path when defining the URI in 2005. From the Abstract, <...resolving URI references that might be in relative form, along with guidelines and security considerations for the use of URIs on the Internet.The URI syntax defines a grammar that is a superset of all valid URIs...>, and the keywords 'resolving'/'security'/'valid'. These keywords have to emerge once you place that letter 'U' for universal/unique/uniform etc. It is a basic axiom from which other assumptions emerge directly. What is wrong with them? You have to 'resolve' issues from the stochastic nature of life to keep a common understanding, you have to keep it secure as to have the uniform nature needs a central authority producing a vulnerability to the whole network and the word valid means there has to be a gatekeeper regardless of how that deciding entity is given access. 
+
+Even from early on in the document:
+1.1.  Overview of URIs
+
+   URIs are characterized as follows:
+
+   Uniform
+
+      Uniformity provides several benefits.  It allows different types
+      of resource identifiers to be used in the same context, even when
+      the mechanisms used to access those resources may differ.  It
+      allows uniform semantic interpretation of common syntactic
+      conventions across different types of resource identifiers.  It
+      allows introduction of new types of resource identifiers without
+      interfering with the way that existing identifiers are used.  It
+      allows the identifiers to be reused in many different contexts,
+      thus permitting new applications or protocols to leverage a pre-
+      existing, large, and widely used set of resource identifiers.
+
+<Uniformity provides some benefits...> Ok, but does it take any other benefits away?.. < It allows different types of resource identifiers to be used in the same context> Yes, that is write but can you then use those types in different context easily?
+
+And Tim Berners-Lee finds it surprising that the web and data is under control and is trying to fix it with Inrupt and Solid using the same axioms of information space?..
