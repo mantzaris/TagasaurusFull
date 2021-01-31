@@ -113,14 +113,13 @@ there is a MULTIVERSE. Funny enough, Luhmann touched on this and from
 <https://link.springer.com/chapter/10.1057/9781137015297_13> 'society
 can be represented as a multiverse and not a single unique universe'
 when considering the 'autopoietic self-constructed perceptions of
-reality'.
+reality'. Why would separations on ontological graphs create anything
+as grand as a 'multiverse'? It is because it allows for a local view
+of entity interactions to exist without succumbing to the over arching
+influence of the dominant analogous entity in the superset.
 
 (@mantzaris: my dad, Panos Mantzaris, made a remark that the approach
 is more Aristotelian than Platonic since Plato promoted the idea that
 there are ideal constructions all of us use in references of language
 while Aristotle believed in the individual perspective being what an
 individual uses to make decisions.
-
-The specification should be as simple as JSON and REST so that
-interexchange from other frameworks carving a similar path of
-incentivised tagging can easily be done.

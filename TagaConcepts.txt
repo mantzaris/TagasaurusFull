@@ -1,0 +1,61 @@
+
+The quote from Kalashnikov (the famous gun designer) should be taken
+seriously: "Things that are complex are not useful, Things that are
+useful are simple."*
+
+- What do we want to do? Solve problems.
+
+- What problem have we identified? Adding suitable meta-data (like
+  tags) to resources/content/media/files is cumbersome and time
+  consuming.
+
+- What are we going to do about it? Give users a tool to tag resources
+  as they naturally desire and provide a sharing mechanism that
+  captures the correspondance and compatibility of the resourses and
+  meta-data.
+
+- How will that work? Meta-data is applied to content by users which
+  is then shared, users receiving new content and the associated
+  meta-data sample the compatibility applying a confirmation or
+  disapproval of the meta-data which is then used to decide whether
+  the source user's data is compatible for a merge or not.
+
+- Why will people bother using it? Time is precious and this tool will
+  take time from the user, to help them avoid wasting even more time
+  scanning through resources which are hard to index/sort through
+  relevance, and have like minded people's effort augment their own.
+
+- Is there a way to lure power users to participate? It is known that
+  the effort amongst users in a group follows a power law and there
+  has to be incentive for those capable of putting in the time to do
+  so; some direct feedback for their efforts. Keeping things simple
+  that return of value is 'popularity' (a simple timeless
+  currency). Tags which are supported, or useful, promote the creator.
+
+- Can a new approach filter out unwanted content? This is probably the
+  most essential as filtration is a basic principle. Yes it can by
+  allowing negative sentiment to be directly accounted for both
+  positive and negative edges to be produced.
+
+- What about dashboards and overviews? There are many tools and
+  features that can be introduced and maybe not a single approach is
+  taken but they can still interact meaningfully if they follow the
+  basic resource and meta-data paradigm.
+
+How the promotion scheme works can become intricate and complicated
+very easily. It can be kept simple by relying on the premise that any
+activity which a user produces can be shared with other users that can
+express their approval or disapproval.
+
+*There are 2 other versions of this quote by Kalashnikov: "When a
+young man, I read somewhere the following: God the Almighty said, 'All
+that is too complex is unnecessary, and it is simple that is needed'"
+and another version: “When a young man, I read somewhere the
+following: God the Almighty said, 'All that is too complex is
+unnecessary, and it is simple that is needed' ... So this has been my
+lifetime motto – I have been creating weapons to defend the borders of
+my fatherland, to be simple and reliable.”
+
+
+
+
