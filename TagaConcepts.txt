@@ -47,6 +47,22 @@ very easily. It can be kept simple by relying on the premise that any
 activity which a user produces can be shared with other users that can
 express their approval or disapproval.
 
+Why not use the method of Marko Rodriguez, the famous graph database scientist
+behind TitanDB and infamous Twitter user who also is a chicken farmer?
+Yes, the method of <Rodriguez, M. A. (2009). A graph analysis of the linked data cloud. arXiv preprint arXiv:0903.0194.>
+is very intresting but even in the abstract he says "integrating Resource Description Framework (RDF)data sets into a single unified representation"
+and does not deviate from that premise. There is the effort to do this
+'automatically' in <Rodriguez, M. A., Bollen, J., & Sompel, H. V. D. (2009). Automatic metadata generation using associative networks. ACM Transactions on Information Systems (TOIS), 27(2), 1-20.>
+but all those automatic approaches always find barriers in the inability to appreciate rich media content. You may even bring up his work of
+<Rodriguez, M. A. (2007, January). Social decision making with multi-relational networks and grammar-based particle swarms. In 2007 40th Annual Hawaii International Conference on System Sciences (HICSS'07) (pp. 39-39). IEEE.> where the relations propagate through the network; but it never actually involves the user in that propagation! The propagation without a user filtration for context means that errors can grow from the constant relevant signal of ontological information. There is also an approach by Mantzaris <Mantzaris, A. V., Walker, T. G., Taylor, C. E., & Ehling, D. (2019). Adaptive network diagram constructions for representing big data event streams on monitoring dashboards. Journal of Big Data, 6(1), 1-19.> which allows meta-data variables to associate through frequency of co-occurances, but even though that does allow for overlaps of ontological tags, and a natural growth of edge types for separations permitting even disjoint networks; its method of analysis is aimed at people being able to visualize the network topologies rather than incentive them to tag or to organize their accumulated resource set.
+
+Once completed would this not fulfill the aspriration of Marvin Minsky to build a database of
+common sense? Yes and no. He wanted a database for all common sense of people as a single map
+which would mean that there would be so many exceptions for each rule/association that it would
+not generalize well. People evolve and so does their view of common sense. The idea of relying upon
+their incentive to perform the actions in an ad-hoc localized manner seems more plausible. 
+
+
 *There are 2 other versions of this quote by Kalashnikov: "When a
 young man, I read somewhere the following: God the Almighty said, 'All
 that is too complex is unnecessary, and it is simple that is needed'"
