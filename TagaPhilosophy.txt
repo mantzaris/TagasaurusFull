@@ -123,3 +123,17 @@ is more Aristotelian than Platonic since Plato promoted the idea that
 there are ideal constructions all of us use in references of language
 while Aristotle believed in the individual perspective being what an
 individual uses to make decisions.
+
+The implications for this basic initial fork in the philosophy is
+grand.  Just take a look at
+https://www.w3.org/DesignIssues/HTTP-URI.html where Tim Berners Lee
+makes a long spiral chain of arguments to pin down what a URI means
+when it is engineered. The attempt to 'philosophically engineer' even
+emails is confronted with a range of theoretical solutions which
+appear to lead no where after rounds of debate and consideration;
+https://www.w3.org/DesignIssues/PhilosophicalEngineering.html. The
+central unit organization has a lot of work to make sure local
+stochasticity does not disrupt and spread. To avoid handling all those
+issues, protocols and regulations try to catch similar circumstances
+in the future to save time and money for the command center (or
+consortium). 
