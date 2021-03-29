@@ -1,0 +1,49 @@
+html,
+body {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  background-color: rgb(88, 88, 161);
+}
+
+.main {
+  display: flex;
+  min-height: 100%;
+}
+
+.left {
+  height: 100vh;
+  width: 20%;
+  border: 2px solid blue;
+}
+.leftupper {
+  height: 50%;
+  width: 100%;
+  background-color: brown;
+}
+.leftlower {
+  height: 50%;
+  width: 100%;
+  background-color: cadetblue;
+  border-top: 5px solid red;
+}
+.center {
+  height: 100%;
+  width: 60%;
+}
+.right {
+  height: 100vh;
+  width: 20%;
+  border: 2px solid blue;
+}
+.rightupper {
+  height: 50%;
+  width: 100%;
+  background-color: coral;
+}
+.rightlower {
+  height: 50%;
+  width: 100%;
+  background-color: cyan;
+  border-top: 5px solid red;
+}
