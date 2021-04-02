@@ -5,7 +5,7 @@
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
         
   <link rel="stylesheet" href="./mycss/mainlayout.css">
-        
+  <link rel="stylesheet" href="./mycss/bootstrap-grid.css">      
    
   <title>Tagasaurus</title>
   </head>
@@ -27,16 +27,36 @@
         <div class="center">
           MEDIA CONTENT
           <hr>
-          some text!!!
-          <a class="w3-btn-floating" onclick="plusDivs(-1)">&#10094;</a>
+          some text ABOVE!!!
+
           <div class="imageDisplay">
-            <img class="mySlides" src="./images/dog1.jpg">
-            <img class="mySlides" src="./images/dog2.jpg">
-            <img class="mySlides" src="./images/cat1.jpg">
-          </div>
-          <a class="w3-btn-floating" onclick="plusDivs(+1)">&#10095;</a>
-          some text!!!
+            <a class="btn1" onclick="plusDivs(-1)">&#10094;</a>
           
+              <img class="mySlides" src="./images/dog1.jpg">
+              <img class="mySlides" src="./images/dog2.jpg">
+              <img class="mySlides" src="./images/cat1.jpg">
+            
+            <a class="btn2" onclick="plusDivs(+1)">&#10095;</a>
+
+          </div>
+          some text BELOW!!!
+          
+          <div class="container">
+            <div class="row">
+              <div class="col">
+                <a class="btn1BS" onclick="plusDivsBS(-1)">&#10094;</a>
+              </div>
+              <div class="col-10">
+                <img class="mySlidesBS" src="./images/dog1.jpg">
+                <img class="mySlidesBS" src="./images/dog2.jpg">
+                <img class="mySlidesBS" src="./images/cat1.jpg">
+              </div>
+              <div class="col">
+                <a class="btn2BS" onclick="plusDivsBS(+1)">&#10095;</a>
+              </div>
+            </div>            
+          </div>
+
         </div>
         <div class="right">
           <div class="rightupper">

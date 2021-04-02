@@ -32,13 +32,21 @@ body {
   width: 60%;
 }
 
+.btn1 {
+  float: left;
+  width: 5%;
+}
+.btn2 {
+  float: right;
+  width: 5%;
+}
+
 .mySlides {
-  max-height: 75vh;
+  max-height: 65vh;
   max-width: 85%;
   margin-left: auto;
   margin-right: auto;
 }
-
 .right {
   height: 100vh;
   width: 20%;
@@ -54,4 +62,11 @@ body {
   width: 100%;
   background-color: cyan;
   border-top: 5px solid red;
+}
+
+.mySlidesBS {
+  margin-left: auto;
+  margin-right: auto;
+  max-height: 65vh;
+  max-width: 85%;
 }
