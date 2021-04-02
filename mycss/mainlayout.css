@@ -34,7 +34,9 @@ body {
 
 .mySlides {
   max-height: 75vh;
-  max-width: 100%;
+  max-width: 85%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .right {
