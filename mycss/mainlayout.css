@@ -31,6 +31,12 @@ body {
   height: 100%;
   width: 60%;
 }
+
+.mySlides {
+  max-height: 75vh;
+  max-width: 100%;
+}
+
 .right {
   height: 100vh;
   width: 20%;
@@ -46,18 +52,4 @@ body {
   width: 100%;
   background-color: cyan;
   border-top: 5px solid red;
-}
-
-.imageContent {
-  height: 100vh;
-  background-color: purple;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.imageShow {
-  object-fit: contain;
-  max-height: 50%;
-  max-width: 50%;
 }
