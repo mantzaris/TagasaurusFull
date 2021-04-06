@@ -1,82 +1,104 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-        
-  <link rel="stylesheet" href="./mycss/mainlayout.css">
-  <link rel="stylesheet" href="./mycss/bootstrap-grid.css">      
-   
-  <title>Tagasaurus</title>
-  </head>
-  <body>    
-    
-      
-      <div class="main">
-        <div class="left">
-          <div class="leftupper">
-            EMOTIONS
-            <hr>
-            
-          </div>
-          <div class="leftlower">
-            RELATED MEMES
-            <hr>
-          </div>
-        </div>
-        <div class="center">
-          MEDIA CONTENT
-          <hr>
-          some text ABOVE!!!
+    <head>
+        <meta charset="UTF-8">
+        <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
 
-          <div class="imageDisplay">
-            
-              <a class="btn1" onclick="plusDivs(-1)">&#10094;</a>
-            
-              <img class="mySlides" src="./images/dog1.jpg">
-              <img class="mySlides" src="./images/dog2.jpg">
-              <img class="mySlides" src="./images/cat1.jpg">
-            
-             <a class="btn2" onclick="plusDivs(+1)">&#10095;</a>
-            
-          </div>
-          some text BELOW!!!
-          
-          <div class="container">
-            <div class="row">
-              <div class="col">
-                <a class="btn1BS" onclick="plusDivsBS(-1)">&#10094;</a>
-              </div>
-              <div class="col-10">
-                <img class="mySlidesBS" src="./images/dog1.jpg">
-                <img class="mySlidesBS" src="./images/dog2.jpg">
-                <img class="mySlidesBS" src="./images/cat1.jpg">
-              </div>
-              <div class="col">
-                <a class="btn2BS" onclick="plusDivsBS(+1)">&#10095;</a>
-              </div>
-            </div>            
-          </div>
+        <!-- bootstrap css -->
+        <link rel="stylesheet" href="./mycss/bootstrap.css">
+        <link rel="stylesheet" href="./mycss/bootstrap-grid.css">
 
-        </div>
-        <div class="right">
-          <div class="rightupper">
-            DESCRIPTION
-            <hr>
-            
-          </div>
+        <!-- custom css -->
+        <link rel="stylesheet" href="./mycss/mainlayout.css">
 
-          <div class="rightlower">
-            TAGS
-            <hr>
-          </div>
+        <title>Tagasaurus</title>
+    </head>
+    <body>
+
+
+        <div class="main">
+            <div class="left">
+                <div class="leftupper">
+                    EMOTIONS
+                    <hr>
+
+                </div>
+                <div class="leftlower">
+                    RELATED MEMES
+                    <hr>
+                </div>
+            </div>
+            <div class="center">
+                MEDIA CONTENT
+                <hr>
+                some text ABOVE!!!
+
+                <div id="topCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="./images/dog1.jpg" class="d-block w-100" alt="First dog">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="./images/dog2.jpg" class="d-block w-100" alt="Second dog">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="./images/cat1.jpg" class="d-block w-100" alt="First cat">
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#topCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#topCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+
+                some text BELOW!!!
+
+                <div id="bottomCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="./images/dog1.jpg" class="d-block w-100" alt="First dog">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="./images/dog2.jpg" class="d-block w-100" alt="Second dog">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="./images/cat1.jpg" class="d-block w-100" alt="First cat">
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#bottomCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#bottomCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+
+            </div>
+            <div class="right">
+                <div class="rightupper">
+                    DESCRIPTION
+                    <hr>
+
+                </div>
+
+                <div class="rightlower">
+                    TAGS
+                    <hr>
+                </div>
+            </div>
         </div>
-      </div>
-    
-    
-    <!-- You can also require other files to run in this process -->
-    <script src="./renderer.js"></script>
-    <script src="./myJS/slides.js"></script> 
-  
-  </body>
+
+
+        <!-- You can also require other files to run in this process -->
+        <script src="./renderer.js"></script>
+        <script src="./myJS/slides.js"></script>
+        <script src="./js/bootstrap.bundle.js"></script>
+
+    </body>
 </html>
