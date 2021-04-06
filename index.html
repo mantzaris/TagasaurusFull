@@ -33,7 +33,7 @@
                 <hr>
                 some text ABOVE!!!
 
-                <div id="topCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div id="topCarousel" class="carousel slide" data-bs-ride="false">
                     <div class="carousel-inner">
                         <div class="carousel-item active">
                             <img src="./images/dog1.jpg" class="d-block w-100" alt="First dog">
@@ -45,39 +45,17 @@
                             <img src="./images/cat1.jpg" class="d-block w-100" alt="First cat">
                         </div>
                     </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#topCarousel" data-bs-slide="prev">
+                    <button class="carousel-control-prev" type="button" data-bs-target="#topCarousel" onclick="plusDivsBS(-1)">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Previous</span>
                     </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#topCarousel" data-bs-slide="next">
+                    <button class="carousel-control-next" type="button" data-bs-target="#topCarousel" onclick="plusDivsBS(+1)">
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Next</span>
                     </button>
                 </div>
 
                 some text BELOW!!!
-
-                <div id="bottomCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <img src="./images/dog1.jpg" class="d-block w-100" alt="First dog">
-                        </div>
-                        <div class="carousel-item">
-                            <img src="./images/dog2.jpg" class="d-block w-100" alt="Second dog">
-                        </div>
-                        <div class="carousel-item">
-                            <img src="./images/cat1.jpg" class="d-block w-100" alt="First cat">
-                        </div>
-                    </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#bottomCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#bottomCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
-                </div>
 
             </div>
             <div class="right">
