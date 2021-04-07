@@ -12,6 +12,7 @@
         <link rel="stylesheet" href="./mycss/mainlayout.css">
 
         <title>Tagasaurus</title>
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
     </head>
     <body>
 
@@ -31,19 +32,14 @@
             <div class="center">
                 MEDIA CONTENT
                 <hr>
-                some text ABOVE!!!
+                image search goes here!!!
 
                 <div id="topCarousel" class="carousel slide" data-bs-ride="false">
                     <div class="carousel-inner">
                         <div class="carousel-item active">
-                            <img src="./images/dog1.jpg" class="d-block w-100" alt="First dog">
+                            <img src="./images/dog1.jpg" class="d-block w-100 img1" id="img1" alt="First dog">
                         </div>
-                        <div class="carousel-item">
-                            <img src="./images/dog2.jpg" class="d-block w-100" alt="Second dog">
-                        </div>
-                        <div class="carousel-item">
-                            <img src="./images/cat1.jpg" class="d-block w-100" alt="First cat">
-                        </div>
+                       
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#topCarousel" onclick="plusDivsBS(-1)">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -55,7 +51,7 @@
                     </button>
                 </div>
 
-                some text BELOW!!!
+                current tags and info
 
             </div>
             <div class="right">
@@ -76,7 +72,7 @@
         <!-- You can also require other files to run in this process -->
         <script src="./renderer.js"></script>
         <script src="./myJS/slides.js"></script>
-        <script src="./js/bootstrap.bundle.js"></script>
+        <!--<script src="./js/bootstrap.bundle.js"></script>-->
 
     </body>
 </html>

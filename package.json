@@ -1,23 +1,26 @@
 {
-  "name": "electron-quick-start",
-  "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "name": "Tagasaurus",
+  "version": "0.0.1",
+  "description": "Tag the Planet!",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
   "repository": "https://github.com/mantzaris/Tagasaurus",
   "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
+    "tagging",
+    "organizer",
+    "photos",
+    "comments",
+    "emoticons",
+    "hastags"
   ],
-  "author": "GitHub",
+  "author": "Alexander V. Mantzaris, Thomas G. Walker",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^10.4.2"
+    "electron": "^10.4.2",
+    "electron-reload": "^1.5.0",
+    "electron-reloader": "^1.2.0"
   },
   "dependencies": {
     "install": "^0.13.0"
