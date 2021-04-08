@@ -38,12 +38,12 @@ body {
   border: 2px solid blue;
 }
 .rightupper {
-  height: 50%;
+  height: 50vh;
   width: 100%;
   background-color: coral;
 }
 .rightlower {
-  height: 50%;
+  height: 50vh;
   width: 100%;
   background-color: cyan;
   border-top: 5px solid red;
