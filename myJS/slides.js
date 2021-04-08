@@ -19,8 +19,43 @@ function showDivsBS(n) {
 }
 
 function processTags() {
-    
+        
     user_description = document.getElementById('descriptionInput').value
-    console.log(user_description)
-    document.getElementById('tagArea').value = user_description;
+            
+    new_user_description = remove_stopwords(user_description)
+    
+    document.getElementById('taglist').innerHTML = ''
+    document.getElementById('taglist').appendChild(makeUL(new_user_description.split(' '))) 
+    
 }
+
+function makeUL(array) {
+    // Create the list element:
+    var list = document.createElement('ul');
+    for (var i = 0; i < array.length; i++) {
+        // Create the list item:
+        var item = document.createElement('li');
+        // Set its contents:
+        item.appendChild(document.createTextNode(array[i]));
+        // Add it to the list:
+        list.appendChild(item);
+    }
+    // Finally, return the constructed list:
+    return list;
+}
+
+
+var stopwords = ['i','me','my','myself','we','our','ours','ourselves','you','your','yours','yourself','yourselves','he','him','his','himself','she','her','hers','herself','it','its','itself','they','them','their','theirs','themselves','what','which','who','whom','this','that','these','those','am','is','are','was','were','be','been','being','have','has','had','having','do','does','did','doing','a','an','the','and','but','if','or','because','as','until','while','of','at','by','for','with','about','against','between','into','through','during','before','after','above','below','to','from','up','down','in','out','on','off','over','under','again','further','then','once','here','there','when','where','why','how','all','any','both','each','few','more','most','other','some','such','no','nor','not','only','own','same','so','than','too','very','s','t','can','will','just','don','should','now']
+//removes via regex the special characters, and removes the stop words
+function remove_stopwords(str) {
+    res = []
+    
+    words = str.split(/[\s,./: ]+/);
+    for(i=0;i<words.length;i++) {
+       word_clean = words[i].split(".").join("")
+       if(!stopwords.includes(word_clean)) {
+           res.push(word_clean)
+       }
+    }
+    return(res.join(' '))
+}  
