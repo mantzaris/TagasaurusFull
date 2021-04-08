@@ -17,3 +17,10 @@ function showDivsBS(n) {
     document.getElementById('img1').src = `./images/${files[slideIndexBS - 1]}`;
         
 }
+
+function processTags() {
+    
+    user_description = document.getElementById('descriptionInput').value
+    console.log(user_description)
+    document.getElementById('tagArea').value = user_description;
+}

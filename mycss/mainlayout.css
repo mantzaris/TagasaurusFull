@@ -40,11 +40,11 @@ body {
 .rightupper {
   height: 50vh;
   width: 100%;
-  background-color: coral;
+  background-color: rgb(190, 190, 190);
 }
 .rightlower {
   height: 50vh;
   width: 100%;
-  background-color: cyan;
-  border-top: 5px solid red;
+  background-color: rgb(190, 190, 190);
+  border-top: 5px solid blue;
 }
