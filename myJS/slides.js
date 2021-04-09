@@ -15,7 +15,9 @@ function showDivsBS(n) {
     if (n < 1) {slideIndexBS = files.length} ;
           
     document.getElementById('img1').src = `./images/${files[slideIndexBS - 1]}`;
-        
+    console.log(document.getElementById('happyRangeID').value)
+    console.log(document.getElementById('sadRangeID').value)
+    console.log(document.getElementById('confusedRangeID').value)
 }
 
 function processTags() {
