@@ -20,7 +20,7 @@
         <div class="main">
             <div class="left">
                 <div class="leftupper">
-                    EMOTIONS *
+                    EMOTIONS (*)
                     <hr>
                         <label for="customRange1" class="form-label">happy range</label>
                         <input type="range" class="form-range" id="happyRangeID">
@@ -36,13 +36,14 @@
                     RELATED MEMES
                     <hr>
 
-                    <div class="pic-container">
-                        <label class="check1">check meme
-                            <input type="checkbox" checked="checked">
+                    <div class="pic-container editable" id="memes" contenteditable="true">
+                        <label class="check1">link 
+                            <input type="checkbox" >
                             <span class="checkmark"></span>
                         </label>
                         <img height="50%" src="./images/fish1.jpg" />
-                        <label class="check2">check meme
+                        
+                        <!-- <label class="check2">check meme
                             <input type="checkbox" checked="checked">
                             <span class="checkmark"></span>
                         </label>
@@ -51,7 +52,7 @@
                             <input type="checkbox" checked="checked">
                             <span class="checkmark"></span>
                         </label>
-                        <img height="50%" src="./images/cat1.jpg" />
+                        <img height="50%" src="./images/cat1.jpg" /> -->
                     </div>
 
                 </div>
@@ -82,23 +83,20 @@
 
             </div>
             <div class="right">
-                <div class="rightupper">
-                    DESCRIPTION #
-                    <hr>
-                    <div class="form-group">
-                        
-                        <textarea class="form-control w-100" style="height: 30vh;" id="descriptionInput" rows="3"></textarea>
+                <div class="d-flex flex-column">
+                    DESCRIPTION (#)                    
+                    <div class="text form-group">                        
+                        <textarea class="form-control" id="descriptionInput" ></textarea>
                     </div>
                     <button class="btn btn-primary btn-sm btn-block" type="button" onclick="processTags()" >Process</button>
-
                 </div>
 
-                <div class="rightlower">
-                    TAGS
-                    <hr>                    
-                    <div id="taglist">
-                        ...
-                    </div>
+                <div class="d-flex flex-column flex-fill rightlower ">
+                    TAGS out                                                 
+                    <div  id="taglist" class="container fill editable " contenteditable="true">
+                        ....
+                    </div>         
+                    
                 </div>
             </div>
         </div>

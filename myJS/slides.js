@@ -22,8 +22,7 @@ function showDivsBS(n) {
 
 function processTags() {
         
-    user_description = document.getElementById('descriptionInput').value
-            
+    user_description = document.getElementById('descriptionInput').value            
     new_user_description = remove_stopwords(user_description)
     
     document.getElementById('taglist').innerHTML = ''
@@ -61,3 +60,28 @@ function remove_stopwords(str) {
     }
     return(res.join(' '))
 }  
+
+
+function meme_fill() {
+
+    document.getElementById('memes').innerHTML = ""
+    meme_box = document.getElementById('memes')    
+
+    for(ii=0;ii<files.length;ii++) {
+
+        console.log( `./images/${files[ii - 1]}` )
+        console.log( meme_box )
+
+        meme_box.insertAdjacentHTML('beforeend', `<label class="check1">link${ii+1} 
+                        <input type="checkbox">  <span class="checkmark"></span> </label>
+                        <img height="50%" width="50%" src="./images/${files[ii]}" /><br>  ` );     
+                
+    }
+    
+    console.log( document.getElementById('memes').innerHTML )
+
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    meme_fill();
+}, false);
