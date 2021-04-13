@@ -15,9 +15,11 @@ function showDivsBS(n) {
     if (n < 1) {slideIndexBS = files.length} ;
           
     document.getElementById('img1').src = `./images/${files[slideIndexBS - 1]}`;
+    
     console.log(document.getElementById('happyRangeID').value)
     console.log(document.getElementById('sadRangeID').value)
     console.log(document.getElementById('confusedRangeID').value)
+
 }
 
 function processTags() {
@@ -28,6 +30,13 @@ function processTags() {
     document.getElementById('taglist').innerHTML = ''
     document.getElementById('taglist').appendChild(makeUL(new_user_description.split(' '))) 
     
+    for (var ii = 0; ii < files.length; ii++) {
+        
+        console.log(document.getElementById(`memeSwitch${ii}`).checked)
+
+    }
+    
+
 }
 
 function makeUL(array) {
@@ -67,21 +76,16 @@ function meme_fill() {
     document.getElementById('memes').innerHTML = ""
     meme_box = document.getElementById('memes')    
 
-    for(ii=0;ii<files.length;ii++) {
+    for(ii=0;ii<files.length;ii++) {        
 
-        console.log( `./images/${files[ii - 1]}` )
-        console.log( meme_box )
-
-        meme_box.insertAdjacentHTML('beforeend', `<label class="check1">link${ii+1} 
-                        <input type="checkbox">  <span class="checkmark"></span> </label>
-                        <img height="50%" width="50%" src="./images/${files[ii]}" /><br>  ` );     
-                
+        meme_box.insertAdjacentHTML('beforeend', `<input class="form-check-input" type="checkbox" value="" id="memeSwitch${ii}">
+                <img height="50%" width="80%" src="./images/${files[ii]}" /><br>  ` ); 
+                   
     }
     
-    console.log( document.getElementById('memes').innerHTML )
-
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     meme_fill();
 }, false);
+
