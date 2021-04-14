@@ -13,9 +13,7 @@ meme_fill()
 //called by the SAVE button to produce a JSON of the picture description state
 function savePicState() {
 
-    console.log("in save state function")
-
-    //slider bar ranges stored in an array     
+    //slider bar ranges stored in an array
     emotion_value_array = [ document.getElementById('happyRangeID').value, document.getElementById('sadRangeID').value, document.getElementById('confusedRangeID').value ]
 
     //meme selection switch check boxes
@@ -28,7 +26,9 @@ function savePicState() {
     image_name = `${files[slideIndexBS - 1]}`
 
     image_state_JSON = { imageName: image_name, tags: processed_tag_word_list, emotionalValueVector: emotion_value_array, memeChoices: meme_switch_booleans }
-    console.log( JSON.stringify(image_state_JSON) )    
+    
+    imageJSON = { imageName: image_name, imageState: image_state_JSON }
+    console.log( JSON.stringify(imageJSON) )    
 
 }
 
