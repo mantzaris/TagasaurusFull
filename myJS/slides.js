@@ -4,22 +4,43 @@ const fs = require('fs');
 const dir = './images'
 const files = fs.readdirSync(dir)
 
+var processed_tag_word_list
+
+//init methods to run upon loading
 showDivsBS(slideIndexBS);
+meme_fill()
+
+//called by the SAVE button to produce a JSON of the picture description state
+function savePicState() {
+
+    console.log("in save state function")
+
+    //slider bar ranges stored in an array     
+    emotion_value_array = [ document.getElementById('happyRangeID').value, document.getElementById('sadRangeID').value, document.getElementById('confusedRangeID').value ]
+
+    //meme selection switch check boxes
+    meme_switch_booleans = []
+    for (var ii = 0; ii < files.length; ii++) {
+        meme_switch_booleans.push( document.getElementById(`memeSwitch${ii}`).checked )     
+    }    
+
+    //the picture file name in context
+    image_name = `${files[slideIndexBS - 1]}`
+
+    image_state_JSON = { imageName: image_name, tags: processed_tag_word_list, emotionalValueVector: emotion_value_array, memeChoices: meme_switch_booleans }
+    console.log( JSON.stringify(image_state_JSON) )    
+
+}
 
 function plusDivsBS(n) {
     showDivsBS(slideIndexBS += n);
 }
-
 function showDivsBS(n) {    
     if (n > files.length) {slideIndexBS = 1}
     if (n < 1) {slideIndexBS = files.length} ;
           
     document.getElementById('img1').src = `./images/${files[slideIndexBS - 1]}`;
-    
-    console.log(document.getElementById('happyRangeID').value)
-    console.log(document.getElementById('sadRangeID').value)
-    console.log(document.getElementById('confusedRangeID').value)
-
+        
 }
 
 function processTags() {
@@ -29,13 +50,10 @@ function processTags() {
     
     document.getElementById('taglist').innerHTML = ''
     document.getElementById('taglist').appendChild(makeUL(new_user_description.split(' '))) 
-    
-    for (var ii = 0; ii < files.length; ii++) {
-        
-        console.log(document.getElementById(`memeSwitch${ii}`).checked)
 
-    }
+    processed_tag_word_list = new_user_description.split(' ')
     
+    savePicState()
 
 }
 
@@ -55,7 +73,7 @@ function makeUL(array) {
 }
 
 
-var stopwords = ['i','me','my','myself','we','our','ours','ourselves','you','your','yours','yourself','yourselves','he','him','his','himself','she','her','hers','herself','it','its','itself','they','them','their','theirs','themselves','what','which','who','whom','this','that','these','those','am','is','are','was','were','be','been','being','have','has','had','having','do','does','did','doing','a','an','the','and','but','if','or','because','as','until','while','of','at','by','for','with','about','against','between','into','through','during','before','after','above','below','to','from','up','down','in','out','on','off','over','under','again','further','then','once','here','there','when','where','why','how','all','any','both','each','few','more','most','other','some','such','no','nor','not','only','own','same','so','than','too','very','s','t','can','will','just','don','should','now']
+var stopwords = [' ','i','me','my','myself','we','our','ours','ourselves','you','your','yours','yourself','yourselves','he','him','his','himself','she','her','hers','herself','it','its','itself','they','them','their','theirs','themselves','what','which','who','whom','this','that','these','those','am','is','are','was','were','be','been','being','have','has','had','having','do','does','did','doing','a','an','the','and','but','if','or','because','as','until','while','of','at','by','for','with','about','against','between','into','through','during','before','after','above','below','to','from','up','down','in','out','on','off','over','under','again','further','then','once','here','there','when','where','why','how','all','any','both','each','few','more','most','other','some','such','no','nor','not','only','own','same','so','than','too','very','s','t','can','will','just','don','should','now']
 //removes via regex the special characters, and removes the stop words
 function remove_stopwords(str) {
     res = []
@@ -85,7 +103,5 @@ function meme_fill() {
     
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    meme_fill();
-}, false);
+//document.addEventListener('DOMContentLoaded', function() { meme_fill();}, false);
 
