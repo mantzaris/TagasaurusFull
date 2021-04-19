@@ -4,11 +4,54 @@ const fs = require('fs');
 const dir = './images'
 const files = fs.readdirSync(dir)
 
+//////////
+const database = openDatabase('mydb', '1.0', 'Test DB', 2 * 1024 * 1024);
+
+function initDb() {
+    query('select * from TEST', () => {}, (a,b,c) => {
+    query('CREATE TABLE IF NOT EXISTS TEST(name ,json,memeChoices,tags)', function () {
+    console.log('Database created success')
+    })
+})}
+
+function query(sql, params, success, fail) {
+    if (objectType(params) === 'function') {
+        fail = success
+        success = params
+        params = []
+    }
+    if (objectType(sql) !== 'string') {
+        throw new Error('The type of parameter "sql" must be String')
+    }
+    if (objectType(params) !== 'array') {
+        params = [params]
+    }
+    if (objectType(success) !== 'function') {
+        success = (a,b) => {
+            console.log('sql success',a,b)
+        }
+    }
+    if (objectType(fail) !== 'function') {
+        fail = (a,b) => {
+            console.error('sql fail',a,b)
+        }
+    }
+    database.transaction(function (tx) {
+        tx.executeSql(sql, params, function (tx, results) {
+            success.call(tx, results)
+        }, fail);
+    });
+    
+}
+    
+function objectType(target) {
+   return Object.prototype.toString.call(target).replace(/\[object (.*)]/, '$1').toLowerCase()
+} 
+
+//var myMod = require('./myJS/myModule.js')
 var processed_tag_word_list
-
 var image_states_JSON = {}
-
-
+initDb() 
 //init methods to run upon loading
 showDivsBS(slideIndexBS);
 meme_fill()
@@ -26,16 +69,28 @@ function savePicState() {
     }
     //the picture file name in context
     image_name = `${files[slideIndexBS - 1]}`
-
     image_state_JSON = { imageName: image_name, tags: processed_tag_word_list, 
-                            emotionalValueVector: emotion_value_array, memeChoices: meme_switch_booleans }
-    
+                            emotionalValueVector: emotion_value_array, memeChoices: meme_switch_booleans }    
     imageJSON = { imageName: image_name, imageState: image_state_JSON }
-
     image_states_JSON[image_name] = image_state_JSON
+    console.log('------------------')
+    console.log( JSON.stringify(image_state_JSON) )  
+    console.log('------------------')    
 
-    console.log( JSON.stringify(image_states_JSON) )
+    const element = JSON.stringify(image_states_JSON);
+    //console.log(myMod.sayHello())    
+    //sqlite.exec("INSERT INTO test VALUES (?,?)", 
+      //              [`${files[slideIndexBS - 1]}`,`${element}`]);
+
+    console.log(`${files[slideIndexBS - 1]}`)
+    console.log(processed_tag_word_list)
+    
+    query('INSERT INTO test (name,json,memeChoices,tags) VALUES (?,?,?,?);',[image_name,'more json string','aa','bb'],(a,b,c)=>{
+        //debugger
+        }) 
+    
 }
+
 
 
 
