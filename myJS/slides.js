@@ -61,13 +61,9 @@ function plusDivsBS(n) {
 
     //set the emotional sliders values to the emotional vector values stored
     database.transaction(function (tx) {
-        console.log(`SELECT * FROM ${table_name} WHERE name="${files[slideIndexBS-1]}"`)
+        //console.log(`SELECT * FROM ${table_name} WHERE name="${files[slideIndexBS-1]}"`)
         tx.executeSql(`SELECT * FROM ${table_name} WHERE name="${files[slideIndexBS-1]}"`, [ ], function(tx, results) {
             select_res = results;  
-            console.log(select_res.rows[0])
-            console.log( JSON.parse(select_res.rows[0]["emotions"]).happy ) 
-            console.log( JSON.parse(select_res.rows[0]["emotions"]).sad ) 
-            console.log( JSON.parse(select_res.rows[0]["emotions"]).confused ) 
             document.getElementById('happy').value = JSON.parse(select_res.rows[0]["emotions"]).happy
             document.getElementById('sad').value = JSON.parse(select_res.rows[0]["emotions"]).sad
             document.getElementById('confused').value = JSON.parse(select_res.rows[0]["emotions"]).confused
@@ -83,7 +79,17 @@ function plusDivsBS(n) {
 }
 
 function showDivsBS(n) {
-    document.getElementById('img1').src = `./images/${files[slideIndexBS - 1]}`;
+
+    document.getElementById('img1').src = `./images/${files[n - 1]}`;
+    database.transaction(function (tx) {
+        //console.log(`SELECT * FROM ${table_name} WHERE name="${files[slideIndexBS-1]}"`)
+        tx.executeSql(`SELECT * FROM ${table_name} WHERE name="${files[n-1]}"`, [ ], function(tx, results) {
+            select_res = results;  
+            document.getElementById('happy').value = JSON.parse(select_res.rows[0]["emotions"]).happy
+            document.getElementById('sad').value = JSON.parse(select_res.rows[0]["emotions"]).sad
+            document.getElementById('confused').value = JSON.parse(select_res.rows[0]["emotions"]).confused
+        })
+    });
 }
 
 function processTags() {
