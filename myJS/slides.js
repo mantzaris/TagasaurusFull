@@ -28,6 +28,7 @@ function savePicState() {
         happy: document.getElementById('happy').value, sad: document.getElementById('sad').value,
         confused: document.getElementById('confused').value
     }
+    console.log(processed_tag_word_list)
     //meme selection switch check boxes
     meme_switch_booleans = {}
     for (var ii = 0; ii < files.length; ii++) {
@@ -49,12 +50,21 @@ function savePicState() {
             if (err.message.indexOf('UNIQUE constraint failed') !== -1) {
                 fns_DB.query(
                     `UPDATE ${table_name} SET emotions=?,memeChoices=?,tags=? WHERE name =?`,
-                    [emotion_value_array,meme_switch_booleans,processed_tag_word_list,image_name]
+                    [ JSON.stringify(emotion_value_array), JSON.stringify(meme_switch_booleans),
+                        JSON.stringify( Object.assign({}, processed_tag_word_list) ),image_name]
                     )
             }else{
                 console.log("insert failed")
             }
     })    
+
+    select_res = undefined
+    database.transaction(function (tx) {
+        tx.executeSql('SELECT * FROM table8', [ ], function(tx, results) {
+            console.log(results); select_res = results;
+        })
+    });
+
 
 }
 
