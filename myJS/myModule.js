@@ -1,16 +1,13 @@
-
-
 exports.dbOpen = function(db__name) {
   //database name, Version number, Text description, Size of database
   let database = openDatabase(db_name, '1.0', 'stores image descriptions', 2 * 1024 * 1024);
   return database
-
 }
 
-exports.initDb = function() {
-  query('select * from TEST', () => {
+exports.initDb = function(create_table_schema,table_name) {
+  query(`select * from ${table_name}`, () => {
   }, (a, b, c) => {
-      query('CREATE TABLE IF NOT EXISTS TEST(name unique,json,memeChoices,tags)', function () {
+      query(create_table_schema, function () {
           console.log('Database created success')
       })
   })
@@ -49,12 +46,9 @@ query = function(sql, params, success, fail) {
           fail.call(tx, err)
       });
   });
-
 }
 
 exports.query = query;
 
-exports.sayHello = function() {
-  return '123'
-}
+
 

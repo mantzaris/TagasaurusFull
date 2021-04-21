@@ -1,12 +1,15 @@
 {
-  "name": "Tagasaurus",
+  "name": "tagasaurus",
   "version": "0.0.1",
   "description": "Tag the Planet!",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
-  "repository": "https://github.com/mantzaris/Tagasaurus",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mantzaris/Tagasaurus.git"
+  },
   "keywords": [
     "tagging",
     "organizer",
@@ -23,6 +26,15 @@
     "electron-reloader": "^1.2.0"
   },
   "dependencies": {
-    "install": "^0.13.0"
-  }
+    "dexie": "^3.0.3",
+    "dexie-export-import": "^1.0.0",
+    "install": "^0.13.0",
+    "rxdb": "^9.17.0",
+    "rxjs": "^6.6.7",
+    "sql.js": "^1.5.0"
+  },
+  "bugs": {
+    "url": "https://github.com/mantzaris/Tagasaurus/issues"
+  },
+  "homepage": "https://github.com/mantzaris/Tagasaurus#readme"
 }
