@@ -5,9 +5,9 @@ const files = fs.readdirSync(dir)
 const ipcRenderer = require('electron').ipcRenderer
 
 const fns_DB = require('./myJS/myModule.js');
-table_name = 'table3'
-table_schema = '(name unique,json,memeChoices,tags)'
-table_col_names = '(name,json,memeChoices,tags)'
+table_name = 'table8'
+table_schema = '(name unique,emotions,memeChoices,tags)'
+table_col_names = '(name,emotions,memeChoices,tags)'
 create_table_schema = `CREATE TABLE IF NOT EXISTS ${table_name}${table_schema}`
 db_name = 'mydb'
 const database = fns_DB.dbOpen(db_name)
@@ -32,34 +32,30 @@ function savePicState() {
     meme_switch_booleans = {}
     for (var ii = 0; ii < files.length; ii++) {
         meme_boolean_tmp = document.getElementById(`${files[ii]}`).checked
-        meme_switch_booleans[`${files[ii]}`] = meme_boolean_tmp
+        if(meme_boolean_tmp == true){
+            meme_switch_booleans[`${files[ii]}`] = meme_boolean_tmp
+        }
     }
     //the picture file name in context
     image_name = `${files[slideIndexBS - 1]}`
 
-    image_state_JSON = {
-        imageName: image_name, tags: processed_tag_word_list,
-        emotionalValueVector: emotion_value_array, memeChoices: meme_switch_booleans
-    }
-    imageJSON = {imageName: image_name, imageState: image_state_JSON}
-    
     fns_DB.query(
-        `INSERT INTO ${table_name} ${table_col_names} VALUES (?,?,?,?);`,
-        [image_name, image_state_JSON, '', ''],
+        `INSERT INTO ${table_name} (name,emotions,memeChoices,tags) VALUES (?,?,?,?);`,
+        [image_name,emotion_value_array,meme_switch_booleans,JSON.stringify(processed_tag_word_list)],
         (a) => {
-            console.log('INSERT INTO success')
+            console.log('INSERT INTO: success')
         },
         (err) => {
-            //console.log(err)
             if (err.message.indexOf('UNIQUE constraint failed') !== -1) {
                 fns_DB.query(
-                    `update ${table_name} set json=?,memeChoices=?,tags=? where name =?`,
-                    [ JSON.stringify(image_state_JSON) ,'', '',image_name]
+                    `UPDATE ${table_name} SET emotions=?,memeChoices=?,tags=? WHERE name =?`,
+                    [emotion_value_array,meme_switch_booleans,processed_tag_word_list,image_name]
                     )
+            }else{
+                console.log("insert failed")
             }
-    })
-    //image_states_JSON[image_name] = image_state_JSON
-    //console.log(JSON.stringify(image_states_JSON))
+    })    
+
 }
 
 

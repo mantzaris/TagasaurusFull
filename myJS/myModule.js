@@ -5,7 +5,7 @@ exports.dbOpen = function(db__name) {
 }
 
 exports.initDb = function(create_table_schema,table_name) {
-  query(`select * from ${table_name}`, () => {
+  query(`SELECT * FROM ${table_name}`, () => {
   }, (a, b, c) => {
       query(create_table_schema, function () {
           console.log('Database created success')
