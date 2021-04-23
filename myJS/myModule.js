@@ -55,7 +55,7 @@ query = function(sql, params, success, fail) {
   }
   if (fns_DB.objectType(success) !== 'function') {
       success = (a, b) => {
-          console.log('sql success', a, b)
+          //console.log('sql success', a, b)
       }
   }
   if (fns_DB.objectType(fail) !== 'function') {
