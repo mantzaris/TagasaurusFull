@@ -5,12 +5,12 @@ const files = fs.readdirSync(dir)
 const ipcRenderer = require('electron').ipcRenderer
 
 const fns_DB = require('./myJS/myModule.js');
-table_name = 'table8'
-table_schema = '(name unique,emotions,memeChoices,tags)'
-table_col_names = '(name,emotions,memeChoices,tags)'
+table_name = 'table9'
+table_schema = '(name unique,emotions,memeChoices,tags,rawDescription)'
+table_col_names = '(name,emotions,memeChoices,tags,rawDescription)'
 create_table_schema = `CREATE TABLE IF NOT EXISTS ${table_name}${table_schema}`
-insert_into_statement = `INSERT INTO ${table_name} (name,emotions,memeChoices,tags) VALUES (?,?,?,?);`
-update_statement = `UPDATE ${table_name} SET emotions=?,memeChoices=?,tags=? WHERE name =?`
+insert_into_statement = `INSERT INTO ${table_name} (name,emotions,memeChoices,tags,rawDescription) VALUES (?,?,?,?,?);`
+update_statement = `UPDATE ${table_name} SET emotions=?,memeChoices=?,tags=?,rawDescription=? WHERE name =?`
 db_name = 'mydb'
 const database = fns_DB.dbOpen(db_name)
 
@@ -39,12 +39,13 @@ function savePicState() {
     }
     //the picture file name in context
     image_name = `${files[slideIndexBS - 1]}`
+    //raw user entered text (prior to processing)
+    rawDescription = document.getElementById('descriptionInput').value
 
     fns_DB.queryInsert(table_name, insert_into_statement, update_statement, 
-                image_name, emotion_value_array, meme_switch_booleans, processed_tag_word_list)
-
+                image_name, emotion_value_array, meme_switch_booleans, processed_tag_word_list,rawDescription)
     
-
+    
 }
 
 //called from the gallery widget
@@ -58,66 +59,86 @@ function plusDivsBS(n) {
     };
     document.getElementById('img1').src = `./images/${files[slideIndexBS - 1]}`;    
 
+    document.getElementById('descriptionInput').value = ""
+    document.getElementById('taglist').innerHTML = ''
+
     //set the emotional sliders values to the emotional vector values stored
     database.transaction(function (tx) {
         tx.executeSql(`SELECT * FROM ${table_name} WHERE name="${files[slideIndexBS-1]}"`, [ ], function(tx, results) {
             select_res = results;  
-            document.getElementById('happy').value = JSON.parse(select_res.rows[0]["emotions"]).happy
-            document.getElementById('sad').value = JSON.parse(select_res.rows[0]["emotions"]).sad
-            document.getElementById('confused').value = JSON.parse(select_res.rows[0]["emotions"]).confused
-                      
-            meme_json_parsed = JSON.parse(results.rows[0]["memeChoices"])
-            for (var ii = 0; ii < files.length; ii++) {
-                if(document.getElementById(`${files[ii]}`) != null) { 
-                    if( (`${files[ii]}` in meme_json_parsed) ){                        
-                        if( meme_json_parsed[`${files[ii]}`] == true ){                            
-                            document.getElementById(`${files[ii]}`).checked = true
+            if(select_res.rows.length > 0){
+                
+                document.getElementById('happy').value = JSON.parse(select_res.rows[0]["emotions"]).happy
+                document.getElementById('sad').value = JSON.parse(select_res.rows[0]["emotions"]).sad
+                document.getElementById('confused').value = JSON.parse(select_res.rows[0]["emotions"]).confused
+            
+                meme_json_parsed = JSON.parse(results.rows[0]["memeChoices"])
+                for (var ii = 0; ii < files.length; ii++) {
+                    if(document.getElementById(`${files[ii]}`) != null) { 
+                        if( (`${files[ii]}` in meme_json_parsed) ){                        
+                            if( meme_json_parsed[`${files[ii]}`] == true ){                            
+                                document.getElementById(`${files[ii]}`).checked = true
+                            } else{
+                                document.getElementById(`${files[ii]}`).checked = false
+                            }
                         } else{
                             document.getElementById(`${files[ii]}`).checked = false
                         }
-                    } else{
-                        document.getElementById(`${files[ii]}`).checked = false
                     }
                 }
+            } else {
+                document.getElementById('happy').value = 0
+                document.getElementById('sad').value = 0
+                document.getElementById('confused').value = 0
             }
-        
         })
     });
 
-
 }
+
 
 function showDivsBS(n) {
 
     document.getElementById('img1').src = `./images/${files[n - 1]}`;
+
+    document.getElementById('descriptionInput').value = ""
+    document.getElementById('taglist').innerHTML = ''
+    
     database.transaction(function (tx) {
         //console.log(`SELECT * FROM ${table_name} WHERE name="${files[slideIndexBS-1]}"`)
         tx.executeSql(`SELECT * FROM ${table_name} WHERE name="${files[n-1]}"`, [ ], function(tx, results) {
             select_res = results;  
-            document.getElementById('happy').value = JSON.parse(select_res.rows[0]["emotions"]).happy
-            document.getElementById('sad').value = JSON.parse(select_res.rows[0]["emotions"]).sad
-            document.getElementById('confused').value = JSON.parse(select_res.rows[0]["emotions"]).confused
+            if(select_res.rows.length > 0){
+                
+                document.getElementById('happy').value = JSON.parse(select_res.rows[0]["emotions"]).happy
+                document.getElementById('sad').value = JSON.parse(select_res.rows[0]["emotions"]).sad
+                document.getElementById('confused').value = JSON.parse(select_res.rows[0]["emotions"]).confused
 
-            meme_json_parsed = JSON.parse(results.rows[0]["memeChoices"])
-            for (var ii = 0; ii < files.length; ii++) {
-                if(document.getElementById(`${files[ii]}`) != null) { 
-                    if( (`${files[ii]}` in meme_json_parsed) ){                        
-                        if( meme_json_parsed[`${files[ii]}`] == true ){                            
-                            document.getElementById(`${files[ii]}`).checked = true
+                meme_json_parsed = JSON.parse(results.rows[0]["memeChoices"])            
+                for (var ii = 0; ii < files.length; ii++) {
+                    if(document.getElementById(`${files[ii]}`) != null) { 
+                        if( (`${files[ii]}` in meme_json_parsed) ){                        
+                            if( meme_json_parsed[`${files[ii]}`] == true ){                            
+                                document.getElementById(`${files[ii]}`).checked = true
+                            } else{
+                                document.getElementById(`${files[ii]}`).checked = false
+                            }
                         } else{
                             document.getElementById(`${files[ii]}`).checked = false
                         }
-                    } else{
-                        document.getElementById(`${files[ii]}`).checked = false
                     }
                 }
+            } else {
+                document.getElementById('happy').value = 0
+                document.getElementById('sad').value = 0
+                document.getElementById('confused').value = 0
             }
-            
         })
     });
 }
 
 function processTags() {
+
     user_description = document.getElementById('descriptionInput').value
     new_user_description = remove_stopwords(user_description)
 

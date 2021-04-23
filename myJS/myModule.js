@@ -19,11 +19,11 @@ exports.objectType = function(target) {
   return Object.prototype.toString.call(target).replace(/\[object (.*)]/, '$1').toLowerCase()
 }
 
-exports.queryInsert = function(table_name,insert_into_statement,update_statement,image_name,emotion_value_array,meme_switch_booleans,processed_tag_word_list){
+exports.queryInsert = function(table_name,insert_into_statement,update_statement,image_name,emotion_value_array,meme_switch_booleans,processed_tag_word_list,rawDescription){
         
     query(
         insert_into_statement,
-        [image_name,emotion_value_array,meme_switch_booleans,JSON.stringify(processed_tag_word_list)],
+        [image_name,emotion_value_array,meme_switch_booleans,JSON.stringify(processed_tag_word_list),rawDescription],
         (a) => {
             console.log('INSERT INTO: success')
         },
@@ -32,7 +32,7 @@ exports.queryInsert = function(table_name,insert_into_statement,update_statement
                 query(
                     update_statement,
                     [ JSON.stringify(emotion_value_array), JSON.stringify(meme_switch_booleans),
-                        JSON.stringify( Object.assign({}, processed_tag_word_list) ),image_name]
+                        JSON.stringify( Object.assign({}, processed_tag_word_list) ),rawDescription,image_name]
                     )
             }else{
                 console.log("insert failed")
