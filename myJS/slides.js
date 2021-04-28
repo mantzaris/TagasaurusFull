@@ -56,12 +56,12 @@ function plusDivsBS(n) {
     if (slideIndexBS < 1) {
         slideIndexBS = files.length
     };
-    document.getElementById('img1').src = `./images/${files[slideIndexBS - 1]}`;    
+    document.getElementById('img1').src = `./images/${files[slideIndexBS - 1]}`;
 
     document.getElementById('descriptionInput').value = ""
     document.getElementById('taglist').innerHTML = ''
 
-    loadStateOfImage() 
+    loadStateOfImage()
 
 }
 
@@ -88,6 +88,9 @@ function loadStateOfImage() {
                 document.getElementById('happy').value = JSON.parse(select_res.rows[0]["emotions"]).happy
                 document.getElementById('sad').value = JSON.parse(select_res.rows[0]["emotions"]).sad
                 document.getElementById('confused').value = JSON.parse(select_res.rows[0]["emotions"]).confused
+                
+                document.getElementById('taglist').appendChild(makeUL(Object.values( JSON.parse(select_res.rows[0]["tags"]) )))                
+                document.getElementById('descriptionInput').value = select_res.rows[0]["rawDescription"]
             
                 meme_json_parsed = JSON.parse(results.rows[0]["memeChoices"])
                 for (var ii = 0; ii < files.length; ii++) {
