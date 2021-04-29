@@ -19,7 +19,7 @@ var slideIndexBS = 1;
 
 //init methods to run upon loading
 firstDisplayInit(slideIndexBS);
-meme_fill()
+//meme_fill()
 fns_DB.initDb(create_table_schema,table_name)
 
 //called by the SAVE button to produce a JSON of the picture description state
@@ -66,15 +66,61 @@ function plusDivsBS(n) {
 }
 
 //called upon app loading
-function firstDisplayInit(n) {
+async function firstDisplayInit(n) {
 
     document.getElementById('img1').src = `./images/${files[n - 1]}`;
 
     document.getElementById('descriptionInput').value = ""
     document.getElementById('taglist').innerHTML = ''
     
+    document.getElementById('happy').value = false
+    document.getElementById('sad').value = false
+    document.getElementById('confused').value = false
+
+    meme_fill()
+
+    var current_file_list = []
+    //current_file_list =  getStoredFileNames(current_file_list)
+    await getStoredFileNames(current_file_list).then()
+    //console.log(current_file_list)
+    checkAndHandleNewImages(current_file_list)
+    
     loadStateOfImage() 
 
+}
+
+function getStoredFileNames(current_file_list){    
+    
+    return new Promise( function(resolve, reject) {
+        database.transaction( function (tx) {
+            tx.executeSql(`SELECT name FROM "${table_name}"`, [ ],  function(tx, select_res) {                         
+                if(select_res.rows.length > 0){                
+                    for( ii = 0; ii < select_res.rows.length; ii++){
+                        current_file_list[ii] = select_res.rows[ii]["name"]
+                    }
+                }            
+                resolve(current_file_list)
+            })
+        });
+    })    
+}
+
+function checkAndHandleNewImages(current_file_list) {    
+    var emotion_value_array_tmp = { happy: 0, sad: 0, confused: 0 }
+    var meme_switch_booleans_tmp = {}
+    rawDescription_tmp = ""
+    processed_tag_word_list_tmp = ""
+    for( ii = 0; ii < files.length; ii++){        
+        bool_new_file_name = current_file_list.some( name_tmp => name_tmp === `${files[ii]}` )
+        if( bool_new_file_name == false ) {
+            //the picture file name in context
+            image_name_tmp = `${files[ii]}`
+            fns_DB.queryInsert(table_name, insert_into_statement, update_statement, 
+                        image_name_tmp, JSON.stringify(emotion_value_array_tmp), 
+                        JSON.stringify(meme_switch_booleans_tmp), 
+                        processed_tag_word_list_tmp,rawDescription_tmp)            
+        }
+    }    
 }
 
 //set the emotional sliders values to the emotional vector values stored
@@ -83,8 +129,7 @@ function loadStateOfImage() {
     database.transaction(function (tx) {
         tx.executeSql(`SELECT * FROM ${table_name} WHERE name="${files[slideIndexBS-1]}"`, [ ], function(tx, results) {
             select_res = results;  
-            if(select_res.rows.length > 0){
-                
+            if(select_res.rows.length > 0){                
                 document.getElementById('happy').value = JSON.parse(select_res.rows[0]["emotions"]).happy
                 document.getElementById('sad').value = JSON.parse(select_res.rows[0]["emotions"]).sad
                 document.getElementById('confused').value = JSON.parse(select_res.rows[0]["emotions"]).confused
@@ -110,6 +155,7 @@ function loadStateOfImage() {
                 document.getElementById('happy').value = 0
                 document.getElementById('sad').value = 0
                 document.getElementById('confused').value = 0
+                
             }
         })
     });
