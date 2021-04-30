@@ -1,5 +1,6 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+//'ipcMain' and 'dialog' are introduced to open the dialog window in slides.js
+const {app, ipcMain, dialog, BrowserWindow} = require('electron')
 const path = require('path')
 
 function createWindow () {
@@ -19,6 +20,12 @@ function createWindow () {
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
 }
+
+//for the ability to load a dialog window in slides.js
+ipcMain.handle('dialog:open', async (_, args) => {
+  const result = dialog.showOpenDialog({ properties: ['openFile' ] })
+  return result
+})
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

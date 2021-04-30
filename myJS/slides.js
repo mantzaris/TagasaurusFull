@@ -1,6 +1,8 @@
 const fs = require('fs');
 const dir = './images'
-const files = fs.readdirSync(dir)
+var files = fs.readdirSync(dir)
+const path = require('path');
+
 
 const ipcRenderer = require('electron').ipcRenderer
 
@@ -43,7 +45,7 @@ function savePicState() {
     rawDescription = document.getElementById('descriptionInput').value
 
     fns_DB.queryInsert(table_name, insert_into_statement, update_statement, 
-                image_name, emotion_value_array, meme_switch_booleans, processed_tag_word_list,rawDescription)
+                image_name, emotion_value_array, meme_switch_booleans, processed_tag_word_list, rawDescription)
         
 }
 
@@ -87,7 +89,39 @@ async function firstDisplayInit(n) {
     
     loadStateOfImage() 
 
+    //dialog window explorer to select new images to import
+    document.getElementById('loadImage').addEventListener('click',async ()=> loadNewImage() )
 }
+
+async function loadNewImage() {
+    //async () => {
+    const result = await ipcRenderer.invoke('dialog:open')
+    console.log(result)
+    //console.log('number of files selected=',result.filePaths.length)
+    //console.log(result.filePaths[0])
+    filename = path.parse(result.filePaths[0]).base;
+    fs.copyFile(result.filePaths[0], `./images/${filename}`, async (err) => {
+        if (err) {
+            console.log("Error Found in file copy:", err);
+        } else {
+            console.log(`File Contents of copied_file: ${result.filePaths[0]}`)
+            files = fs.readdirSync(dir)
+            var current_file_list = []
+            //current_file_list =  getStoredFileNames(current_file_list)
+            await getStoredFileNames(current_file_list).then()
+            //console.log(current_file_list)
+            checkAndHandleNewImages(current_file_list)
+            
+            refreshFileList()
+            meme_fill()
+        }
+    });
+}
+
+function refreshFileList() {
+    files = fs.readdirSync(dir)
+}
+
 
 function getStoredFileNames(current_file_list){    
     
@@ -106,19 +140,23 @@ function getStoredFileNames(current_file_list){
 }
 
 function checkAndHandleNewImages(current_file_list) {    
+    
     var emotion_value_array_tmp = { happy: 0, sad: 0, confused: 0 }
     var meme_switch_booleans_tmp = {}
     rawDescription_tmp = ""
     processed_tag_word_list_tmp = ""
     for( ii = 0; ii < files.length; ii++){        
         bool_new_file_name = current_file_list.some( name_tmp => name_tmp === `${files[ii]}` )
+        
         if( bool_new_file_name == false ) {
+            
             //the picture file name in context
             image_name_tmp = `${files[ii]}`
             fns_DB.queryInsert(table_name, insert_into_statement, update_statement, 
                         image_name_tmp, JSON.stringify(emotion_value_array_tmp), 
                         JSON.stringify(meme_switch_booleans_tmp), 
-                        processed_tag_word_list_tmp,rawDescription_tmp)            
+                        processed_tag_word_list_tmp,rawDescription_tmp)      
+            
         }
     }    
 }
