@@ -19,46 +19,36 @@
 
         <div class="main">
             <div class="left">
-                <div class="leftupper">
-                    EMOTIONS (*)
-                    <hr>
-                        <label for="customRange1" class="form-label">happy range</label>
-                        <input type="range" class="form-range" id="happy">
-                        
-                        <label for="customRange1" class="form-label">sad range</label>
-                        <input type="range" class="form-range" id="sad">
-
-                        <label for="customRange1" class="form-label">confused range</label>
-                        <input type="range" class="form-range" id="confused">
-
+                <div class="leftupper">                    
+                    <label id="emotion-box-title" class="form-label">EMOTIONS (*)</label>
+                    <hr>    
+                    <label for="customRange1" class="form-label">happy range</label>
+                    <input type="range" class="form-range" id="happy">                        
+                    <label for="customRange1" class="form-label">sad range</label>
+                    <input type="range" class="form-range" id="sad">
+                    <label for="customRange1" class="form-label">confused range</label>
+                    <input type="range" class="form-range" id="confused">
                 </div>
-                <div class="leftlower">
-                    RELATED MEMES
-                    <hr>
-
-                    <div class="pic-container editable form-check form-switch" id="memes" contenteditable="true">
+                <div class="leftlower">                    
+                    <label id="meme-box-title" class="form-label">Related Memes * &rarr;</label>
+                    <div class="meme-container editable form-check form-switch" id="memes" contenteditable="true">
                         <label class="check1">link 
                             <input type="checkbox" >
                             <span class="checkmark"></span>
                         </label>
-                        <img height="50%" src="./images/fish1.jpg" />
-                        
-                        
+                        <img height="50%" src="./images/fish1.jpg" />                         
                     </div>
-
                 </div>
             </div>
             <div class="center">
                 <button class="btn btn-primary btn-sm btn-block" id="loadImage" type="button" onclick="processTags()">Load new image</button>
-                <hr>
                 image search goes here!
-
+                <hr>                
                 <div id="topCarousel" class="carousel slide" data-bs-ride="false">
                     <div class="carousel-inner">
                         <div class="carousel-item active">
                             <img src="./images/dog1.jpg" class="d-block w-100 img1" id="img1" alt="First dog">
-                        </div>
-                       
+                        </div>                       
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#topCarousel" onclick="plusDivsBS(-1)">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -69,22 +59,19 @@
                         <span class="visually-hidden">Next</span>
                     </button>
                 </div>
-
-                current tags and info
-
             </div>
             <div class="right">
-                <div class="d-flex flex-column">
-                    DESCRIPTION (#)                    
-                    <div class="text form-group">                        
-                        <textarea class="form-control" id="descriptionInput" ></textarea>
+                <div class="rightupper">
+                    DESCRIPTION         
+                    <div class="text form-group textarea1">                        
+                        <textarea class="form-control textarea1" id="descriptionInput" ></textarea>
+                        <button class="btn btn-primary btn-sm btn-block" type="button" onclick="processTags()">SAVE</button>
                     </div>
-                    <button class="btn btn-primary btn-sm btn-block" type="button" onclick="processTags()" >SAVE</button>
+                    
                     
                 </div>
-
-                <div class="d-flex flex-column flex-fill rightlower ">
-                    TAGS out                                                 
+                <div class="rightlower">
+                    <label id="tags-box-title" class="form-label">TAGS out (#)</label>
                     <div  id="taglist" class="container fill editable " contenteditable="true">
                         ....
                     </div>         
