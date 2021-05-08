@@ -46,7 +46,10 @@ function savePicState() {
 
     fns_DB.queryInsert(table_name, insert_into_statement, update_statement, 
                 image_name, emotion_value_array, meme_switch_booleans, processed_tag_word_list, rawDescription)
-        
+
+    //vNotify.success({text: 'text', title:'title'});
+    //vanilla_notify.vNotify.success({text: 'Saved', title:'titleTEST'});
+
 }
 
 //called from the gallery widget

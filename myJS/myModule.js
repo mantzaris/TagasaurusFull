@@ -1,4 +1,7 @@
-const { exportDB } = require("dexie-export-import");
+
+//notification code from: https://github.com/MLaritz/Vanilla-Notify
+const vanilla_notify = require('./vanilla-notify.js');
+
 
 exports.dbOpen = function(db__name) {
   //database name, Version number, Text description, Size of database
@@ -26,6 +29,7 @@ exports.queryInsert = function(table_name,insert_into_statement,update_statement
         [image_name,emotion_value_array,meme_switch_booleans,JSON.stringify(processed_tag_word_list),rawDescription],
         (a) => {
             console.log('INSERT INTO: success')
+            vanilla_notify.vNotify.success({visibleDuration: 1200,fadeOutDuration: 250,fadeInDuration: 250, text: 'Stored your perspective!', title:'Saved'});
         },
         (err) => {
             if (err.message.indexOf('UNIQUE constraint failed') !== -1) {
@@ -34,6 +38,7 @@ exports.queryInsert = function(table_name,insert_into_statement,update_statement
                     [ JSON.stringify(emotion_value_array), JSON.stringify(meme_switch_booleans),
                         JSON.stringify( Object.assign({}, processed_tag_word_list) ),rawDescription,image_name]
                     )
+                    vanilla_notify.vNotify.success({visibleDuration: 1200,fadeOutDuration: 250,fadeInDuration: 250, text: 'Stored your perspective!', title:'Saved'});
             }else{
                 console.log("insert failed")
             }
@@ -65,7 +70,7 @@ query = function(sql, params, success, fail) {
   }
   database.transaction(function (tx) {
       tx.executeSql(sql, params, function (tx, results) {
-          success.call(tx, results)
+          success.call(tx, results)          
       }, function (tx, err) {
           fail.call(tx, err)
       });
