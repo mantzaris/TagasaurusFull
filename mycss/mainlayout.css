@@ -1,3 +1,6 @@
+/* css for the notifications */
+@import "./vanilla-notify.css";
+
 html,
 body {
   height: 100%;

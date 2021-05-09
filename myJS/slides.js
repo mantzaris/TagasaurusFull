@@ -3,12 +3,13 @@ const dir = './images'
 var files = fs.readdirSync(dir)
 const path = require('path');
 
-
 const ipcRenderer = require('electron').ipcRenderer
 
+//module for the processing of the description
 const description_process_module = require('./myJS/descriptionProcessing.js');
 
-const fns_DB = require('./myJS/myModule.js');
+//module functions for DB connectivity
+const fns_DB = require('./myJS/myDBmodule.js');
 table_name = 'table9'
 table_schema = '(name unique,emotions,memeChoices,tags,rawDescription)'
 table_col_names = '(name,emotions,memeChoices,tags,rawDescription)'
@@ -218,14 +219,14 @@ function processTags() {
     savePicState()
 }
 
-function makeUL(array) {
+function makeUL(tag_array) {
     // Create the list element:
     var list = document.createElement('ul');
-    for (var i = 0; i < array.length; i++) {
+    for (var i = 0; i < tag_array.length; i++) {
         // Create the list item:
         var item = document.createElement('li');
         // Set its contents:
-        item.appendChild(document.createTextNode(array[i]));
+        item.appendChild(document.createTextNode(tag_array[i]));
         // Add it to the list:
         list.appendChild(item);
     }
@@ -233,7 +234,7 @@ function makeUL(array) {
     return list;
 }
 
-
+//populate the meme switch view with images
 function meme_fill() {
     document.getElementById('memes').innerHTML = ""
     meme_box = document.getElementById('memes')
