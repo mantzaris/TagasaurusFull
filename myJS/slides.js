@@ -3,6 +3,10 @@ const dir = './images'
 var files = fs.readdirSync(dir)
 const path = require('path');
 
+//notification code from: https://github.com/MLaritz/Vanilla-Notify
+const vanilla_notify = require('./myJS/vanilla-notify.js');
+
+
 const ipcRenderer = require('electron').ipcRenderer
 
 //module for the processing of the description
@@ -100,28 +104,23 @@ async function firstDisplayInit(n) {
 }
 
 async function loadNewImage() {
-    //async () => {
     const result = await ipcRenderer.invoke('dialog:open')
-    console.log(result)
-    //console.log('number of files selected=',result.filePaths.length)
-    //console.log(result.filePaths[0])
-    filename = path.parse(result.filePaths[0]).base;
-    fs.copyFile(result.filePaths[0], `./images/${filename}`, async (err) => {
-        if (err) {
-            console.log("Error Found in file copy:", err);
-        } else {
-            console.log(`File Contents of copied_file: ${result.filePaths[0]}`)
-            files = fs.readdirSync(dir)
-            var current_file_list = []
-            //current_file_list =  getStoredFileNames(current_file_list)
-            await getStoredFileNames(current_file_list).then()
-            //console.log(current_file_list)
-            checkAndHandleNewImages(current_file_list)
-            
-            refreshFileList()
-            meme_fill()
-        }
-    });
+    if(result.canceled == false) {        
+        filename = path.parse(result.filePaths[0]).base;    
+        fs.copyFile(result.filePaths[0], `./images/${filename}`, async (err) => {
+            if (err) {
+                console.log("Error Found in file copy:", err);
+            } else {
+                console.log(`File Contents of copied_file: ${result.filePaths[0]}`)
+                files = fs.readdirSync(dir)
+                var current_file_list = []
+                await getStoredFileNames(current_file_list).then()
+                checkAndHandleNewImages(current_file_list)                
+                refreshFileList()
+                meme_fill()
+            }
+        });
+    }
 }
 
 function refreshFileList() {
@@ -246,6 +245,64 @@ function meme_fill() {
     }
 }
 
+//delete image from user choice
+function Delete_Image() {    
+    //try to delete the file (image)
+    try {
+        fs.unlinkSync( `./images/${files[slideIndexBS - 1]}` );
+        console.log(`File is deleted: ${files[slideIndexBS - 1]}`);
+    } catch (error) {
+        console.log(error);
+        console.log(`File was not deleted: ${files[slideIndexBS - 1]}`);
+    }
 
-//document.addEventListener('DOMContentLoaded', function() { meme_fill();}, false);
+    refreshFileList()
+    meme_fill()
+    //shift the image view to the next image
+    plusDivsBS( 1 ) 
 
+    //delete unecessary entries that don't connect to current files
+    Delete_DB_Unreferenced_Entries() 
+
+}
+
+//delete DB entries which are have no current image ref
+function Delete_DB_Unreferenced_Entries() {
+    //console.log( "in fn Delete_DB_Unreferenced_Entries" );
+    refreshFileList()
+    //console.log( files )
+    var all_db_filenames = ''
+    all_db_filenames_promise = new Promise( function(resolve, reject) {
+        database.transaction(function (tx) {
+            tx.executeSql(`SELECT name FROM "${table_name}"`, [ ], function(tx, results) {
+                //console.log("in SELECT results")
+                row_entries = Object.values(results.rows)                
+                db_filenames = row_entries.map(function(x){
+                    return x.name;
+                })                
+                resolve(db_filenames)
+            })
+        });
+    })
+
+    all_db_filenames_promise.then( function(result){        
+        all_db_filenames = result        
+        for(ii=0; ii<all_db_filenames.length; ii++){
+            //console.log(`file to check ; ${all_db_filenames[ii]}`)
+            in_or_not_bool = files.some(file_tmp => file_tmp == all_db_filenames[ii])
+            if(in_or_not_bool == false){
+                Delete_File_From_DB(all_db_filenames[ii])                
+            }
+        }
+    })
+    vanilla_notify.vNotify.success({visibleDuration: 1200,fadeOutDuration: 250,fadeInDuration: 250, text: 'Files deleted from database', title:'Deleted'});
+    return all_db_filenames
+}
+
+function Delete_File_From_DB(file_name){
+    database.transaction( function (tx) {
+        tx.executeSql(`DELETE FROM "${table_name}" WHERE name="${file_name}"`, [ ], function(tx, results) {
+            //
+        })
+    })
+}
