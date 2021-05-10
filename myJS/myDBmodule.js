@@ -22,6 +22,11 @@ exports.objectType = function(target) {
   return Object.prototype.toString.call(target).replace(/\[object (.*)]/, '$1').toLowerCase()
 }
 
+//update for the memes to reference current files
+exports.memeUpdate = function(update_statement,meme_switch_booleans,image_name){
+    query( update_statement, [ JSON.stringify(meme_switch_booleans), image_name] )
+}
+
 exports.queryInsert = function(table_name,insert_into_statement,update_statement,image_name,emotion_value_array,meme_switch_booleans,processed_tag_word_list,rawDescription){
         
     query(

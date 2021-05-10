@@ -157,7 +157,7 @@ function checkAndHandleNewImages(current_file_list) {
             
             //the picture file name in context
             image_name_tmp = `${files[ii]}`
-            fns_DB.queryInsert(table_name, insert_into_statement, update_statement, 
+            fns_DB.queryInsert(table_name, insert_into_statement, update_statement,
                         image_name_tmp, JSON.stringify(emotion_value_array_tmp), 
                         JSON.stringify(meme_switch_booleans_tmp), 
                         processed_tag_word_list_tmp,rawDescription_tmp)      
@@ -264,6 +264,9 @@ function Delete_Image() {
     //delete unecessary entries that don't connect to current files
     Delete_DB_Unreferenced_Entries() 
 
+    //delete the meme references which do not reference files currently accessible
+    Delete_Void_MemeChoices()
+
 }
 
 //delete DB entries which are have no current image ref
@@ -299,6 +302,7 @@ function Delete_DB_Unreferenced_Entries() {
     return all_db_filenames
 }
 
+
 function Delete_File_From_DB(file_name){
     database.transaction( function (tx) {
         tx.executeSql(`DELETE FROM "${table_name}" WHERE name="${file_name}"`, [ ], function(tx, results) {
@@ -306,3 +310,38 @@ function Delete_File_From_DB(file_name){
         })
     })
 }
+
+//get the name and memeChoices for each file to then update the entry with an altered memeChoice set 
+function Delete_Void_MemeChoices(){
+    //console.log('getting ready to get rid of the meme references which no longer are valid')
+    database.transaction( function (tx) {
+        tx.executeSql(`SELECT name,memeChoices FROM "${table_name}"`, [ ], function(tx, results) {
+            //console.log(results)
+            Void_MemeChoices_Helper(results.rows)
+        })
+    })
+}
+
+//get the names and memes and examine if they need updating
+function Void_MemeChoices_Helper(name_memes){
+
+    update_statement_memeChoices = `UPDATE ${table_name} SET memeChoices=? WHERE name =?`
+
+    for(ii=0; ii<name_memes.length; ii++){
+        parsed_memeChoices = JSON.parse(name_memes[ii].memeChoices)        
+        changed_memes = false
+        for (name_key in parsed_memeChoices) {
+            in_or_not_bool = files.some(file_tmp => file_tmp == name_key)
+            if(in_or_not_bool == false){
+                delete parsed_memeChoices[name_key] 
+                changed_memes = true
+            }        
+        }
+        if(changed_memes == true){
+            fns_DB.memeUpdate(update_statement_memeChoices, parsed_memeChoices, name_memes[ii].name)
+        }    
+    }
+
+}
+
+
