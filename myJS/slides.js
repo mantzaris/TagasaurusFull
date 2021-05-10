@@ -133,15 +133,15 @@ function getStoredFileNames(current_file_list){
     return new Promise( function(resolve, reject) {
         database.transaction( function (tx) {
             tx.executeSql(`SELECT name FROM "${table_name}"`, [ ],  function(tx, select_res) {                         
-                if(select_res.rows.length > 0){                
+                if(select_res.rows.length > 0){
                     for( ii = 0; ii < select_res.rows.length; ii++){
                         current_file_list[ii] = select_res.rows[ii]["name"]
                     }
-                }            
+                }
                 resolve(current_file_list)
             })
         });
-    })    
+    })
 }
 
 function checkAndHandleNewImages(current_file_list) {    
@@ -150,7 +150,7 @@ function checkAndHandleNewImages(current_file_list) {
     var meme_switch_booleans_tmp = {}
     rawDescription_tmp = ""
     processed_tag_word_list_tmp = ""
-    for( ii = 0; ii < files.length; ii++){        
+    for( ii = 0; ii < files.length; ii++){
         bool_new_file_name = current_file_list.some( name_tmp => name_tmp === `${files[ii]}` )
         
         if( bool_new_file_name == false ) {
@@ -171,8 +171,8 @@ function loadStateOfImage() {
     
     database.transaction(function (tx) {
         tx.executeSql(`SELECT * FROM ${table_name} WHERE name="${files[slideIndexBS-1]}"`, [ ], function(tx, results) {
-            select_res = results;  
-            if(select_res.rows.length > 0){                
+            select_res = results;
+            if(select_res.rows.length > 0){
                 document.getElementById('happy').value = JSON.parse(select_res.rows[0]["emotions"]).happy
                 document.getElementById('sad').value = JSON.parse(select_res.rows[0]["emotions"]).sad
                 document.getElementById('confused').value = JSON.parse(select_res.rows[0]["emotions"]).confused
@@ -345,3 +345,17 @@ function Void_MemeChoices_Helper(name_memes){
 }
 
 
+//function to reset annotations to default
+function ResetImage(){
+
+    document.getElementById('happy').value = 0
+    document.getElementById('sad').value = 0
+    document.getElementById('confused').value = 0
+
+    document.getElementById('descriptionInput').value = ""
+
+    for (var ii = 0; ii < files.length; ii++) {
+        document.getElementById(`${files[ii]}`).checked = false    
+    }    
+
+}
