@@ -2,6 +2,8 @@ const fs = require('fs');
 const dir = './images'
 var files = fs.readdirSync(dir)
 const path = require('path');
+const fse = require('fs-extra');
+
 
 //notification code from: https://github.com/MLaritz/Vanilla-Notify
 const vanilla_notify = require('./myJS/vanilla-notify.js');
@@ -362,49 +364,42 @@ function ResetImage(){
 
 //functionality for the export of all the information
 function Export_All(){
-
-    
-
     const save_promise = ipcRenderer.invoke('dialog:save')
     save_promise.then(function(path_chosen){ 
         //get ready to export data
-        if(path_chosen.canceled == false){            
-            
-
+        if(path_chosen.canceled == false){
             if (!fs.existsSync(path_chosen.filePath)){
-                fs.mkdirSync(path_chosen.filePath);
-                
+                fs.mkdirSync(path_chosen.filePath);                
                 //call the DB to get the data dump and pass it to the 
                 database.transaction( function (tx) {
                     tx.executeSql(`SELECT * FROM "${table_name}"`, [ ], function(tx, results) {
-                        console.log( JSON.stringify(results.rows) )
-
-                        Write_Export_Data(path_chosen.filePath,JSON.stringify(results.rows))
+                        //console.log( JSON.stringify(results.rows) )
+                        Write_Export_Data(path_chosen.filePath,results.rows)
                     })
-                })
-                
+                })                
             } else {
                 vanilla_notify.vNotify.error({visibleDuration: 1200,fadeOutDuration: 250,fadeInDuration: 250, text: 'File or Folder already exists', title:'Canceled'});
             }
-
         } else{
             vanilla_notify.vNotify.notify({visibleDuration: 1200,fadeOutDuration: 250,fadeInDuration: 250, text: 'No destination and folder name given', title:'Canceled'});
         }
-    })    
+    })
 }
 
-function Write_Export_Data(file_path,db_rows_stringified){
+//put the annotation data to disk for the user's chosen folder
+function Write_Export_Data(file_path,db_rows){
 
-    console.log(file_path)
+    //write the json data out to the folder        
+    file_name_data = '/TagasaurusAnnotations.json'
+    fs.writeFileSync( file_path+file_name_data, JSON.stringify(db_rows) );
     
-
-    file_name_data = '/annotations.csv'
-    fs.writeFileSync(file_path+file_name_data, 'Hey there!');
-    
-
-
-    console.log("finished writing the file txt")
-
+    //now copy the files as well to a new 'images' directory
+    fs.mkdirSync( file_path+'/images');
+    fse.copy( './images', file_path+'/images', err => {
+        if (err){ return console.error(err) }
+        else { console.log('folder copy success!') }
+    })    
+    console.log("finished writing the annotations json file and copying images folder")
 
 }
 
