@@ -27,6 +27,13 @@ ipcMain.handle('dialog:open', async (_, args) => {
   return result
 })
 
+//for the ability to save a data export
+ipcMain.handle('dialog:save', async (_, args) => {
+  const result = dialog.showSaveDialog({ title: "Enter Folder Name to Create"})
+  return result
+})
+
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.

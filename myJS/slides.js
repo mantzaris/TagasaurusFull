@@ -359,3 +359,54 @@ function ResetImage(){
     }    
 
 }
+
+//functionality for the export of all the information
+function Export_All(){
+
+    
+
+    const save_promise = ipcRenderer.invoke('dialog:save')
+    save_promise.then(function(path_chosen){ 
+        //get ready to export data
+        if(path_chosen.canceled == false){            
+            
+
+            if (!fs.existsSync(path_chosen.filePath)){
+                fs.mkdirSync(path_chosen.filePath);
+                
+                //call the DB to get the data dump and pass it to the 
+                database.transaction( function (tx) {
+                    tx.executeSql(`SELECT * FROM "${table_name}"`, [ ], function(tx, results) {
+                        console.log( JSON.stringify(results.rows) )
+
+                        Write_Export_Data(path_chosen.filePath,JSON.stringify(results.rows))
+                    })
+                })
+                
+            } else {
+                vanilla_notify.vNotify.error({visibleDuration: 1200,fadeOutDuration: 250,fadeInDuration: 250, text: 'File or Folder already exists', title:'Canceled'});
+            }
+
+        } else{
+            vanilla_notify.vNotify.notify({visibleDuration: 1200,fadeOutDuration: 250,fadeInDuration: 250, text: 'No destination and folder name given', title:'Canceled'});
+        }
+    })    
+}
+
+function Write_Export_Data(file_path,db_rows_stringified){
+
+    console.log(file_path)
+    
+
+    file_name_data = '/annotations.csv'
+    fs.writeFileSync(file_path+file_name_data, 'Hey there!');
+    
+
+
+    console.log("finished writing the file txt")
+
+
+}
+
+
+
