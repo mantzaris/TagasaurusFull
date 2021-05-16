@@ -11,6 +11,9 @@ const vanilla_notify = require('./myJS/vanilla-notify.js');
 
 const ipcRenderer = require('electron').ipcRenderer
 
+//module for the main annotation view alterations-directly affects the DOM
+const view_annotate_module = require('./myJS/view-annotate-module.js');
+
 //module for the processing of the description
 const description_process_module = require('./myJS/descriptionProcessing.js');
 
@@ -72,8 +75,8 @@ function plusDivsBS(n) {
     };
     document.getElementById('img1').src = `./images/${files[slideIndexBS - 1]}`;
 
-    document.getElementById('descriptionInput').value = ""
-    document.getElementById('taglist').innerHTML = ''
+    text_val_obj = {descriptionInput:'', taglist:''}
+    view_annotate_module.Annotation_DOM_Alter(emotion_val_obj)
 
     loadStateOfImage()
 
@@ -83,13 +86,9 @@ function plusDivsBS(n) {
 async function firstDisplayInit(n) {
 
     document.getElementById('img1').src = `./images/${files[n - 1]}`;
-
-    document.getElementById('descriptionInput').value = ""
-    document.getElementById('taglist').innerHTML = ''
     
-    document.getElementById('happy').value = false
-    document.getElementById('sad').value = false
-    document.getElementById('confused').value = false
+    emotion_val_obj = {happy:0, sad:0, confused:0,descriptionInput:'', taglist:''}
+    view_annotate_module.Annotation_DOM_Alter(emotion_val_obj)
 
     meme_fill()
 
@@ -175,13 +174,17 @@ function loadStateOfImage() {
         tx.executeSql(`SELECT * FROM ${table_name} WHERE name="${files[slideIndexBS-1]}"`, [ ], function(tx, results) {
             select_res = results;
             if(select_res.rows.length > 0){
-                document.getElementById('happy').value = JSON.parse(select_res.rows[0]["emotions"]).happy
-                document.getElementById('sad').value = JSON.parse(select_res.rows[0]["emotions"]).sad
-                document.getElementById('confused').value = JSON.parse(select_res.rows[0]["emotions"]).confused
-                
-                document.getElementById('taglist').appendChild(makeUL(Object.values( JSON.parse(select_res.rows[0]["tags"]) )))                
-                document.getElementById('descriptionInput').value = select_res.rows[0]["rawDescription"]
+                                
+                happy_val = JSON.parse(select_res.rows[0]["emotions"]).happy
+                sad_val = JSON.parse(select_res.rows[0]["emotions"]).sad
+                confused_val = JSON.parse(select_res.rows[0]["emotions"]).confused
+                tags_list = JSON.parse(select_res.rows[0]["tags"])
+                rawDescription_tmp = select_res.rows[0]["rawDescription"]
+                val_obj = {happy: happy_val, sad: sad_val, confused: confused_val,
+                                descriptionInput: rawDescription_tmp, taglist: tags_list}
+                view_annotate_module.Annotation_DOM_Alter(val_obj)
             
+
                 meme_json_parsed = JSON.parse(results.rows[0]["memeChoices"])
                 for (var ii = 0; ii < files.length; ii++) {
                     if(document.getElementById(`${files[ii]}`) != null) { 
@@ -196,11 +199,9 @@ function loadStateOfImage() {
                         }
                     }
                 }
-            } else {
-                document.getElementById('happy').value = 0
-                document.getElementById('sad').value = 0
-                document.getElementById('confused').value = 0
-                
+            } else {                
+                emotion_val_obj = {happy: 0, sad: 0, confused: 0}
+                view_annotate_module.Annotation_DOM_Alter(emotion_val_obj)                
             }
         })
     });
@@ -212,8 +213,9 @@ function processTags() {
     user_description = document.getElementById('descriptionInput').value
     new_user_description = description_process_module.process_description(user_description)
 
-    document.getElementById('taglist').innerHTML = ''
-    document.getElementById('taglist').appendChild(makeUL(new_user_description.split(' ')))
+    tags_split = new_user_description.split(' ')
+    val_obj = {taglist:tags_split}
+    view_annotate_module.Annotation_DOM_Alter(val_obj)  
 
     processed_tag_word_list = new_user_description.split(' ')
 
@@ -350,11 +352,8 @@ function Void_MemeChoices_Helper(name_memes){
 //function to reset annotations to default
 function ResetImage(){
 
-    document.getElementById('happy').value = 0
-    document.getElementById('sad').value = 0
-    document.getElementById('confused').value = 0
-
-    document.getElementById('descriptionInput').value = ""
+    emotion_val_obj = {happy: 0, sad: 0, confused: 0, descriptionInput:'', taglist:''}
+    view_annotate_module.Annotation_DOM_Alter(emotion_val_obj)
 
     for (var ii = 0; ii < files.length; ii++) {
         document.getElementById(`${files[ii]}`).checked = false    
@@ -389,7 +388,7 @@ function Export_All(){
 //put the annotation data to disk for the user's chosen folder
 function Write_Export_Data(file_path,db_rows){
 
-    //write the json data out to the folder        
+    //write the json data out to the folder
     file_name_data = '/TagasaurusAnnotations.json'
     fs.writeFileSync( file_path+file_name_data, JSON.stringify(db_rows) );
     
@@ -398,7 +397,7 @@ function Write_Export_Data(file_path,db_rows){
     fse.copy( './images', file_path+'/images', err => {
         if (err){ return console.error(err) }
         else { console.log('folder copy success!') }
-    })    
+    })
     console.log("finished writing the annotations json file and copying images folder")
 
 }
