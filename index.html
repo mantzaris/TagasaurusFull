@@ -36,12 +36,12 @@
                             <input type="checkbox" >
                             <span class="checkmark"></span>
                         </label>
-                        <img height="50%" src="./images/fish1.jpg" />                         
+                        <img height="50%" src="" />                         
                     </div>
                 </div>
             </div>
             <div class="center">
-                <button class="btn btn-primary btn-sm btn-block" id="loadImage" type="button">Load new image</button>                
+                <button class="btn btn-primary btn-sm btn-block" id="loadImage" type="button" onclick="loadNewImage()">Load new image</button>                
                 <button class="btn btn-primary btn-sm btn-block" id="deleteImage" type="button" onclick="Delete_Image()">Delete image</button>
                 <button class="btn btn-primary btn-sm btn-block" id="deleteImage" type="button" onclick="Export_All()">Export All</button>
                 <br>
@@ -51,7 +51,7 @@
                 <div id="topCarousel" class="carousel slide" data-bs-ride="false">
                     <div class="carousel-inner">
                         <div class="carousel-item active">
-                            <img src="" class="d-block w-100 img1" id="img1" alt="First dog">
+                            <img src="" class="d-block w-100 imgMain" id="imgMain" alt="main image">
                         </div>                       
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#topCarousel" onclick="plusDivsBS(-1)">

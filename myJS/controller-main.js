@@ -19,6 +19,7 @@ const description_process_module = require('./myJS/descriptionProcessing.js');
 
 //module functions for DB connectivity
 const fns_DB = require('./myJS/myDBmodule.js');
+//const { Annotation_DOM_Alter } = require('./view-annotate-module.js');
 table_name = 'table9'
 table_schema = '(name unique,emotions,memeChoices,tags,rawDescription)'
 table_col_names = '(name,emotions,memeChoices,tags,rawDescription)'
@@ -33,7 +34,7 @@ var slideIndexBS = 1;
 
 //init methods to run upon loading
 firstDisplayInit(slideIndexBS);
-//meme_fill()
+//obj()
 fns_DB.initDb(create_table_schema,table_name)
 
 //called by the SAVE button to produce a JSON of the picture description state
@@ -73,24 +74,19 @@ function plusDivsBS(n) {
     if (slideIndexBS < 1) {
         slideIndexBS = files.length
     };
-    document.getElementById('img1').src = `./images/${files[slideIndexBS - 1]}`;
-
-    text_val_obj = {descriptionInput:'', taglist:''}
-    view_annotate_module.Annotation_DOM_Alter(emotion_val_obj)
+    
+    val_obj = {descriptionInput:'', taglist:'', imgMain:files[slideIndexBS - 1]}
+    view_annotate_module.Annotation_DOM_Alter(val_obj)
 
     loadStateOfImage()
 
 }
 
 //called upon app loading
-async function firstDisplayInit(n) {
-
-    document.getElementById('img1').src = `./images/${files[n - 1]}`;
-    
-    emotion_val_obj = {happy:0, sad:0, confused:0,descriptionInput:'', taglist:''}
+async function firstDisplayInit(n) {        
+    emotion_val_obj = {happy:0, sad:0, confused:0,descriptionInput:'', taglist:'', imgMain:files[n - 1]}
     view_annotate_module.Annotation_DOM_Alter(emotion_val_obj)
-
-    meme_fill()
+    view_annotate_module.meme_fill(files)
 
     var current_file_list = []
     //current_file_list =  getStoredFileNames(current_file_list)
@@ -100,14 +96,13 @@ async function firstDisplayInit(n) {
     
     loadStateOfImage() 
 
-    //dialog window explorer to select new images to import
-    document.getElementById('loadImage').addEventListener('click',async ()=> loadNewImage() )
 }
 
+//dialog window explorer to select new images to import
 async function loadNewImage() {
     const result = await ipcRenderer.invoke('dialog:open')
     if(result.canceled == false) {        
-        filename = path.parse(result.filePaths[0]).base;    
+        filename = path.parse(result.filePaths[0]).base;
         fs.copyFile(result.filePaths[0], `./images/${filename}`, async (err) => {
             if (err) {
                 console.log("Error Found in file copy:", err);
@@ -118,7 +113,7 @@ async function loadNewImage() {
                 await getStoredFileNames(current_file_list).then()
                 checkAndHandleNewImages(current_file_list)                
                 refreshFileList()
-                meme_fill()
+                view_annotate_module.meme_fill(files)
             }
         });
     }
@@ -145,7 +140,7 @@ function getStoredFileNames(current_file_list){
     })
 }
 
-function checkAndHandleNewImages(current_file_list) {    
+function checkAndHandleNewImages(current_file_list) {
     
     var emotion_value_array_tmp = { happy: 0, sad: 0, confused: 0 }
     var meme_switch_booleans_tmp = {}
@@ -182,23 +177,22 @@ function loadStateOfImage() {
                 rawDescription_tmp = select_res.rows[0]["rawDescription"]
                 val_obj = {happy: happy_val, sad: sad_val, confused: confused_val,
                                 descriptionInput: rawDescription_tmp, taglist: tags_list}
-                view_annotate_module.Annotation_DOM_Alter(val_obj)
-            
-
+                
                 meme_json_parsed = JSON.parse(results.rows[0]["memeChoices"])
                 for (var ii = 0; ii < files.length; ii++) {
                     if(document.getElementById(`${files[ii]}`) != null) { 
                         if( (`${files[ii]}` in meme_json_parsed) ){                        
-                            if( meme_json_parsed[`${files[ii]}`] == true ){                            
-                                document.getElementById(`${files[ii]}`).checked = true
+                            if( meme_json_parsed[`${files[ii]}`] == true ){                                                            
+                                val_obj[`${files[ii]}`] = true
                             } else{
-                                document.getElementById(`${files[ii]}`).checked = false
+                                val_obj[`${files[ii]}`] = false
                             }
                         } else{
-                            document.getElementById(`${files[ii]}`).checked = false
+                            val_obj[`${files[ii]}`] = false
                         }
                     }
                 }
+                view_annotate_module.Annotation_DOM_Alter(val_obj)
             } else {                
                 emotion_val_obj = {happy: 0, sad: 0, confused: 0}
                 view_annotate_module.Annotation_DOM_Alter(emotion_val_obj)                
@@ -222,33 +216,6 @@ function processTags() {
     savePicState()
 }
 
-function makeUL(tag_array) {
-    // Create the list element:
-    var list = document.createElement('ul');
-    for (var i = 0; i < tag_array.length; i++) {
-        // Create the list item:
-        var item = document.createElement('li');
-        // Set its contents:
-        item.appendChild(document.createTextNode(tag_array[i]));
-        // Add it to the list:
-        list.appendChild(item);
-    }
-    // Finally, return the constructed list:
-    return list;
-}
-
-//populate the meme switch view with images
-function meme_fill() {
-    document.getElementById('memes').innerHTML = ""
-    meme_box = document.getElementById('memes')
-
-    for (ii = 0; ii < files.length; ii++) {
-
-        meme_box.insertAdjacentHTML('beforeend', `<input class="form-check-input" type="checkbox" value="" id="${files[ii]}">
-                <img height="50%" width="80%" src="./images/${files[ii]}" /><br>  `);
-    }
-}
-
 //delete image from user choice
 function Delete_Image() {    
     //try to delete the file (image)
@@ -261,7 +228,7 @@ function Delete_Image() {
     }
 
     refreshFileList()
-    meme_fill()
+    view_annotate_module.meme_fill(files)
     //shift the image view to the next image
     plusDivsBS( 1 ) 
 
@@ -348,17 +315,13 @@ function Void_MemeChoices_Helper(name_memes){
 
 }
 
-
 //function to reset annotations to default
 function ResetImage(){
-
-    emotion_val_obj = {happy: 0, sad: 0, confused: 0, descriptionInput:'', taglist:''}
-    view_annotate_module.Annotation_DOM_Alter(emotion_val_obj)
-
-    for (var ii = 0; ii < files.length; ii++) {
-        document.getElementById(`${files[ii]}`).checked = false    
+    val_obj = {happy: 0, sad: 0, confused: 0, descriptionInput:'', taglist:''}
+    for (var ii = 0; ii < files.length; ii++) {        
+        val_obj[`${files[ii]}`] = false
     }    
-
+    view_annotate_module.Annotation_DOM_Alter(val_obj)
 }
 
 //functionality for the export of all the information
