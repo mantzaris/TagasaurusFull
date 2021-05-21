@@ -47,10 +47,10 @@ exports.Get_Stored_File_Names = function(current_file_list){
 }
 
 //get the annotation data for an image
-exports.Return_All_DB_Data = function(file_name){
+exports.Return_All_DB_Data = function(){
     return new Promise(function(resolve,reject){
         database.transaction(function (tx) {
-            tx.executeSql(`SELECT * FROM ${table_name}"`, [ ], function(tx, result) {
+            tx.executeSql(`SELECT * FROM "${table_name}"`, [ ], function(tx, result) {
                 resolve(result)
             })
         });

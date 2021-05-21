@@ -18,7 +18,7 @@ const delete_helper = require('./myJS/delete-helper.js')
 //module for the processing of the description
 const description_process_module = require('./myJS/descriptionProcessing.js');
 //module functions for DB connectivity 
-const fns_DB = require('./myJS/myDBmodule.js');
+const fns_DB = require('./myJS/db-access-module.js');
 //const { Annotation_DOM_Alter } = require('./view-annotate-module.js');
 table_name = 'table9'
 table_schema = '(name unique,emotions,memeChoices,tags,rawDescription)'
