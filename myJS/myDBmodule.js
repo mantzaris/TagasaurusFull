@@ -18,9 +18,7 @@ exports.initDb = function(create_table_schema,table_name) {
   })
 }
 
-exports.objectType = function(target) {
-  return Object.prototype.toString.call(target).replace(/\[object (.*)]/, '$1').toLowerCase()
-}
+
 
 //update for the memes to reference current files
 exports.memeUpdate = function(update_statement,meme_switch_booleans,image_name){
@@ -51,24 +49,30 @@ exports.queryInsert = function(table_name,insert_into_statement,update_statement
 }
 
 
+
+objectType = function(target) {
+    return Object.prototype.toString.call(target).replace(/\[object (.*)]/, '$1').toLowerCase()
+}
+
+//runs many queries, mostly the INSER and UPDATE QUERIES
 query = function(sql, params, success, fail) {
-  if (fns_DB.objectType(params) === 'function') {
+  if (objectType(params) === 'function') {
       fail = success
       success = params
       params = []
   }
-  if (fns_DB.objectType(sql) !== 'string') {
+  if (objectType(sql) !== 'string') {
       throw new Error('The type of parameter "sql" must be String')
   }
-  if (fns_DB.objectType(params) === 'string') {
+  if (objectType(params) === 'string') {
       params = [params]
   }
-  if (fns_DB.objectType(success) !== 'function') {
+  if (objectType(success) !== 'function') {
       success = (a, b) => {
           //console.log('sql success', a, b)
       }
   }
-  if (fns_DB.objectType(fail) !== 'function') {
+  if (objectType(fail) !== 'function') {
       fail = (a, b) => {
           console.error('sql fail', a, b)
       }
