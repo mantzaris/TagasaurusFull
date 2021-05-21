@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+
+        <!-- bootstrap css -->
+        <link rel="stylesheet" href="./mycss/bootstrap.css">
+        <link rel="stylesheet" href="./mycss/bootstrap-grid.css">
+
+        <!-- custom css -->
+        <link rel="stylesheet" href="./mycss/welcome-screen.css">        
+
+        <style>
+            body, html {
+            height: 100%;
+            }
+
+            .bg {
+            /* The image used */
+            background-image: url("Reef.jpg");
+
+            /* Full height */
+            height: 100%;
+
+            /* Center and scale the image nicely */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            }
+        </style>
+        <title>Tagasaurus</title>
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+    </head>
+    <body>
+        <div class="bg">
+        <div class="tagBtn">
+            <img width="50%" height="30%" src="Taga.png" alt="Italian Trulli">
+        </div>
+        
+        <div class="tagBtn">
+            <a style="font-size:70px; color:red;" href="index.html">Start Tagging!</a>
+        </div>
+
+    </div>
+
+    </body>
+</html>

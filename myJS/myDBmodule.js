@@ -9,12 +9,23 @@ exports.DB_Open = function(db__name) {
   return database
 }
 
-exports.Init_Db = function(create_table_schema,table_name) {
+exports.Init_DB = function(create_table_schema,table_name) {
     Query(`SELECT * FROM ${table_name}`, () => {
     }, (a, b, c) => {
         Query(create_table_schema, function () {
             console.log('Database created success')
         })
+    })
+}
+
+//get the annotation data for an image
+exports.Return_Image_Annotations_From_DB = function(file_name){
+    return new Promise(function(resolve,reject){
+        database.transaction(function (tx) {
+            tx.executeSql(`SELECT * FROM ${table_name} WHERE name="${file_name}"`, [ ], function(tx, result) {
+                resolve(result)
+            })
+        });
     })
 }
 
@@ -34,6 +45,10 @@ exports.Get_Stored_File_Names = function(current_file_list){
         });
     })
 }
+
+
+
+
 
 //update for the memes to reference current files
 exports.Meme_Update = function(update_statement,meme_switch_booleans,image_name){

@@ -44,8 +44,9 @@
                 <button class="btn btn-primary btn-sm btn-block" id="loadImage" type="button" onclick="loadNewImage()">Load new image</button>                
                 <button class="btn btn-primary btn-sm btn-block" id="deleteImage" type="button" onclick="Delete_Image()">Delete image</button>
                 <button class="btn btn-primary btn-sm btn-block" id="deleteImage" type="button" onclick="Export_All()">Export All</button>
+                <a href="welcome-screen.html" class="btn btn-info" role="button">Return to Main</a>
                 <br>
-                <button class="btn btn-primary btn-sm btn-block" id="searchImages" type="button"">image search BTN PLACE_HOLDER!</button>
+                <button class="btn btn-primary btn-sm btn-block" id="searchImages" type="button">image search BTN PLACE_HOLDER!</button>
                 
                 <hr>                
                 <div id="topCarousel" class="carousel slide" data-bs-ride="false">
@@ -54,11 +55,11 @@
                             <img src="" class="d-block w-100 imgMain" id="imgMain" alt="main image">
                         </div>                       
                     </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#topCarousel" onclick="plusDivsBS(-1)">
+                    <button class="carousel-control-prev" type="button" data-bs-target="#topCarousel" onclick="New_Image_Display(-1)">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Previous</span>
                     </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#topCarousel" onclick="plusDivsBS(+1)">
+                    <button class="carousel-control-next" type="button" data-bs-target="#topCarousel" onclick="New_Image_Display(+1)">
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Next</span>
                     </button>
@@ -69,8 +70,8 @@
                     DESCRIPTION         
                     <div class="text form-group textarea1">                        
                         <textarea class="form-control textarea1" id="descriptionInput" ></textarea>
-                        <button class="btn btn-primary btn-sm btn-block" type="button" onclick="processTags()">SAVE</button>
-                        <button class="btn btn-primary btn-sm btn-block" type="button" onclick="ResetImage()">Reset Image</button>
+                        <button class="btn btn-primary btn-sm btn-block" type="button" onclick="Process_Image()">SAVE</button>
+                        <button class="btn btn-primary btn-sm btn-block" type="button" onclick="Reset_Image()">Reset Image</button>
                     </div>
                     
                     
