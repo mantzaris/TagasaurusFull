@@ -1,6 +1,6 @@
 
 //notification code from: https://github.com/MLaritz/Vanilla-Notify
-const vanilla_notify = require('./vanilla-notify.js');
+//const vanilla_notify = require('./vanilla-notify.js');
 
 
 exports.DB_Open = function(db__name) {
@@ -46,9 +46,16 @@ exports.Get_Stored_File_Names = function(current_file_list){
     })
 }
 
-
-
-
+//get the annotation data for an image
+exports.Return_All_DB_Data = function(file_name){
+    return new Promise(function(resolve,reject){
+        database.transaction(function (tx) {
+            tx.executeSql(`SELECT * FROM ${table_name}"`, [ ], function(tx, result) {
+                resolve(result)
+            })
+        });
+    })
+}
 
 //update for the memes to reference current files
 exports.Meme_Update = function(update_statement,meme_switch_booleans,image_name){

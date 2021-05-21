@@ -26,9 +26,13 @@
     "electron-reloader": "^1.2.0"
   },
   "dependencies": {
+    "dexie": "^3.0.3",
     "fs-extra": "^10.0.0",
+    "indexeddb-js": "0.0.14",
     "install": "^0.13.0",
-    "sql.js": "^1.5.0"
+    "rxdb": "^9.20.0",
+    "sql.js": "^1.5.0",
+    "sqlite3": "^5.0.2"
   },
   "bugs": {
     "url": "https://github.com/mantzaris/Tagasaurus/issues"

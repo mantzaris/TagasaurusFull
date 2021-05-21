@@ -1,0 +1,79 @@
+/* css for the notifications */
+@import "./vanilla-notify.css";
+
+html,
+body {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  background-color: rgb(190, 190, 190);
+}
+.main {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  border: 2px solid green;
+}
+
+.left {
+  height: 100%;
+  flex: 2;
+  border: 2px solid green;
+}
+.leftupper {
+  height: 50%;
+  padding: 2px 2px 2px 2px;
+}
+#emotion-box-title {
+  height: 5%;
+  padding-left: 2px;
+}
+.leftlower {
+  height: 50%;
+  border-top: 2px solid green;
+}
+#meme-box-title {
+  white-space: nowrap;
+  height: 4%;
+  padding-left: 2px;
+}
+.meme-container {
+  height: 92%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  margin-bottom: 0px;
+}
+
+.center {
+  height: 100%;
+  flex: 7;
+  border: 2px solid green;
+  overflow-y: scroll;
+}
+
+.right {
+  height: 100%;
+  border: 2px solid green;
+  flex: 2;
+}
+.rightupper {
+  height: 50%;
+  padding: 2px 2px 2px 2px;
+}
+.textarea1 {
+  height: 90%;
+}
+#tags-box-title {
+  height: 4%;
+  padding-left: 2px;
+}
+.rightlower {
+  height: 45%;
+  border-top: 2px solid green;
+}
+/*max-height: 35vh; */
+#taglist {
+  overflow-y: auto;
+  max-height: 100%;
+  display: block;
+}
