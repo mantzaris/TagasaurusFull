@@ -93,7 +93,7 @@ function Void_MemeChoices_Helper(name_memes){
             }        
         }
         if(changed_memes == true){
-            fns_DB.memeUpdate(update_statement_memeChoices, parsed_memeChoices, name_memes[ii].name)
+            fns_DB.Meme_Update(update_statement_memeChoices, parsed_memeChoices, name_memes[ii].name)
         }    
     }
 

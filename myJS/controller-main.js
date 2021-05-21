@@ -33,7 +33,7 @@ create_table_schema = `CREATE TABLE IF NOT EXISTS ${table_name}${table_schema}`
 insert_into_statement = `INSERT INTO ${table_name} (name,emotions,memeChoices,tags,rawDescription) VALUES (?,?,?,?,?);`
 update_statement = `UPDATE ${table_name} SET emotions=?,memeChoices=?,tags=?,rawDescription=? WHERE name =?`
 db_name = 'mydb'
-const database = fns_DB.dbOpen(db_name)
+const database = fns_DB.DB_Open(db_name)
 
 var processed_tag_word_list
 var slideIndexBS = 1;
@@ -41,7 +41,7 @@ var slideIndexBS = 1;
 //init methods to run upon loading
 firstDisplayInit(slideIndexBS);
 //obj()
-fns_DB.initDb(create_table_schema,table_name)
+fns_DB.Init_Db(create_table_schema,table_name)
 
 //called by the SAVE button to produce a JSON of the picture description state
 function savePicState() {
@@ -63,7 +63,7 @@ function savePicState() {
     //raw user entered text (prior to processing)
     rawDescription = document.getElementById('descriptionInput').value
 
-    fns_DB.queryInsert(table_name, insert_into_statement, update_statement, 
+    fns_DB.Query_Insert(table_name, insert_into_statement, update_statement, 
                 image_name, emotion_value_array, meme_switch_booleans, processed_tag_word_list, rawDescription)
 
     //vNotify.success({text: 'text', title:'title'});
@@ -94,14 +94,12 @@ async function firstDisplayInit(n) {
     view_annotate_module.Annotation_DOM_Alter(emotion_val_obj)
     view_annotate_module.Meme_View_Fill(files)
 
-    var current_file_list = []
-    //current_file_list =  getStoredFileNames(current_file_list)
-    await getStoredFileNames(current_file_list).then()
+    //var current_file_list = []
+    //current_file_list =  Get_Stored_File_Names(current_file_list)
+    current_file_list = await fns_DB.Get_Stored_File_Names().then(function(results){return results})
     //console.log(current_file_list)
     checkAndHandleNewImages(current_file_list)
-    
     loadStateOfImage() 
-
 }
 
 //dialog window explorer to select new images to import
@@ -115,8 +113,8 @@ async function loadNewImage() {
             } else {
                 console.log(`File Contents of copied_file: ${result.filePaths[0]}`)
                 files = fs.readdirSync(dir)
-                var current_file_list = []
-                await getStoredFileNames(current_file_list).then()
+                //var current_file_list = []
+                current_file_list = await fns_DB.Get_Stored_File_Names().then(function(results){return results})
                 checkAndHandleNewImages(current_file_list)                
                 refreshFileList()
                 view_annotate_module.Meme_View_Fill(files)
@@ -134,21 +132,6 @@ function ResetImage(){
 }
 
 
-function getStoredFileNames(current_file_list){    
-    
-    return new Promise( function(resolve, reject) {
-        database.transaction( function (tx) {
-            tx.executeSql(`SELECT name FROM "${table_name}"`, [ ],  function(tx, select_res) {                         
-                if(select_res.rows.length > 0){
-                    for( ii = 0; ii < select_res.rows.length; ii++){
-                        current_file_list[ii] = select_res.rows[ii]["name"]
-                    }
-                }
-                resolve(current_file_list)
-            })
-        });
-    })
-}
 
 function checkAndHandleNewImages(current_file_list) {
     
@@ -162,7 +145,7 @@ function checkAndHandleNewImages(current_file_list) {
         if( bool_new_file_name == false ) {
             //the picture file name in context
             image_name_tmp = `${files[ii]}`
-            fns_DB.queryInsert(table_name, insert_into_statement, update_statement,
+            fns_DB.Query_Insert(table_name, insert_into_statement, update_statement,
                         image_name_tmp, JSON.stringify(emotion_value_array_tmp),
                         JSON.stringify(meme_switch_booleans_tmp),
                         processed_tag_word_list_tmp,rawDescription_tmp)
