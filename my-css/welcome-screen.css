@@ -1,29 +1,40 @@
-.tagBtn {
-  text-align: center;
-}
-
 body,
 html {
   height: 100%;
+  background: linear-gradient(180deg, #bfb9b9 0%, #6acde3 98%);
 }
 
-.bg {
-  /* The image used */
-
-  /* Full height */
-  height: 100%;
-
-  /* Center and scale the image nicely */
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
+.neon {
+  font-size: 50px;
+  text-align: center;
+  color: rgb(3, 117, 79);
+  text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #fff, 0 0 40px #0ff,
+    0 0 80px #0ff, 0 0 90px #0ff, 0 0 100px #0ff, 0 0 150px #0ff;
 }
 
-/* Make sure that padding behaves as expected */
-* {
-  box-sizing: border-box;
+.btn_start_tagging {
+  display: block;
+  border: none;
+  background-color: #04aa6d;
+  padding: 14px 28px;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 50px;
+  color: yellow;
 }
 
+.btn_div {
+  margin: auto;
+  width: 75%;
+  border: 5px solid green;
+  border-radius: 15px;
+}
+
+.skill_title {
+  font-weight: bold;
+  text-align: center;
+}
 /* Container for skill bars */
 .container {
   width: 100%; /* Full width */
@@ -32,24 +43,22 @@ html {
 
 .progress {
   text-align: right; /* Right-align text */
-  padding-top: 20px; /* Add top padding */
-  padding-bottom: 20px; /* Add bottom padding */
-  color: white; /* White text color */
+  padding-top: 25px; /* Add top padding */
+  padding-bottom: 25px; /* Add bottom padding */
+  color: black; /* White text color */
+  font-weight: bold;
+  font-size: 15px;
 }
 
 .tags {
-  width: 90%;
-  background-color: #04aa6d;
+  background-color: rgb(238, 140, 28);
 } /* Green */
 .emotions {
-  width: 80%;
-  background-color: #2196f3;
+  background-color: rgb(238, 140, 28);
 } /* Blue */
 .memes {
-  width: 65%;
-  background-color: #f44336;
+  background-color: rgb(238, 140, 28);
 } /* Red */
 .score {
-  width: 60%;
-  background-color: rgb(170, 170, 38);
+  background-color: rgb(238, 140, 28);
 } /* Dark Grey */

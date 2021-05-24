@@ -18,35 +18,45 @@
         <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
     </head>
     <body>
-        <div class="bg" style="background-image: url('Taga.png');">
-            
-        <div class="tagBtn" style="font-size:35px; color:green;">Tagasaurus, tag the planet!</div>
+       
+        <div class="container_title">
+            <h1 class="neon">Tagasaurus... tag the planet!</h1>
+          </div>
         
-        <p>Percentage of Images Tagged (#)</p>
+          <br><br>
+
+        <div class="skill_title">Percentage of Images Tagged (#)</div>
         <div class="container">
-            <div id="tagged_percentage" class="progress tags">90%</div>
-        </div>
-              
-        <p>Percentage of Images Emotions Stamped (*)</p>
-        <div class="container">
-            <div id="emotion_stamped_percentage" class="progress emotions">80%</div>
-        </div>
-              
-        <p>Percentage of Images Meme connected (->)</p>
-        <div class="container">
-            <div id="meme_connected_images" class="progress memes">65%</div>
-        </div>
-              
-        <p>Awesomeness Score</p>
-        <div class="container">
-            <div id="awesomeness_score" class="progress score">60%</div>
-        </div>
-            
-        <div class="tagBtn">
-            <a style="font-size:70px; color:red;" href="tagging.html">Start Tagging!</a>
+            <div id="tagged_percentage" class="progress tags"></div>
         </div>
 
+        <br>
+              
+        <div  class="skill_title">Percentage of Images Emotions Stamped (*)</div>
+        <div class="container">
+            <div id="emotion_stamped_percentage" class="progress emotions"></div>
         </div>
+            
+        <br>
+
+        <div  class="skill_title">Percentage of Images Meme connected (->)</div>
+        <div class="container">
+            <div id="meme_connected_images" class="progress memes"></div>
+        </div>
+        
+        <br>
+
+        <div  class="skill_title">Awesomeness Score</div>
+        <div class="container">
+            <div id="awesomeness_score" class="progress score"></div>
+        </div>
+
+        <br><br>
+        
+        <div class="btn_div">
+            <a href="tagging.html" type="button" class="btn_start_tagging">Start Tagging!</a> 
+        </div>
+    
 
     <script src="./myJS/db-analytics.js"></script>
 
