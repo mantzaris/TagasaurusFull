@@ -33,6 +33,7 @@ html {
 
 .skill_title {
   font-weight: bold;
+  font-size: 30px;
   text-align: center;
 }
 /* Container for skill bars */
@@ -43,11 +44,11 @@ html {
 
 .progress {
   text-align: right; /* Right-align text */
-  padding-top: 25px; /* Add top padding */
-  padding-bottom: 25px; /* Add bottom padding */
+  padding-top: 35px; /* Add top padding */
+  padding-bottom: 35px; /* Add bottom padding */
   color: black; /* White text color */
   font-weight: bold;
-  font-size: 15px;
+  font-size: 28px;
 }
 
 .tags {
