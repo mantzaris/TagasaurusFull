@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 
 //const controller = require('./myJS/controller-main.js');
 const fns_DB = require('./myJS/db-access-module.js');
@@ -12,34 +14,34 @@ const database = fns_DB.DB_Open(db_name)
 //\check{μ} = \biggl(\frac{∑^{N_T - N_0}_{i=1} 1/x_i} {N_T - N_0}\biggr)^{-1} \times \frac{N_T - N_0} {N_T} \mbox{,}
 function Harmonic_Mean(arr) {
     let n_T = arr.length
-    let n_0 = ((arr).filter(element=>element==0)).length
+    let n_0 = ((arr).filter(element => element == 0)).length
     let sum_reciprocal_nonzero = 0;
-    for (let i = 0; i < n_T; i++){
-        if(arr[i] != 0){
+    for (let i = 0; i < n_T; i++) {
+        if (arr[i] != 0) {
             sum_reciprocal_nonzero = sum_reciprocal_nonzero + (1 / arr[i]);
         }
     }
-    mu_H = (1 / (sum_reciprocal_nonzero / (n_T - n_0))) * ((n_T-n_0) / n_T)
+    mu_H = (1 / (sum_reciprocal_nonzero / (n_T - n_0))) * ((n_T - n_0) / n_T)
     return mu_H;
 }
 
-async function Display_Skill_Levels(){    
-    all_data = await fns_DB.Return_All_DB_Data().then(function(results){ return results })
-        
+async function Display_Skill_Levels() {
+    all_data = await fns_DB.Return_All_DB_Data().then(function (results) { return results })
+
     total_images_in_db = all_data.rows.length
-    total_tagged_images = 0 
+    total_tagged_images = 0
     meme_connected_images = 0
     emotion_stamped_images = 0
     images_scores_array = []
-    for (const [key, value] of Object.entries(all_data.rows)) {
-
-        non_empty_entry = JSON.parse(value.tags).find(element => element != "") 
-        if(non_empty_entry != undefined){ total_tagged_images = 1 + total_tagged_images }
+    for (const [key, value] of Object.entries(all_data.rows)) {        
+        try{ non_empty_entry = JSON.parse(value.tags).find(element => element != "") 
+        } catch { non_empty_entry = undefined }
+        if (non_empty_entry != undefined) { total_tagged_images = 1 + total_tagged_images }
         meme_counts = Object.keys(JSON.parse(value["memeChoices"])).length
-        if(meme_counts > 0){ meme_connected_images = 1 + meme_connected_images }
+        if (meme_counts > 0) { meme_connected_images = 1 + meme_connected_images }
 
         non_empty_emotion = (Object.values(JSON.parse(value.emotions))).find(element => element != "0")
-        if(non_empty_emotion != undefined){ emotion_stamped_images = 1 + emotion_stamped_images }
+        if (non_empty_emotion != undefined) { emotion_stamped_images = 1 + emotion_stamped_images }
 
         tagged_bool_num = + (non_empty_entry != undefined)
         memes_bool_num = + (meme_counts > 0)
@@ -47,7 +49,7 @@ async function Display_Skill_Levels(){
         images_scores_array.push((tagged_bool_num + memes_bool_num + emotion_bool_num) / 3)
 
     }
-    
+
     tagged_percentage = 100 * (total_tagged_images / total_images_in_db)
     meme_connected_percentage = 100 * (meme_connected_images / total_images_in_db)
     emotion_stamped_images_percentage = 100 * (emotion_stamped_images / total_images_in_db)
@@ -65,6 +67,6 @@ async function Display_Skill_Levels(){
     document.getElementById('awesomeness_score').innerHTML = `${Math.round(scores_harmonic_mean)}%`
     document.getElementById('awesomeness_score').style.width = `${Math.round(scores_harmonic_mean)}%`
 
-} 
+}
 
-Display_Skill_Levels() 
+Display_Skill_Levels()

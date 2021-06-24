@@ -12,10 +12,11 @@
   },
   "keywords": [
     "tagging",
-    "organizer",
+    "documenter",
     "photos",
     "comments",
     "emoticons",
+    "sentiment",
     "hastags"
   ],
   "author": "Alexander V. Mantzaris, Thomas G. Walker",
@@ -26,11 +27,12 @@
     "electron-reloader": "^1.2.0"
   },
   "dependencies": {
-    "dexie": "^3.0.3",
+    "fs": "^0.0.1-security",
     "fs-extra": "^10.0.0",
-    "indexeddb-js": "0.0.14",
+    "indexeddb-js": "^0.0.14",
     "install": "^0.13.0",
-    "rxdb": "^9.20.0",
+    "json": "^11.0.0",
+    "path": "^0.12.7",
     "sql.js": "^1.5.0",
     "sqlite3": "^5.0.2"
   },
