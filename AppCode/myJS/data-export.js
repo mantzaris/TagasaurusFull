@@ -26,11 +26,10 @@ function Export_User_Annotation_Data(table_name){
 function Write_Export_Data(file_path,db_rows){
     //write the json data out to the folder
     file_name_data = '/TagasaurusAnnotations.json'    
-    console.log(JSON.stringify(db_rows))
     fs.writeFileSync( file_path+file_name_data, JSON.stringify(db_rows) );    
     //now copy the files as well to a new 'images' directory
     fs.mkdirSync( file_path+'/images');
-    fse.copy( './AppCode/images', file_path+'/images', err => {
+    fse.copy( dir, file_path+'/images', err => {
         if (err){ return console.error(err) }
         else { console.log('folder copy success!') }
     })

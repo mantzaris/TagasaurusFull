@@ -1,5 +1,6 @@
 const fs = require('fs');
-const dir = './AppCode/images'
+//console.log(__dirname)
+const dir = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
 var image_files_in_dir = fs.readdirSync(dir)
 const path = require('path');
 const fse = require('fs-extra');
@@ -68,7 +69,7 @@ async function Load_New_Image() {
     const result = await ipcRenderer.invoke('dialog:open')
     if(result.canceled == false) {        
         filename = path.parse(result.filePaths[0]).base;
-        fs.copyFile(result.filePaths[0], `./images/${filename}`, async (err) => {
+        fs.copyFile(result.filePaths[0], `${dir}/${filename}`, async (err) => {
             if (err) {
                 console.log("Error Found in file copy:", err);
             } else {

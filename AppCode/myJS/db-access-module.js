@@ -29,6 +29,19 @@ exports.Return_Image_Annotations_From_DB = function(file_name){
     })
 }
 
+exports.Delete_File_From_DB = function(file_name){
+    database.transaction( function (tx) {
+        tx.executeSql(`DELETE FROM "${table_name}" WHERE name="${file_name}"`, [ ], function(tx, results) {
+            //
+        })
+    })
+}
+
+
+
+
+
+
 //returns an array of the file names stored in the DB
 exports.Get_Stored_File_Names = function(current_file_list){
     current_file_list = []
@@ -54,6 +67,37 @@ exports.Return_All_DB_Data = function(){
                 resolve(result)
             })
         });
+    })
+}
+
+//get the name and memeChoices for each file to then update the entry with an altered memeChoice set
+exports.Delete_Void_MemeChoices = function Delete_Void_MemeChoices(){
+    //console.log('getting ready to get rid of the meme references which no longer are valid')
+    database.transaction( function (tx) {
+        tx.executeSql(`SELECT name,memeChoices FROM "${table_name}"`, [ ], function(tx, results) {
+            //console.log(results)
+            //(results.rows)
+            name_memes = results.rows
+
+            update_statement_memeChoices = `UPDATE ${table_name} SET memeChoices=? WHERE name =?`
+
+            for(ii=0; ii<name_memes.length; ii++){
+                parsed_memeChoices = JSON.parse(name_memes[ii].memeChoices)        
+                changed_memes = false
+                for (name_key in parsed_memeChoices) {
+                    in_or_not_bool = image_files_in_dir.some(file_tmp => file_tmp == name_key)
+                    if(in_or_not_bool == false){
+                        delete parsed_memeChoices[name_key] 
+                        changed_memes = true
+                    }        
+                }
+                if(changed_memes == true){
+                    fns_DB.Meme_Update(update_statement_memeChoices, parsed_memeChoices, name_memes[ii].name)
+                }    
+            }
+
+            
+        })
     })
 }
 
