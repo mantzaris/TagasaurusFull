@@ -33,7 +33,7 @@ async function Display_Skill_Levels() {
     meme_connected_images = 0
     emotion_stamped_images = 0
     images_scores_array = []
-    for (const [key, value] of Object.entries(all_data.rows)) {        
+    for (const [key, value] of Object.entries(all_data.rows)) {    
         try{ non_empty_entry = JSON.parse(value.tags).find(element => element != "") 
         } catch { non_empty_entry = undefined }
         if (non_empty_entry != undefined) { total_tagged_images = 1 + total_tagged_images }
