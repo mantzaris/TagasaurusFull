@@ -16,18 +16,7 @@ function Delete_Image_File(file){
 
 function Image_Delete_From_DB_And_MemeRefs(table_name){
 
-     //delete unecessary entries that don't connect to current files
-    Delete_DB_Unreferenced_Entries(table_name) 
-
-     //delete the meme references which do not reference files currently accessible
-     fns_DB.Delete_Void_MemeChoices()
-
-}
-
-//delete DB entries which are have no current image ref
-function Delete_DB_Unreferenced_Entries(table_name) {
-    
-    //console.log( files )
+     //delete unecessary entries that don't connect to current files    
     var all_db_filenames = ''
     all_db_filenames_promise = fns_DB.Get_Stored_File_Names()
 
@@ -42,7 +31,9 @@ function Delete_DB_Unreferenced_Entries(table_name) {
         }
     })
     vanilla_notify.vNotify.info({visibleDuration: 1200,fadeOutDuration: 250,fadeInDuration: 250, text: 'Files deleted from database', title:'Deleted'});
-    return all_db_filenames
+    
+    //delete the meme references which do not reference files currently accessible
+    fns_DB.Delete_Void_MemeChoices()
 
 }
 

@@ -38,10 +38,6 @@ exports.Delete_File_From_DB = function(file_name){
 }
 
 
-
-
-
-
 //returns an array of the file names stored in the DB
 exports.Get_Stored_File_Names = function(current_file_list){
     current_file_list = []
