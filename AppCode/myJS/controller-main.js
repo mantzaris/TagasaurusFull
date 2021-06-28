@@ -21,15 +21,9 @@ const description_process_module = require('./myJS/descriptionProcessing.js');
 //module functions for DB connectivity 
 const fns_DB = require('./myJS/db-access-module.js');
 //const { Annotation_DOM_Alter } = require('./view-annotate-module.js');
-table_name = 'table9'
-table_schema = '(name unique,emotions,memeChoices,tags,rawDescription)'
-table_col_names = '(name,emotions,memeChoices,tags,rawDescription)'
-create_table_schema = `CREATE TABLE IF NOT EXISTS ${table_name}${table_schema}`
-insert_into_statement = `INSERT INTO ${table_name} (name,emotions,memeChoices,tags,rawDescription) VALUES (?,?,?,?,?);`
-update_statement = `UPDATE ${table_name} SET emotions=?,memeChoices=?,tags=?,rawDescription=? WHERE name =?`
-db_name = 'mydb'
 
-const database = fns_DB.DB_Open(db_name)
+const database = fns_DB.DB_Open()
+fns_DB.Init_DB()
 
 var processed_tag_word_list
 var image_index = 1;
@@ -37,7 +31,6 @@ var image_index = 1;
 //init methods to run upon loading
 First_Display_Init(image_index); 
 
-fns_DB.Init_DB(create_table_schema,table_name)
 
 //called upon app loading
 async function First_Display_Init(n) {        
@@ -106,8 +99,7 @@ function Check_And_Handle_New_Images(current_file_list) {
         if( bool_new_file_name == false ) {
             //the picture file name in context
             image_name_tmp = `${image_files_in_dir[ii]}`
-            fns_DB.Query_Insert(table_name, insert_into_statement, update_statement,
-                        image_name_tmp, JSON.stringify(emotion_value_array_tmp),
+            fns_DB.Query_Insert( image_name_tmp, JSON.stringify(emotion_value_array_tmp),
                         JSON.stringify(meme_switch_booleans_tmp),
                         processed_tag_word_list_tmp,rawDescription_tmp)
         }
@@ -116,7 +108,7 @@ function Check_And_Handle_New_Images(current_file_list) {
 
 //set the emotional sliders values to the emotional vector values stored
 async function Load_State_Of_Image() {
-    image_annotations = await fns_DB.Return_Image_Annotations_From_DB(image_files_in_dir[image_index - 1]).then(function(result){return result})
+    image_annotations = await fns_DB.Return_Image_Annotations_From_DB(image_files_in_dir[image_index - 1]).then(function(result){return result})    
     view_annotate_module.Display_Image_State_Results(image_files_in_dir,image_annotations)
 }
 
@@ -150,12 +142,11 @@ function Save_Pic_State() {
     image_name = `${image_files_in_dir[image_index - 1]}`
     //raw user entered text (prior to processing)
     rawDescription = document.getElementById('descriptionInput').value
-    fns_DB.Query_Insert(table_name, insert_into_statement, update_statement, 
-                image_name, emotion_value_array, meme_switch_booleans, processed_tag_word_list, rawDescription)
+    fns_DB.Query_Insert( image_name, emotion_value_array, meme_switch_booleans, processed_tag_word_list, rawDescription)
 }
 
 //delete image from user choice
-function Delete_Image() {    
+function Delete_Image() {
     //try to delete the file (image)
     success = delete_helper.Delete_Image_File(image_files_in_dir[image_index-1])
     if(success == 1){

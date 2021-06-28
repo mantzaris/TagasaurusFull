@@ -1,15 +1,22 @@
 
 //notification code from: https://github.com/MLaritz/Vanilla-Notify
 //const vanilla_notify = require('./vanilla-notify.js');
+db_name = 'mydb'
+table_name = 'table9'
+table_schema = '(name unique,emotions,memeChoices,tags,rawDescription)'
+create_table_schema = `CREATE TABLE IF NOT EXISTS ${table_name}${table_schema}`
+
+insert_into_statement = `INSERT INTO ${table_name} (name,emotions,memeChoices,tags,rawDescription) VALUES (?,?,?,?,?);`
+const update_statement = `UPDATE ${table_name} SET emotions=?,memeChoices=?,tags=?,rawDescription=? WHERE name =?`
 
 
-exports.DB_Open = function(db__name) {
+exports.DB_Open = function() {
   //database name, Version number, Text description, Size of database
   let database = openDatabase(db_name, '1.0', 'stores image descriptions', 2 * 1024 * 1024);
   return database
 }
 
-exports.Init_DB = function(create_table_schema,table_name) {
+exports.Init_DB = function() {
     Query(`SELECT * FROM ${table_name}`, () => {
     }, (a, b, c) => {
         Query(create_table_schema, function () {
@@ -78,14 +85,14 @@ exports.Delete_Void_MemeChoices = function Delete_Void_MemeChoices(){
             update_statement_memeChoices = `UPDATE ${table_name} SET memeChoices=? WHERE name =?`
 
             for(ii=0; ii<name_memes.length; ii++){
-                parsed_memeChoices = JSON.parse(name_memes[ii].memeChoices)        
+                parsed_memeChoices = JSON.parse(name_memes[ii].memeChoices)
                 changed_memes = false
                 for (name_key in parsed_memeChoices) {
                     in_or_not_bool = image_files_in_dir.some(file_tmp => file_tmp == name_key)
                     if(in_or_not_bool == false){
                         delete parsed_memeChoices[name_key] 
                         changed_memes = true
-                    }        
+                    }
                 }
                 if(changed_memes == true){
                     fns_DB.Meme_Update(update_statement_memeChoices, parsed_memeChoices, name_memes[ii].name)
@@ -98,11 +105,11 @@ exports.Delete_Void_MemeChoices = function Delete_Void_MemeChoices(){
 }
 
 //update for the memes to reference current files
-exports.Meme_Update = function(update_statement,meme_switch_booleans,image_name){
+exports.Meme_Update = function(meme_switch_booleans,image_name){
     Query( update_statement, [ JSON.stringify(meme_switch_booleans), image_name] )
 }
 
-exports.Query_Insert = function(table_name,insert_into_statement,update_statement,image_name,emotion_value_array,meme_switch_booleans,processed_tag_word_list,rawDescription){
+exports.Query_Insert = function(image_name,emotion_value_array,meme_switch_booleans,processed_tag_word_list,rawDescription){
         
     Query(
         insert_into_statement,

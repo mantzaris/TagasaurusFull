@@ -3,9 +3,7 @@ const fs = require('fs');
 
 //const controller = require('./myJS/controller-main.js');
 const fns_DB = require('./myJS/db-access-module.js');
-db_name = 'mydb'
-table_name = 'table9'
-const database = fns_DB.DB_Open(db_name)
+const database = fns_DB.DB_Open()
 
 // algorithm DFLOW by EPA ( https://stats.stackexchange.com/a/430254/1098 )
 //$\mu_H = \left(\frac{\sum^{n_T - n_0}_{i=1} 1/x_i} {n_T - n_0}\right)^{-1} \times \frac{n_T - n_0} {n_T} ,$

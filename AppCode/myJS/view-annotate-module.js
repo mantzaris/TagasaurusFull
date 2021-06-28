@@ -15,7 +15,7 @@ function Annotation_DOM_Alter(annotation_obj){
             document.getElementById(key_tmp).value = annotation_obj[key_tmp]
         } else if(key_tmp == 'imgMain'){            
             document.getElementById(key_tmp).src = `${dir}/${annotation_obj[key_tmp]}`;
-        } else if( key_tmp.split('.').length > 1 ){ // memes 
+        } else if( key_tmp.split('.').length > 1 ){ // memes, get the file name which is the element ID on the tagging HTML page
             document.getElementById(key_tmp).checked = annotation_obj[key_tmp]
         } else{ //emotions
             document.getElementById(key_tmp).value = annotation_obj[key_tmp]
@@ -26,7 +26,6 @@ function Annotation_DOM_Alter(annotation_obj){
 //set view to display image state results of query for a particular file name
 function Display_Image_State_Results(files,select_result){
     if(select_result.rows.length > 0){
-                                
         happy_val = JSON.parse(select_result.rows[0]["emotions"]).happy
         sad_val = JSON.parse(select_result.rows[0]["emotions"]).sad
         confused_val = JSON.parse(select_result.rows[0]["emotions"]).confused
@@ -36,6 +35,7 @@ function Display_Image_State_Results(files,select_result){
                         descriptionInput: rawDescription_tmp, taglist: tags_list}
         
         meme_json_parsed = JSON.parse(select_result.rows[0]["memeChoices"])
+        
         for (var ii = 0; ii < files.length; ii++) {
             if(document.getElementById(`${files[ii]}`) != null) { 
                 if( (`${files[ii]}` in meme_json_parsed) ){                        
@@ -88,9 +88,9 @@ function Make_Tag_HTML_UL(tag_array) {
 //function to reset annotations to default
 function Reset_Image_View(files){
     val_obj = {happy: 0, sad: 0, confused: 0, descriptionInput:'', taglist:''}
-    for (var ii = 0; ii < files.length; ii++) {        
-        val_obj[`${files[ii]}`] = false
-    }    
+    for (var ii = 0; ii < files.length; ii++) {
+        val_obj[`${files[ii]}`] = false //each file name is the element ID for the tagging page
+    }
     Annotation_DOM_Alter(val_obj)
 }
 
