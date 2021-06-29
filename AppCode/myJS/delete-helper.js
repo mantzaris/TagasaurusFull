@@ -14,7 +14,7 @@ function Delete_Image_File(file){
 }
 
 
-function Image_Delete_From_DB_And_MemeRefs(table_name){
+function Image_Delete_From_DB_And_MemeRefs(){
 
      //delete unecessary entries that don't connect to current files    
     var all_db_filenames = ''
@@ -23,7 +23,7 @@ function Image_Delete_From_DB_And_MemeRefs(table_name){
     all_db_filenames_promise.then( function(result){
         all_db_filenames = result
         for(ii=0; ii<all_db_filenames.length; ii++){
-            //console.log(`file to check ; ${all_db_filenames[ii]}`)
+            //no images in directory for that DB filename entry? then delete it
             in_or_not_bool = image_files_in_dir.some(file_tmp => file_tmp == all_db_filenames[ii])
             if(in_or_not_bool == false){
                 fns_DB.Delete_File_From_DB(all_db_filenames[ii])

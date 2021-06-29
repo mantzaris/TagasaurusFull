@@ -1,7 +1,7 @@
 //const fns_DB = require('./myJS/db-access-module.js');
 
 //functionality for the export of all the information
-function Export_User_Annotation_Data(table_name){
+function Export_User_Annotation_Data(){
 
     const save_promise = ipcRenderer.invoke('dialog:save')
     save_promise.then(function(path_chosen){ 

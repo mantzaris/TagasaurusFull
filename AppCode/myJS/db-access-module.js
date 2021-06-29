@@ -78,19 +78,15 @@ exports.Delete_Void_MemeChoices = function Delete_Void_MemeChoices(){
     //console.log('getting ready to get rid of the meme references which no longer are valid')
     database.transaction( function (tx) {
         tx.executeSql(`SELECT name,memeChoices FROM "${table_name}"`, [ ], function(tx, results) {
-            //console.log(results)
-            //(results.rows)
             name_memes = results.rows
-
             update_statement_memeChoices = `UPDATE ${table_name} SET memeChoices=? WHERE name =?`
-
             for(ii=0; ii<name_memes.length; ii++){
                 parsed_memeChoices = JSON.parse(name_memes[ii].memeChoices)
                 changed_memes = false
                 for (name_key in parsed_memeChoices) {
                     in_or_not_bool = image_files_in_dir.some(file_tmp => file_tmp == name_key)
                     if(in_or_not_bool == false){
-                        delete parsed_memeChoices[name_key] 
+                        delete parsed_memeChoices[name_key]
                         changed_memes = true
                     }
                 }
@@ -98,15 +94,13 @@ exports.Delete_Void_MemeChoices = function Delete_Void_MemeChoices(){
                     fns_DB.Meme_Update(update_statement_memeChoices, parsed_memeChoices, name_memes[ii].name)
                 }    
             }
-
-            
         })
     })
 }
 
 //update for the memes to reference current files
-exports.Meme_Update = function(meme_switch_booleans,image_name){
-    Query( update_statement, [ JSON.stringify(meme_switch_booleans), image_name] )
+exports.Meme_Update = function(update_statement_memeChoices,meme_switch_booleans,image_name){
+    Query( update_statement_memeChoices, [ JSON.stringify(meme_switch_booleans), image_name] )
 }
 
 exports.Query_Insert = function(image_name,emotion_value_array,meme_switch_booleans,processed_tag_word_list,rawDescription){

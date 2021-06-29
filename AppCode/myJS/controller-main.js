@@ -155,12 +155,12 @@ function Delete_Image() {
         //refresh the image view to the next image (which is by defaul the 'next' +1)
         New_Image_Display( 0 ) 
         //perform the house cleaning for the image references in the DB and the rest of the annotations
-        delete_helper.Image_Delete_From_DB_And_MemeRefs(table_name)    
+        delete_helper.Image_Delete_From_DB_And_MemeRefs()    
     }
 }
 
 //functionality for the export of all the information
 function Export_All(){
-    data_export.Export_User_Annotation_Data(table_name)
+    data_export.Export_User_Annotation_Data()
 }
 
