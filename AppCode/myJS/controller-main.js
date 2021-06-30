@@ -38,8 +38,11 @@ async function First_Display_Init(n) {
     view_annotate_module.Annotation_DOM_Alter(emotion_val_obj)
     view_annotate_module.Meme_View_Fill(image_files_in_dir)
     current_file_list = await fns_DB.Get_Stored_File_Names().then(function(results){return results})
-    Check_And_Handle_New_Images(current_file_list)
     Load_State_Of_Image() 
+    //load files in the directory but not DB, into the DB with defaults
+    Check_And_Handle_New_Images(current_file_list)
+    //DB entries not in the directory are lingering entries to be deleted
+    delete_helper.Image_Delete_From_DB_And_MemeRefs()
 }
 
 //called from the gallery widget
@@ -68,9 +71,14 @@ async function Load_New_Image() {
             } else {
                 console.log(`File Contents of copied_file: ${result.filePaths[0]}`)
                 image_files_in_dir = fs.readdirSync(dir)
-                //var current_file_list = []
                 current_file_list = await fns_DB.Get_Stored_File_Names().then(function(results){return results})
-                Check_And_Handle_New_Images(current_file_list)                
+                var emotion_value_array_tmp = { happy: 0, sad: 0, confused: 0 }
+                var meme_switch_booleans_tmp = {}
+                rawDescription_tmp = "" 
+                processed_tag_word_list_tmp = ""
+                fns_DB.Query_Insert( filename, JSON.stringify(emotion_value_array_tmp),
+                        JSON.stringify(meme_switch_booleans_tmp),
+                        processed_tag_word_list_tmp,rawDescription_tmp)
                 Refresh_File_List()
                 view_annotate_module.Meme_View_Fill(image_files_in_dir)
             }
@@ -88,7 +96,7 @@ function Reset_Image(){
     view_annotate_module.Reset_Image_View(image_files_in_dir)
 }
 
-//
+//checking to see if the directory has new files that have beein included and insert into the database
 function Check_And_Handle_New_Images(current_file_list) {
     var emotion_value_array_tmp = { happy: 0, sad: 0, confused: 0 }
     var meme_switch_booleans_tmp = {}
@@ -155,7 +163,7 @@ function Delete_Image() {
         //refresh the image view to the next image (which is by defaul the 'next' +1)
         New_Image_Display( 0 ) 
         //perform the house cleaning for the image references in the DB and the rest of the annotations
-        delete_helper.Image_Delete_From_DB_And_MemeRefs()    
+        //delete_helper.Image_Delete_From_DB_And_MemeRefs()    
     }
 }
 

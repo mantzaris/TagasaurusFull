@@ -5,6 +5,8 @@ function Delete_Image_File(file){
     try {
         fs.unlinkSync( `${dir}/${file}` );
         console.log(`File is deleted: ${file}`);
+        fns_DB.Delete_File_From_DB(file)
+        fns_DB.Delete_Void_MemeChoices()
         return 1
     } catch (error) {
         console.log(error);
@@ -15,8 +17,7 @@ function Delete_Image_File(file){
 
 
 function Image_Delete_From_DB_And_MemeRefs(){
-
-     //delete unecessary entries that don't connect to current files    
+    //delete unecessary entries that don't connect to current files    
     var all_db_filenames = ''
     all_db_filenames_promise = fns_DB.Get_Stored_File_Names()
 

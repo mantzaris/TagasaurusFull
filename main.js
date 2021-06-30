@@ -4,6 +4,7 @@ const {app, ipcMain, dialog, BrowserWindow} = require('electron')
 const path = require('path')
 
 function createWindow () {
+  //debugger
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
