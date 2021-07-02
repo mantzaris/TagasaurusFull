@@ -1,0 +1,39 @@
+body,
+html {
+  height: 100%;
+  background-color: rgb(190, 190, 190);
+}
+
+.wrapper {
+  display: grid;
+  /*grid-template-columns: repeat(3, 1fr);*/
+  gap: 5px;
+  height: 100vh;
+  /*grid-auto-rows: minmax(100px, auto);*/
+  border: 3px solid #4caf50;
+}
+.one {
+  grid-column: 1 / 4;
+  grid-row: 1;
+  border: 3px solid #4caf50;
+}
+.two {
+  grid-column: 4 / 11;
+  grid-row: 1;
+  border: 3px solid #4caf50;
+}
+.three {
+  grid-column: 1 / 4;
+  grid-row: 2 / 5;
+  border: 3px solid #4caf50;
+}
+.four {
+  grid-column: 1 / 4;
+  grid-row: 5 / 11;
+  border: 3px solid #4caf50;
+}
+.five {
+  grid-column: 4 / 11;
+  grid-row: 2 / 11;
+  border: 3px solid #4caf50;
+}

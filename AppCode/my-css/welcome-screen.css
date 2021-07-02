@@ -12,7 +12,8 @@ html {
     0 0 80px #0ff, 0 0 90px #0ff, 0 0 100px #0ff, 0 0 150px #0ff;
 }
 
-.btn_start_tagging {
+.btn_start_tagging,
+.btn_create_entities {
   display: block;
   border: none;
   background-color: #04aa6d;

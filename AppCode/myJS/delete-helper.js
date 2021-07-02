@@ -28,10 +28,10 @@ function Image_Delete_From_DB_And_MemeRefs(){
             in_or_not_bool = image_files_in_dir.some(file_tmp => file_tmp == all_db_filenames[ii])
             if(in_or_not_bool == false){
                 fns_DB.Delete_File_From_DB(all_db_filenames[ii])
+                vanilla_notify.vNotify.info({visibleDuration: 1200,fadeOutDuration: 250,fadeInDuration: 250, text: 'Files deleted from database', title:'Deleted'});
             }
         }
     })
-    vanilla_notify.vNotify.info({visibleDuration: 1200,fadeOutDuration: 250,fadeInDuration: 250, text: 'Files deleted from database', title:'Deleted'});
     
     //delete the meme references which do not reference files currently accessible
     fns_DB.Delete_Void_MemeChoices()
