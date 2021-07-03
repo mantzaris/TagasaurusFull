@@ -29,3 +29,12 @@ function Entity_Description_Page() {
 function Entity_Memes_Page() {
     console.log("entity memes page button clicked")
 }
+
+
+function Load_First_Image(){
+    default_img = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/Taga.png'
+    console.log(default_img)
+    document.getElementById("entityProfileImg").src = default_img;
+}
+
+Load_First_Image()

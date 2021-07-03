@@ -76,8 +76,15 @@ html {
   align-items: center;
   text-align: justify;
   font-size: 4vw;
+  background-color: #04aa6d;
 }
 
-.success {
-  background-color: #04aa6d;
-} /* Green */
+.imgEntityMain {
+  margin: auto;
+  display: block;
+  max-width: 100%;
+  max-height: 90%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
