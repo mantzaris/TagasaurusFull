@@ -30,6 +30,10 @@ function Entity_Memes_Page() {
     console.log("entity memes page button clicked")
 }
 
+function Set_Entity_Name_Label(){
+    document.getElementById("entityName").textContent= '#' + "Taga";
+
+}
 
 function Load_First_Image(){
     default_img = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/Taga.png'
@@ -37,4 +41,5 @@ function Load_First_Image(){
     document.getElementById("entityProfileImg").src = default_img;
 }
 
+Set_Entity_Name_Label()
 Load_First_Image()
