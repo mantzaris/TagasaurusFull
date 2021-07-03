@@ -26,10 +26,38 @@
     <div class="center-div1">
         
         <div class="wrapper">
-            <div class="one">One (entity name)</div>
-            <div class="two">Two (buttons)</div>
+            <div class="one">
+                <span class="label success">#EntityName</span>
+            </div>
+
+            <div class="two"> 
+                
+                <button type="button" class="btn btn-primary btn-lg" onclick="Prev_Image()">
+                    <span class="arrow left"></span>Prev
+                </button>
+                <button type="button" class="btn btn-primary btn-lg" onclick="Next_Image()">
+                    Next<span class="arrow right"></span>
+                </button>
+                
+                <button type="button" class="btn btn-primary btn-lg" onclick="Create_New_Entity()">
+                    create new  entity
+                </button>
+                <button type="button" class="btn btn-primary btn-lg" onclick="Alter_Entity()">
+                    alter  entity
+                </button>                
+            </div>
+
             <div class="three">Three (entity image)</div>
-            <div class="four">Four (annotation data)</div>
+            <div class="four">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        <li class="page-item"><a class="page-link" onclick="Entity_Emotion_Page()" href="#">Emotions (*)</a></li>
+                        <li class="page-item"><a class="page-link" onclick="Entity_Description_Page()" href="#">Text Description (#)</a></li>
+                        <li class="page-item"><a class="page-link" onclick="Entity_Memes_Page()" href="#">Memes (->)</a></li>                      
+                    </ul>
+                </nav>
+
+            </div>
             <div class="five">Five (image members)</div>            
           </div>
 

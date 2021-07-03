@@ -27,6 +27,7 @@
     "electron-reloader": "^1.2.0"
   },
   "dependencies": {
+    "bootstrap-icons": "^1.5.0",
     "fs": "^0.0.1-security",
     "fs-extra": "^10.0.0",
     "indexeddb-js": "^0.0.14",
