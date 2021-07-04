@@ -40,14 +40,20 @@
                 </button>
                 
                 <button type="button" class="btn btn-primary btn-lg" onclick="Create_New_Entity()">
-                    create new  entity
+                    create new  
+                    <br>
+                    entity
                 </button>
-                <button type="button" class="btn btn-primary btn-lg" onclick="Alter_Entity()">
-                    alter  entity
-                </button>                
+                <button type="button" class="btn btn-primary btn-lg" onclick="Delete_Entity()">
+                    delete entity
+                </button>
+                <button type="button" class="btn btn-primary btn-lg" onclick="Export_Entities()">
+                    export entities
+                </button>  
+                <a href="welcome-screen.html" class="btn btn-info" role="button">Return to Main</a>
             </div>
 
-            <div class="three imgDiv">
+            <div class="three">
 
                 <img class="imgEntityMain" id="entityProfileImg" src="">
 
@@ -55,17 +61,30 @@
 
 
             <div class="four">
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination">
-                        <li class="page-item"><a class="page-link" onclick="Entity_Emotion_Page()" href="#">Emotions (*)</a></li>
-                        <li class="page-item"><a class="page-link" onclick="Entity_Description_Page()" href="#">Text Description (#)</a></li>
-                        <li class="page-item"><a class="page-link" onclick="Entity_Memes_Page()" href="#">Memes (->)</a></li>                      
+                
+                <nav aria-label="Page navigation of annotations">
+                    <ul class="pagination pagination-large">
+                        <li id="entity-emotion-view" class="page-item"  aria-current="page"><a class="page-link" onclick="Entity_Emotion_Page()" href="#">Emotions (*)</a></li>
+                        <li id="entity-description-view" class="page-item"><a class="page-link" onclick="Entity_Description_Page()" href="#">Text Description (#)</a></li>
+                        <li id="entity-meme-view" class="page-item"><a class="page-link" onclick="Entity_Memes_Page()" href="#">Memes (->)</a></li>                      
                     </ul>
                 </nav>
+                <span id="annotationPages">
+                    area to manipulate
+                    <br>
+                    some stuff to change
+
+                </span>
 
             </div>
-            <div class="five">Five (image members)</div>            
-          </div>
+
+            <div class="five" id="entityGallery">Five (image members)
+
+                
+            </div>            
+
+
+        </div>
 
     </div>
 

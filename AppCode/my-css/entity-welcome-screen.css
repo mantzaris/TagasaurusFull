@@ -33,11 +33,13 @@ html {
   grid-column: 1 / 5;
   grid-row: 10 / 21;
   border: 3px solid #4caf50;
+  overflow: scroll;
 }
 .five {
   grid-column: 5 / 11;
   grid-row: 3 / 21;
   border: 3px solid #4caf50;
+  overflow: scroll;
 }
 
 .buttonPreNext {
@@ -87,4 +89,31 @@ html {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+}
+
+.textarea2 {
+  height: 70%;
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 4px;
+}
+
+/* Create two equal columns that sits next to each other */
+.column {
+  flex: 25%;
+  padding: 0 4px;
+}
+
+.column img {
+  margin-top: 8px;
+  vertical-align: middle;
+}
+
+.imgG {
+  width: 30%;
+  height: 30%;
 }
