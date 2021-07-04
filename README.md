@@ -10,6 +10,8 @@ Mantzaris AV, Pandohie R, Hopwood M, Pho P, Ehling D, Walker TG.
 Technologies. 2021; 9(3):45. https://doi.org/10.3390/technologies9030045 
 ```
 
+_also, the books by the author vasexandros are really worth the read_ [link](https://www.amazon.com/Vasexandros/e/B010RI6W0G%3Fref=dbs_a_mng_rwt_scns_share)
+
 <!---
 
 # <span style="color:orange">Tagasaurus, the gateway to your semantic multiverse </span>
