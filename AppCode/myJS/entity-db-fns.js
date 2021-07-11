@@ -1,33 +1,33 @@
 
-var entities = [
+var entities_ex = [
     {
-        "entityName":"ss",
-        "entityImage":"test.jpg",
-        "entityEmotions":{happy:0,sad:0,confused:0},
+        "entityName":"name1",
+        "entityImage":"test1.jpg",
+        "entityEmotions":{happy:10,sad:0,confused:0},
         "textDescription" : "lots of reactions etc and details",
-        "entityMemes": ["file1.jpg","file2.jpg","file3.jpg"]
+        "entityMemes": ["file2.jpg"]
     },
     {
-        "entityName":"ss2",
+        "entityName":"name2",
         "entityImage":"test2.jpg",
-        "entityEmotions":{happy:0,sad:0,confused:0},
-        "textDescription" : "lots of reactions etc and details",
-        "entityMemes": ["file1.jpg","file3.jpg"]
+        "entityEmotions":{happy:0,sad:20,confused:0},
+        "textDescription" : "what a cool car I really like name2",
+        "entityMemes": ["test1.jpg","test3.jpg"]
     },
     {
-        "entityName":"ss3",
-        "entityImage":"test.jpg",
-        "entityEmotions":{happy:0,sad:0,confused:0},
-        "textDescription" : "lots of reactions etc and details",
-        "entityMemes": ["file1.jpg","file2.jpg","file3.jpg"]
-    },
-    ] 
+        "entityName":"name3",
+        "entityImage":"test3.jpg",
+        "entityEmotions":{happy:90,sad:40,confused:60},
+        "entityDescription" : "this was a great holiday",
+        "entityMemes": ["file2.jpg"]
+    }
+] 
 
 
 db_entities = null;
 
-const ENTITY_DB_NAME = 'testEntityKP'
-const ENTITY_OBJSTORE_NAME = 'entitiesTmp'
+const ENTITY_DB_NAME = 'entityDB'
+const ENTITY_OBJSTORE_NAME = 'entityStore'
 const ENTITY_KEY_PATH_NAME = "entityName" //primary key for records
 
 //create the database and the objectstore (table), and the keyPath (primary key) as the entity name
@@ -223,6 +223,7 @@ function Get_All_From_DB(){
         console.log(event.target.result)
     }
 }
+exports.Get_All_From_DB = Get_All_From_DB
 
 //return all the keys (primary keys) in the object store
 function Get_All_Keys_From_DB(index){

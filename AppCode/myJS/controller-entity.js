@@ -1,9 +1,15 @@
 
 
+entity_db_fns = require('./myJS/entity-db-fns.js');
+// eg. entity_db_fns.Get_All_From_DB()
+
 console.log('in entity view')
+
+
 
 function Prev_Image() {
     console.log("previous image button clicked")
+    
 }
 
 function Next_Image() {
@@ -12,6 +18,7 @@ function Next_Image() {
 
 function Create_New_Entity() {
     console.log("create new entity button clicked")
+    
 }
 
 function Delete_Entity() {
@@ -89,21 +96,21 @@ function Entity_Memes_Page() {
     default_img = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/Taga.png'
 
     gallery_html = `<div class="row">
-    
-      <img class="imgG" src="${default_img}">
-      <img class="imgG" src="${default_img}">
-      <img class="imgG" src="${default_img}">
-      <img  class="imgG" src="${default_img}">
-      <img  class="imgG" src="${default_img}">
-      <img  class="imgG" src="${default_img}">
-      <img  class="imgG" src="${default_img}">
-      <img  class="imgG" src="${default_img}">
-      <img  class="imgG" src="${default_img}">
-      <img class="imgG" src="${default_img}">
-      <img class="imgG" src="${default_img}">
-      <img class="imgG" src="${default_img}">
-      <img class="imgG" src="${default_img}">
-    `
+        
+        <img class="imgG" src="${default_img}">
+        <img class="imgG" src="${default_img}">
+        <img class="imgG" src="${default_img}">
+        <img class="imgG" src="${default_img}">
+        <img class="imgG" src="${default_img}">
+        <img class="imgG" src="${default_img}">
+        <img class="imgG" src="${default_img}">
+        <img class="imgG" src="${default_img}">
+        <img class="imgG" src="${default_img}">
+        <img class="imgG" src="${default_img}">
+        <img class="imgG" src="${default_img}">
+        <img class="imgG" src="${default_img}">
+        <img class="imgG" src="${default_img}">
+        `
     gallery_html += `<br><button type="button" class="btn btn-primary btn-lg" onclick="New_Entity_Memes()">Choose new memes</button>`
 
     document.getElementById("annotationPages").innerHTML  = gallery_html;
@@ -134,24 +141,23 @@ function Load_Entity_Gallery(){
       <img class="imgG" src="${default_img}">
       <img class="imgG" src="${default_img}">
       <img class="imgG" src="${default_img}">
-      <img  class="imgG" src="${default_img}">
-      <img  class="imgG" src="${default_img}">
-      <img  class="imgG" src="${default_img}">
-      <img  class="imgG" src="${default_img}">
-      <img  class="imgG" src="${default_img}">
-      <img  class="imgG" src="${default_img}">
+      <img class="imgG" src="${default_img}">
+      <img class="imgG" src="${default_img}">
+      <img class="imgG" src="${default_img}">
+      <img class="imgG" src="${default_img}">
+      <img class="imgG" src="${default_img}">
+      <img class="imgG" src="${default_img}">
       <img class="imgG" src="${default_img}">
       <img class="imgG" src="${default_img}">
       <img class="imgG" src="${default_img}">
       <img class="imgG" src="${default_img}">
     `
-
+    
     gallery_html += `</div>`
-  
+
     document.getElementById("entityGallery").innerHTML  = gallery_html;
 
     /*gallery_html += `<img src="${default_img}" alt="entityMemberImage" class="img-thumbnail"></img>`*/
-
 
 }
 

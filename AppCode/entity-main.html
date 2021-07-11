@@ -23,7 +23,7 @@
 
 <body>
 
-    <div class="center-div1">
+    <div class="center-div1" id="entityMainBodyDiv">
         
         <div class="wrapper">
             <div class="one">
@@ -39,11 +39,11 @@
                     Next<span class="arrow right"></span>
                 </button>
                 
-                <button type="button" class="btn btn-primary btn-lg" onclick="Create_New_Entity()">
+                <a type="button" class="btn btn-primary btn-lg" href="entity-creation-page.html" >
                     create new  
                     <br>
                     entity
-                </button>
+                </a>
                 <button type="button" class="btn btn-primary btn-lg" onclick="Delete_Entity()">
                     delete entity
                 </button>
@@ -97,8 +97,8 @@
         </div>
     -->
 
-    <script src="./myJS/entity-view.js"></script>
-    <script src="./myJS/idbTry.js"></script>
+    <script src="./myJS/controller-entity.js"></script>
+
 </body>
 
 </html>

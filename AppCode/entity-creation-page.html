@@ -1,0 +1,77 @@
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+
+    <!-- bootstrap css -->
+    <link rel="stylesheet" href="./bootstrap-css/bootstrap.css">
+    <link rel="stylesheet" href="./bootstrap-css/bootstrap-grid.css">
+
+    <!-- custom css -->
+    <link rel="stylesheet" href="./my-css/entity-welcome-screen.css">
+
+    <style>
+
+    </style>
+    <title>Tagasaurus</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+</head>
+
+<body>
+
+    <div class="center-div1" id="entityCreateBodyDiv">
+
+
+        <nav aria-label="Page navigation of new entity creation">
+            <ul class="pagination pagination-lg justify-content-center">
+
+                <li class="page-item">
+                    <a class="page-link" onclick="Entity_CreationPage_Previous()">
+                        Previous
+                    </a>
+                </li>
+
+                <li id="page1" class="page-item ">
+                    <a class="page-link" href="#">
+                        part 1
+                    </a>
+                </li>
+
+                <li id="page2" class="page-item ">
+                    <span class="page-link">
+                        part 2
+                    </span>
+                </li>
+
+                <li id="page3" class="page-item ">
+                    <a class="page-link" href="#">
+                        part 3                       
+                    </a>
+                </li>
+
+                <li class="page-item">
+                    <a class="page-link" onclick="Entity_CreationPage_Next()">
+                        Next
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+
+        <div id="partBody">
+            
+
+        </div>
+
+    </div>
+
+
+    <script src="./myJS/entity-creation.js"></script>
+
+</body>
+
+</html>
