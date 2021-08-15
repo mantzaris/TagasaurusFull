@@ -28,6 +28,19 @@ ipcMain.handle('dialog:open', async (_, args) => {
   return result
 })
 
+//for the ability to load a dialog window in the entity creation for the selection of a profile image
+ipcMain.handle('dialog:openEntity', async (_, args) => {
+  const result = dialog.showOpenDialog({ properties: ['openFile' ], defaultPath: '/home/resort/Documents/repos/Tagasaurus/images/' })
+  return result
+})
+
+//for the ability to load the entity creation for the selection of a profile image set
+ipcMain.handle('dialog:openEntityImageSet', async (_, args) => {
+  const result = dialog.showOpenDialog({ properties: ['openFile', 'multiSelections' ], defaultPath: '/home/resort/Documents/repos/Tagasaurus/images/' })
+  return result
+})
+
+
 //for the ability to save a data export
 ipcMain.handle('dialog:save', async (_, args) => {
   const result = dialog.showSaveDialog({ title: "Enter Folder Name to Create"})

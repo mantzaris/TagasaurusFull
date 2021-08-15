@@ -74,7 +74,7 @@ async function Load_New_Image() {
                 current_file_list = await fns_DB.Get_Stored_File_Names().then(function(results){return results})
                 var emotion_value_array_tmp = { happy: 0, sad: 0, confused: 0 }
                 var meme_switch_booleans_tmp = {}
-                rawDescription_tmp = "" 
+                rawDescription_tmp = ""
                 processed_tag_word_list_tmp = ""
                 fns_DB.Query_Insert( filename, JSON.stringify(emotion_value_array_tmp),
                         JSON.stringify(meme_switch_booleans_tmp),
@@ -111,7 +111,7 @@ function Check_And_Handle_New_Images(current_file_list) {
                         JSON.stringify(meme_switch_booleans_tmp),
                         processed_tag_word_list_tmp,rawDescription_tmp)
         }
-    }    
+    }
 }
 
 //set the emotional sliders values to the emotional vector values stored
