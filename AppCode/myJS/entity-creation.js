@@ -17,6 +17,7 @@ path = require('path');
 var entity_tag_name = ""
 var entity_file_name = ""
 var entity_description = ""
+var entity_image_set = ""
 
 function Entity_CreationPage_Previous() {
 
@@ -130,6 +131,9 @@ function Part2_HTML() {
             </div>
             <br>
             
+            <button type="button" class="btn btn-primary btn-lg" onclick="Next_Btn_Step2()">
+                Next
+            </button>
         </div>
         `
     return htmlpart2
@@ -138,7 +142,35 @@ function Part2_HTML() {
 
 function Part3_HTML() {
 
-    return `hellow world! part3`
+    htmlpart3 = /*html*/`        
+        entity emotions, entity memes <br>
+        <div class="emotion-page">                    
+            <label id="emotion-box-title" class="form-label">EMOTIONS (*)</label>
+            <hr>    
+            <label for="customRange1" class="form-label">happy range</label>
+            <input type="range" class="form-range" id="happy">                        
+            <label for="customRange1" class="form-label">sad range</label>
+            <input type="range" class="form-range" id="sad">
+            <label for="customRange1" class="form-label">confused range</label>
+            <input type="range" class="form-range" id="confused">
+        </div>
+        
+        <hr>
+
+
+        <label id="meme-box-title" class="form-label">Memes Connections * &rarr;</label>
+        <button class="btn btn-primary btn-sm btn-block" type="button" onclick="Load_New_Entity_MemeSet()">CHOOSE MEME SET</button>
+        <div class="row" id="newEntityMemeSet">
+
+        </div>
+        <hr>
+        <br>
+        <button type="button" class="btn btn-primary btn-lg" onclick="Finish_Btn()">
+            Finish
+        </button>
+
+        `
+    return htmlpart3
 }
 
 
@@ -161,7 +193,7 @@ async function Load_New_Entity_ImageSet() {
         return path.parse(filepath).base
     })
     console.log(files_tmp_base)
-
+    entity_image_set = files_tmp_base
     imgHTML_tmp = ""
     files_tmp_base.forEach(filename => {
         imgHTML_tmp += `<img class="imgG" src="/home/resort/Documents/repos/Tagasaurus/images/${filename}">`
@@ -173,6 +205,27 @@ async function Load_New_Entity_ImageSet() {
 
     document.getElementById("newEntityPictureSet").innerHTML  = htmlpart_imageset
 
+}
+
+async function Load_New_Entity_MemeSet() {
+    
+    result = await ipcRenderer_pics.invoke('dialog:openEntityImageSet')
+    files_tmp = result.filePaths
+    files_tmp_base = files_tmp.map(function(filepath) {
+        return path.parse(filepath).base
+    })
+    console.log(files_tmp_base)
+    entity_image_set = files_tmp_base
+    imgHTML_tmp = ""
+    files_tmp_base.forEach(filename => {
+        imgHTML_tmp += `<img class="imgG" src="/home/resort/Documents/repos/Tagasaurus/images/${filename}">`
+    });
+    console.log(imgHTML_tmp)
+    htmlpart_imageset = /*html*/`
+                    ${imgHTML_tmp}
+                `
+
+    document.getElementById("newEntityMemeSet").innerHTML  = htmlpart_imageset
 
 }
 
@@ -185,8 +238,23 @@ function Next_Btn_Step1() {
     entity_description = document.getElementById('descriptionCreateEntity').value
     console.log(entity_description)
 
-    step_ind += 1
     Entity_Fill_Delegation()
+    Entity_CreationPage_Next()
+}
+
+function Next_Btn_Step2() {
+
+    console.log("next step 2")
+    
+
+    Entity_Fill_Delegation()
+    Entity_CreationPage_Next()
+}
+
+function Finish_Btn() {
+
+    console.log('finishing the entity creation')
+
 }
 
 Pagination_page_item_activate()
