@@ -13,6 +13,8 @@ var step_ind = 1;
 dir_pics = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
 ipcRenderer_pics = require('electron').ipcRenderer
 path = require('path');
+entity_db_fns = require('./myJS/entity-db-fns.js');
+
 
 var entity_tag_name = ""
 var entity_file_name = ""
@@ -280,6 +282,9 @@ function Finish_Btn() {
         }
 
     console.log(entities_entry)
+    console.log('now going to insert entity data')
+
+    entity_db_fns.Insert_Record(entities_entry)
 
 }
 

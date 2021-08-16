@@ -1,4 +1,4 @@
-
+/*
 var entities_ex = [
     {
         "entityName":"name1",
@@ -22,11 +22,11 @@ var entities_ex = [
         "entityMemes": ["file2.jpg"]
     }
 ] 
-
+*/
 
 db_entities = null;
 
-const ENTITY_DB_NAME = 'entityDB'
+const ENTITY_DB_NAME = 'entityDB_test'
 const ENTITY_OBJSTORE_NAME = 'entityStore'
 const ENTITY_KEY_PATH_NAME = "entityName" //primary key for records
 
@@ -123,6 +123,8 @@ function Insert_Record(records) {
         }
     }
 }
+exports.Insert_Record = Insert_Record
+
 
 //eg. get_record('abc@def.com')
 function Get_Record(record_key){
