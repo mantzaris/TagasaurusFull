@@ -18,6 +18,8 @@ var entity_tag_name = ""
 var entity_file_name = ""
 var entity_description = ""
 var entity_image_set = ""
+var emotion_values = ""
+var meme_image_set = ""
 
 function Entity_CreationPage_Previous() {
 
@@ -83,6 +85,10 @@ function Entity_Fill_Delegation() {
         html_part = Part3_HTML()
 
         document.getElementById('partBody').innerHTML = html_part
+
+        document.getElementById('happy').value = 0
+        document.getElementById('sad').value = 0
+        document.getElementById('confused').value = 0
 
     }
 
@@ -169,7 +175,7 @@ function Part3_HTML() {
             Finish
         </button>
 
-        `
+        `        
     return htmlpart3
 }
 
@@ -215,12 +221,12 @@ async function Load_New_Entity_MemeSet() {
         return path.parse(filepath).base
     })
     console.log(files_tmp_base)
-    entity_image_set = files_tmp_base
+    meme_image_set = files_tmp_base
     imgHTML_tmp = ""
     files_tmp_base.forEach(filename => {
         imgHTML_tmp += `<img class="imgG" src="/home/resort/Documents/repos/Tagasaurus/images/${filename}">`
     });
-    console.log(imgHTML_tmp)
+    console.log(meme_image_set)
     htmlpart_imageset = /*html*/`
                     ${imgHTML_tmp}
                 `
@@ -244,8 +250,7 @@ function Next_Btn_Step1() {
 
 function Next_Btn_Step2() {
 
-    console.log("next step 2")
-    
+    console.log("next step 2")    
 
     Entity_Fill_Delegation()
     Entity_CreationPage_Next()
@@ -253,7 +258,28 @@ function Next_Btn_Step2() {
 
 function Finish_Btn() {
 
-    console.log('finishing the entity creation')
+    //emotion_values = 
+    happy_value = document.getElementById('happy').value
+    sad_value = document.getElementById('sad').value
+    confused_value = document.getElementById('confused').value
+
+    console.log(entity_tag_name)
+    console.log(entity_file_name)
+    console.log(entity_description)
+    console.log(entity_image_set)
+    console.log([happy_value,sad_value,confused_value])
+    console.log(meme_image_set)
+
+    entities_entry = {
+            "entityName": entity_tag_name,
+            "entityImage": entity_file_name,
+            "entityDescription": entity_description,
+            "entityImageSet": entity_image_set,
+            "entityEmotions": {happy:happy_value,sad:sad_value,confused:confused_value},            
+            "entityMemes": meme_image_set
+        }
+
+    console.log(entities_entry)
 
 }
 
