@@ -30,6 +30,9 @@ const ENTITY_DB_NAME = 'entityDB_test'
 const ENTITY_OBJSTORE_NAME = 'entityStore'
 const ENTITY_KEY_PATH_NAME = "entityName" //primary key for records
 
+var entity_keys = '';
+var current_record;
+
 //create the database and the objectstore (table), and the keyPath (primary key) as the entity name
 function Create_Db(){
 
@@ -127,33 +130,45 @@ exports.Insert_Record = Insert_Record
 
 
 //eg. get_record('abc@def.com')
-function Get_Record(record_key){
+async function Get_Record(record_key){
 
-    if(db_entities){
-        const get_transaction = db_entities.transaction(ENTITY_OBJSTORE_NAME, 'readonly')
-        const store = get_transaction.objectStore(ENTITY_OBJSTORE_NAME)
+    myPromise = new Promise((resolve, reject) => {
+        if(db_entities){
+            const get_transaction = db_entities.transaction(ENTITY_OBJSTORE_NAME, 'readonly')
+            const store = get_transaction.objectStore(ENTITY_OBJSTORE_NAME)
 
-        get_transaction.onerror = function(event){
-            console.log(`entity, problem with transactions for Get_Record of ${record_key} , error report:`)
-            console.log(event.target.error)
+            get_transaction.onerror = function(event){
+                console.log(`entity, problem with transactions for Get_Record of ${record_key} , error report:`)
+                console.log(event.target.error)
+            }
+            get_transaction.oncomplete = function(event){
+                console.log(`entity, all transactions complete for Get_Record of ${record_key}`)
+                console.log(request.result)
+            }
+            
+            let request = store.get(record_key);
+            
+            request.onerror = function(event){
+                console.log('entity, could not get record from store in Get_Record by key: ', record_key)
+                console.log(event.target.error)
+            }
+            request.onsuccess = function(event){
+                console.log('entity, successfully got / retrieved ', record_key, ' ', event.target.result)
+                // PUT HERE THE CALL BACK FOR THE RESULT TO BE ACTED UPON
+                resolve(event.target.result)
+            }
         }
-        get_transaction.oncomplete = function(event){
-            console.log(`entity, all transactions complete for Get_Record of ${record_key}`)
-            console.log(request.result)
-        }
-        
-        let request = store.get(record_key);
-        
-        request.onerror = function(event){
-            console.log('entity, could not get record from store in Get_Record by key: ', record_key)
-            console.log(event.target.error)
-        }
-        request.onsuccess = function(event){
-            console.log('entity, successfully got / retrieved ', record_key, ' ', event.target.result)
-            // PUT HERE THE CALL BACK FOR THE RESULT TO BE ACTED UPON
-        }
-    }
+    })
+    await myPromise.then(value => {current_record = value; console.log(`promise return: ${value}`); })    
 }
+exports.Get_Record = Get_Record
+
+//access the keys
+function Read_Current_Record() {
+    return current_record
+}
+exports.Read_Current_Record = Read_Current_Record
+
 
 //eg. update_record({name:'scifi',dob:'22/11/80',email:'yea@lll.org'})
 function Update_Record(record){
@@ -228,21 +243,40 @@ function Get_All_From_DB(){
 exports.Get_All_From_DB = Get_All_From_DB
 
 //return all the keys (primary keys) in the object store
-function Get_All_Keys_From_DB(index){
-
+async function Get_All_Keys_From_DB(){
+    console.log('in Get_All_Keys_From_DB')
     let cursor_transaction = db_entities.transaction(ENTITY_OBJSTORE_NAME, 'readonly')
     let store = cursor_transaction.objectStore(ENTITY_OBJSTORE_NAME)
 
-    let request = store.getAllKeys();
-    request.onerror = function(event){
-        console.log('entity, could not IDBObjectStore.Get_All_Keys_From_DB()')
-        console.log(event.target.error)
-    }
-    request.onsuccess = function(event) {
-        console.log('entity, success in IDBObjectStore.Get_All_Keys_From_DB()')
-        console.log(event.target.result)
-    }
+    myPromise = new Promise((resolve, reject) => {
+        
+        let request = store.getAllKeys();
+        request.onerror = function(event){
+            console.log('entity, could not IDBObjectStore.Get_All_Keys_From_DB()')
+            console.log(event.target.error)
+            reject(event.target.error)
+        }
+        request.onsuccess = function(event) {
+            console.log('entity, success in IDBObjectStore.Get_All_Keys_From_DB()')
+            console.log(event.target.result)
+            console.log(entity_keys)
+            entity_keys = event.target.result
+            console.log(entity_keys)
+            resolve(entity_keys)
+        }
+
+    });
+    await myPromise.then(value => { console.log(`promise return: ${value}`); })
+    return
 }
+exports.Get_All_Keys_From_DB = Get_All_Keys_From_DB
+
+//access the keys
+function Read_All_Keys_From_DB() {
+    return entity_keys
+}
+exports.Read_All_Keys_From_DB = Read_All_Keys_From_DB
+
 
 ii=0
 var docs = []

@@ -31,8 +31,8 @@ function Entity_CreationPage_Previous() {
     }
     console.log(step_ind)
 
-    Pagination_page_item_activate() 
-    Entity_Fill_Delegation() 
+    Pagination_page_item_activate()
+    Entity_Fill_Delegation()
 
 }
 
@@ -283,7 +283,7 @@ function Finish_Btn() {
 
     console.log(entities_entry)
     console.log('now going to insert entity data')
-
+    console.log
     entity_db_fns.Insert_Record(entities_entry)
 
 }
