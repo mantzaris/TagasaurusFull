@@ -9,7 +9,8 @@ console.log('in entity view')
 
 
 var current_record;
-
+var all_keys;
+var key_index = 0;
 
 
 function Prev_Image() {
@@ -21,8 +22,10 @@ async function Next_Image() {
     console.log("next image button clicked")
     await entity_db_fns.Get_All_Keys_From_DB()
     keys_tmp = entity_db_fns.Read_All_Keys_From_DB()
-    console.log('keys tmp = '+keys_tmp[0])
-    await entity_db_fns.Get_Record(keys_tmp[0])
+    console.log('allkeys = '+keys_tmp)
+    console.log('key_index = '+key_index)
+    console.log('allkeys length = '+all_keys.length)
+    await entity_db_fns.Get_Record(keys_tmp[key_index])
     record_tmp = entity_db_fns.Read_Current_Record()
     console.log(record_tmp)
     console.log('entity name: ')
@@ -54,6 +57,9 @@ async function Next_Image() {
     console.log("what is the entity db fns obj")
     console.log(entity_db_fns)
 
+    if(key_index < all_keys.length-1){
+        key_index += 1
+    }
 }
 
 function Create_New_Entity() {
@@ -222,11 +228,45 @@ async function Load_Entity_Gallery(){
 
 }
 
-function test(){
+async function Initialize_Entity_Page(){
     console.log("test FN")
-    entity_db_fns.Get_All_Keys_From_DB()
-    //var entity_db_fns2 = await require('./myJS/entity-db-fns.js');
-    //entity_db_fns2.Get_All_Keys_From_DB()
+    await entity_db_fns.Create_Db()
+    await entity_db_fns.Get_All_Keys_From_DB()
+    all_keys = entity_db_fns.Read_All_Keys_From_DB()
+    
+    first_record = await entity_db_fns.Get_Record(all_keys[0])
+    console.log('the new get record')
+    console.log(first_record)
+
+    //entity name
+    document.getElementById("entityName").textContent = '#' + first_record.entityName;
+    //entity profile image
+    default_img = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' + first_record.entityImage
+    console.log(default_img)
+    document.getElementById("entityProfileImg").src = default_img;
+
+    gallery_html = `<div class="row">`
+    default_path = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' 
+    image_set = first_record.entityImageSet
+    image_set.forEach(element => {
+        gallery_html += `
+        <img class="imgG" src="${default_path + element}">
+        `
+    });    
+    gallery_html += `</div>`
+    document.getElementById("entityGallery").innerHTML  = gallery_html;
+
+    emotion_set_obj = record_tmp.entityEmotions
+    for (var emotion in emotion_set_obj) {       
+        document.getElementById(emotion).value = emotion_set_obj[emotion]
+    }
+    
+    current_record = first_record
+
+    key_index += 1
+    console.log("new key index")
+    console.log(key_index)
+    
 }
 
 //Require_DB_Module()
@@ -235,4 +275,4 @@ Set_Entity_Name_Label()
 Load_First_Image()
 Load_Entity_Gallery()
 //PROBLEM
-test()
+Initialize_Entity_Page()

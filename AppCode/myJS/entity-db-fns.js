@@ -34,44 +34,52 @@ var entity_keys = '';
 var current_record;
 
 //create the database and the objectstore (table), and the keyPath (primary key) as the entity name
-function Create_Db(){
+async function Create_Db(){
 
-    let request = window.indexedDB.open(ENTITY_DB_NAME,1)
-    
-    request.onsuccess = function(event){
-        db_entities = event.target.result;
-        console.log(`entity, Create_Db() successfully opened DB, ${ENTITY_DB_NAME}`)
-        console.log(event.target.result)
-    }
-    request.onerror = function(event){
-        console.log(`entity, Create_Db() error opening a db, ${ENTITY_DB_NAME}`);
-        console.log(event.target.error)
-    }
-    
-    request.onupgradeneeded = function(event){
-        console.log('entity, Create_Db() onupgradeneeded')
-        console.log(event.target.result.name)
-        console.log('printing out db_entities object (db object) ', db_entities)
+    myPromise = new Promise((resolve, reject) => {
+        let request = window.indexedDB.open(ENTITY_DB_NAME,1)
         
-        //if db_entities exists and tablename/object store the same do not recreate
-        version_num = event.oldVersion
-        if(version_num > 0) { //db exists
+        request.onsuccess = function(event){
             db_entities = event.target.result;
-            console.log(`entities, onupgradeneeded in Create_Db() the event.oldVersion value= ${version_num}`)  
-            console.log('in upgradeneeded db_entities table name check!!!')
+            resolve(db_entities)
+            console.log(`entity, Create_Db() successfully opened DB, ${ENTITY_DB_NAME}`)
             console.log(event.target.result)
+        }
+        request.onerror = function(event){
+            console.log(`entity, Create_Db() error opening a db, ${ENTITY_DB_NAME}`);
+            console.log(event.target.error)
+        }
+    
+        request.onupgradeneeded = function(event){
+            console.log('entity, Create_Db() onupgradeneeded')
             console.log(event.target.result.name)
-        } else{ //new db, so time to create it from scratch, oldVersion is ZERO
-            console.log(`entities, create NEW db in Create_Db() the 'event.oldVersion' value= ${version_num}`)
-            db_entities = event.target.result;
-            store = db_entities.createObjectStore(ENTITY_OBJSTORE_NAME,{keyPath: ENTITY_KEY_PATH_NAME})
-            store.transaction.oncomplete = function(event){
-                console.log("entitiesTmp store creation successfully completed in onupgradeneeded")
+            console.log('printing out db_entities object (db object) ', db_entities)
+            
+            //if db_entities exists and tablename/object store the same do not recreate
+            version_num = event.oldVersion
+            if(version_num > 0) { //db exists
+                db_entities = event.target.result;
+                resolve(db_entities)
+                console.log(`entities, onupgradeneeded in Create_Db() the event.oldVersion value= ${version_num}`)  
+                console.log('in upgradeneeded db_entities table name check!!!')
                 console.log(event.target.result)
+                console.log(event.target.result.name)
+            } else{ //new db, so time to create it from scratch, oldVersion is ZERO
+                console.log(`entities, create NEW db in Create_Db() the 'event.oldVersion' value= ${version_num}`)
+                db_entities = event.target.result;
+                resolve(db_entities)
+                store = db_entities.createObjectStore(ENTITY_OBJSTORE_NAME,{keyPath: ENTITY_KEY_PATH_NAME})
+                store.transaction.oncomplete = function(event){
+                    console.log("entitiesTmp store creation successfully completed in onupgradeneeded")
+                    console.log(event.target.result)
+                }
             }
         }
-    }
+    });
+    await myPromise.then(value => {db_entities = value; console.log(`promise return: Create_Db`); })    
+
 }
+exports.Create_Db = Create_Db
 
 
 //incase we need to get rid of the database
@@ -160,7 +168,8 @@ async function Get_Record(record_key){
             }
         }
     })
-    await myPromise.then(value => {current_record = value; console.log(`promise return: ${value}`); })    
+    record_tmp = await myPromise.then(value => {current_record = value; console.log(`promise return: ${value}`); return value; })    
+    return record_tmp
 }
 exports.Get_Record = Get_Record
 
