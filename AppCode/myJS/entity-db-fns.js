@@ -73,6 +73,7 @@ function Create_Db(){
     }
 }
 
+
 //incase we need to get rid of the database
 function Delete_Db(){
     let request = window.indexedDB.deleteDatabase(ENTITY_DB_NAME)
@@ -321,6 +322,7 @@ function cursor(){
 
 
 //MUST RUN THIS FUNCTION FIRST TO GET THE DB OBJECT
+
 Create_Db()
 //delete_db()
 

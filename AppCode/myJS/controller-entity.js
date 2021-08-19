@@ -1,6 +1,8 @@
 
 
-entity_db_fns = require('./myJS/entity-db-fns.js');
+var entity_db_fns = require('./myJS/entity-db-fns.js');
+
+
 // eg. entity_db_fns.Get_All_From_DB()
 
 console.log('in entity view')
@@ -9,9 +11,10 @@ console.log('in entity view')
 var current_record;
 
 
+
 function Prev_Image() {
     console.log("previous image button clicked")
-    
+    test()
 }
 
 async function Next_Image() {
@@ -48,6 +51,8 @@ async function Next_Image() {
     }
     
     current_record = record_tmp
+    console.log("what is the entity db fns obj")
+    console.log(entity_db_fns)
 
 }
 
@@ -60,9 +65,6 @@ function Delete_Entity() {
     console.log("Delete_Entity entity button clicked")
 }
 
-function Export_Entities() {
-    console.log("Export_Entities entity button clicked")
-}
 
 function Entity_Emotion_Page() {
     console.log("entity emotion page button clicked")
@@ -191,7 +193,7 @@ function Load_First_Image(){
     document.getElementById("entityProfileImg").src = default_img;
 }
 
-function Load_Entity_Gallery(){
+async function Load_Entity_Gallery(){
     console.log('entity gallery')
     default_img = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/Taga.png'
 
@@ -220,7 +222,17 @@ function Load_Entity_Gallery(){
 
 }
 
+function test(){
+    console.log("test FN")
+    entity_db_fns.Get_All_Keys_From_DB()
+    //var entity_db_fns2 = await require('./myJS/entity-db-fns.js');
+    //entity_db_fns2.Get_All_Keys_From_DB()
+}
+
+//Require_DB_Module()
 Entity_Emotion_Page()
 Set_Entity_Name_Label()
 Load_First_Image()
 Load_Entity_Gallery()
+//PROBLEM
+test()
