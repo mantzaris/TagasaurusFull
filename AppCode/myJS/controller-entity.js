@@ -1,19 +1,13 @@
 
-
 var entity_db_fns = require('./myJS/entity-db-fns.js');
-
 
 // eg. entity_db_fns.Get_All_From_DB()
 
 console.log('in entity view')
 
-
 var current_record;
 var all_keys;
 var key_index = 0;
-
-
-
 
 
 function Create_New_Entity() {
@@ -44,7 +38,6 @@ function Set_Entity_Name_Label(){
     document.getElementById("entityName").textContent= '#' + "Taga";
 
 }
-
 
 
 function Entity_Memes_Page() {

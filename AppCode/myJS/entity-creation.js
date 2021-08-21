@@ -64,6 +64,16 @@ function Pagination_page_item_activate() {
     console.log(document.getElementById(`step3`).classList)
 
     document.getElementById(`step${step_ind}`).className += " active";
+
+    if(step_ind == 1){
+        document.getElementById(`previous_creation_page`).className += " disabled";
+    } else if(step_ind == 2){
+        document.getElementById(`previous_creation_page`).classList.remove("disabled")
+        document.getElementById(`next_creation_page`).classList.remove("disabled")
+    } else if(step_ind == 3){
+        document.getElementById(`next_creation_page`).className += " disabled";
+
+    }
 }
 
 
@@ -117,7 +127,7 @@ function Part1_HTML() {
             3) entity description
             <textarea class="form-control textareaCreate2" id="descriptionCreateEntity" ></textarea>            
             
-            <br>
+            <br>           
             <button type="button" class="btn btn-primary btn-lg" onclick="Next_Btn_Step1()">
                 Next
             </button>
@@ -138,7 +148,9 @@ function Part2_HTML() {
 
             </div>
             <br>
-            
+            <button type="button" class="btn btn-primary btn-lg" onclick="Entity_CreationPage_Previous()">
+                Back
+            </button>
             <button type="button" class="btn btn-primary btn-lg" onclick="Next_Btn_Step2()">
                 Next
             </button>
@@ -173,9 +185,12 @@ function Part3_HTML() {
         </div>
         <hr>
         <br>
-        <button type="button" class="btn btn-primary btn-lg" onclick="Finish_Btn()">
-            Finish
+        <button type="button" class="btn btn-primary btn-lg" onclick="Entity_CreationPage_Previous()">
+            Back
         </button>
+        <a type="button" class="btn btn-primary btn-lg" onclick="Finish_Btn()" href="entity-main.html">
+            Finish
+        </a>
 
         `        
     return htmlpart3
@@ -286,6 +301,7 @@ function Finish_Btn() {
     console.log
     entity_db_fns.Insert_Record(entities_entry)
 
+    
 }
 
 Pagination_page_item_activate()
