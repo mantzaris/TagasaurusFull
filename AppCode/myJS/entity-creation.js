@@ -6,6 +6,11 @@
 //5 entity emotions
 //6 entity memes
 
+//notification code from: https://github.com/MLaritz/Vanilla-Notify
+vanilla_notify = require('./js-modules-downloaded/vanilla-notify.js');
+
+
+
 console.log("js for the creation of the entity")
 
 var step_ind = 1;
@@ -114,17 +119,17 @@ function Part1_HTML() {
     htmlpart1 = /*html*/`
         <div>
 
-            1) tag name
+            <p style="font-size:3em;"> 1) tag name </p>
             <textarea class="form-control textareaCreate1" id="nameCreateEntity" ></textarea>
             <br>
 
-            2) entity profile picture
-            <button class="btn btn-primary btn-sm btn-block" type="button" onclick="Load_New_Entity_Image()">CHOOSE</button>
+            <p style="font-size:3em;"> 2) entity profile picture </p>
+            <button class="btn btn-primary btn-lg btn-block" type="button" onclick="Load_New_Entity_Image()">CHOOSE FILE</button>
             <div class="row" id="newEntityProfilePic">
 
             </div>
             <br>
-            3) entity description
+            <p style="font-size:3em;"> 3) entity description </p>
             <textarea class="form-control textareaCreate2" id="descriptionCreateEntity" ></textarea>            
             
             <br>           
@@ -142,8 +147,11 @@ function Part2_HTML() {
     htmlpart2 = /*html*/`
         <div>
 
-            1) entity pictures selection
-            <button class="btn btn-primary btn-sm btn-block" type="button" onclick="Load_New_Entity_ImageSet()">CHOOSE IMAGE SET</button>
+            <img class="imgG" src="/home/resort/Documents/repos/Tagasaurus/images/${entity_file_name}">
+            <br>
+            <p style="font-size:3em;"> 1) entity pictures selection </p>
+            
+            <button class="btn btn-primary btn-lg btn-block" type="button" onclick="Load_New_Entity_ImageSet()">CHOOSE IMAGE SET</button>
             <div class="row" id="newEntityPictureSet">
 
             </div>
@@ -188,14 +196,13 @@ function Part3_HTML() {
         <button type="button" class="btn btn-primary btn-lg" onclick="Entity_CreationPage_Previous()">
             Back
         </button>
-        <a type="button" class="btn btn-primary btn-lg" onclick="Finish_Btn()" href="entity-main.html">
+        <a type="button" class="btn btn-primary btn-lg" onclick="Finish_Btn()" >
             Finish
         </a>
 
         `        
     return htmlpart3
 }
-
 
 async function Load_New_Entity_Image() {
     const result = await ipcRenderer_pics.invoke('dialog:openEntity')
@@ -212,22 +219,25 @@ async function Load_New_Entity_ImageSet() {
     
     result = await ipcRenderer_pics.invoke('dialog:openEntityImageSet')
     files_tmp = result.filePaths
-    files_tmp_base = files_tmp.map(function(filepath) {
-        return path.parse(filepath).base
+    files_tmp_base = []
+    files_tmp.map(function(filepath) {
+        tmp_file_path = path.parse(filepath).base
+        if(tmp_file_path != entity_file_name){
+            files_tmp_base.push(tmp_file_path)
+        }
     })
     console.log(files_tmp_base)
-    entity_image_set = files_tmp_base
     imgHTML_tmp = ""
     files_tmp_base.forEach(filename => {
         imgHTML_tmp += `<img class="imgG" src="/home/resort/Documents/repos/Tagasaurus/images/${filename}">`
     });
-    console.log(imgHTML_tmp)
     htmlpart_imageset = /*html*/`
                     ${imgHTML_tmp}
                 `
 
     document.getElementById("newEntityPictureSet").innerHTML  = htmlpart_imageset
-
+    files_tmp_base.push(entity_file_name)
+    entity_image_set = files_tmp_base
 }
 
 async function Load_New_Entity_MemeSet() {
@@ -254,16 +264,21 @@ async function Load_New_Entity_MemeSet() {
 
 function Next_Btn_Step1() {
 
-    console.log("next step 1")
-    console.log(entity_file_name)
     entity_tag_name = document.getElementById('nameCreateEntity').value
-    console.log(entity_tag_name)
     entity_description = document.getElementById('descriptionCreateEntity').value
-    console.log(entity_description)
 
-    Entity_Fill_Delegation()
-    Entity_CreationPage_Next()
+    if(entity_tag_name == "" || entity_description == "" || entity_file_name == ""){
+        vanilla_notify.vNotify.error({visibleDuration: 1200,fadeOutDuration: 250,
+                            fadeInDuration: 350, text: 'no empty fields!', title:'attention'});
+
+    } else{
+
+        Entity_Fill_Delegation()
+        Entity_CreationPage_Next()
+    }
+
 }
+
 
 function Next_Btn_Step2() {
 
@@ -275,32 +290,38 @@ function Next_Btn_Step2() {
 
 function Finish_Btn() {
 
-    //emotion_values = 
+    //emotion_values =     
     happy_value = document.getElementById('happy').value
     sad_value = document.getElementById('sad').value
     confused_value = document.getElementById('confused').value
 
-    console.log(entity_tag_name)
-    console.log(entity_file_name)
-    console.log(entity_description)
-    console.log(entity_image_set)
-    console.log([happy_value,sad_value,confused_value])
-    console.log(meme_image_set)
+    if(happy_value == 0 && sad_value == 0 && confused_value == 0){
+        vanilla_notify.vNotify.error({visibleDuration: 1200,fadeOutDuration: 250,
+            fadeInDuration: 350, text: 'at least one non-zero emotion!', title:'attention'});
 
-    entities_entry = {
-            "entityName": entity_tag_name,
-            "entityImage": entity_file_name,
-            "entityDescription": entity_description,
-            "entityImageSet": entity_image_set,
-            "entityEmotions": {happy:happy_value,sad:sad_value,confused:confused_value},            
-            "entityMemes": meme_image_set
-        }
+    } else{
+        console.log(entity_tag_name)
+        console.log(entity_file_name)
+        console.log(entity_description)
+        console.log(entity_image_set)
+        console.log([happy_value,sad_value,confused_value])
+        console.log(meme_image_set)
 
-    console.log(entities_entry)
-    console.log('now going to insert entity data')
-    console.log
-    entity_db_fns.Insert_Record(entities_entry)
+        entities_entry = {
+                "entityName": entity_tag_name,
+                "entityImage": entity_file_name,
+                "entityDescription": entity_description,
+                "entityImageSet": entity_image_set,
+                "entityEmotions": {happy:happy_value,sad:sad_value,confused:confused_value},            
+                "entityMemes": meme_image_set
+            }
 
+        console.log(entities_entry)
+        console.log('now going to insert entity data')
+        entity_db_fns.Insert_Record(entities_entry)
+        //window redirect
+        window.location="entity-main.html"
+    }
     
 }
 
