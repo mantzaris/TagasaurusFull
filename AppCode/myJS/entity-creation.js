@@ -171,23 +171,24 @@ function Part2_HTML() {
 function Part3_HTML() {
 
     htmlpart3 = /*html*/`        
-        entity emotions, entity memes <br>
+    <p style="font-size:2em;">entity emotions, entity memes</p>
+        <br>
         <div class="emotion-page">                    
-            <label id="emotion-box-title" class="form-label">EMOTIONS (*)</label>
+            <label id="emotion-box-title" class="form-label" style="font-size:2em;">EMOTIONS (*)</label>
             <hr>    
-            <label for="customRange1" class="form-label">happy range</label>
+            <label for="customRange1" class="form-label" style="font-size:1.5em;">happy range</label>
             <input type="range" class="form-range" id="happy">                        
-            <label for="customRange1" class="form-label">sad range</label>
+            <label for="customRange1" class="form-label" style="font-size:1.5em;">sad range</label>
             <input type="range" class="form-range" id="sad">
-            <label for="customRange1" class="form-label">confused range</label>
+            <label for="customRange1" class="form-label" style="font-size:1.5em;">confused range</label>
             <input type="range" class="form-range" id="confused">
         </div>
         
         <hr>
 
 
-        <label id="meme-box-title" class="form-label">Memes Connections * &rarr;</label>
-        <button class="btn btn-primary btn-sm btn-block" type="button" onclick="Load_New_Entity_MemeSet()">CHOOSE MEME SET</button>
+        <label id="meme-box-title" class="form-label" style="font-size:2em;">Memes Connections * &rarr;</label>
+        <button class="btn btn-primary btn-lg btn-block" type="button" onclick="Load_New_Entity_MemeSet()">CHOOSE MEME SET</button>
         <div class="row" id="newEntityMemeSet">
 
         </div>
