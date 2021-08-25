@@ -53,11 +53,13 @@ function Entity_Memes_Page() {
     gallery_html = `<div class="row" id="meme_page_view">`
     default_path = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' 
     memes_array = current_record.entityMemes
-    memes_array.forEach(element => {
-        gallery_html += `
-        <img class="imgG" src="${default_path + element}">
-        `
-    });    
+    if(memes_array != ""){
+        memes_array.forEach(element => {
+            gallery_html += `
+            <img class="imgG" src="${default_path + element}">
+            `
+        });    
+    }
     gallery_html += `<br><button type="button" class="btn btn-primary btn-lg" onclick="New_Entity_Memes()">Choose new memes</button>`
     document.getElementById("annotationPages").innerHTML  = gallery_html;
 }
