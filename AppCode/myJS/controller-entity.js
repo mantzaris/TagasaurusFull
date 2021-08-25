@@ -16,14 +16,24 @@ function Create_New_Entity() {
     
 }
 
-function Delete_Entity() {
+async function Delete_Entity() {
     console.log("Delete_Entity entity button clicked")
+
+    console.log(`entity to be deleted: ${current_record.entityName}`)
+    entity_key = current_record.entityName
+
+    await entity_db_fns.Delete_Record(entity_key)
+    await entity_db_fns.Get_All_Keys_From_DB()
+    all_keys = entity_db_fns.Read_All_Keys_From_DB()   
+
     Toastify({
-        text: "This is a toast", duration: 2000, newWindow: true,
+        text: "This is a toast", duration: 1500, newWindow: true,
         close: true, gravity: "top", position: "left",
         backgroundColor: "#96c93d", stopOnFocus: true
         //onClick: function(){} // Callback after click
     }).showToast();
+
+    Show_Entity_From_Key(all_keys[key_index])
 }
 
 function Save_Entity_Emotions() {

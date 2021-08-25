@@ -232,10 +232,12 @@ function Delete_Record(record_key){
             console.log(event.target.error)
         }
         request.onsuccess = function(event){
-            console.log('entity, successfully delete ', record_key, ' ', event.target.result)
+            console.log('entity, successfully deleted: ', record_key, ' ', event.target.result)
         }    
     }
 }
+exports.Delete_Record = Delete_Record
+
 
 //return all the records in the object store 
 function Get_All_From_DB(){
