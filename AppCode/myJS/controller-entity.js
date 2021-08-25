@@ -1,7 +1,8 @@
 
 var entity_db_fns = require('./myJS/entity-db-fns.js');
 
-// eg. entity_db_fns.Get_All_From_DB()
+Toastify = require('toastify-js')
+
 
 console.log('in entity view')
 
@@ -17,11 +18,17 @@ function Create_New_Entity() {
 
 function Delete_Entity() {
     console.log("Delete_Entity entity button clicked")
+    Toastify({
+        text: "This is a toast", duration: 2000, newWindow: true,
+        close: true, gravity: "top", position: "left",
+        backgroundColor: "#96c93d", stopOnFocus: true
+        //onClick: function(){} // Callback after click
+    }).showToast();
 }
 
 function Save_Entity_Emotions() {
     console.log("Save_Entity_Emotions button clicked")
-   
+
 }
 
 
@@ -145,6 +152,7 @@ async function Next_Image() {
         key_index = 0
     }
     Show_Entity_From_Key(all_keys[key_index])
+    
     
 }
 

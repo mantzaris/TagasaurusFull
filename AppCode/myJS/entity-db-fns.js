@@ -149,6 +149,7 @@ async function Get_Record(record_key){
             get_transaction.onerror = function(event){
                 console.log(`entity, problem with transactions for Get_Record of ${record_key} , error report:`)
                 console.log(event.target.error)
+                reject("false")
             }
             get_transaction.oncomplete = function(event){
                 console.log(`entity, all transactions complete for Get_Record of ${record_key}`)
@@ -160,6 +161,7 @@ async function Get_Record(record_key){
             request.onerror = function(event){
                 console.log('entity, could not get record from store in Get_Record by key: ', record_key)
                 console.log(event.target.error)
+                reject("false")
             }
             request.onsuccess = function(event){
                 console.log('entity, successfully got / retrieved ', record_key, ' ', event.target.result)
@@ -168,7 +170,8 @@ async function Get_Record(record_key){
             }
         }
     })
-    record_tmp = await myPromise.then(value => {current_record = value; console.log(`promise return: ${value}`); return value; })    
+    record_tmp = await myPromise.then(value => {current_record = value; console.log(`promise return: ${value}`); return value; })
+                                    .catch(resolve_val => console.log('in the CATCH'))   
     return record_tmp
 }
 exports.Get_Record = Get_Record

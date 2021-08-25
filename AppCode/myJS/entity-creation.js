@@ -238,6 +238,7 @@ async function Load_New_Entity_ImageSet() {
 
     document.getElementById("newEntityPictureSet").innerHTML  = htmlpart_imageset
     files_tmp_base.push(entity_file_name)
+    console.log(`the new image set is: ${files_tmp_base}`)
     entity_image_set = files_tmp_base
 }
 
@@ -263,33 +264,43 @@ async function Load_New_Entity_MemeSet() {
 
 }
 
-function Next_Btn_Step1() {
+async function Next_Btn_Step1() {
 
     entity_tag_name = document.getElementById('nameCreateEntity').value
     entity_description = document.getElementById('descriptionCreateEntity').value
+    //record exists in the DB?..
+    response = await entity_db_fns.Get_Record(entity_tag_name)
 
     if(entity_tag_name == "" || entity_description == "" || entity_file_name == ""){
         vanilla_notify.vNotify.error({visibleDuration: 1200,fadeOutDuration: 250,
-                            fadeInDuration: 350, text: 'no empty fields!', title:'attention'});
-
-    } else{
-
+                            fadeInDuration: 350, text: 'no empty fields!', title:'attention'});    
+    } else if(response == undefined){ //case for it being a new tag not defined yet
         Entity_Fill_Delegation()
-        Entity_CreationPage_Next()
+        Entity_CreationPage_Next()    
+    } else { 
+        vanilla_notify.vNotify.error({visibleDuration: 1200,fadeOutDuration: 250,
+            fadeInDuration: 350, text: 'tag name already exists!', title:'issue'});
+        console.log('RECORD ALREADY EXISTS')            
     }
 
+
+    
 }
 
 
 function Next_Btn_Step2() {
 
-    console.log("next step 2")    
+    console.log("next step 2")   
+    
+    if(entity_image_set.length == 0){
+        entity_image_set = [entity_file_name]
+    }
 
     Entity_Fill_Delegation()
     Entity_CreationPage_Next()
 }
 
-function Finish_Btn() {
+async function Finish_Btn() {
 
     //emotion_values =     
     happy_value = document.getElementById('happy').value
@@ -319,7 +330,7 @@ function Finish_Btn() {
 
         console.log(entities_entry)
         console.log('now going to insert entity data')
-        entity_db_fns.Insert_Record(entities_entry)
+        await entity_db_fns.Insert_Record(entities_entry)
         //window redirect
         window.location="entity-main.html"
     }
