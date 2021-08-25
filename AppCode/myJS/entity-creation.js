@@ -137,6 +137,9 @@ function Part1_HTML() {
                 Next
             </button>
         </div>
+        <a type="button" style="background-color: #993333" class="btn btn-primary btn-lg" href="entity-main.html" >
+            Cancel
+        </a>
         `
     return htmlpart1
 }
@@ -163,6 +166,9 @@ function Part2_HTML() {
                 Next
             </button>
         </div>
+        <a type="button" style="background-color: #993333" class="btn btn-primary btn-lg" href="entity-main.html" >
+            Cancel
+        </a>
         `
     return htmlpart2
 
@@ -200,9 +206,22 @@ function Part3_HTML() {
         <a type="button" class="btn btn-primary btn-lg" onclick="Finish_Btn()" >
             Finish
         </a>
-
+        <br>
+        <a type="button" style="background-color: #993333" class="btn btn-primary btn-lg" href="entity-main.html" >
+            Cancel
+        </a>
         `        
     return htmlpart3
+}
+
+function Page_Next(){
+
+    if(step_ind == 1) {
+        Next_Btn_Step1()
+    } else if(step_ind == 2) {
+        Next_Btn_Step2()
+    } 
+
 }
 
 async function Load_New_Entity_Image() {
