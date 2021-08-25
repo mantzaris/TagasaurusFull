@@ -4,20 +4,12 @@ var entity_db_fns = require('./myJS/entity-db-fns.js');
 Toastify = require('toastify-js')
 
 
-console.log('in entity view')
-
 var current_record;
 var all_keys;
 var key_index = 0;
 
 
-function Create_New_Entity() {
-    console.log("create new entity button clicked")
-    
-}
-
 async function Delete_Entity() {
-    console.log("Delete_Entity entity button clicked")
 
     console.log(`entity to be deleted: ${current_record.entityName}`)
     entity_key = current_record.entityName
@@ -41,7 +33,6 @@ function Save_Entity_Emotions() {
 
 }
 
-
 function Save_Entity_Description() {
     console.log("Save_Entity_Description button clicked")
 
@@ -50,12 +41,6 @@ function Save_Entity_Description() {
 function New_Entity_Memes(){
     console.log('New_Entity_Memes button pressed')
 }
-
-function Set_Entity_Name_Label(){
-    document.getElementById("entityName").textContent= '#' + "Taga";
-
-}
-
 
 function Entity_Memes_Page() {
     document.getElementById('entity-meme-view').className += " active";
@@ -93,9 +78,9 @@ function Entity_Emotion_Page() {
     document.getElementById('entity-meme-view').classList.remove("active")
     emotion_HTML = `<div class="emotion-page" id="emotion_page_view">                    
                     <label id="emotion-box-title" class="form-label">EMOTIONS (*)</label>
-                    <hr>    
+                    <hr>
                     <label for="customRange1" class="form-label">happy range</label>
-                    <input type="range" class="form-range" id="happy">                        
+                    <input type="range" class="form-range" id="happy">
                     <label for="customRange1" class="form-label">sad range</label>
                     <input type="range" class="form-range" id="sad">
                     <label for="customRange1" class="form-label">confused range</label>
@@ -109,16 +94,17 @@ function Entity_Emotion_Page() {
 
 function Set_Entity_Emotion_Values() {
     emotion_set_obj = current_record.entityEmotions
+    console.log("in set entity emotion values")
+    console.log(current_record.entityEmotions)
+    console.log(emotion_set_obj)
     for (var emotion in emotion_set_obj) {       
         document.getElementById(emotion).value = emotion_set_obj[emotion]
     }
 }
 
-
 async function Show_Entity_From_Key(entity_key) {
 
-    current_record = await entity_db_fns.Get_Record(entity_key)
-
+    current_record = await entity_db_fns.Get_Record(entity_key) 
     //entity name
     document.getElementById("entityName").textContent = '#' + current_record.entityName;
     //entity profile image
@@ -169,19 +155,20 @@ async function Next_Image() {
 async function Initialize_Entity_Page(){
     await entity_db_fns.Create_Db()
     await entity_db_fns.Get_All_Keys_From_DB()
-    all_keys = entity_db_fns.Read_All_Keys_From_DB()    
-    Show_Entity_From_Key(all_keys[0])
+    all_keys = entity_db_fns.Read_All_Keys_From_DB() 
+      
+    await Show_Entity_From_Key(all_keys[0])
+    await Entity_Emotion_Page()
     
 }
 
-
-Set_Entity_Name_Label()
 //the key starting point for the page
-Initialize_Entity_Page()
-Entity_Emotion_Page()
+async function Start_Entity_Page(){
+    await Initialize_Entity_Page()
+   
+}
 
-
-
+Start_Entity_Page()
 
 
 
@@ -200,19 +187,19 @@ async function Load_Entity_Gallery(){
     console.log('entity gallery')
     default_img = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/Taga.png'
     gallery_html = `<div class="row">    
-      <img class="imgG" src="${default_img}">
-      <img class="imgG" src="${default_img}">
-      <img class="imgG" src="${default_img}">
-      <img class="imgG" src="${default_img}">
-      <img class="imgG" src="${default_img}">
-      <img class="imgG" src="${default_img}">
-      <img class="imgG" src="${default_img}">
-      <img class="imgG" src="${default_img}">
-      <img class="imgG" src="${default_img}">
-      <img class="imgG" src="${default_img}">
-      <img class="imgG" src="${default_img}">
-      <img class="imgG" src="${default_img}">
-      <img class="imgG" src="${default_img}">
+    <img class="imgG" src="${default_img}">
+    <img class="imgG" src="${default_img}">
+    <img class="imgG" src="${default_img}">
+    <img class="imgG" src="${default_img}">
+    <img class="imgG" src="${default_img}">
+    <img class="imgG" src="${default_img}">
+    <img class="imgG" src="${default_img}">
+    <img class="imgG" src="${default_img}">
+    <img class="imgG" src="${default_img}">
+    <img class="imgG" src="${default_img}">
+    <img class="imgG" src="${default_img}">
+    <img class="imgG" src="${default_img}">
+    <img class="imgG" src="${default_img}">
     `    
     gallery_html += `</div>`
     document.getElementById("entityGallery").innerHTML  = gallery_html;    

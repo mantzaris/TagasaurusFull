@@ -9,8 +9,6 @@
 //notification code from: https://github.com/MLaritz/Vanilla-Notify
 vanilla_notify = require('./js-modules-downloaded/vanilla-notify.js');
 
-
-
 console.log("js for the creation of the entity")
 
 var step_ind = 1;
@@ -30,7 +28,6 @@ var meme_image_set = ""
 
 function Entity_CreationPage_Previous() {
 
-    console.log("clicked for previous page of creation process")
     if(step_ind > 1) {
         step_ind = step_ind - 1
     }
@@ -60,13 +57,8 @@ function Entity_CreationPage_Next() {
 
 function Pagination_page_item_activate() {
     document.getElementById(`step1`).classList.remove("active")
-    console.log(document.getElementById(`step1`).classList)
-
     document.getElementById(`step2`).classList.remove("active")
-    console.log(document.getElementById(`step2`).classList)
-
     document.getElementById(`step3`).classList.remove("active")
-    console.log(document.getElementById(`step3`).classList)
 
     document.getElementById(`step${step_ind}`).className += " active";
 
@@ -309,8 +301,6 @@ async function Next_Btn_Step1() {
 
 function Next_Btn_Step2() {
 
-    console.log("next step 2")   
-    
     if(entity_image_set.length == 0){
         entity_image_set = [entity_file_name]
     }
@@ -331,12 +321,6 @@ async function Finish_Btn() {
             fadeInDuration: 350, text: 'at least one non-zero emotion!', title:'attention'});
 
     } else{
-        console.log(entity_tag_name)
-        console.log(entity_file_name)
-        console.log(entity_description)
-        console.log(entity_image_set)
-        console.log([happy_value,sad_value,confused_value])
-        console.log(meme_image_set)
 
         entities_entry = {
                 "entityName": entity_tag_name,

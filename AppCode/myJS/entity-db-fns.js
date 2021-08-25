@@ -61,7 +61,6 @@ async function Create_Db(){
                 db_entities = event.target.result;
                 resolve(db_entities)
                 console.log(`entities, onupgradeneeded in Create_Db() the event.oldVersion value= ${version_num}`)  
-                console.log('in upgradeneeded db_entities table name check!!!')
                 console.log(event.target.result)
                 console.log(event.target.result.name)
             } else{ //new db, so time to create it from scratch, oldVersion is ZERO
@@ -170,7 +169,7 @@ async function Get_Record(record_key){
             }
         }
     })
-    record_tmp = await myPromise.then(value => {current_record = value; console.log(`promise return: ${value}`); return value; })
+    record_tmp = await myPromise.then(value => {current_record = value; return value; })
                                     .catch(resolve_val => console.log('in the CATCH'))   
     return record_tmp
 }
@@ -273,8 +272,6 @@ async function Get_All_Keys_From_DB(){
         }
         request.onsuccess = function(event) {
             console.log('entity, success in IDBObjectStore.Get_All_Keys_From_DB()')
-            console.log(event.target.result)
-            console.log(entity_keys)
             entity_keys = event.target.result
             console.log(entity_keys)
             resolve(entity_keys)
