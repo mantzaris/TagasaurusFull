@@ -146,16 +146,29 @@ function Set_Entity_Emotion_Values() {
     }
 }
 
-async function Show_Entity_From_Key(entity_key) {
+//assign a new set of images to the gallery which includes the entity image (replacement set)
+async function New_Gallery_Images(){
 
-    current_record = await entity_db_fns.Get_Record(entity_key) 
-    //entity name
-    document.getElementById("entityName").textContent = '#' + current_record.entityName;
-    //entity profile image
-    default_img = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' + current_record.entityImage
-    document.getElementById("entityProfileImg").src = default_img;
-
+    console.log('new gallery images')
+    result = await ipcRenderer_pics.invoke('dialog:openEntityImageSet')
+    files_tmp = result.filePaths
+    files_tmp_base = files_tmp.map(function(filepath) {
+        return path.parse(filepath).base
+    })
+    console.log(files_tmp_base)
+    if(files_tmp_base.length == 0){
+        console.log('empty gallery array chosen')
+        files_tmp_base = [current_record.entityName]
+    } else {
+        console.log('non empty gallery array chosen')
+        if(files_tmp_base.includes(current_record.entityImage) == false){
+            files_tmp_base.push(current_record.entityImage)
+        }
+    }
+    current_record.entityImageSet = files_tmp_base
     gallery_html = `<div class="row">`
+    gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="Add_Gallery_Images()">add more images</button><br>`
+    gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="New_Gallery_Images()">new images</button><br>`
     default_path = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' 
     image_set = current_record.entityImageSet
     image_set.forEach(element => {
@@ -164,8 +177,65 @@ async function Show_Entity_From_Key(entity_key) {
         `
     });    
     gallery_html += `</div>`
-    document.getElementById("entityGallery").innerHTML  = gallery_html;   
-    
+    document.getElementById("entityGallery").innerHTML  = gallery_html;
+    entity_db_fns.Update_Record(current_record)
+
+}
+
+//include an extra set of images to the gallery (on top of the previous set)
+async function Add_Gallery_Images(){
+
+    console.log('add gallery images')
+
+    image_set_tmp = current_record.entityImageSet
+    result = await ipcRenderer_pics.invoke('dialog:openEntityImageSet')
+    files_tmp = result.filePaths
+    files_tmp.map(function(filepath) {
+        filenamebase_tmp = path.parse(filepath).base
+        if(image_set_tmp.includes(filenamebase_tmp) == false){
+            image_set_tmp.push(filenamebase_tmp)
+        }
+    })
+    console.log(image_set_tmp)
+    current_record.entityImageSet = image_set_tmp
+    gallery_html = `<div class="row">`
+    gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="Add_Gallery_Images()">add more images</button><br>`
+    gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="New_Gallery_Images()">new images</button><br>`
+    default_path = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' 
+    image_set = current_record.entityImageSet
+    image_set.forEach(element => {
+        gallery_html += `
+        <img class="imgG" src="${default_path + element}">
+        `
+    });    
+    gallery_html += `</div>`
+    document.getElementById("entityGallery").innerHTML  = gallery_html;
+    entity_db_fns.Update_Record(current_record)
+
+}
+
+async function Show_Entity_From_Key(entity_key) {
+
+    current_record = await entity_db_fns.Get_Record(entity_key) 
+    //entity name
+    document.getElementById("entityName").textContent = '#' + current_record.entityName;
+    //entity profile image
+    default_img = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' + current_record.entityImage
+    document.getElementById("entityProfileImg").src = default_img;
+    //include the collection set of images for the gallery of the entity
+    gallery_html = `<div class="row">`
+    gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="Add_Gallery_Images()">add more images</button><br>`
+    gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="New_Gallery_Images()">new image set</button><br>`
+    default_path = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' 
+    image_set = current_record.entityImageSet
+    image_set.forEach(element => {
+        gallery_html += `
+        <img class="imgG" src="${default_path + element}">
+        `
+    });    
+    gallery_html += `</div>`
+    document.getElementById("entityGallery").innerHTML  = gallery_html;
+    //entity annotations
     if( document.getElementById("emotion_page_view") != null ){
         Set_Entity_Emotion_Values()
     } else if( document.getElementById("descriptionInputEntity") != null ){
