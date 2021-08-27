@@ -1,5 +1,8 @@
 
 var entity_db_fns = require('./myJS/entity-db-fns.js');
+ipcRenderer_pics = require('electron').ipcRenderer
+path = require('path');
+
 
 Toastify = require('toastify-js')
 
@@ -30,16 +33,55 @@ async function Delete_Entity() {
 
 function Save_Entity_Emotions() {
     console.log("Save_Entity_Emotions button clicked")
+    happy_value = document.getElementById('happy').value
+    sad_value = document.getElementById('sad').value
+    confused_value = document.getElementById('confused').value
+    console.log(`new entity emotional values= ${[happy_value,sad_value,confused_value]}`)
 
+    //"entityEmotions": {happy:happy_value,sad:sad_value,confused:confused_value}, 
+    console.log(current_record.entityEmotions)
+    current_record.entityEmotions = {happy:happy_value,sad:sad_value,confused:confused_value}
+    console.log(current_record.entityEmotions)
+    entity_db_fns.Update_Record(current_record)
 }
 
 function Save_Entity_Description() {
     console.log("Save_Entity_Description button clicked")
+    //"entityDescription": entity_description
+    console.log(current_record.entityDescription)
+    current_record.entityDescription = document.getElementById("descriptionInputEntity").value
+    entity_db_fns.Update_Record(current_record)
 
 }
 
-function New_Entity_Memes(){
+async function New_Entity_Memes(){
     console.log('New_Entity_Memes button pressed')
+    console.log(current_record.entityMemes)
+    result = await ipcRenderer_pics.invoke('dialog:openEntityImageSet')
+    files_tmp = result.filePaths
+    files_tmp_base = files_tmp.map(function(filepath) {
+        return path.parse(filepath).base
+    })
+    console.log(files_tmp_base)
+    if(files_tmp_base.length == 0){
+        console.log('empty meme array chosen')
+    } else {
+        console.log('non empty meme array chosen')
+    }
+    current_record.entityMemes = files_tmp_base
+    entity_db_fns.Update_Record(current_record)
+    gallery_html = `<div class="row" id="meme_page_view">`
+    default_path = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' 
+    memes_array = current_record.entityMemes
+    if(memes_array != ""){
+        memes_array.forEach(element => {
+            gallery_html += `
+            <img class="imgG" src="${default_path + element}">
+            `
+        });    
+    }
+    gallery_html += `<br><button type="button" class="btn btn-primary btn-lg" onclick="New_Entity_Memes()">Choose new memes</button>`
+    document.getElementById("annotationPages").innerHTML  = gallery_html;
 }
 
 function Entity_Memes_Page() {

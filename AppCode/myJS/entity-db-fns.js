@@ -184,9 +184,9 @@ exports.Read_Current_Record = Read_Current_Record
 
 //eg. update_record({name:'scifi',dob:'22/11/80',email:'yea@lll.org'})
 function Update_Record(record){
-
+    
     if(db_entities){
-        const update_transaction = db_entities_entities.transaction(ENTITY_OBJSTORE_NAME, 'readwrite')
+        const update_transaction = db_entities.transaction(ENTITY_OBJSTORE_NAME, 'readwrite')
         const store = update_transaction.objectStore(ENTITY_OBJSTORE_NAME)
 
         update_transaction.onerror = function(event){
@@ -208,6 +208,8 @@ function Update_Record(record){
         }
     }
 }
+exports.Update_Record = Update_Record
+
 
 //eg. delete_record('yeah@lll.org')
 function Delete_Record(record_key){
