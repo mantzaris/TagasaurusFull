@@ -9,6 +9,10 @@
 //notification code from: https://github.com/MLaritz/Vanilla-Notify
 vanilla_notify = require('./js-modules-downloaded/vanilla-notify.js');
 
+const fse = require('fs-extra');
+const fs = require('fs');
+
+
 console.log("js for the creation of the entity")
 
 var step_ind = 1;
@@ -17,6 +21,7 @@ dir_pics = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // '.
 ipcRenderer_pics = require('electron').ipcRenderer
 path = require('path');
 entity_db_fns = require('./myJS/entity-db-fns.js');
+my_file_helper = require('./myJS/copy-new-file-helper.js')
 
 
 var entity_tag_name = ""
@@ -263,12 +268,24 @@ function Page_Next(){
 
 async function Load_New_Entity_Image() {
     const result = await ipcRenderer_pics.invoke('dialog:openEntity')
+    console.log(result.filePaths[0])
     console.log(dir_pics)
     if(result.canceled == false) {        
         filename = path.parse(result.filePaths[0]).base;
         entity_file_name = filename
         console.log(filename)
-        document.getElementById("newEntityProfilePic").innerHTML  = `<img class="imgG" src="/home/resort/Documents/repos/Tagasaurus/images/${filename}">`;
+        directory_of_image = path.dirname(result.filePaths[0])
+        console.log(directory_of_image)
+        if(directory_of_image != dir_pics){//dir_pics
+            console.log('file is not in the taga images directory')
+            new_filename = my_file_helper.Copy_Non_Taga_Files(result,dir_pics)
+            document.getElementById("newEntityProfilePic").innerHTML  = `<img class="imgG" src="${dir_pics}/${new_filename}">`;
+
+        } else{
+            console.log('file is in the taga images directory')
+            document.getElementById("newEntityProfilePic").innerHTML  = `<img class="imgG" src="${dir_pics}/${filename}">`;
+        }
+        
     }
 }
 
