@@ -158,7 +158,7 @@ async function New_Entity_Image(){
         current_record.entityImage = filename
         default_img = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' + current_record.entityImage
         document.getElementById("entityProfileImg").src = default_img//current_record.entityImage;
-        //include new image in the gallery image set        
+        //include new image in the gallery image set
         image_set = current_record.entityImageSet
         if(image_set.includes(current_record.entityImage) == false){
             image_set.push(current_record.entityImage)
@@ -166,18 +166,18 @@ async function New_Entity_Image(){
             gallery_html = `<div class="row">`
             gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="Add_Gallery_Images()">add more images</button><br>`
             gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="New_Gallery_Images()">new images</button><br>`
-            default_path = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' 
+            default_path = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/'
             image_set = current_record.entityImageSet
             image_set.forEach(element => {
             gallery_html += `
             <img class="imgG" src="${default_path + element}">
             `
-            });    
+            });
             gallery_html += `</div>`
             document.getElementById("entityGallery").innerHTML  = gallery_html;
 
         }
-        entity_db_fns.Update_Record(current_record)        
+        entity_db_fns.Update_Record(current_record)
     }
 }
 

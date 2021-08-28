@@ -28,6 +28,13 @@ var meme_image_set = ""
 
 function Entity_CreationPage_Previous() {
 
+    if(step_ind == 3){
+        happy_value = document.getElementById('happy').value
+        sad_value = document.getElementById('sad').value
+        confused_value = document.getElementById('confused').value
+        emotion_values = {happy:happy_value,sad:sad_value,confused:confused_value}
+    }
+
     if(step_ind > 1) {
         step_ind = step_ind - 1
     }
@@ -83,21 +90,59 @@ function Entity_Fill_Delegation() {
 
         document.getElementById('partBody').innerHTML = html_part
 
+        if(entity_tag_name != ""){
+            document.getElementById("nameCreateEntity").value = entity_tag_name
+        }
+        if(entity_description != ""){
+            document.getElementById("descriptionCreateEntity").value = entity_description
+        }
+        if(entity_file_name != ""){
+            document.getElementById("newEntityProfilePic").innerHTML  = `<img class="imgG" src="/home/resort/Documents/repos/Tagasaurus/images/${entity_file_name}">`
+        }
+
     } else if(step_ind == 2) {
 
         html_part = Part2_HTML()
 
         document.getElementById('partBody').innerHTML = html_part
 
+        if(entity_image_set != ""){
+            imgHTML_tmp = ""
+            entity_image_set.forEach(filename => {
+                imgHTML_tmp += `<img class="imgG" src="/home/resort/Documents/repos/Tagasaurus/images/${filename}">`
+            });
+            htmlpart_imageset = /*html*/`
+                            ${imgHTML_tmp}
+                        `
+            document.getElementById("newEntityPictureSet").innerHTML  = htmlpart_imageset
+        }
+
     } else if(step_ind == 3) {
 
         html_part = Part3_HTML()
 
         document.getElementById('partBody').innerHTML = html_part
+        if(emotion_values == ""){
+            document.getElementById('happy').value = 0
+            document.getElementById('sad').value = 0
+            document.getElementById('confused').value = 0
+        } else {
+            document.getElementById('happy').value = emotion_values.happy
+            document.getElementById('sad').value = emotion_values.sad
+            document.getElementById('confused').value = emotion_values.confused
+        }
+        if(meme_image_set != ""){
 
-        document.getElementById('happy').value = 0
-        document.getElementById('sad').value = 0
-        document.getElementById('confused').value = 0
+            imgHTML_tmp = ""
+            meme_image_set.forEach(filename => {
+                imgHTML_tmp += `<img class="imgG" src="/home/resort/Documents/repos/Tagasaurus/images/${filename}">`
+            });
+            htmlpart_imageset = /*html*/`
+                            ${imgHTML_tmp}
+                        `
+            document.getElementById("newEntityMemeSet").innerHTML  = htmlpart_imageset
+            
+        }    
 
     }
 
