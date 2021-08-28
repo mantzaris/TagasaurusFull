@@ -280,12 +280,10 @@ async function Load_New_Entity_Image() {
             console.log('file is not in the taga images directory')
             new_filename = my_file_helper.Copy_Non_Taga_Files(result,dir_pics)
             document.getElementById("newEntityProfilePic").innerHTML  = `<img class="imgG" src="${dir_pics}/${new_filename}">`;
-
         } else{
             console.log('file is in the taga images directory')
             document.getElementById("newEntityProfilePic").innerHTML  = `<img class="imgG" src="${dir_pics}/${filename}">`;
         }
-        
     }
 }
 
@@ -294,46 +292,78 @@ async function Load_New_Entity_ImageSet() {
     result = await ipcRenderer_pics.invoke('dialog:openEntityImageSet')
     files_tmp = result.filePaths
     files_tmp_base = []
-    files_tmp.map(function(filepath) {
-        tmp_file_path = path.parse(filepath).base
-        if(tmp_file_path != entity_file_name){
-            files_tmp_base.push(tmp_file_path)
-        }
-    })
-    console.log(files_tmp_base)
-    imgHTML_tmp = ""
-    files_tmp_base.forEach(filename => {
-        imgHTML_tmp += `<img class="imgG" src="/home/resort/Documents/repos/Tagasaurus/images/${filename}">`
-    });
-    htmlpart_imageset = /*html*/`
-                    ${imgHTML_tmp}
-                `
 
-    document.getElementById("newEntityPictureSet").innerHTML  = htmlpart_imageset
-    files_tmp_base.push(entity_file_name)
-    console.log(`the new image set is: ${files_tmp_base}`)
-    entity_image_set = files_tmp_base
+    if(result.filePaths.length > 0){
+        directory_of_image = path.dirname(result.filePaths[0])
+        console.log(directory_of_image)
+        if(directory_of_image != dir_pics){//dir_pics
+            console.log('files are not in the taga images directory')
+            files_tmp_base = my_file_helper.Copy_Non_Taga_Files(result,dir_pics)
+        } else{
+            console.log('files are in the taga images directory')
+            files_tmp.map(function(filepath) {
+                tmp_file_path = path.parse(filepath).base
+                if(tmp_file_path != entity_file_name){
+                    files_tmp_base.push(tmp_file_path)
+                }
+            })
+        }
+
+        console.log(files_tmp_base)
+        imgHTML_tmp = ""
+        files_tmp_base.forEach(filename => {
+            imgHTML_tmp += `<img class="imgG" src="/home/resort/Documents/repos/Tagasaurus/images/${filename}">`
+        });
+        htmlpart_imageset = /*html*/`
+                        ${imgHTML_tmp}
+                    `
+
+        document.getElementById("newEntityPictureSet").innerHTML  = htmlpart_imageset
+        files_tmp_base.push(entity_file_name)
+        console.log(`the new image set is: ${files_tmp_base}`)
+        entity_image_set = files_tmp_base
+    }
 }
 
 async function Load_New_Entity_MemeSet() {
     
     result = await ipcRenderer_pics.invoke('dialog:openEntityImageSet')
     files_tmp = result.filePaths
-    files_tmp_base = files_tmp.map(function(filepath) {
-        return path.parse(filepath).base
-    })
-    console.log(files_tmp_base)
-    meme_image_set = files_tmp_base
-    imgHTML_tmp = ""
-    files_tmp_base.forEach(filename => {
-        imgHTML_tmp += `<img class="imgG" src="/home/resort/Documents/repos/Tagasaurus/images/${filename}">`
-    });
-    console.log(meme_image_set)
-    htmlpart_imageset = /*html*/`
-                    ${imgHTML_tmp}
-                `
 
-    document.getElementById("newEntityMemeSet").innerHTML  = htmlpart_imageset
+    files_tmp_base = []
+    if(result.filePaths.length > 0){
+        directory_of_image = path.dirname(result.filePaths[0])
+        console.log(directory_of_image)
+        if(directory_of_image != dir_pics){//dir_pics
+            console.log('files are not in the taga images directory')
+            files_tmp_base = my_file_helper.Copy_Non_Taga_Files(result,dir_pics)
+        } else{
+            console.log('files are in the taga images directory')
+            files_tmp.map(function(filepath) {
+                tmp_file_path = path.parse(filepath).base
+                if(tmp_file_path != entity_file_name){
+                    files_tmp_base.push(tmp_file_path)
+                }
+            })
+        }
+    /*
+        files_tmp_base = files_tmp.map(function(filepath) {
+            return path.parse(filepath).base
+        })
+        console.log(files_tmp_base)
+    */
+        meme_image_set = files_tmp_base
+        imgHTML_tmp = ""
+        files_tmp_base.forEach(filename => {
+            imgHTML_tmp += `<img class="imgG" src="/home/resort/Documents/repos/Tagasaurus/images/${filename}">`
+        });
+        console.log(meme_image_set)
+        htmlpart_imageset = /*html*/`
+                        ${imgHTML_tmp}
+                    `
+
+        document.getElementById("newEntityMemeSet").innerHTML  = htmlpart_imageset
+    }
 
 }
 
@@ -404,3 +434,15 @@ async function Finish_Btn() {
 
 Pagination_page_item_activate()
 Entity_Fill_Delegation()
+
+
+
+/*
+    files_tmp_base = []
+    files_tmp.map(function(filepath) {
+        tmp_file_path = path.parse(filepath).base
+        if(tmp_file_path != entity_file_name){
+            files_tmp_base.push(tmp_file_path)
+        }
+    })
+*/
