@@ -1,7 +1,12 @@
 
 var entity_db_fns = require('./myJS/entity-db-fns.js');
+my_file_helper = require('./myJS/copy-new-file-helper.js')
+
 ipcRenderer_pics = require('electron').ipcRenderer
 path = require('path');
+const fse = require('fs-extra');
+const fs = require('fs');
+dir_pics = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
 
 
 Toastify = require('toastify-js')
@@ -63,11 +68,21 @@ async function New_Entity_Memes(){
         return path.parse(filepath).base
     })
     console.log(files_tmp_base)
+
     if(files_tmp_base.length == 0){
         console.log('empty meme array chosen')
     } else {
-        console.log('non empty meme array chosen')
+        console.log('non meme gallery array chosen')
+        directory_of_image = path.dirname(result.filePaths[0])
+        console.log(directory_of_image)
+        if(directory_of_image != dir_pics){//dir_pics
+            console.log('files are not in the taga images directory')
+            files_tmp_base = my_file_helper.Copy_Non_Taga_Files(result,dir_pics)
+        } else{
+            console.log('files are in the taga images directory')
+        }
     }
+
     current_record.entityMemes = files_tmp_base
     entity_db_fns.Update_Record(current_record)
     gallery_html = `<div class="row" id="meme_page_view">`
@@ -152,8 +167,21 @@ async function New_Entity_Image(){
     result = await ipcRenderer_pics.invoke('dialog:openEntity')
     file_tmp = result.filePaths
     console.log(file_tmp)
+
     if(file_tmp.length > 0){
-        filename = path.parse(file_tmp[0]).base
+
+        directory_of_image = path.dirname(result.filePaths[0])
+        console.log(directory_of_image)
+        if(directory_of_image != dir_pics){//dir_pics
+            console.log('file is not in the taga images directory')
+            new_filename = my_file_helper.Copy_Non_Taga_Files(result,dir_pics)
+        } else{
+            console.log('file is in the taga images directory')
+            new_filename = path.parse(file_tmp[0]).base
+
+        }
+
+        filename = new_filename//path.parse(file_tmp[0]).base
         console.log(filename)
         current_record.entityImage = filename
         default_img = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' + current_record.entityImage
@@ -196,6 +224,16 @@ async function New_Gallery_Images(){
         files_tmp_base = [current_record.entityImage]
     } else {
         console.log('non empty gallery array chosen')
+        
+        directory_of_image = path.dirname(result.filePaths[0])
+        console.log(directory_of_image)
+        if(directory_of_image != dir_pics){//dir_pics
+            console.log('files are not in the taga images directory')
+            files_tmp_base = my_file_helper.Copy_Non_Taga_Files(result,dir_pics)
+        } else{
+            console.log('files are in the taga images directory')
+        }
+
         if(files_tmp_base.includes(current_record.entityImage) == false){
             files_tmp_base.push(current_record.entityImage)
         }
@@ -225,12 +263,41 @@ async function Add_Gallery_Images(){
     image_set_tmp = current_record.entityImageSet
     result = await ipcRenderer_pics.invoke('dialog:openEntityImageSet')
     files_tmp = result.filePaths
-    files_tmp.map(function(filepath) {
-        filenamebase_tmp = path.parse(filepath).base
-        if(image_set_tmp.includes(filenamebase_tmp) == false){
-            image_set_tmp.push(filenamebase_tmp)
-        }
+    files_tmp_base = files_tmp.map(function(filepath) {
+        return path.parse(filepath).base
     })
+
+    if(files_tmp_base.length == 0){
+        console.log('empty gallery array chosen')
+    } else {
+        console.log('non empty gallery array chosen')
+        
+        directory_of_image = path.dirname(result.filePaths[0])
+        console.log(directory_of_image)
+        if(directory_of_image != dir_pics){//dir_pics
+            console.log('files are not in the taga images directory')
+            files_tmp_base = my_file_helper.Copy_Non_Taga_Files(result,dir_pics)
+            files_tmp.map(function(filepath) {
+                filenamebase_tmp = path.parse(filepath).base
+                if(image_set_tmp.includes(filenamebase_tmp) == false){
+                    image_set_tmp.push(filenamebase_tmp)
+                }
+            })
+        } else{
+            console.log('files are in the taga images directory')
+            files_tmp.map(function(filepath) {
+                filenamebase_tmp = path.parse(filepath).base
+                if(image_set_tmp.includes(filenamebase_tmp) == false){
+                    image_set_tmp.push(filenamebase_tmp)
+                }
+            })
+        }
+
+        if(files_tmp_base.includes(current_record.entityImage) == false){
+            files_tmp_base.push(current_record.entityImage)
+        }
+    }
+
     console.log(image_set_tmp)
     current_record.entityImageSet = image_set_tmp
     gallery_html = `<div class="row">`
