@@ -146,6 +146,41 @@ function Set_Entity_Emotion_Values() {
     }
 }
 
+async function New_Entity_Image(){
+
+    console.log('changing the entity profile image')
+    result = await ipcRenderer_pics.invoke('dialog:openEntity')
+    file_tmp = result.filePaths
+    console.log(file_tmp)
+    if(file_tmp.length > 0){
+        filename = path.parse(file_tmp[0]).base
+        console.log(filename)
+        current_record.entityImage = filename
+        default_img = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' + current_record.entityImage
+        document.getElementById("entityProfileImg").src = default_img//current_record.entityImage;
+        //include new image in the gallery image set        
+        image_set = current_record.entityImageSet
+        if(image_set.includes(current_record.entityImage) == false){
+            image_set.push(current_record.entityImage)
+            current_record.entityImageSet = image_set
+            gallery_html = `<div class="row">`
+            gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="Add_Gallery_Images()">add more images</button><br>`
+            gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="New_Gallery_Images()">new images</button><br>`
+            default_path = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' 
+            image_set = current_record.entityImageSet
+            image_set.forEach(element => {
+            gallery_html += `
+            <img class="imgG" src="${default_path + element}">
+            `
+            });    
+            gallery_html += `</div>`
+            document.getElementById("entityGallery").innerHTML  = gallery_html;
+
+        }
+        entity_db_fns.Update_Record(current_record)        
+    }
+}
+
 //assign a new set of images to the gallery which includes the entity image (replacement set)
 async function New_Gallery_Images(){
 
@@ -158,7 +193,7 @@ async function New_Gallery_Images(){
     console.log(files_tmp_base)
     if(files_tmp_base.length == 0){
         console.log('empty gallery array chosen')
-        files_tmp_base = [current_record.entityName]
+        files_tmp_base = [current_record.entityImage]
     } else {
         console.log('non empty gallery array chosen')
         if(files_tmp_base.includes(current_record.entityImage) == false){
