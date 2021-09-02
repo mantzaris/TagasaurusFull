@@ -219,7 +219,7 @@ async function Add_Gallery_Images(){
         if(directory_of_image != DIR_PICS){//DIR_PICS
             console.log('files are not in the taga images directory')
             files_tmp_base = MY_FILE_HELPER.Copy_Non_Taga_Files(result,DIR_PICS)
-            files_tmp.map(function(filePATH) {
+            files_tmp_base.map(function(filePATH) {
                 filenamebase_tmp = PATH.parse(filePATH).base
                 if(image_set_tmp.includes(filenamebase_tmp) == false){
                     image_set_tmp.push(filenamebase_tmp)
