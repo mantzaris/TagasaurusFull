@@ -9,19 +9,17 @@
 //notification code from: https://github.com/MLaritz/Vanilla-Notify
 vanilla_notify = require('./js-modules-downloaded/vanilla-notify.js');
 
-const fse = require('fs-extra');
-const fs = require('fs');
+const FSE = require('fs-extra');
+const FS = require('fs');
 
-
-console.log("js for the creation of the entity")
 
 var step_ind = 1;
 
-dir_pics = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
-ipcRenderer_pics = require('electron').ipcRenderer
-path = require('path');
-entity_db_fns = require('./myJS/entity-db-fns.js');
-my_file_helper = require('./myJS/copy-new-file-helper.js')
+const DIR_PICS = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
+const IPC_RENDERER_PICS = require('electron').ipcRenderer
+const PATH = require('path');
+const ENTITY_DB_FNS = require('./myJS/entity-db-fns.js');
+const MY_FILE_HELPER = require('./myJS/copy-new-file-helper.js')
 
 
 var entity_tag_name = ""
@@ -267,42 +265,42 @@ function Page_Next(){
 }
 
 async function Load_New_Entity_Image() {
-    const result = await ipcRenderer_pics.invoke('dialog:openEntity')
+    const result = await IPC_RENDERER_PICS.invoke('dialog:openEntity')
     console.log(result.filePaths[0])
-    console.log(dir_pics)
+    console.log(DIR_PICS)
     if(result.canceled == false) {        
-        filename = path.parse(result.filePaths[0]).base;
+        filename = PATH.parse(result.filePaths[0]).base;
         entity_file_name = filename
         console.log(filename)
-        directory_of_image = path.dirname(result.filePaths[0])
+        directory_of_image = PATH.dirname(result.filePaths[0])
         console.log(directory_of_image)
-        if(directory_of_image != dir_pics){//dir_pics
+        if(directory_of_image != DIR_PICS){//DIR_PICS
             console.log('file is not in the taga images directory')
-            new_filename = my_file_helper.Copy_Non_Taga_Files(result,dir_pics)
-            document.getElementById("newEntityProfilePic").innerHTML  = `<img class="imgG" src="${dir_pics}/${new_filename}">`;
+            new_filename = MY_FILE_HELPER.Copy_Non_Taga_Files(result,DIR_PICS)
+            document.getElementById("newEntityProfilePic").innerHTML  = `<img class="imgG" src="${DIR_PICS}/${new_filename}">`;
         } else{
             console.log('file is in the taga images directory')
-            document.getElementById("newEntityProfilePic").innerHTML  = `<img class="imgG" src="${dir_pics}/${filename}">`;
+            document.getElementById("newEntityProfilePic").innerHTML  = `<img class="imgG" src="${DIR_PICS}/${filename}">`;
         }
     }
 }
 
 async function Load_New_Entity_ImageSet() {
     
-    result = await ipcRenderer_pics.invoke('dialog:openEntityImageSet')
+    result = await IPC_RENDERER_PICS.invoke('dialog:openEntityImageSet')
     files_tmp = result.filePaths
     files_tmp_base = []
 
     if(result.filePaths.length > 0){
-        directory_of_image = path.dirname(result.filePaths[0])
+        directory_of_image = PATH.dirname(result.filePaths[0])
         console.log(directory_of_image)
-        if(directory_of_image != dir_pics){//dir_pics
+        if(directory_of_image != DIR_PICS){//DIR_PICS
             console.log('files are not in the taga images directory')
-            files_tmp_base = my_file_helper.Copy_Non_Taga_Files(result,dir_pics)
+            files_tmp_base = MY_FILE_HELPER.Copy_Non_Taga_Files(result,DIR_PICS)
         } else{
             console.log('files are in the taga images directory')
             files_tmp.map(function(filepath) {
-                tmp_file_path = path.parse(filepath).base
+                tmp_file_path = PATH.parse(filepath).base
                 if(tmp_file_path != entity_file_name){
                     files_tmp_base.push(tmp_file_path)
                 }
@@ -327,20 +325,20 @@ async function Load_New_Entity_ImageSet() {
 
 async function Load_New_Entity_MemeSet() {
     
-    result = await ipcRenderer_pics.invoke('dialog:openEntityImageSet')
+    result = await IPC_RENDERER_PICS.invoke('dialog:openEntityImageSet')
     files_tmp = result.filePaths
 
     files_tmp_base = []
     if(result.filePaths.length > 0){
-        directory_of_image = path.dirname(result.filePaths[0])
+        directory_of_image = PATH.dirname(result.filePaths[0])
         console.log(directory_of_image)
-        if(directory_of_image != dir_pics){//dir_pics
+        if(directory_of_image != DIR_PICS){//DIR_PICS
             console.log('files are not in the taga images directory')
-            files_tmp_base = my_file_helper.Copy_Non_Taga_Files(result,dir_pics)
+            files_tmp_base = MY_FILE_HELPER.Copy_Non_Taga_Files(result,DIR_PICS)
         } else{
             console.log('files are in the taga images directory')
             files_tmp.map(function(filepath) {
-                tmp_file_path = path.parse(filepath).base
+                tmp_file_path = PATH.parse(filepath).base
                 if(tmp_file_path != entity_file_name){
                     files_tmp_base.push(tmp_file_path)
                 }
@@ -348,7 +346,7 @@ async function Load_New_Entity_MemeSet() {
         }
     /*
         files_tmp_base = files_tmp.map(function(filepath) {
-            return path.parse(filepath).base
+            return PATH.parse(filepath).base
         })
         console.log(files_tmp_base)
     */
@@ -372,7 +370,7 @@ async function Next_Btn_Step1() {
     entity_tag_name = document.getElementById('nameCreateEntity').value
     entity_description = document.getElementById('descriptionCreateEntity').value
     //record exists in the DB?..
-    response = await entity_db_fns.Get_Record(entity_tag_name)
+    response = await ENTITY_DB_FNS.Get_Record(entity_tag_name)
 
     if(entity_tag_name == "" || entity_description == "" || entity_file_name == ""){
         vanilla_notify.vNotify.error({visibleDuration: 1200,fadeOutDuration: 250,
@@ -425,7 +423,7 @@ async function Finish_Btn() {
 
         console.log(entities_entry)
         console.log('now going to insert entity data')
-        await entity_db_fns.Insert_Record(entities_entry)
+        await ENTITY_DB_FNS.Insert_Record(entities_entry)
         //window redirect
         window.location="entity-main.html"
     }
@@ -440,7 +438,7 @@ Entity_Fill_Delegation()
 /*
     files_tmp_base = []
     files_tmp.map(function(filepath) {
-        tmp_file_path = path.parse(filepath).base
+        tmp_file_path = PATH.parse(filepath).base
         if(tmp_file_path != entity_file_name){
             files_tmp_base.push(tmp_file_path)
         }
