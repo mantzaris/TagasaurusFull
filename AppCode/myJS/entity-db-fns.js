@@ -222,12 +222,52 @@ exports.Read_All_Keys_From_DB = Read_All_Keys_From_DB
 
 
 
+
+
+async function Check_Presence_Of_Entity_Profile_Images(){
+
+    get_record_promise = new Promise( (resolve, reject) => {
+        
+        entity_keys_tmp = Read_All_Keys_From_DB() //get the local keys variable
+
+        entity_keys_tmp.forEach( async key_tmp => {
+            console.log(`temp key in the array used ${key_tmp}`)
+
+            entity_obj_tmp = await Get_Record(key_tmp)
+
+            filename_path_to_local = DIR_PICS + '/' + entity_obj_tmp.entityImage
+            console.log(`filename path to local= ${filename_path_to_local}`)
+            image_exists = FS.existsSync(filename_path_to_local)
+
+            if( FS.existsSync(filename_path_to_local) == false ) {
+
+                console.log(`big problem with image ${filename_path_to_local}`)
+                console.log(`the problem entity object is: ${entity_obj_tmp.entityImage}`)
+
+            }
+
+        });
+        
+        resolve('ok!')
+
+
+        //resolve("42! resolving this promise timer")
+    })
+    get_record_promise.then(function(value){
+        console.log(`the returned promise value is=== ${value}`)
+    })
+
+}
+exports.Check_Presence_Of_Entity_Profile_Images = Check_Presence_Of_Entity_Profile_Images
+
+
+
+
+
+
+
 //MUST RUN THIS FUNCTION FIRST TO GET THE DB OBJECT
-Create_Db()
-
-
-
-
+//Create_Db()
 
 //* to implement in the future
 //* IDBIndex.getAll()

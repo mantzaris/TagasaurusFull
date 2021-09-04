@@ -25,6 +25,9 @@ async function Delete_Entity() {
     await ENTITY_DB_FNS.Get_All_Keys_From_DB() //refresh the current key list
     all_entity_keys = ENTITY_DB_FNS.Read_All_Keys_From_DB() //retrieve that key list and set to the local global variable
 
+    if(current_key_index >= all_entity_keys.length) { current_key_index = 0 }
+    Show_Entity_From_Key_Or_Current_Entity(all_entity_keys[current_key_index]) //current index for keys will be 1 ahead from before delete
+
     //notification
     Toastify({
         text: "This is a toast", duration: 1500, newWindow: true,
@@ -33,7 +36,6 @@ async function Delete_Entity() {
         //onClick: function(){} // Callback after click
     }).showToast();
 
-    Show_Entity_From_Key_Or_Current_Entity(all_entity_keys[current_key_index]) //current index for keys will be 1 ahead from before delete
 }
 
 //choose a new entity meme set from an already built entity (replace the previous meme set)
@@ -248,6 +250,7 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
     if(use_key == 1){
         current_entity_obj = await ENTITY_DB_FNS.Get_Record(entity_key_or_obj) 
     } 
+
     //entity name
     document.getElementById("entityName").textContent = '#' + current_entity_obj.entityName;
     //entity profile image
@@ -305,6 +308,10 @@ async function Initialize_Entity_Page(){
     await Show_Entity_From_Key_Or_Current_Entity(all_entity_keys[0]) //set the first entity to be seen, populate entity object data on view
     await Entity_Emotion_Page() //the entity annotation is the first page to see alternative is the text description
     
+
+    ENTITY_DB_FNS.Check_Presence_Of_Entity_Profile_Images()
+    console.log('printing after entity profile image inspections')
+
 }
 
 //the key starting point for the page
