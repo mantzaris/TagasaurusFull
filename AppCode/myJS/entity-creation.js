@@ -343,10 +343,12 @@ async function Load_New_Entity_MemeSet() {
 
 
 //the start of the page is to activate the pagination and then the entity stage based upon the step_ind
-Pagination_page_item_activate()
-Entity_Fill_Delegation()
-
-
+async function Entity_Creation_Page_Init(){
+    await ENTITY_DB_FNS.Create_Db()
+    Pagination_page_item_activate()
+    Entity_Fill_Delegation()
+}
+Entity_Creation_Page_Init()
 
 /*
     files_tmp_base = []
