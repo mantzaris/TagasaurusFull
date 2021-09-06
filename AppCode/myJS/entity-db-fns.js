@@ -4,6 +4,9 @@ const FSE = require('fs-extra');
 const FS = require('fs');
 const { profile } = require('console');
 
+const MY_FILE_HELPER = require('./copy-new-file-helper.js')
+
+
 const DIR_PICS_ENTITY_DB = reqPath = PATH.join(__dirname, '../../images')  // __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
 
 db_entities = null;
@@ -236,61 +239,54 @@ function randomExcluded(min, max, excluded) {
     if (n >= excluded && excluded != -1) n++;
     return n;
 }
-
 //return the maximum value that can be sampled
 function randInteger(maxInt){
     return Math.floor(Math.random() * maxInt )
 }
-
+//examine in sequence all the profile images of entities and make sure the file exists or replace it with a candidate gallery image
+//or give it the default taga image
 async function Check_Presence_Of_Entity_Profile_Images(){
-
-    get_record_promise = new Promise( (resolve, reject) => {
-        
+    get_record_promise = new Promise( (resolve, reject) => {        
         entity_keys_tmp = Read_All_Keys_From_DB() //get the local keys variable
-
-        entity_keys_tmp.forEach( async key_tmp => {
-            
-
+        if(entity_keys == ''){ //if not set up yet, call the DB to get the key list
+            Get_All_Keys_From_DB() 
+            entity_keys_tmp = Read_All_Keys_From_DB()
+        }
+        entity_keys_tmp.forEach( async key_tmp => { //go through the key list to check the profile image integrity            
             entity_obj_tmp = await Get_Record(key_tmp)
             filename_path_to_local = DIR_PICS_ENTITY_DB + '/' + entity_obj_tmp.entityImage
-            console.log(`filename path to local= ${filename_path_to_local}`)
-
             image_exists = FS.existsSync(filename_path_to_local)
             if( FS.existsSync(filename_path_to_local) == false ) {
-                console.log(`problem with temp key in the array used ${key_tmp}`)
-                console.log(`big problem with image ${filename_path_to_local}`)
-                image_set_tmp = entity_obj_tmp.entityImageSet.slice() 
                 num_of_images_in_set = (entity_obj_tmp.entityImageSet).length
-                profile_image_ind = image_set_tmp.findIndex(img => img === entity_obj_tmp.entityImage);
-                new_profile_candidate_ind = randomExcluded(0, num_of_images_in_set, profile_image_ind)
-                new_profile_candidate_image_name = entity_obj_tmp.entityImageSet[new_profile_candidate_ind]
-
-                console.log(`number of images: ${num_of_images_in_set},  imageset: ${entity_obj_tmp.entityImageSet},   
-                        number of images in set: ${num_of_images_in_set},   profile_img_ind: ${profile_image_ind},    
-                        new profile candidate ind: ${new_profile_candidate_ind}, new profile image name: ${new_profile_candidate_image_name}  `)
-                
-                entity_obj_tmp.entityImage = new_profile_candidate_image_name
-                image_set_tmp.splice(profile_image_ind,1)
-                entity_obj_tmp.entityImageSet = image_set_tmp
-                //image_replacement = entity_obj_tmp.entityImageSet[rand_ind]
-                console.log(`new profile image name: ${entity_obj_tmp}`)
-                console.log(`new image set for the entity: ${image_set_tmp}`)
-
-                console.log(entity_obj_tmp.entityName)
-                Update_Record(entity_obj_tmp)
-
-
+                if(num_of_images_in_set >= 2){ //alternatives to choose from within gallery, sample a random image to replace it and excluse prior
+                    image_set_tmp = entity_obj_tmp.entityImageSet.slice() //clone the array with this approach                    
+                    profile_image_ind = image_set_tmp.findIndex(img => img === entity_obj_tmp.entityImage);
+                    new_profile_candidate_ind = randomExcluded(0, num_of_images_in_set, profile_image_ind)
+                    new_profile_candidate_image_name = entity_obj_tmp.entityImageSet[new_profile_candidate_ind]
+                    entity_obj_tmp.entityImage = new_profile_candidate_image_name
+                    image_set_tmp.splice(profile_image_ind,1)
+                    entity_obj_tmp.entityImageSet = image_set_tmp
+                    Update_Record(entity_obj_tmp)
+                } else { //default to Taga for the image (LOL) since there are no gallery alternatives
+                    filename_path_to_local_TagaPNG = DIR_PICS_ENTITY_DB + '/' + 'Taga.png'
+                    if( FS.existsSync(filename_path_to_local_TagaPNG) == true ) {    
+                        entity_obj_tmp.entityImage = 'Taga.png'
+                        entity_obj_tmp.entityImageSet = [ 'Taga.png' ]
+                        Update_Record(entity_obj_tmp)
+                    } else { //If Taga is not in the directory
+                        taga_source = PATH.join(__dirname, '../../Taga.png')
+                        FS.copyFileSync(taga_source, `${DIR_PICS}/Taga.png`, FS.constants.COPYFILE_EXCL)
+                        entity_obj_tmp.entityImage = 'Taga.png'
+                        entity_obj_tmp.entityImageSet = [ 'Taga.png' ]
+                        Update_Record(entity_obj_tmp)                        
+                    }
+                }
             }
-
-        });
-        
-        resolve('ok!')
-
-
-        //resolve("42! resolving this promise timer")
+        });        
+        resolve('ok entity profile image checks!')
     })
     get_record_promise.then(function(value){
-        console.log(`the returned promise value is === ${value}`)
+        //console.log(`the returned promise value is === ${value}`)
     })
 
 }
