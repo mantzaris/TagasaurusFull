@@ -245,7 +245,7 @@ function randInteger(maxInt){
 }
 //examine in sequence all the profile images of entities and make sure the file exists or replace it with a candidate gallery image
 //or give it the default taga image
-async function Check_Presence_Of_Entity_Profile_and_Gallery_Images(){
+async function Check_Presence_Of_Entity_Profile_and_Gallery_Images_and_Memes(){
     get_record_promise = new Promise( (resolve, reject) => {        
         entity_keys_tmp = Read_All_Keys_From_DB() //get the local keys variable
         if(entity_keys == ''){ //if not set up yet, call the DB to get the key list
@@ -254,7 +254,23 @@ async function Check_Presence_Of_Entity_Profile_and_Gallery_Images(){
         }
         entity_keys_tmp.forEach( async key_tmp => { //go through the key list to check the profile image integrity            
             entity_obj_tmp = await Get_Record(key_tmp)
-
+            
+            //MEMES first
+            if(Array.isArray(entity_obj_tmp.entityMemes) == false || entity_obj_tmp.entityMemes.length == 0) {
+                //entity_obj_tmp.entityMemes = [entity_obj_tmp.entityMemes]
+            } else {
+                //now check the MEMES to see if they are there or remove them from the meme store vector
+                image_set_tmp = entity_obj_tmp.entityMemes.slice() //clone the array
+                entity_obj_tmp.entityMemes.forEach( async image_tmp => {
+                    filename_path_to_local = DIR_PICS_ENTITY_DB + '/' + image_tmp
+                    image_exists = FS.existsSync(filename_path_to_local)
+                    if( FS.existsSync(filename_path_to_local) == false ) { 
+                        meme_image_ind = image_set_tmp.findIndex(img => img === image_tmp);
+                        image_set_tmp.splice(meme_image_ind,1) //you cannot splice the array you are looping upon!!!!!             
+                    }
+                })
+                entity_obj_tmp.entityMemes = image_set_tmp
+            }
             //going to do gallery and entities together
             //doing gallery first since if the gallery is not fresh the profile image substitution is more complicated
             image_set_tmp = entity_obj_tmp.entityImageSet.slice() //clone the array
@@ -295,8 +311,7 @@ async function Check_Presence_Of_Entity_Profile_and_Gallery_Images(){
                 }
             } else {
                 Update_Record(entity_obj_tmp)
-            }
-        
+            }        
         });        
         resolve(42)
     })
@@ -305,7 +320,7 @@ async function Check_Presence_Of_Entity_Profile_and_Gallery_Images(){
         //console.log(`the returned promise value is === ${value}`)
     })
 }
-exports.Check_Presence_Of_Entity_Profile_and_Gallery_Images = Check_Presence_Of_Entity_Profile_and_Gallery_Images
+exports.Check_Presence_Of_Entity_Profile_and_Gallery_Images_and_Memes = Check_Presence_Of_Entity_Profile_and_Gallery_Images_and_Memes
 
 
 
