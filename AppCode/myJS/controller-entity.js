@@ -306,9 +306,7 @@ async function Initialize_Entity_Page(){
     all_entity_keys = ENTITY_DB_FNS.Read_All_Keys_From_DB() //retrieve the key set stored as a global within the module
 
     ENTITY_DB_FNS.Check_Presence_Of_Entity_Profile_and_Gallery_Images()
-    //ENTITY_DB_FNS.Check_Presence_Of_Entity_Profile_Images() //check profile images of entities
-    //ENTITY_DB_FNS.Check_Presence_Of_Gallery_Profile_Images() //check profile images of entities
-
+    
     await Show_Entity_From_Key_Or_Current_Entity(all_entity_keys[0]) //set the first entity to be seen, populate entity object data on view
     await Entity_Emotion_Page() //the entity annotation is the first page to see alternative is the text description
     

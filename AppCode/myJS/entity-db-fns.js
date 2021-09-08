@@ -258,92 +258,55 @@ async function Check_Presence_Of_Entity_Profile_and_Gallery_Images(){
             //going to do gallery and entities together
             //doing gallery first since if the gallery is not fresh the profile image substitution is more complicated
             image_set_tmp = entity_obj_tmp.entityImageSet.slice() //clone the array
-            console.log(`entity key: ${key_tmp}`)
-            console.log(`original imageset ${image_set_tmp}`)
             entity_obj_tmp.entityImageSet.forEach( async image_tmp => {
                 filename_path_to_local = DIR_PICS_ENTITY_DB + '/' + image_tmp
                 image_exists = FS.existsSync(filename_path_to_local)
-                console.log(`looking at image ${image_tmp}`)
                 if( FS.existsSync(filename_path_to_local) == false ) { 
-                    console.log(`image: ${image_tmp}, does not exist`)
                     gallery_image_ind = image_set_tmp.findIndex(img => img === image_tmp);
                     image_set_tmp.splice(gallery_image_ind,1) //you cannot splice the array you are looping upon!!!!!             
-                    console.log(`taking out missing image of key ${key_tmp} with missing Gallery image ${image_tmp}`)
-                    
                 }
             })
             entity_obj_tmp.entityImageSet = image_set_tmp
-            Update_Record(entity_obj_tmp)
-            console.log(`new imagesettmp=${image_set_tmp}`)
+            //Update_Record(entity_obj_tmp)
             
-            if(1==0){
-                //now deal with the profile image
-                filename_path_to_local = DIR_PICS_ENTITY_DB + '/' + entity_obj_tmp.entityImage
-                image_exists = FS.existsSync(filename_path_to_local)
-                if( FS.existsSync(filename_path_to_local) == false ) {
-                    num_of_images_in_set = (entity_obj_tmp.entityImageSet).length
-                    if(num_of_images_in_set >= 1){ //alternatives to choose from within gallery, sample a random image to replace it and excluse prior
-                        new_profile_candidate_ind = randInteger(num_of_images_in_set)
-                        new_profile_candidate_image_name = entity_obj_tmp.entityImageSet[new_profile_candidate_ind]
-                        entity_obj_tmp.entityImage = new_profile_candidate_image_name
-                        
-                        Update_Record(entity_obj_tmp)
-                    } else { //default to Taga for the image (LOL) since there are no gallery alternatives
-                        filename_path_to_local_TagaPNG = DIR_PICS_ENTITY_DB + '/' + 'Taga.png'
-                        if( FS.existsSync(filename_path_to_local_TagaPNG) == true ) {    
-                            entity_obj_tmp.entityImage = 'Taga.png'
-                            entity_obj_tmp.entityImageSet = [ 'Taga.png' ]
-                            Update_Record(entity_obj_tmp)
-                        } else { //If Taga is not in the directory
-                            taga_source = PATH.join(__dirname, '../../Taga.png')
-                            FS.copyFileSync(taga_source, `${DIR_PICS}/Taga.png`, FS.constants.COPYFILE_EXCL)
-                            entity_obj_tmp.entityImage = 'Taga.png'
-                            entity_obj_tmp.entityImageSet = [ 'Taga.png' ]
-                            Update_Record(entity_obj_tmp)                        
-                        }
-                    }
-                } else {
+            //now deal with the PROFILE IMAGE, non-existant files from the image set should already be removed
+            filename_path_to_local = DIR_PICS_ENTITY_DB + '/' + entity_obj_tmp.entityImage
+            image_exists = FS.existsSync(filename_path_to_local)
+            if( FS.existsSync(filename_path_to_local) == false ) {
+                num_of_images_in_set = (entity_obj_tmp.entityImageSet).length
+                if(num_of_images_in_set >= 1){ //alternatives to choose from within gallery, sample a random image to replace it and excluse prior
+                    new_profile_candidate_ind = randInteger(num_of_images_in_set)
+                    new_profile_candidate_image_name = entity_obj_tmp.entityImageSet[new_profile_candidate_ind]
+                    entity_obj_tmp.entityImage = new_profile_candidate_image_name                    
                     Update_Record(entity_obj_tmp)
+                } else { //default to Taga for the image (LOL) since there are no gallery alternatives
+                    filename_path_to_local_TagaPNG = DIR_PICS_ENTITY_DB + '/' + 'Taga.png'
+                    if( FS.existsSync(filename_path_to_local_TagaPNG) == true ) {
+                        entity_obj_tmp.entityImage = 'Taga.png'
+                        entity_obj_tmp.entityImageSet = [ 'Taga.png' ]
+                        Update_Record(entity_obj_tmp)
+                    } else { //If Taga is not in the directory
+                        taga_source = PATH.join(__dirname, '../../Taga.png')
+                        FS.copyFileSync(taga_source, `${DIR_PICS}/Taga.png`, FS.constants.COPYFILE_EXCL)
+                        entity_obj_tmp.entityImage = 'Taga.png'
+                        entity_obj_tmp.entityImageSet = [ 'Taga.png' ]
+                        Update_Record(entity_obj_tmp)
+                    }
                 }
+            } else {
+                Update_Record(entity_obj_tmp)
             }
+        
         });        
         resolve(42)
     })
     get_record_promise.then(function(value){
        //Check_Presence_Of_Gallery_Profile_Images()
-       console.log(`the returned promise value is === ${value}`)
-    })
-}
-exports.Check_Presence_Of_Entity_Profile_and_Gallery_Images = Check_Presence_Of_Entity_Profile_and_Gallery_Images
-//now check to make sure that all the Gallery images are available if not remove them
-async function Check_Presence_Of_Gallery_Profile_Images(){
-    get_record_promise = new Promise( (resolve, reject) => {
-        entity_keys_tmp = Read_All_Keys_From_DB() //get the local keys variable
-        if(entity_keys == ''){ //if not set up yet, call the DB to get the key list
-            Get_All_Keys_From_DB()
-            entity_keys_tmp = Read_All_Keys_From_DB()
-        }
-        entity_keys_tmp.forEach( async key_tmp => { //go through the key list to check the profile image integrity            
-            entity_obj_tmp = await Get_Record(key_tmp)
-            image_set_tmp = entity_obj_tmp.entityImageSet.slice() //clone the array
-            image_set_tmp.forEach( async image_tmp => {
-                filename_path_to_local = DIR_PICS_ENTITY_DB + '/' + image_tmp
-                image_exists = FS.existsSync(filename_path_to_local)
-                if( FS.existsSync(filename_path_to_local) == false ) { //image is missing in gallery (hopefully profile image is ok)
-                    gallery_image_ind = image_set_tmp.findIndex(img => img === image_tmp);
-                    image_set_tmp.splice(gallery_image_ind,1)
-                    entity_obj_tmp.entityImageSet = image_set_tmp
-                    console.log(`taking out missing image of key ${key_tmp} with missing Gallery image ${image_tmp}`)
-                }
-            })
-            Update_Record(entity_obj_tmp) 
-        })
-    })
-    get_record_promise.then(function(value){
         //console.log(`the returned promise value is === ${value}`)
     })
 }
-exports.Check_Presence_Of_Gallery_Profile_Images = Check_Presence_Of_Gallery_Profile_Images
+exports.Check_Presence_Of_Entity_Profile_and_Gallery_Images = Check_Presence_Of_Entity_Profile_and_Gallery_Images
+
 
 
 
