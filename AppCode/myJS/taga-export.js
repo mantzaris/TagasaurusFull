@@ -1,16 +1,26 @@
+//module functions for DB connectivity 
+FNS_DB = require('./myJS/db-access-module.js');
 
-//const fns_DB = require('./myJS/db-access-module.js');
+const IPC_Renderer = require('electron').ipcRenderer
+
+const FS = require('fs');
+//console.log(__dirname)
+const dir = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
+var image_files_in_dir = fs.readdirSync(dir)
+const path = require('path');
+const FSE = require('fs-extra');
+
 
 //functionality for the export of all the information
 function Export_User_Annotation_Data(){
 
-    const save_promise = ipcRenderer.invoke('dialog:save')
+    const save_promise = IPC_Renderer.invoke('dialog:save')
     save_promise.then(function(path_chosen){ 
         //get ready to export data
         if(path_chosen.canceled == false){
-            if (!fs.existsSync(path_chosen.filePath)){
-                fs.mkdirSync(path_chosen.filePath);                                
-                fns_DB.Return_All_DB_Data().then(function (results) { 
+            if (!FS.existsSync(path_chosen.filePath)){
+                FS.mkdirSync(path_chosen.filePath);                                
+                FNS_DB.Return_All_DB_Data().then(function (results) { 
                     Write_Export_Data(path_chosen.filePath,results.rows)
                 })
             } else {
@@ -27,10 +37,10 @@ function Export_User_Annotation_Data(){
 function Write_Export_Data(file_path,db_rows){
     //write the json data out to the folder
     file_name_data = '/TagasaurusAnnotations.json'    
-    fs.writeFileSync( file_path+file_name_data, JSON.stringify(db_rows) );    
+    FS.writeFileSync( file_path+file_name_data, JSON.stringify(db_rows) );    
     //now copy the files as well to a new 'images' directory
-    fs.mkdirSync( file_path+'/images');
-    fse.copy( dir, file_path+'/images', err => {
+    FS.mkdirSync( file_path+'/images');
+    FSE.copy( dir, file_path+'/images', err => {
         if (err){ return console.error(err) }
         else { console.log('folder copy success!') }
     })
@@ -38,4 +48,3 @@ function Write_Export_Data(file_path,db_rows){
 }
 
 
-exports.Export_User_Annotation_Data = Export_User_Annotation_Data
