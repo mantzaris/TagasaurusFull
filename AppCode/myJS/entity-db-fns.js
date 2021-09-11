@@ -19,6 +19,20 @@ var entity_keys = '';
 var current_record;
 
 
+//return the constants for the db name, the store name and the key path
+function Get_Entity_DB_labels(){
+    return {'ENTITY_DB_NAME':ENTITY_DB_NAME,'ENTITY_OBJSTORE_NAME':ENTITY_OBJSTORE_NAME,
+                'ENTITY_KEY_PATH_NAME':ENTITY_KEY_PATH_NAME}
+}
+exports.Get_Entity_DB_labels = Get_Entity_DB_labels
+
+//get the indexeddb obj to do DB function work (just return the premade one, not create)
+function Get_DB(){
+    return db_entities
+}
+exports.Get_DB = Get_DB
+
+
 //create the database and the objectstore (table), and the keyPath (primary key) as the entity name
 async function Create_Db(){
     Create_Db_Promise = new Promise((resolve, reject) => {
