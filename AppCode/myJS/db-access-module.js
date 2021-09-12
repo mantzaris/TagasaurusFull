@@ -12,8 +12,8 @@ const update_statement = `UPDATE ${table_name} SET emotions=?,memeChoices=?,tags
 
 exports.DB_Open = function() {
   //database name, Version number, Text description, Size of database
-  let database = openDatabase(db_name, '1.0', 'stores image descriptions', 2 * 1024 * 1024);
-  return database
+    let database = openDatabase(db_name, '1.0', 'stores image descriptions', 2 * 1024 * 1024);
+    return database
 }
 
 exports.Init_DB = function() {

@@ -16,14 +16,17 @@ const view_annotate_module = require('./myJS/view-annotate-module.js');
 const data_export = require('./myJS/data-export.js') 
 //module for helping the process of deleting an image and the references to it
 const delete_helper = require('./myJS/delete-helper.js')
+const delete_helper_IDB = require('./myJS/tagging-delete-helper.js')
 //module for the processing of the description
 const description_process_module = require('./myJS/descriptionProcessing.js');
 //module functions for DB connectivity 
 const fns_DB = require('./myJS/db-access-module.js');
+const fns_DB_IDB = require('./myJS/tagging-db-fns.js');
 //const { Annotation_DOM_Alter } = require('./view-annotate-module.js');
 
 const database = fns_DB.DB_Open()
 fns_DB.Init_DB()
+fns_DB_IDB.Create_Db()
 
 var processed_tag_word_list
 var image_index = 1;
@@ -32,17 +35,43 @@ var image_index = 1;
 First_Display_Init(image_index); 
 
 
+//fill the IDB for 'tagging' when loading so new files are taken into account 'eventually', feed it the DB list of files
+async function Check_And_Handle_New_Images_IDB(current_file_list) {
+    //default annotation obj values to use when new file found
+    for( ii = 0; ii < image_files_in_dir.length; ii++){
+        bool_new_file_name = current_file_list.some( name_tmp => name_tmp === `${image_files_in_dir[ii]}` )
+        if( bool_new_file_name == false ) {
+            //the picture file name in context
+            image_name_tmp = `${image_files_in_dir[ii]}`
+            tagging_entry = {
+                "imageName": image_name_tmp,
+                "taggingTags": [],
+                "taggingRawDescription": "",
+                "taggingEmotions": { happy: 0, sad: 0, confused: 0 },            
+                "taggingMemesChoices": {}
+            }
+        await fns_DB_IDB.Insert_Record(tagging_entry)
+        }
+    }
+}
+
 //called upon app loading
 async function First_Display_Init(n) {        
     emotion_val_obj = {happy:0, sad:0, confused:0,descriptionInput:'', taglist:'', imgMain:image_files_in_dir[n - 1]}
     view_annotate_module.Annotation_DOM_Alter(emotion_val_obj)
     view_annotate_module.Meme_View_Fill(image_files_in_dir)
     current_file_list = await fns_DB.Get_Stored_File_Names().then(function(results){return results})
+    //get IDB current file list
+    await fns_DB_IDB.Get_All_Keys_From_DB()
+    current_file_list_IDB = fns_DB_IDB.Read_All_Keys_From_DB()
+    console.log(current_file_list_IDB)
     Load_State_Of_Image() 
     //load files in the directory but not DB, into the DB with defaults
     Check_And_Handle_New_Images(current_file_list)
+    Check_And_Handle_New_Images_IDB(current_file_list_IDB)
     //DB entries not in the directory are lingering entries to be deleted
     delete_helper.Image_Delete_From_DB_And_MemeRefs()
+    delete_helper_IDB.Image_Delete_From_DB_And_MemeRefs()
 }
 
 //called from the gallery widget

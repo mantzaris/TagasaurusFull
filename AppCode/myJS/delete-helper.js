@@ -14,6 +14,7 @@ function Delete_Image_File(file){
         return -1
     }
 }
+exports.Delete_Image_File = Delete_Image_File
 
 
 function Image_Delete_From_DB_And_MemeRefs(){
@@ -37,8 +38,6 @@ function Image_Delete_From_DB_And_MemeRefs(){
     fns_DB.Delete_Void_MemeChoices()
 
 }
-
-
-
-exports.Delete_Image_File = Delete_Image_File
 exports.Image_Delete_From_DB_And_MemeRefs = Image_Delete_From_DB_And_MemeRefs
+
+
