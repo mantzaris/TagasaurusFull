@@ -92,7 +92,7 @@ exports.Delete_Void_MemeChoices = function Delete_Void_MemeChoices(){
                 }
                 if(changed_memes == true){
                     fns_DB.Meme_Update(update_statement_memeChoices, parsed_memeChoices, name_memes[ii].name)
-                }    
+                }
             }
         })
     })

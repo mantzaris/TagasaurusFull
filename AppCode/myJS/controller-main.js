@@ -12,6 +12,7 @@ const vanilla_notify = require('./js-modules-downloaded/vanilla-notify.js');
 const ipcRenderer = require('electron').ipcRenderer
 //module for the main annotation view alterations-directly affects the DOM
 const view_annotate_module = require('./myJS/view-annotate-module.js');
+const tagging_view_annotate = require('./myJS/tagging-view-annotate.js');
 //module for the functionality to export all the annotation data 
 const data_export = require('./myJS/data-export.js') 
 //module for helping the process of deleting an image and the references to it
@@ -45,10 +46,10 @@ async function Check_And_Handle_New_Images_IDB(current_file_list) {
             image_name_tmp = `${image_files_in_dir[ii]}`
             tagging_entry = {
                 "imageName": image_name_tmp,
-                "taggingTags": [],
-                "taggingRawDescription": "",
-                "taggingEmotions": { happy: 0, sad: 0, confused: 0 },            
-                "taggingMemesChoices": {}
+                "tags": [],
+                "rawDescription": "",
+                "emotions": { happy: 0, sad: 0, confused: 0 },            
+                "memeChoices": {}
             }
         await fns_DB_IDB.Insert_Record(tagging_entry)
         }
@@ -56,7 +57,7 @@ async function Check_And_Handle_New_Images_IDB(current_file_list) {
 }
 
 //called upon app loading
-async function First_Display_Init(n) {        
+async function First_Display_Init(n) {
     emotion_val_obj = {happy:0, sad:0, confused:0,descriptionInput:'', taglist:'', imgMain:image_files_in_dir[n - 1]}
     view_annotate_module.Annotation_DOM_Alter(emotion_val_obj)
     view_annotate_module.Meme_View_Fill(image_files_in_dir)
@@ -65,7 +66,11 @@ async function First_Display_Init(n) {
     await fns_DB_IDB.Get_All_Keys_From_DB()
     current_file_list_IDB = fns_DB_IDB.Read_All_Keys_From_DB()
     console.log(current_file_list_IDB)
-    Load_State_Of_Image() 
+    Load_State_Of_Image()
+    
+    //UNOCMMENT LATER!!!!
+    //Load_State_Of_Image_IDB() 
+    
     //load files in the directory but not DB, into the DB with defaults
     Check_And_Handle_New_Images(current_file_list)
     Check_And_Handle_New_Images_IDB(current_file_list_IDB)
@@ -86,7 +91,15 @@ function New_Image_Display(n) {
     
     val_obj = {descriptionInput:'', taglist:'', imgMain:image_files_in_dir[image_index - 1]}
     view_annotate_module.Annotation_DOM_Alter(val_obj)
+
+    //UNOCMMENT LATER!!!!
+    tagging_view_annotate.Annotation_DOM_Alter(val_obj)
+
     Load_State_Of_Image()
+
+    //UNOCMMENT LATER!!!!
+    //Load_State_Of_Image_IDB() 
+
 }
 
 //dialog window explorer to select new images to import
@@ -101,6 +114,9 @@ async function Load_New_Image() {
                 console.log(`File Contents of copied_file: ${result.filePaths[0]}`)
                 image_files_in_dir = fs.readdirSync(dir)
                 current_file_list = await fns_DB.Get_Stored_File_Names().then(function(results){return results})
+                await fns_DB_IDB.Get_All_Keys_From_DB()
+                current_file_list_IDB = fns_DB_IDB.Read_All_Keys_From_DB()
+
                 var emotion_value_array_tmp = { happy: 0, sad: 0, confused: 0 }
                 var meme_switch_booleans_tmp = {}
                 rawDescription_tmp = ""
@@ -108,8 +124,14 @@ async function Load_New_Image() {
                 fns_DB.Query_Insert( filename, JSON.stringify(emotion_value_array_tmp),
                         JSON.stringify(meme_switch_booleans_tmp),
                         processed_tag_word_list_tmp,rawDescription_tmp)
+                fns_DB_IDB.Update_Record( { 'imageName':filename,'emotions':emotion_value_array_tmp,'tags':[],
+                                                                'rawDescription':"","memeChoices": {} } )
                 Refresh_File_List()
                 view_annotate_module.Meme_View_Fill(image_files_in_dir)
+            
+                //UNOCMMENT LATER!!!!
+                //tagging_view_annotate.Annotation_DOM_Alter(image_files_in_dir)
+
             }
         });
     }
@@ -132,7 +154,7 @@ function Check_And_Handle_New_Images(current_file_list) {
     rawDescription_tmp = "" 
     processed_tag_word_list_tmp = ""
     for( ii = 0; ii < image_files_in_dir.length; ii++){
-        bool_new_file_name = current_file_list.some( name_tmp => name_tmp === `${image_files_in_dir[ii]}` )        
+        bool_new_file_name = current_file_list.some( name_tmp => name_tmp === `${image_files_in_dir[ii]}` )
         if( bool_new_file_name == false ) {
             //the picture file name in context
             image_name_tmp = `${image_files_in_dir[ii]}`
@@ -147,6 +169,12 @@ function Check_And_Handle_New_Images(current_file_list) {
 async function Load_State_Of_Image() {
     image_annotations = await fns_DB.Return_Image_Annotations_From_DB(image_files_in_dir[image_index - 1]).then(function(result){return result})    
     view_annotate_module.Display_Image_State_Results(image_files_in_dir,image_annotations)
+}
+
+//set the emotional sliders values to the emotional vector values stored
+async function Load_State_Of_Image_IDB() {
+    image_annotations = await fns_DB_IDB.Get_Record(image_files_in_dir[image_index - 1])
+    tagging_view_annotate.Display_Image_State_Results(image_files_in_dir,image_annotations)
 }
 
 //process image for saving including the text to tags
