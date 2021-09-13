@@ -25,20 +25,20 @@ function Annotation_DOM_Alter(annotation_obj){
         }
     }
 }
-
+exports.Annotation_DOM_Alter = Annotation_DOM_Alter
 
 //set view to display image state results of query for a particular file name
 function Display_Image_State_Results(files,select_result){
-    if(select_result.rows.length > 0){
-        happy_val = select_result["emotions"].happy
-        sad_val = select_result["emotions"].sad
-        confused_val = select_result["emotions"].confused
-        tags_list = select_result["tags"]
-        rawDescription_tmp = select_result["rawDescription"]
+    if(Object.keys(select_result).length != 0){
+        happy_val = select_result["taggingEmotions"].happy
+        sad_val = select_result["taggingEmotions"].sad
+        confused_val = select_result["taggingEmotions"].confused
+        tags_list = select_result["taggingTags"]
+        rawDescription_tmp = select_result["taggingRawDescription"]
         val_obj = {happy: happy_val, sad: sad_val, confused: confused_val,
                         descriptionInput: rawDescription_tmp, taglist: tags_list}
         
-        meme_json_parsed = select_result["memeChoices"]
+        meme_json_parsed = select_result["taggingMemesChoices"]
         
         for (var ii = 0; ii < files.length; ii++) {
             if(document.getElementById(`${files[ii]}`) != null) { 
@@ -59,10 +59,48 @@ function Display_Image_State_Results(files,select_result){
         Annotation_DOM_Alter(emotion_val_obj)                
     }
 }
+exports.Display_Image_State_Results = Display_Image_State_Results
 
 
+//populate the meme switch view with images
+function Meme_View_Fill(files) {
+    document.getElementById('memes').innerHTML = ""
+    meme_box = document.getElementById('memes')
+
+    for (ii = 0; ii < files.length; ii++) {
+
+        meme_box.insertAdjacentHTML('beforeend', `<input class="form-check-input" type="checkbox" value="" id="${files[ii]}">
+                <img height="50%" width="80%" src="${dir}/${files[ii]}" /><br>  `);
+    }
+}
+exports.Meme_View_Fill = Meme_View_Fill
 
 
+//helper function to create the inner HTML for the tag list within the tag box
+function Make_Tag_HTML_UL(tag_array) {
+    // Create the list element:
+    var list = document.createElement('ul');
+    for (var i = 0; i < tag_array.length; i++) {
+        // Create the list item:
+        var item = document.createElement('li');
+        // Set its contents:
+        item.appendChild(document.createTextNode(tag_array[i]));
+        // Add it to the list:
+        list.appendChild(item);
+    }
+    // Finally, return the constructed list:
+    return list;
+}
+
+//function to reset annotations to default
+function Reset_Image_View(files){
+    val_obj = {happy: 0, sad: 0, confused: 0, descriptionInput:'', taglist:''}
+    for (var ii = 0; ii < files.length; ii++) {
+        val_obj[`${files[ii]}`] = false //each file name is the element ID for the tagging page
+    }
+    Annotation_DOM_Alter(val_obj)
+}
+exports.Reset_Image_View = Reset_Image_View
 
 
 

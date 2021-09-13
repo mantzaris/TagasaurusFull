@@ -246,19 +246,27 @@ function Read_All_Keys_From_DB() {
 exports.Read_All_Keys_From_DB = Read_All_Keys_From_DB
 
 
-//return all the records in the object store  (NOT BEING USED YET CAUSE WE CURRENTLY ONLY RETURN THE KEYS FOR ALL OBJECTS)
-function Get_All_From_DB(){
+//return all the records in the object store
+async function Get_All_From_DB(){
     let cursor_transaction = db_tagging.transaction(TAGGING_OBJSTORE_NAME, 'readonly')
     let store = cursor_transaction.objectStore(TAGGING_OBJSTORE_NAME)
 
-    let request = store.getAll();
-    request.onerror = function(event){
-        //console.log('entity, could not Get_All_From_DB()')
-        console.log(event.target.error)
-    }
-    request.onsuccess = function(event) {
-        //console.log('entity, success in Get_All_From_DB()') //console.log(event.target.result)
-    }
+    get_all_DB_promise = new Promise((resolve, reject) => {
+        let request = store.getAll();
+        request.onerror = function(event){
+            //console.log('entity, could not Get_All_From_DB()')
+            console.log(event.target.error)
+        }
+        request.onsuccess = function(event) {
+            //resolve(event.target.result)
+            console.log(`before returning the GET ALL FROM DB : ${event.target.result}`)
+            console.log(` the GET ALL FROM DB stringified now : ${JSON.stringify(event.target.result)}`)
+
+            resolve( event.target.result )
+            //console.log('entity, success in Get_All_From_DB()') //console.log(event.target.result)
+        }
+    })
+    return get_all_DB_promise
 }
 exports.Get_All_From_DB = Get_All_From_DB
 
