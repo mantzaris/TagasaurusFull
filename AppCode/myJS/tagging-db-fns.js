@@ -281,6 +281,7 @@ async function Delete_Void_MemeChoices(){
     all_keys.forEach(async (key) => { 
         record_tmp = await Get_Record(key)
         memes_tmp = record_tmp.taggingMemesChoices
+        console.log(`the idb funs delete void meme choices stringify : ${JSON.stringify(record_tmp)}`)
         memes_new = JSON.parse(JSON.stringify(memes_tmp)) //how we clone a JS object
         changed_memes = false
         for (var meme_key of Object.keys(memes_tmp)) {

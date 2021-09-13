@@ -20,6 +20,7 @@ function Annotation_DOM_Alter(annotation_obj){
             document.getElementById(key_tmp).src = `${dir}/${annotation_obj[key_tmp]}`;
         } else if( key_tmp.split('.').length > 1 ){ // memes, get the file name which is the element ID on the tagging HTML page
             document.getElementById(key_tmp).checked = annotation_obj[key_tmp]
+            console.log(`in the key_tmp application check and key_tmp=${key_tmp}`)
         } else{ //emotions
             document.getElementById(key_tmp).value = annotation_obj[key_tmp]
         }
@@ -38,12 +39,16 @@ function Display_Image_State_Results(files,select_result){
         val_obj = {happy: happy_val, sad: sad_val, confused: confused_val,
                         descriptionInput: rawDescription_tmp, taglist: tags_list}
         
-        meme_json_parsed = select_result["taggingMemesChoices"]
-        
+        meme_json_parsed = select_result["taggingMemeChoices"]
+        console.log(`---------------\n   
+                    in taggind Display image state results, files= ${files},  
+                    select_result=${JSON.stringify(select_result)},    
+                    memeparsed=${meme_json_parsed},    
+                    rawDescription_tmp=${rawDescription_tmp}`)
         for (var ii = 0; ii < files.length; ii++) {
-            if(document.getElementById(`${files[ii]}`) != null) { 
+            if(document.getElementById(`${files[ii]}`) != null) {
                 if( (`${files[ii]}` in meme_json_parsed) ){                        
-                    if( meme_json_parsed[`${files[ii]}`] == true ){                                                            
+                    if( meme_json_parsed[`${files[ii]}`] == true ){
                         val_obj[`${files[ii]}`] = true
                     } else{
                         val_obj[`${files[ii]}`] = false

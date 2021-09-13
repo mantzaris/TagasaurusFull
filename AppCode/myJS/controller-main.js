@@ -48,10 +48,10 @@ async function Check_And_Handle_New_Images_IDB(current_file_list) {
             image_name_tmp = `${image_files_in_dir[ii]}`
             tagging_entry = {
                 "imageName": image_name_tmp,
-                "tags": [],
-                "rawDescription": "",
-                "emotions": { happy: 0, sad: 0, confused: 0 },            
-                "memeChoices": {}
+                "taggingTags": [],
+                "taggingRawDescription": "",
+                "taggingEmotions": { happy: 0, sad: 0, confused: 0 },            
+                "taggingMemesChoices": {}
             }
         await fns_DB_IDB.Insert_Record(tagging_entry)
         }
@@ -81,7 +81,7 @@ async function First_Display_Init(n) {
     Check_And_Handle_New_Images_IDB(current_file_list_IDB)
     //DB entries not in the directory are lingering entries to be deleted
     //delete_helper.Image_Delete_From_DB_And_MemeRefs()
-    delete_helper_IDB.Image_Delete_From_DB_And_MemeRefs()
+    //delete_helper_IDB.Image_Delete_From_DB_And_MemeRefs()
 }
 
 //called from the gallery widget
@@ -126,17 +126,11 @@ async function Load_New_Image() {
                 var meme_switch_booleans_tmp = {}
                 rawDescription_tmp = ""
                 processed_tag_word_list_tmp = ""
-                /*
-                fns_DB.Query_Insert( filename, JSON.stringify(emotion_value_array_tmp),
-                        JSON.stringify(meme_switch_booleans_tmp),
-                        processed_tag_word_list_tmp,rawDescription_tmp)
-                */
-                fns_DB_IDB.Insert_Record( { 'imageName':filename,'emotions':emotion_value_array_tmp,'tags':[],
-                                                                'rawDescription':"","memeChoices": {} } )
+
+                fns_DB_IDB.Insert_Record( { 'imageName':filename,'taggingEmotions':emotion_value_array_tmp,'taggingTags':[],
+                                                                'taggingRawDescription':"","taggingMemeChoices": {} } )
                 Refresh_File_List()
-                //view_annotate_module.Meme_View_Fill(image_files_in_dir)
-            
-                //UNOCMMENT LATER!!!!
+
                 tagging_view_annotate.Annotation_DOM_Alter(image_files_in_dir)
 
             }
@@ -151,7 +145,6 @@ function Refresh_File_List() {
 
 //bring the image annotation view to the default state (not saving it until confirmed)
 function Reset_Image(){
-    //view_annotate_module.Reset_Image_View(image_files_in_dir)
     tagging_view_annotate.Reset_Image_View(image_files_in_dir)
 }
 
@@ -166,11 +159,7 @@ function Check_And_Handle_New_Images(current_file_list) {
         if( bool_new_file_name == false ) {
             //the picture file name in context
             image_name_tmp = `${image_files_in_dir[ii]}`
-            /*
-            fns_DB.Query_Insert( image_name_tmp, JSON.stringify(emotion_value_array_tmp),
-                        JSON.stringify(meme_switch_booleans_tmp),
-                        processed_tag_word_list_tmp,rawDescription_tmp)
-            */
+
             fns_DB_IDB.Insert_Record({'imageName':image_name_tmp,'taggingEmotions':emotion_value_array_tmp,
                                         'taggingMemeChoices':meme_switch_booleans_tmp,
                                         'taggingRawDescription':rawDescription_tmp,
@@ -179,16 +168,13 @@ function Check_And_Handle_New_Images(current_file_list) {
     }
 }
 
-//set the emotional sliders values to the emotional vector values stored
-async function Load_State_Of_Image() {
-    image_annotations = await fns_DB.Return_Image_Annotations_From_DB(image_files_in_dir[image_index - 1]).then(function(result){return result})    
-    view_annotate_module.Display_Image_State_Results(image_files_in_dir,image_annotations)
-}
+
 
 //set the emotional sliders values to the emotional vector values stored
 async function Load_State_Of_Image_IDB() {
     image_annotations = await fns_DB_IDB.Get_Record(image_files_in_dir[image_index - 1])
-    console.log(`in load state of image idb image annotations: ${image_annotations} and the imageName : ${image_annotations.imageName}`)
+    console.log(`in load state of image idb image annotations: ${JSON.stringify(image_annotations)} 
+            and the imageName : ${image_annotations.imageName}`)
     tagging_view_annotate.Display_Image_State_Results(image_files_in_dir,image_annotations)
 }
 
@@ -212,7 +198,7 @@ function Save_Pic_State() {
         confused: document.getElementById('confused').value
     }    
     //meme selection switch check boxes
-    meme_switch_booleans = {}
+    meme_switch_booleans = []
     for (var ii = 0; ii < image_files_in_dir.length; ii++) {
         meme_boolean_tmp = document.getElementById(`${image_files_in_dir[ii]}`).checked
         if(meme_boolean_tmp == true){
@@ -224,10 +210,15 @@ function Save_Pic_State() {
     //raw user entered text (prior to processing)
     rawDescription = document.getElementById('descriptionInput').value
     //fns_DB.Query_Insert( image_name, emotion_value_array, meme_switch_booleans, processed_tag_word_list, rawDescription)
-    fns_DB_IDB.Update_Record({'imageName':image_name,'taggingEmotions':emotion_value_array,
-                            'taggingMemeChoices':meme_switch_booleans,
-                            'taggingRawDescription':rawDescription,
-                            'taggingTags':[]})
+    new_record = {'imageName':image_name,'taggingEmotions':emotion_value_array,
+                    'taggingMemeChoices':meme_switch_booleans,
+                    'taggingRawDescription':rawDescription,
+                    'taggingTags':processed_tag_word_list}
+
+    console.log(`new_record from saving pic state in tagging: ${JSON.stringify(new_record)}`)
+    console.log(`new_record meme_switch_booleans: ${JSON.stringify(new_record.taggingMemeChoices)}`)
+
+    fns_DB_IDB.Update_Record(new_record)
 
 }
 
@@ -238,7 +229,6 @@ function Delete_Image() {
     success = delete_helper_IDB.Delete_Image_File(image_files_in_dir[image_index-1])
     if(success == 1){
         Refresh_File_List()
-        //view_annotate_module.Meme_View_Fill(image_files_in_dir)
         tagging_view_annotate.Meme_View_Fill(image_files_in_dir)
         //refresh the image view to the next image (which is by defaul the 'next' +1)
         New_Image_Display( 0 ) 
