@@ -130,8 +130,12 @@ async function Load_New_Image() {
                 fns_DB_IDB.Insert_Record( { 'imageName':filename,'taggingEmotions':emotion_value_array_tmp,'taggingTags':[],
                                                                 'taggingRawDescription':"","taggingMemeChoices": {} } )
                 Refresh_File_List()
-
-                tagging_view_annotate.Annotation_DOM_Alter(image_files_in_dir)
+                console.log(`before calling the annotation dom alter with image_files_in_dir: ${image_files_in_dir}`)
+                image_annotations = await fns_DB_IDB.Get_Record(image_files_in_dir[image_index - 1])
+                
+                tagging_view_annotate.Display_Image_State_Results(image_files_in_dir,image_annotations)
+                tagging_view_annotate.Meme_View_Fill(image_files_in_dir)
+                //tagging_view_annotate.Annotation_DOM_Alter(image_files_in_dir)
 
             }
         });

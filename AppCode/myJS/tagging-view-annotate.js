@@ -5,7 +5,7 @@
 
 //pass in an object with emotion, meme or description keys to have those values displayed
 function Annotation_DOM_Alter(annotation_obj){
-    
+    console.log(`in the annotation dom alter printin the object keys for the input; ${Object.keys(annotation_obj)}`)
     for(let key_tmp of Object.keys(annotation_obj)){
         if(key_tmp == 'taglist'){
             if(annotation_obj[key_tmp] == ''){
@@ -20,9 +20,11 @@ function Annotation_DOM_Alter(annotation_obj){
             document.getElementById(key_tmp).src = `${dir}/${annotation_obj[key_tmp]}`;
         } else if( key_tmp.split('.').length > 1 ){ // memes, get the file name which is the element ID on the tagging HTML page
             document.getElementById(key_tmp).checked = annotation_obj[key_tmp]
-            console.log(`in the key_tmp application check and key_tmp=${key_tmp}`)
+            
         } else{ //emotions
+            console.log(`in the key_tmp application check and key_tmp=${key_tmp}`)
             document.getElementById(key_tmp).value = annotation_obj[key_tmp]
+           
         }
     }
 }
