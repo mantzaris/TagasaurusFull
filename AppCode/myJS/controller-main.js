@@ -11,24 +11,24 @@ const vanilla_notify = require('./js-modules-downloaded/vanilla-notify.js');
 
 const ipcRenderer = require('electron').ipcRenderer
 //module for the main annotation view alterations-directly affects the DOM
-const view_annotate_module = require('./myJS/view-annotate-module.js');
+//const view_annotate_module = require('./myJS/view-annotate-module.js');
 const tagging_view_annotate = require('./myJS/tagging-view-annotate.js');
 //module for the functionality to export all the annotation data 
-const data_export = require('./myJS/data-export.js')
+//const data_export = require('./myJS/data-export.js')
 const tagging_data_export = require('./myJS/tagging-data-export.js')
 
 //module for helping the process of deleting an image and the references to it
-const delete_helper = require('./myJS/delete-helper.js')
+//const delete_helper = require('./myJS/delete-helper.js')
 const delete_helper_IDB = require('./myJS/tagging-delete-helper.js')
 //module for the processing of the description
 const description_process_module = require('./myJS/descriptionProcessing.js');
 //module functions for DB connectivity 
-const fns_DB = require('./myJS/db-access-module.js');
+//const fns_DB = require('./myJS/db-access-module.js');
 const fns_DB_IDB = require('./myJS/tagging-db-fns.js');
 //const { Annotation_DOM_Alter } = require('./view-annotate-module.js');
 
-const database = fns_DB.DB_Open()
-fns_DB.Init_DB()
+//const database = fns_DB.DB_Open()
+//fns_DB.Init_DB()
 fns_DB_IDB.Create_Db()
 
 var processed_tag_word_list
