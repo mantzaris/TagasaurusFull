@@ -2,8 +2,11 @@ const fs = require('fs');
 
 
 //const controller = require('./myJS/controller-main.js');
-const fns_DB = require('./myJS/db-access-module.js');
-const database = fns_DB.DB_Open()
+//const fns_DB = require('./myJS/db-access-module.js');
+const fns_DB_IDB = require('./myJS/tagging-db-fns.js');
+
+//const database = fns_DB.DB_Open()
+
 
 // algorithm DFLOW by EPA ( https://stats.stackexchange.com/a/430254/1098 )
 //$\mu_H = \left(\frac{\sum^{n_T - n_0}_{i=1} 1/x_i} {n_T - n_0}\right)^{-1} \times \frac{n_T - n_0} {n_T} ,$
@@ -24,21 +27,26 @@ function Harmonic_Mean(arr) {
 }
 
 async function Display_Skill_Levels() {
-    all_data = await fns_DB.Return_All_DB_Data().then(function (results) { return results })
+    await fns_DB_IDB.Create_Db()
 
-    total_images_in_db = all_data.rows.length
+    //all_data = await fns_DB.Return_All_DB_Data().then(function (results) { return results })
+    all_data = await fns_DB_IDB.Get_All_From_DB()//.then(function(results) {return results})
+    console.log(`-----------\n ALL DATA \n ${all_data}`)
+    total_images_in_db = all_data.length
     total_tagged_images = 0
     meme_connected_images = 0
     emotion_stamped_images = 0
     images_scores_array = []
-    for (const [key, value] of Object.entries(all_data.rows)) {    
-        try{ non_empty_entry = JSON.parse(value.tags).find(element => element != "") 
+    for (const key of Object.keys(all_data)) {    
+        value = (JSON.stringify(all_data[key]))
+        
+        try{ non_empty_entry = (all_data[key].taggingTags).find(element => element != "") 
         } catch { non_empty_entry = undefined }
         if (non_empty_entry != undefined) { total_tagged_images = 1 + total_tagged_images }
-        meme_counts = Object.keys(JSON.parse(value["memeChoices"])).length
+        console.log(`----------------\n meme = ${  (Object.values(all_data[key]["taggingMemeChoices"])).length  }`)
+        meme_counts = (Object.values(all_data[key]["taggingMemeChoices"])).length//Object.keys(JSON.parse(value["taggingMemeChoices"])).length
         if (meme_counts > 0) { meme_connected_images = 1 + meme_connected_images }
-
-        non_empty_emotion = (Object.values(JSON.parse(value.emotions))).find(element => element != "0")
+        non_empty_emotion = (Object.values(all_data[key]["taggingEmotions"])).find(element => element != "0")
         if (non_empty_emotion != undefined) { emotion_stamped_images = 1 + emotion_stamped_images }
 
         tagged_bool_num = + (non_empty_entry != undefined)
