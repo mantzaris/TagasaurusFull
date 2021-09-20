@@ -1,5 +1,7 @@
 //module functions for DB connectivity 
-FNS_DB = require('./myJS/db-access-module.js');
+//FNS_DB = require('./myJS/db-access-module.js');
+//fns_DB_IDB = require('./myJS/tagging-db-fns.js');
+
 
 const IPC_Renderer = require('electron').ipcRenderer
 
@@ -11,8 +13,7 @@ const path = require('path');
 const FSE = require('fs-extra');
 
 const ENTITY_DB_FNS = require('./myJS/entity-db-fns.js');
-
-
+ENTITY_DB_FNS.Create_Db() 
 
 //functionality for the export of all the information
 async function Export_User_Annotation_Data(){
@@ -43,15 +44,15 @@ async function Export_User_Annotation_Data(){
         if(path_chosen.canceled == false){
             if (!FS.existsSync(path_chosen.filePath)){
                 FS.mkdirSync(path_chosen.filePath);
-                FNS_DB.Return_All_DB_Data().then(function (results) {
+                fns_DB_IDB.Get_All_From_DB().then(function (results) {
                     console.log('!!!!!!!!!!!!--------------------------------------!!!!!!!!!!!')
                     //console.log(results.rows)
                     console.log('!!!!!!!!!!!!--------------------------------------!!!!!!!!!!!')
-                    tagged_and_entity_JSON = {'imageAnnotations':results.rows,'allEntityObjects':all_entity_Objects}
+                    tagged_and_entity_JSON = {'imageAnnotations':results,'allEntityObjects':all_entity_Objects}
                     tagged_and_entity_JSON_str = JSON.stringify(tagged_and_entity_JSON)
                     
                     console.log( tagged_and_entity_JSON ) //.allEntityObjects )
-                    Write_Export_Data(path_chosen.filePath,results.rows)
+                    Write_Export_Data(path_chosen.filePath,tagged_and_entity_JSON)
                 })
             } else {
                 vanilla_notify.vNotify.error({visibleDuration: 1200,fadeOutDuration: 250,fadeInDuration: 250, text: 'File or Folder already exists', title:'Canceled'});
@@ -76,5 +77,3 @@ function Write_Export_Data(file_path,db_rows){
     })
     console.log("finished writing the annotations json file and copying images folder")
 }
-
-

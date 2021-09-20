@@ -74,6 +74,8 @@ my fatherland, to be simple and reliable.”
 
 From the book, "The Unfinished Revolution: How to Make Technology Work for Us--Instead of the Other Way Around", by the late Michael Dertouzos we can understand that his vision assumed individuals with local storage that would then choose to integrate their searches and data with others based upon the chosen demand. 
 
+Linus Torvalds: "Talk is cheap, show me the code"
+-why is it cheap?
 Martti Malmi: "Code speaks louder than words"
-and then you may wonder why?
+-and then you may wonder why?
 Marshall McLuhan: "the medium is the message"
