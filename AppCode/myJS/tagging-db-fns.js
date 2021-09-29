@@ -259,9 +259,6 @@ async function Get_All_From_DB(){
         }
         request.onsuccess = function(event) {
             //resolve(event.target.result)
-            console.log(`before returning the GET ALL FROM DB : ${event.target.result}`)
-            console.log(` the GET ALL FROM DB stringified now : ${JSON.stringify(event.target.result)}`)
-
             resolve( event.target.result )
             //console.log('entity, success in Get_All_From_DB()') //console.log(event.target.result)
         }
@@ -281,7 +278,6 @@ async function Delete_Void_MemeChoices(){
     all_keys.forEach(async (key) => { 
         record_tmp = await Get_Record(key)
         memes_tmp = record_tmp.taggingMemeChoices
-        console.log(`the idb funs delete void meme choices stringify : ${JSON.stringify(record_tmp)}`)
         memes_new = JSON.parse(JSON.stringify(memes_tmp)) //how we clone a JS object
         changed_memes = false
         for (var meme_key of Object.keys(memes_tmp)) {

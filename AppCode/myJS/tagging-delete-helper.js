@@ -6,7 +6,9 @@ function Delete_Image_File(file){
         fs.unlinkSync( `${dir}/${file}` );
         console.log(`File is deleted: ${file}`);
         fns_DB_IDB.Delete_Record(file)
-        fns_DB_IDB.Delete_Void_MemeChoices()
+        fns_DB_IDB.Delete_Void_MemeChoices() //!!!needs to be optimized
+        vanilla_notify.vNotify.info({visibleDuration: 1200,fadeOutDuration: 250,fadeInDuration: 250, text: 'Files deleted from database', title:'Deleted'});
+
         return 1
     } catch (error) {
         console.log(error);
@@ -17,6 +19,7 @@ function Delete_Image_File(file){
 exports.Delete_Image_File = Delete_Image_File
 
 
+/*
 //get an overkill method to find all image names in the DB, all the images in the directory of taga, then deletes from
 //DB if not there and checks to make sure it is no longer referenced from other images via memes
 async function Image_Delete_From_DB_And_MemeRefs(){
@@ -37,6 +40,6 @@ async function Image_Delete_From_DB_And_MemeRefs(){
     fns_DB_IDB.Delete_Void_MemeChoices()
 }
 exports.Image_Delete_From_DB_And_MemeRefs = Image_Delete_From_DB_And_MemeRefs
-
+*/
 
 

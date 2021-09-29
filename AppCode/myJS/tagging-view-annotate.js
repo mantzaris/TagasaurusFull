@@ -5,7 +5,6 @@
 
 //pass in an object with emotion, meme or description keys to have those values displayed
 function Annotation_DOM_Alter(annotation_obj){
-    console.log(`in the annotation dom alter printin the object keys for the input; ${Object.keys(annotation_obj)}`)
     for(let key_tmp of Object.keys(annotation_obj)){
         if(key_tmp == 'taglist'){
             if(annotation_obj[key_tmp] == ''){
@@ -16,13 +15,12 @@ function Annotation_DOM_Alter(annotation_obj){
             }
         } else if(key_tmp == 'descriptionInput'){
             document.getElementById(key_tmp).value = annotation_obj[key_tmp]
-        } else if(key_tmp == 'imgMain'){            
+        } else if(key_tmp == 'imgMain'){
             document.getElementById(key_tmp).src = `${dir}/${annotation_obj[key_tmp]}`;
         } else if( key_tmp.split('.').length > 1 ){ // memes, get the file name which is the element ID on the tagging HTML page
             document.getElementById(key_tmp).checked = annotation_obj[key_tmp]
             
         } else{ //emotions
-            console.log(`in the key_tmp application check and key_tmp=${key_tmp}`)
             document.getElementById(key_tmp).value = annotation_obj[key_tmp]
         
         }
@@ -42,11 +40,7 @@ function Display_Image_State_Results(files,select_result){
                         descriptionInput: rawDescription_tmp, taglist: tags_list}
         
         meme_json_parsed = select_result["taggingMemeChoices"]
-        console.log(`---------------\n   
-                    in taggind Display image state results, files= ${files},  
-                    select_result=${JSON.stringify(select_result)},    
-                    memeparsed=${meme_json_parsed},    
-                    rawDescription_tmp=${rawDescription_tmp}`)
+
         for (var ii = 0; ii < files.length; ii++) {
             if(document.getElementById(`${files[ii]}`) != null) {
                 if( (`${files[ii]}` in meme_json_parsed) ){                        
@@ -76,7 +70,8 @@ function Meme_View_Fill(files) {
 
     for (ii = 0; ii < files.length; ii++) {
 
-        meme_box.insertAdjacentHTML('beforeend', `<input class="form-check-input" type="checkbox" value="" id="${files[ii]}">
+        meme_box.insertAdjacentHTML('beforeend', `<input class="form-check-input" 
+                type="checkbox" value="" id="${files[ii]}">
                 <img height="50%" width="80%" src="${dir}/${files[ii]}" /><br>  `);
     }
 }

@@ -7,44 +7,48 @@ tags:
   - user interface
   - database
 authors:
-  - name: Alexander V. Mantzaris
+  - name: Alexander V. Mantzaris^[corresponding author]
     orcid: 0000-0002-0026-5725 
-    affiliation: Deptartment of Statistics and Data Science, University of Central Florida
+    affiliation: 1
   - name: Randyll Pandohie
-    orcid:
-    affiliation: Deptartment of Statistics and Data Science, University of Central Florida
-  - name: Author Without ORCID^[co-first author] # note this makes a footnote saying 'co-first author'
+    orcid: 0000-0002-6164-9714
+    affiliation: 1
+  - name: Michael Hopwood
     orcid: 0000-0001-6190-1767
-    affiliation: Deptartment of Statistics and Data Science, University of Central Florida
-  - name: Author with no affiliation^[corresponding author]
-    affiliation: Deptartment of Statistics and Data Science, University of Central Florida
+    affiliation: 1
+  - name: Patrick Pho
+    orcid: 0000-0002-3127-9812
+    affiliation: 1
+  - name: Dustin Ehling
+    affiliation: 2
+  - name: Thomas G. Walker
+    affiliation: 2
 affiliations:
- - name: Lyman Spitzer, Jr. Fellow, Princeton University
+ - name: Deptartment of Statistics and Data Science, University of Central Florida
    index: 1
- - name: Institution Name
-   index: 2
  - name: Independent Researcher
-   index: 3
-date: 13 August 2017
+   index: 2
+date: 20 September 2021
 bibliography: paper.bib
 
-# Optional fields if submitting to a AAS journal too, see this blog post:
-# https://blog.joss.theoj.org/2018/12/a-new-collaboration-with-aas-publishing
-aas-doi: 10.3847/xxxxx <- update this with the DOI from AAS once you know it.
-aas-journal: Astrophysical Journal <- The name of the AAS journal.
----
 
 # Summary
 
-The forces on stars, galaxies, and dark matter under external gravitational
-fields lead to the dynamical evolution of structures in the universe. The orbits
-of these bodies are therefore key to understanding the formation, history, and
-future state of galaxies. The field of "galactic dynamics," which aims to model
-the gravitating components of galaxies to study their structure and evolution,
-is now well-established, commonly taught, and frequently used in astronomy.
-Aside from toy problems and demonstrations, the majority of problems require
-efficient numerical tools, many of which require the same base code (e.g., for
-performing numerical orbit integration).
+Large collections of images are held by individuals who wish to locally store the photos they
+take, by online web services providing image sharing capabilities and researchers in
+machine learning working on developing classifiers for object detection. An individual storing
+their photos is often limited in the range of meta data they can associate with images without
+resorting to storing the information in separate files since although description entry fields
+are common; the ability to record the emotions explicitly is not. Machine learning research in
+object detection is increasingly looking to label images with objects from complex scenes where
+there are multiple objects to detect. Another is with networked data common to social media
+where the classification of reactions for predictions is of interest and here having a composite
+of tags, emotions and image associations (memes) is of value to train a model. Tagasaurus,
+provides a tool for users to manually insert image annotation information as metadata stored in
+an in browser database. This collection of annotations with the image store can be exported for
+subseqent analysis in the machine learning use case, or used by individuals as a type of 'lifeblog'
+to remember the sentiment with their descriptions.
+
 
 # Statement of need
 
@@ -101,12 +105,10 @@ For a quick reference, the following citation commands can be used:
 
 # Figures
 
-Figures can be included like this:
-![Caption for example figure.\label{fig:example}](figure.png)
-and referenced from text using \autoref{fig:example}.
+![Caption for example figure. images taken from www.pexels.com which has a free use license 'https://www.pexels.com/license/' \label{fig:tagging}](tagging.png){ width=80% } and referenced from text using \autoref{fig:tagging}.
 
 Figure sizes can be customized by adding an optional second parameter:
-![Caption for example figure.](figure.png){ width=20% }
+![Caption for example figure.](entity.png){ width=80% }
 
 # Acknowledgements
 
