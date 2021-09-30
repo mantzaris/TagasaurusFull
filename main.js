@@ -23,9 +23,12 @@ function createWindow () {
 }
 
 //for the ability to load a dialog window in slides.js
-ipcMain.handle('dialog:open', async (_, args) => {
-  const result = dialog.showOpenDialog({ properties: ['openFile' ] })
-  return result
+ipcMain.handle('dialog:open', async (event, args) => {
+  console.log('in the load invoke in mainjs')
+  console.log(args.directory)
+  result = dialog.showOpenDialog({ properties: ['openFile' ] })
+  res = {res:result,tmp:'WWWWWWWWWWWW'}
+  return args.directory
 })
 
 //for the ability to load a dialog window in the entity creation for the selection of a profile image

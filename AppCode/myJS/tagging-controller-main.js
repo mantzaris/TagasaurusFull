@@ -1,32 +1,28 @@
-const fs = require('fs');
-//console.log(__dirname)
-const dir = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
-var image_files_in_dir = fs.readdirSync(dir)
-const path = require('path');
-const fse = require('fs-extra');
+const FS = require('fs');
+const PATH = require('path');
+//FSE is not being used but should be for the directory batch import
+//const FSE = require('fs-extra');
 
+//the object for the window functionality
+const IPC_RENDERER = require('electron').ipcRenderer
 
-//notification code from: https://github.com/MLaritz/Vanilla-Notify
-const vanilla_notify = require('./js-modules-downloaded/vanilla-notify.js');
-
-const ipcRenderer = require('electron').ipcRenderer
 //module for the main annotation view alterations-directly affects the DOM
-//const view_annotate_module = require('./myJS/view-annotate-module.js');
-const tagging_view_annotate_module = require('./myJS/tagging-view-annotate.js');
-
-//module for helping the process of deleting an image and the references to it
-//const delete_helper = require('./myJS/delete-helper.js')
-const tagging_delete_helper_module = require('./myJS/tagging-delete-helper.js')
+const TAGGING_VIEW_ANNOTATE_MODULE = require('./myJS/tagging-view-annotate.js');
+//module for HELPING the PROCESS of deleting an image and the references to it
+const TAGGING_DELETE_HELPER_MODULE = require('./myJS/tagging-delete-helper.js')
 //module for the processing of the description
-const description_process_module = require('./myJS/descriptionProcessing.js');
-//module functions for DB connectivity 
-//const fns_DB = require('./myJS/db-access-module.js');
-const fns_DB_IDB = require('./myJS/tagging-db-fns.js');
-//const { Annotation_DOM_Alter } = require('./view-annotate-module.js');
+const DESCRIPTION_PROCESS_MODULE = require('./myJS/description-processing.js');
+//module functions for DB connectivity
+const TAGGING_IDB_MODULE = require('./myJS/tagging-db-fns.js');
 
-//const database = fns_DB.DB_Open()
-//fns_DB.Init_DB()
-fns_DB_IDB.Create_Db()
+const dir = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
+console.log(`the dir variable string = \n >--->   ${dir}  <---<`)
+
+var image_files_in_dir = FS.readdirSync(dir)
+
+
+//needs to be called to start the DB object within the file
+TAGGING_IDB_MODULE.Create_Db()
 
 var processed_tag_word_list
 var image_index = 1;
@@ -50,7 +46,7 @@ async function Check_And_Handle_New_Images_IDB(current_file_list) {
                 "taggingEmotions": { happy: 0, sad: 0, confused: 0 },            
                 "taggingMemesChoices": {}
             }
-        await fns_DB_IDB.Insert_Record(tagging_entry)
+        await TAGGING_IDB_MODULE.Insert_Record(tagging_entry)
         }
     }
 }
@@ -59,14 +55,14 @@ async function Check_And_Handle_New_Images_IDB(current_file_list) {
 async function First_Display_Init(n) {
     emotion_val_obj = {happy:0, sad:0, confused:0,descriptionInput:'', taglist:'', imgMain:image_files_in_dir[n - 1]}
     //view_annotate_module.Annotation_DOM_Alter(emotion_val_obj)
-    tagging_view_annotate_module.Annotation_DOM_Alter(emotion_val_obj)
+    TAGGING_VIEW_ANNOTATE_MODULE.Annotation_DOM_Alter(emotion_val_obj)
     //view_annotate_module.Meme_View_Fill(image_files_in_dir)
-    tagging_view_annotate_module.Meme_View_Fill(image_files_in_dir)
+    TAGGING_VIEW_ANNOTATE_MODULE.Meme_View_Fill(image_files_in_dir)
     //current_file_list = await fns_DB.Get_Stored_File_Names().then(function(results){return results})
     //get IDB current file list
-    await fns_DB_IDB.Create_Db()
-    await fns_DB_IDB.Get_All_Keys_From_DB()
-    current_file_list_IDB = fns_DB_IDB.Read_All_Keys_From_DB()
+    await TAGGING_IDB_MODULE.Create_Db()
+    await TAGGING_IDB_MODULE.Get_All_Keys_From_DB()
+    current_file_list_IDB = TAGGING_IDB_MODULE.Read_All_Keys_From_DB()
     
     await Load_State_Of_Image_IDB() 
     
@@ -87,40 +83,44 @@ function New_Image_Display(n) {
     };
     val_obj = {descriptionInput:'', taglist:'', imgMain:image_files_in_dir[image_index - 1]}
     //view_annotate_module.Annotation_DOM_Alter(val_obj)
-    tagging_view_annotate_module.Annotation_DOM_Alter(val_obj)
+    TAGGING_VIEW_ANNOTATE_MODULE.Annotation_DOM_Alter(val_obj)
     Load_State_Of_Image_IDB()
 }
 
 //dialog window explorer to select new images to import
 async function Load_New_Image() {
-    const result = await ipcRenderer.invoke('dialog:open')
+    console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    console.log(dir)
+    const result = await IPC_RENDERER.invoke('dialog:open',{directory:dir})
+    console.log(result)
+
     if(result.canceled == false) {        
-        filename = path.parse(result.filePaths[0]).base;
-        fs.copyFile(result.filePaths[0], `${dir}/${filename}`, async (err) => {
+        filename = PATH.parse(result.filePaths[0]).base;
+        FS.copyFile(result.filePaths[0], `${dir}/${filename}`, async (err) => {
             if (err) {
                 console.log("Error Found in file copy:", err);
-            } else {
-                console.log(`File Contents of copied_file: ${result.filePaths[0]}`)
-                image_files_in_dir = fs.readdirSync(dir)
+            } else {                
+                image_files_in_dir = FS.readdirSync(dir)
                 //current_file_list = await fns_DB.Get_Stored_File_Names().then(function(results){return results})
-                await fns_DB_IDB.Get_All_Keys_From_DB()
-                current_file_list_IDB = fns_DB_IDB.Read_All_Keys_From_DB()
+                await TAGGING_IDB_MODULE.Get_All_Keys_From_DB()
+                current_file_list_IDB = TAGGING_IDB_MODULE.Read_All_Keys_From_DB()
 
                 var emotion_value_array_tmp = { happy: 0, sad: 0, confused: 0 }
                 var meme_switch_booleans_tmp = {}
                 rawDescription_tmp = ""
                 processed_tag_word_list_tmp = ""
 
-                fns_DB_IDB.Insert_Record( { 'imageName':filename,'taggingEmotions':emotion_value_array_tmp,'taggingTags':[],
+                TAGGING_IDB_MODULE.Insert_Record( { 'imageName':filename,'taggingEmotions':emotion_value_array_tmp,'taggingTags':[],
                                                                 'taggingRawDescription':"","taggingMemeChoices": {} } )
                 Refresh_File_List()
                 console.log(`before calling the annotation dom alter with image_files_in_dir: ${image_files_in_dir}`)
-                image_annotations = await fns_DB_IDB.Get_Record(image_files_in_dir[image_index - 1])
+                image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
                 
-                tagging_view_annotate_module.Display_Image_State_Results(image_files_in_dir,image_annotations)
-                tagging_view_annotate_module.Meme_View_Fill(image_files_in_dir)
-                //tagging_view_annotate_module.Annotation_DOM_Alter(image_files_in_dir)
+                TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_files_in_dir,image_annotations)
+                TAGGING_VIEW_ANNOTATE_MODULE.Meme_View_Fill(image_files_in_dir)
+                //TAGGING_VIEW_ANNOTATE_MODULE.Annotation_DOM_Alter(image_files_in_dir)
                 image_index += 1
+                
             }
         });
     }
@@ -128,33 +128,33 @@ async function Load_New_Image() {
 
 //update the file variable storing the array of all the files in the folder
 function Refresh_File_List() {
-    image_files_in_dir = fs.readdirSync(dir)
+    image_files_in_dir = FS.readdirSync(dir)
 }
 
 //bring the image annotation view to the default state (not saving it until confirmed)
 function Reset_Image(){
-    tagging_view_annotate_module.Reset_Image_View(image_files_in_dir)
+    TAGGING_VIEW_ANNOTATE_MODULE.Reset_Image_View(image_files_in_dir)
 }
 
 
 //set the emotional sliders values to the emotional vector values stored
 async function Load_State_Of_Image_IDB() {
-    image_annotations = await fns_DB_IDB.Get_Record(image_files_in_dir[image_index - 1])
+    image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
     console.log(`---> in Load_State_Of_Image_IDB()  <--- `)
     console.log(`now looking at file ${image_files_in_dir[image_index - 1]}`)
     console.log(`the image annotation object:`)
     console.log(image_annotations)
-    tagging_view_annotate_module.Display_Image_State_Results(image_files_in_dir,image_annotations)
+    TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_files_in_dir,image_annotations)
 }
 
 //process image for saving including the text to tags
 function Process_Image() {
     user_description = document.getElementById('descriptionInput').value
-    new_user_description = description_process_module.process_description(user_description)
+    new_user_description = DESCRIPTION_PROCESS_MODULE.process_description(user_description)
     tags_split = new_user_description.split(' ')
     val_obj = {taglist:tags_split}
     //view_annotate_module.Annotation_DOM_Alter(val_obj)  
-    tagging_view_annotate_module.Annotation_DOM_Alter(val_obj)
+    TAGGING_VIEW_ANNOTATE_MODULE.Annotation_DOM_Alter(val_obj)
     processed_tag_word_list = new_user_description.split(' ')
     Save_Pic_State()
 }
@@ -187,17 +187,17 @@ function Save_Pic_State() {
     console.log(`new_record from saving pic state in tagging: ${JSON.stringify(new_record)}`)
     console.log(`new_record meme_switch_booleans: ${JSON.stringify(new_record.taggingMemeChoices)}`)
 
-    fns_DB_IDB.Update_Record(new_record)
+    TAGGING_IDB_MODULE.Update_Record(new_record)
 
 }
 
 //delete image from user choice
 function Delete_Image() {
     //try to delete the file (image)
-    success = tagging_delete_helper_module.Delete_Image_File(image_files_in_dir[image_index-1])
+    success = TAGGING_DELETE_HELPER_MODULE.Delete_Image_File(image_files_in_dir[image_index-1])
     if(success == 1){
         Refresh_File_List() //just reload the list of files in the taga img directory
-        tagging_view_annotate_module.Meme_View_Fill(image_files_in_dir)
+        TAGGING_VIEW_ANNOTATE_MODULE.Meme_View_Fill(image_files_in_dir)
         //refresh the image view to the next image (which is by defaul the 'next' +1)
         New_Image_Display( 0 ) 
     }
