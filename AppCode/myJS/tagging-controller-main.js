@@ -16,6 +16,9 @@ const DESCRIPTION_PROCESS_MODULE = require('./myJS/description-processing.js');
 const TAGGING_IDB_MODULE = require('./myJS/tagging-db-fns.js');
 
 const dir = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
+var last_user_image_directory_chosen = ''
+//var directory_load_new_image = 
+//onsole.log(`the dir variable string = \n >---> ${directory_load_new_image} <---<`)
 console.log(`the dir variable string = \n >--->   ${dir}  <---<`)
 
 var image_files_in_dir = FS.readdirSync(dir)
@@ -90,10 +93,21 @@ function New_Image_Display(n) {
 //dialog window explorer to select new images to import
 async function Load_New_Image() {
     console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-    console.log(dir)
-    const result = await IPC_RENDERER.invoke('dialog:open',{directory:dir})
-    console.log(result)
 
+    console.log(dir)
+    const result = await IPC_RENDERER.invoke('dialog:open',{directory: last_user_image_directory_chosen})
+    last_user_image_directory_chosen = PATH.dirname(result.filePaths[0])
+    console.log(last_user_image_directory_chosen)
+    console.log(result)
+    console.log(PATH.dirname(result.filePaths[0]))
+
+    //result = result.a
+    if(PATH.dirname(result.filePaths[0]) == dir && result.canceled == false){
+        console.log('same directory')
+        return
+    }
+
+    //resets when the folder contains the same source file
     if(result.canceled == false) {        
         filename = PATH.parse(result.filePaths[0]).base;
         FS.copyFile(result.filePaths[0], `${dir}/${filename}`, async (err) => {
