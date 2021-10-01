@@ -16,7 +16,7 @@ function Annotation_DOM_Alter(annotation_obj){
         } else if(key_tmp == 'descriptionInput'){
             document.getElementById(key_tmp).value = annotation_obj[key_tmp]
         } else if(key_tmp == 'imgMain'){
-            document.getElementById(key_tmp).src = `${dir}/${annotation_obj[key_tmp]}`;
+            document.getElementById(key_tmp).src = `${TAGA_IMAGE_DIRECTORY}/${annotation_obj[key_tmp]}`;
         } else if( key_tmp.split('.').length > 1 ){ // memes, get the file name which is the element ID on the tagging HTML page
             document.getElementById(key_tmp).checked = annotation_obj[key_tmp]
             
@@ -72,7 +72,7 @@ function Meme_View_Fill(files) {
 
         meme_box.insertAdjacentHTML('beforeend', `<input class="form-check-input" 
                 type="checkbox" value="" id="${files[ii]}">
-                <img height="50%" width="80%" src="${dir}/${files[ii]}" /><br>  `);
+                <img height="50%" width="80%" src="${TAGA_IMAGE_DIRECTORY}/${files[ii]}" /><br>  `);
     }
 }
 exports.Meme_View_Fill = Meme_View_Fill

@@ -3,7 +3,7 @@
 //deletes the image only here called from user input button
 function Delete_Image_File(file){
     try {
-        FS.unlinkSync( `${dir}/${file}` );
+        FS.unlinkSync( `${TAGA_IMAGE_DIRECTORY}/${file}` );
         TAGGING_IDB_MODULE.Delete_Record(file)
         TAGGING_IDB_MODULE.Delete_Void_MemeChoices() //!!!needs to be optimized
         return 1

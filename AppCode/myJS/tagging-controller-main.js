@@ -14,14 +14,13 @@ const TAGGING_DELETE_HELPER_MODULE = require('./myJS/tagging-delete-helper.js')
 const DESCRIPTION_PROCESS_MODULE = require('./myJS/description-processing.js');
 //module functions for DB connectivity
 const TAGGING_IDB_MODULE = require('./myJS/tagging-db-fns.js');
-
-const dir = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
+//the folder to store the taga images (with a commented set of alternative solutions that all appear to work)
+const TAGA_IMAGE_DIRECTORY = PATH.resolve(PATH.resolve(),'images') //PATH.resolve(__dirname, '..', 'images') //PATH.join(__dirname,'..','images')  //PATH.normalize(__dirname+PATH.sep+'..') + PATH.sep + 'images'     //__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
+//holds the last directory the user imported images from
 var last_user_image_directory_chosen = ''
-//var directory_load_new_image = 
-//onsole.log(`the dir variable string = \n >---> ${directory_load_new_image} <---<`)
-console.log(`the dir variable string = \n >--->   ${dir}  <---<`)
 
-var image_files_in_dir = FS.readdirSync(dir)
+
+var image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY)
 
 
 //needs to be called to start the DB object within the file
@@ -92,17 +91,12 @@ function New_Image_Display(n) {
 
 //dialog window explorer to select new images to import
 async function Load_New_Image() {
-    console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-
-    console.log(dir)
+    
     const result = await IPC_RENDERER.invoke('dialog:open',{directory: last_user_image_directory_chosen})
     last_user_image_directory_chosen = PATH.dirname(result.filePaths[0])
-    console.log(last_user_image_directory_chosen)
-    console.log(result)
-    console.log(PATH.dirname(result.filePaths[0]))
-
-    //result = result.a
-    if(PATH.dirname(result.filePaths[0]) == dir && result.canceled == false){
+    
+    //ignore selections from the taga image folder store
+    if(PATH.dirname(result.filePaths[0]) == TAGA_IMAGE_DIRECTORY && result.canceled == false){
         console.log('same directory')
         return
     }
@@ -110,11 +104,11 @@ async function Load_New_Image() {
     //resets when the folder contains the same source file
     if(result.canceled == false) {        
         filename = PATH.parse(result.filePaths[0]).base;
-        FS.copyFile(result.filePaths[0], `${dir}/${filename}`, async (err) => {
+        FS.copyFile(result.filePaths[0], `${TAGA_IMAGE_DIRECTORY}/${filename}`, async (err) => {
             if (err) {
                 console.log("Error Found in file copy:", err);
             } else {                
-                image_files_in_dir = FS.readdirSync(dir)
+                image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY)
                 //current_file_list = await fns_DB.Get_Stored_File_Names().then(function(results){return results})
                 await TAGGING_IDB_MODULE.Get_All_Keys_From_DB()
                 current_file_list_IDB = TAGGING_IDB_MODULE.Read_All_Keys_From_DB()
@@ -142,7 +136,7 @@ async function Load_New_Image() {
 
 //update the file variable storing the array of all the files in the folder
 function Refresh_File_List() {
-    image_files_in_dir = FS.readdirSync(dir)
+    image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY)
 }
 
 //bring the image annotation view to the default state (not saving it until confirmed)
