@@ -16,6 +16,8 @@ const DESCRIPTION_PROCESS_MODULE = require('./myJS/description-processing.js');
 const TAGGING_IDB_MODULE = require('./myJS/tagging-db-fns.js');
 //copies files and adds salt for conflicting same file names
 const MY_FILE_HELPER = require('./myJS/copy-new-file-helper.js')
+//functionality to insert an element into a sorted array with binary search
+const MY_ARRAY_INSERT_HELPER = require('./myJS/utility-insert-into-sorted-array.js')
 //the folder to store the taga images (with a commented set of alternative solutions that all appear to work)
 const TAGA_IMAGE_DIRECTORY = PATH.resolve(PATH.resolve(),'images') //PATH.resolve(__dirname, '..', 'images') //PATH.join(__dirname,'..','images')  //PATH.normalize(__dirname+PATH.sep+'..') + PATH.sep + 'images'     //__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
 //holds the last directory the user imported images from
@@ -25,8 +27,6 @@ var last_user_image_directory_chosen = ''
 var image_files_in_dir = ''
 //set this variable to the file directory, but should be made to look up in the database
 Refresh_File_List() //var image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY)
-
-
 
 //needs to be called to start the DB object within the file
 TAGGING_IDB_MODULE.Create_Db()
@@ -38,9 +38,15 @@ var image_index = 1;
 First_Display_Init(image_index); 
 
 
+
+//update the file variable storing the array of all the files in the folder
+function Refresh_File_List() {
+    image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY)
+}
+
 //fill the IDB for 'tagging' when loading so new files are taken into account 'eventually', feed it the DB list of files
 async function Check_And_Handle_New_Images_IDB(current_file_list) {
-    //default annotation obj values to use when new file found
+    //default annotation oNew_Image_Display(n) bj values to use when new file found
     for( ii = 0; ii < image_files_in_dir.length; ii++){
         bool_new_file_name = current_file_list.some( name_tmp => name_tmp === `${image_files_in_dir[ii]}` )
         if( bool_new_file_name == false ) {
@@ -100,13 +106,8 @@ function New_Image_Display(n) {
 async function Load_New_Image() {
     
     const result = await IPC_RENDERER.invoke('dialog:tagging-new-file-select',{directory: last_user_image_directory_chosen})
-    if(result.canceled == true) {
-        return
-    }
-
     //ignore selections from the taga image folder store
-    if(PATH.dirname(result.filePaths[0]) == TAGA_IMAGE_DIRECTORY){
-        console.log('same directory')
+    if(result.canceled == true || PATH.dirname(result.filePaths[0]) == TAGA_IMAGE_DIRECTORY) {
         return
     }
 
@@ -114,28 +115,29 @@ async function Load_New_Image() {
 
     //resets when the folder contains the same source file
     filenames = MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_IMAGE_DIRECTORY)
-    filename = PATH.parse(result.filePaths[0]).base;
     filenames.forEach(filename => {
 
-            var emotion_value_array_tmp = { happy: 0, sad: 0, confused: 0 }
-            var meme_switch_booleans_tmp = {}
-            rawDescription_tmp = ""
-            processed_tag_word_list_tmp = ""
-            TAGGING_IDB_MODULE.Insert_Record( { 'imageName':filename,'taggingEmotions':emotion_value_array_tmp,'taggingTags':[],
-                                                            'taggingRawDescription':"","taggingMemeChoices": {} } )
-    
+        var emotion_value_array_tmp = { happy: 0, sad: 0, confused: 0 }
+        var meme_switch_booleans_tmp = {}
+        rawDescription_tmp = ""
+        processed_tag_word_list_tmp = ""
+        TAGGING_IDB_MODULE.Insert_Record( { 'imageName':filename,'taggingEmotions':emotion_value_array_tmp,'taggingTags':[],
+                                                        'taggingRawDescription':"","taggingMemeChoices": {} } )
+        MY_ARRAY_INSERT_HELPER.Insert_Into_Sorted_Array(image_files_in_dir,filename)
+
     });
     
-    Refresh_File_List()
-    image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
+    //Refresh_File_List()
+    filename_index = image_files_in_dir.indexOf(filenames[0]) //set index to first of the new images
+    image_index = filename_index + 1
+    image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index-1])
     TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_files_in_dir,image_annotations)
     TAGGING_VIEW_ANNOTATE_MODULE.Meme_View_Fill(image_files_in_dir)
+    console.log(`filename index = ${filename_index}`)
+    console.log(`image annotations image name = ${image_annotations["imageName"]}`)
+    New_Image_Display(0)
 }
 
-//update the file variable storing the array of all the files in the folder
-function Refresh_File_List() {
-    image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY)
-}
 
 //bring the image annotation view to the default state (not saving it until confirmed)
 function Reset_Image(){
