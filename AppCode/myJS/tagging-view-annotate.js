@@ -59,6 +59,7 @@ function Display_Image_State_Results(files,select_result){
         emotion_val_obj = {happy: 0, sad: 0, confused: 0}
         Annotation_DOM_Alter(emotion_val_obj)                
     }
+    Meme_View_Fill(files)
 }
 exports.Display_Image_State_Results = Display_Image_State_Results
 

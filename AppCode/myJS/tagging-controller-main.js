@@ -24,6 +24,15 @@ const TAGA_IMAGE_DIRECTORY = PATH.resolve(PATH.resolve(),'images') //PATH.resolv
 var last_user_image_directory_chosen = ''
 
 
+var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
+                                                "imageName": '',
+                                                "taggingTags": [],
+                                                "taggingRawDescription": "",
+                                                "taggingEmotions": { happy: 0, sad: 0, confused: 0 },            
+                                                "taggingMemesChoices": {}
+                                            }
+
+
 var image_files_in_dir = ''
 //set this variable to the file directory, but should be made to look up in the database
 Refresh_File_List() //var image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY)
@@ -113,7 +122,6 @@ async function Load_New_Image() {
 
     last_user_image_directory_chosen = PATH.dirname(result.filePaths[0])   
 
-    //resets when the folder contains the same source file
     filenames = MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_IMAGE_DIRECTORY)
     filenames.forEach(filename => {
 
@@ -126,15 +134,10 @@ async function Load_New_Image() {
         MY_ARRAY_INSERT_HELPER.Insert_Into_Sorted_Array(image_files_in_dir,filename)
 
     });
-    
-    //Refresh_File_List()
     filename_index = image_files_in_dir.indexOf(filenames[0]) //set index to first of the new images
     image_index = filename_index + 1
     image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index-1])
     TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_files_in_dir,image_annotations)
-    TAGGING_VIEW_ANNOTATE_MODULE.Meme_View_Fill(image_files_in_dir)
-    console.log(`filename index = ${filename_index}`)
-    console.log(`image annotations image name = ${image_annotations["imageName"]}`)
     New_Image_Display(0)
 }
 
@@ -148,10 +151,6 @@ function Reset_Image(){
 //set the emotional sliders values to the emotional vector values stored
 async function Load_State_Of_Image_IDB() {
     image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
-    console.log(`---> in Load_State_Of_Image_IDB()  <--- `)
-    console.log(`now looking at file ${image_files_in_dir[image_index - 1]}`)
-    console.log(`the image annotation object:`)
-    console.log(image_annotations)
     TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_files_in_dir,image_annotations)
 }
 
