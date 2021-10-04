@@ -25,12 +25,12 @@ var last_user_image_directory_chosen = ''
 
 
 var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
-                                                "imageName": '',
-                                                "taggingTags": [],
-                                                "taggingRawDescription": "",
-                                                "taggingEmotions": { happy: 0, sad: 0, confused: 0 },            
-                                                "taggingMemesChoices": {}
-                                            }
+                                    "imageName": '',      //"imageFileHash": '',
+                                    "taggingRawDescription": "",
+                                    "taggingTags": [],
+                                    "taggingEmotions": { happy: 0, sad: 0, confused: 0 },
+                                    "taggingMemeChoices": []
+                                    }
 
 
 var image_files_in_dir = ''
@@ -61,14 +61,9 @@ async function Check_And_Handle_New_Images_IDB(current_file_list) {
         if( bool_new_file_name == false ) {
             //the picture file name in context
             image_name_tmp = `${image_files_in_dir[ii]}`
-            tagging_entry = {
-                "imageName": image_name_tmp,
-                "taggingTags": [],
-                "taggingRawDescription": "",
-                "taggingEmotions": { happy: 0, sad: 0, confused: 0 },            
-                "taggingMemesChoices": {}
-            }
-        await TAGGING_IDB_MODULE.Insert_Record(tagging_entry)
+            tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
+            tagging_entry.imageName = image_name_tmp
+            await TAGGING_IDB_MODULE.Insert_Record(tagging_entry)
         }
     }
 }
@@ -80,6 +75,7 @@ async function First_Display_Init(n) {
     TAGGING_VIEW_ANNOTATE_MODULE.Annotation_DOM_Alter(emotion_val_obj)
     //view_annotate_module.Meme_View_Fill(image_files_in_dir)
     TAGGING_VIEW_ANNOTATE_MODULE.Meme_View_Fill(image_files_in_dir)
+
     //current_file_list = await fns_DB.Get_Stored_File_Names().then(function(results){return results})
     //get IDB current file list
     await TAGGING_IDB_MODULE.Create_Db()
@@ -96,6 +92,7 @@ async function First_Display_Init(n) {
 
 //called from the gallery widget, where 'n' is the number of images forward or backwards to move
 function New_Image_Display(n) {
+    
     image_index += n;
     if (image_index > image_files_in_dir.length) {
         image_index = 1
@@ -120,17 +117,13 @@ async function Load_New_Image() {
         return
     }
 
-    last_user_image_directory_chosen = PATH.dirname(result.filePaths[0])   
-
+    last_user_image_directory_chosen = PATH.dirname(result.filePaths[0])
     filenames = MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_IMAGE_DIRECTORY)
     filenames.forEach(filename => {
 
-        var emotion_value_array_tmp = { happy: 0, sad: 0, confused: 0 }
-        var meme_switch_booleans_tmp = {}
-        rawDescription_tmp = ""
-        processed_tag_word_list_tmp = ""
-        TAGGING_IDB_MODULE.Insert_Record( { 'imageName':filename,'taggingEmotions':emotion_value_array_tmp,'taggingTags':[],
-                                                        'taggingRawDescription':"","taggingMemeChoices": {} } )
+        tagging_entry_tmp = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
+        tagging_entry_tmp.imageName = filename
+        TAGGING_IDB_MODULE.Insert_Record(tagging_entry_tmp)
         MY_ARRAY_INSERT_HELPER.Insert_Into_Sorted_Array(image_files_in_dir,filename)
 
     });
@@ -167,8 +160,9 @@ function Process_Image() {
 }
 
 //called by the SAVE button to produce a JSON of the picture description state
-function Save_Pic_State() {
+async function Save_Pic_State() {
     //slider bar ranges stored in an array
+
     emotion_value_array = {
         happy: document.getElementById('happy').value, sad: document.getElementById('sad').value,
         confused: document.getElementById('confused').value
@@ -178,24 +172,24 @@ function Save_Pic_State() {
     for (var ii = 0; ii < image_files_in_dir.length; ii++) {
         meme_boolean_tmp = document.getElementById(`${image_files_in_dir[ii]}`).checked
         if(meme_boolean_tmp == true){
-            meme_switch_booleans[`${image_files_in_dir[ii]}`] = meme_boolean_tmp
+            meme_switch_booleans.push(image_files_in_dir[ii])
         }
     }
     //the picture file name in context
     image_name = `${image_files_in_dir[image_index - 1]}`
     //raw user entered text (prior to processing)
     rawDescription = document.getElementById('descriptionInput').value
-    //fns_DB.Query_Insert( image_name, emotion_value_array, meme_switch_booleans, processed_tag_word_list, rawDescription)
-    new_record = {'imageName':image_name,'taggingEmotions':emotion_value_array,
-                    'taggingMemeChoices':meme_switch_booleans,
-                    'taggingRawDescription':rawDescription,
-                    'taggingTags':processed_tag_word_list}
 
-    console.log(`new_record from saving pic state in tagging: ${JSON.stringify(new_record)}`)
-    console.log(`new_record meme_switch_booleans: ${JSON.stringify(new_record.taggingMemeChoices)}`)
+    new_record = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
+    new_record.imageName = image_name
+    new_record.taggingEmotions = emotion_value_array
+    new_record.taggingMemeChoices = meme_switch_booleans
+    new_record.taggingRawDescription = rawDescription
+    new_record.taggingTags = processed_tag_word_list
 
-    TAGGING_IDB_MODULE.Update_Record(new_record)
+    await TAGGING_IDB_MODULE.Update_Record(new_record)
 
+    image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
 }
 
 //delete image from user choice
@@ -206,7 +200,7 @@ function Delete_Image() {
         Refresh_File_List() //just reload the list of files in the taga img directory
         TAGGING_VIEW_ANNOTATE_MODULE.Meme_View_Fill(image_files_in_dir)
         //refresh the image view to the next image (which is by defaul the 'next' +1)
-        New_Image_Display( 0 ) 
+        New_Image_Display( 0 )
     }
 }
 

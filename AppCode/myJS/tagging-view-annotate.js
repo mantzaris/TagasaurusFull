@@ -18,8 +18,7 @@ function Annotation_DOM_Alter(annotation_obj){
         } else if(key_tmp == 'imgMain'){
             document.getElementById(key_tmp).src = `${TAGA_IMAGE_DIRECTORY}/${annotation_obj[key_tmp]}`;
         } else if( key_tmp.split('.').length > 1 ){ // memes, get the file name which is the element ID on the tagging HTML page
-            document.getElementById(key_tmp).checked = annotation_obj[key_tmp]
-            
+            document.getElementById(key_tmp).checked = true // annotation_obj[key_tmp]
         } else{ //emotions
             document.getElementById(key_tmp).value = annotation_obj[key_tmp]
         
@@ -30,6 +29,7 @@ exports.Annotation_DOM_Alter = Annotation_DOM_Alter
 
 //set view to display image state results of query for a particular file name
 function Display_Image_State_Results(files,select_result){
+    Meme_View_Fill(files)
     if(Object.keys(select_result).length != 0){
         happy_val = select_result["taggingEmotions"].happy
         sad_val = select_result["taggingEmotions"].sad
@@ -40,26 +40,21 @@ function Display_Image_State_Results(files,select_result){
                         descriptionInput: rawDescription_tmp, taglist: tags_list}
         
         meme_json_parsed = select_result["taggingMemeChoices"]
-
         for (var ii = 0; ii < files.length; ii++) {
             if(document.getElementById(`${files[ii]}`) != null) {
-                if( (`${files[ii]}` in meme_json_parsed) ){                        
-                    if( meme_json_parsed[`${files[ii]}`] == true ){
-                        val_obj[`${files[ii]}`] = true
-                    } else{
-                        val_obj[`${files[ii]}`] = false
-                    }
-                } else{
-                    val_obj[`${files[ii]}`] = false
+                if( meme_json_parsed.includes(files[ii]) ){
+                    val_obj[`${files[ii]}`] = true
+                
                 }
             }
         }
+        
         Annotation_DOM_Alter(val_obj)
     } else {                
         emotion_val_obj = {happy: 0, sad: 0, confused: 0}
         Annotation_DOM_Alter(emotion_val_obj)                
     }
-    Meme_View_Fill(files)
+    
 }
 exports.Display_Image_State_Results = Display_Image_State_Results
 
@@ -98,10 +93,13 @@ function Make_Tag_HTML_UL(tag_array) {
 //function to reset annotations to default
 function Reset_Image_View(files){
     val_obj = {happy: 0, sad: 0, confused: 0, descriptionInput:'', taglist:''}
-    for (var ii = 0; ii < files.length; ii++) {
-        val_obj[`${files[ii]}`] = false //each file name is the element ID for the tagging page
-    }
     Annotation_DOM_Alter(val_obj)
+    for (var ii = 0; ii < files.length; ii++) {
+        //val_obj[`${files[ii]}`] = false //each file name is the element ID for the tagging page
+        document.getElementById(files[ii]).checked = false 
+    }
+    
+
 }
 exports.Reset_Image_View = Reset_Image_View
 
