@@ -25,7 +25,8 @@ var last_user_image_directory_chosen = ''
 
 
 var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
-                                    "imageName": '',      //"imageFileHash": '',
+                                    "imageFileName": '',      
+                                    "imageFileHash": '',
                                     "taggingRawDescription": "",
                                     "taggingTags": [],
                                     "taggingEmotions": { happy: 0, sad: 0, confused: 0 },
@@ -62,7 +63,7 @@ async function Check_And_Handle_New_Images_IDB(current_file_list) {
             //the picture file name in context
             image_name_tmp = `${image_files_in_dir[ii]}`
             tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
-            tagging_entry.imageName = image_name_tmp
+            tagging_entry.imageFileName = image_name_tmp
             await TAGGING_IDB_MODULE.Insert_Record(tagging_entry)
         }
     }
@@ -122,7 +123,7 @@ async function Load_New_Image() {
     filenames.forEach(filename => {
 
         tagging_entry_tmp = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
-        tagging_entry_tmp.imageName = filename
+        tagging_entry_tmp.imageFileName = filename
         TAGGING_IDB_MODULE.Insert_Record(tagging_entry_tmp)
         MY_ARRAY_INSERT_HELPER.Insert_Into_Sorted_Array(image_files_in_dir,filename)
 
@@ -181,7 +182,7 @@ async function Save_Pic_State() {
     rawDescription = document.getElementById('descriptionInput').value
 
     new_record = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
-    new_record.imageName = image_name
+    new_record.imageFileName = image_name
     new_record.taggingEmotions = emotion_value_array
     new_record.taggingMemeChoices = meme_switch_booleans
     new_record.taggingRawDescription = rawDescription
@@ -193,11 +194,11 @@ async function Save_Pic_State() {
 }
 
 //delete image from user choice
-function Delete_Image() {
-    //try to delete the file (image)
-    success = TAGGING_DELETE_HELPER_MODULE.Delete_Image_File(image_files_in_dir[image_index-1])
+async function Delete_Image() {
+    //try to delete the file (image) from the image folder and from the DB
+    success = await TAGGING_DELETE_HELPER_MODULE.Delete_Image_File(image_files_in_dir[image_index-1])
     if(success == 1){
-        Refresh_File_List() //just reload the list of files in the taga img directory
+        //Refresh_File_List() //just reload the list of files in the taga img directory        
         TAGGING_VIEW_ANNOTATE_MODULE.Meme_View_Fill(image_files_in_dir)
         //refresh the image view to the next image (which is by defaul the 'next' +1)
         New_Image_Display( 0 )

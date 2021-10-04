@@ -1,11 +1,7 @@
 const fs = require('fs');
 
 
-//const controller = require('./myJS/controller-main.js');
-//const fns_DB = require('./myJS/db-access-module.js');
 const fns_DB_IDB = require('./myJS/tagging-db-fns.js');
-
-//const database = fns_DB.DB_Open()
 
 
 // algorithm DFLOW by EPA ( https://stats.stackexchange.com/a/430254/1098 )
@@ -31,7 +27,6 @@ async function Display_Skill_Levels() {
 
     //all_data = await fns_DB.Return_All_DB_Data().then(function (results) { return results })
     all_data = await fns_DB_IDB.Get_All_From_DB()//.then(function(results) {return results})
-    console.log(`-----------\n ALL DATA \n ${all_data}`)
     total_images_in_db = all_data.length
     total_tagged_images = 0
     meme_connected_images = 0
@@ -43,7 +38,6 @@ async function Display_Skill_Levels() {
         try{ non_empty_entry = (all_data[key].taggingTags).find(element => element != "") 
         } catch { non_empty_entry = undefined }
         if (non_empty_entry != undefined) { total_tagged_images = 1 + total_tagged_images }
-        console.log(`----------------\n meme = ${  (Object.values(all_data[key]["taggingMemeChoices"])).length  }`)
         meme_counts = (Object.values(all_data[key]["taggingMemeChoices"])).length//Object.keys(JSON.parse(value["taggingMemeChoices"])).length
         if (meme_counts > 0) { meme_connected_images = 1 + meme_connected_images }
         non_empty_emotion = (Object.values(all_data[key]["taggingEmotions"])).find(element => element != "0")

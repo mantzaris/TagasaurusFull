@@ -10,9 +10,9 @@ const DIR_PICS_TAGGING_DB = reqPath = PATH.join(__dirname, '../../images')  // _
 
 db_tagging = null;
 
-const TAGGING_DB_NAME = 'taggingDB_test'
-const TAGGING_OBJSTORE_NAME = 'taggingStore'
-const TAGGING_KEY_PATH_NAME = "imageName" //primary key for records, here the image name is the key (not like entities where there are multiple uses of same image)
+const TAGGING_DB_NAME = 'taggingDB_test2'
+const TAGGING_OBJSTORE_NAME = 'taggingStore2'
+const TAGGING_KEY_PATH_NAME = "imageFileName" //primary key for records, here the image name is the key (not like entities where there are multiple uses of same image)
 
 var tagging_keys = '';
 var current_record;
@@ -40,7 +40,6 @@ async function Create_Db(){
         request.onsuccess = function(event){
             db_tagging = event.target.result;
             resolve(db_tagging)
-            //console.log(`entity, Create_Db() successfully opened DB, ${ENTITY_DB_NAME}`)  //    console.log(event.target.result)
         }
         request.onerror = function(event){
             console.log(`tagging, Create_Db() error opening a db, ${TAGGING_DB_NAME}`);
@@ -278,19 +277,15 @@ async function Delete_Void_MemeChoices(){
     all_keys.forEach(async (key) => { 
         record_tmp = await Get_Record(key)
         memes_tmp = record_tmp.taggingMemeChoices
-        memes_new = JSON.parse(JSON.stringify(memes_tmp)) //how we clone a JS object
-        changed_memes = false
-        for (var meme_key of Object.keys(memes_tmp)) {
-            in_or_not_bool = image_files_in_dir.some(file_tmp => file_tmp == meme_key)
-            if(in_or_not_bool == false){
-                delete memes_new[meme_key]
-                changed_memes = true
+        memes_new = []
+        for(ii=0; ii<memes_tmp.length; ii++) {
+            in_or_not_bool = image_files_in_dir.some(file_tmp => file_tmp == memes_tmp[ii])
+            if(in_or_not_bool == true){
+                memes_new.push(memes_tmp[ii])
             }
         }
-        if(changed_memes == true){
-            record_tmp.taggingMemesChoices = memes_new
-            Update_Record(record_tmp)
-        }
+        record_tmp.taggingMemeChoices = memes_new
+        Update_Record(record_tmp)
     });
 }
 exports.Delete_Void_MemeChoices = Delete_Void_MemeChoices
