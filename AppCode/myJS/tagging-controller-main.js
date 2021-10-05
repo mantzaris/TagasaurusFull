@@ -33,18 +33,15 @@ var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
                                     "taggingMemeChoices": []
                                     }
 
-
 var image_files_in_dir = ''
-//set this variable to the file directory, but should be made to look up in the database
-Refresh_File_List() //var image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY)
-
-//needs to be called to start the DB object within the file
-TAGGING_IDB_MODULE.Create_Db()
 
 var processed_tag_word_list
 var image_index = 1;
 
 //init methods to run upon loading
+Refresh_File_List() //var image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY)
+//needs to be called to start the DB object within the file
+TAGGING_IDB_MODULE.Create_Db()
 First_Display_Init(image_index); 
 
 
@@ -68,7 +65,6 @@ async function Check_And_Handle_New_Images_IDB(current_file_list) {
         }
     }
 }
-
 //called upon app loading
 async function First_Display_Init(n) {
     emotion_val_obj = {happy:0, sad:0, confused:0,descriptionInput:'', taglist:'', imgMain:image_files_in_dir[n - 1]}
@@ -76,24 +72,18 @@ async function First_Display_Init(n) {
     TAGGING_VIEW_ANNOTATE_MODULE.Annotation_DOM_Alter(emotion_val_obj)
     //view_annotate_module.Meme_View_Fill(image_files_in_dir)
     TAGGING_VIEW_ANNOTATE_MODULE.Meme_View_Fill(image_files_in_dir)
-
     //current_file_list = await fns_DB.Get_Stored_File_Names().then(function(results){return results})
     //get IDB current file list
-    await TAGGING_IDB_MODULE.Create_Db()
     await TAGGING_IDB_MODULE.Get_All_Keys_From_DB()
     current_file_list_IDB = TAGGING_IDB_MODULE.Read_All_Keys_From_DB()
-    
     await Load_State_Of_Image_IDB() 
-    
     //load files in the directory but not DB, into the DB with defaults
     //Check_And_Handle_New_Images(current_file_list)
     Check_And_Handle_New_Images_IDB(current_file_list_IDB)
     //DB entries not in the directory are lingering entries to be deleted
 }
-
 //called from the gallery widget, where 'n' is the number of images forward or backwards to move
-function New_Image_Display(n) {
-    
+function New_Image_Display(n) {    
     image_index += n;
     if (image_index > image_files_in_dir.length) {
         image_index = 1
@@ -105,6 +95,12 @@ function New_Image_Display(n) {
     //view_annotate_module.Annotation_DOM_Alter(val_obj)
     TAGGING_VIEW_ANNOTATE_MODULE.Annotation_DOM_Alter(val_obj)
     Load_State_Of_Image_IDB()
+}
+
+//set the emotional sliders values to the emotional vector values stored
+async function Load_State_Of_Image_IDB() {
+    image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
+    TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_files_in_dir,image_annotations)
 }
 
 //dialog window explorer to select new images to import, and calls the functions to update the view
@@ -142,13 +138,7 @@ function Reset_Image(){
 }
 
 
-//set the emotional sliders values to the emotional vector values stored
-async function Load_State_Of_Image_IDB() {
-    image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
-    TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_files_in_dir,image_annotations)
-}
-
-//process image for saving including the text to tags
+//process image for saving including the text to tags (Called from the html Save button)
 function Process_Image() {
     user_description = document.getElementById('descriptionInput').value
     new_user_description = DESCRIPTION_PROCESS_MODULE.process_description(user_description)
@@ -162,7 +152,6 @@ function Process_Image() {
 
 //called by the SAVE button to produce a JSON of the picture description state
 async function Save_Pic_State() {
-    //slider bar ranges stored in an array
 
     emotion_value_array = {
         happy: document.getElementById('happy').value, sad: document.getElementById('sad').value,
@@ -190,7 +179,6 @@ async function Save_Pic_State() {
 
     await TAGGING_IDB_MODULE.Update_Record(new_record)
 
-    image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
 }
 
 //delete image from user choice
