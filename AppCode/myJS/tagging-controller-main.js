@@ -41,7 +41,6 @@ var image_index = 1;
 //init methods to run upon loading
 Refresh_File_List() //var image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY)
 //needs to be called to start the DB object within the file
-TAGGING_IDB_MODULE.Create_Db()
 First_Display_Init(image_index); 
 
 
@@ -52,21 +51,35 @@ function Refresh_File_List() {
 }
 
 //fill the IDB for 'tagging' when loading so new files are taken into account 'eventually', feed it the DB list of files
-async function Check_And_Handle_New_Images_IDB(current_file_list) {
-    //default annotation oNew_Image_Display(n) bj values to use when new file found
+async function Check_And_Handle_New_Images_IDB(current_DB_file_list) {
+    //default annotation New_Image_Display(n) bj values to use when new file found
     for( ii = 0; ii < image_files_in_dir.length; ii++){
-        bool_new_file_name = current_file_list.some( name_tmp => name_tmp === `${image_files_in_dir[ii]}` )
+        bool_new_file_name = current_DB_file_list.some( name_tmp => name_tmp === `${image_files_in_dir[ii]}` )
         if( bool_new_file_name == false ) {
-            //the picture file name in context
             image_name_tmp = `${image_files_in_dir[ii]}`
             tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
             tagging_entry.imageFileName = image_name_tmp
             await TAGGING_IDB_MODULE.Insert_Record(tagging_entry)
         }
     }
+    //file no longer present so it's entry is to be deleted
+    for( ii = 0; ii < current_DB_file_list.length; ii++){
+        bool_missing_file_name = image_files_in_dir.some( name_tmp => name_tmp === `${current_DB_file_list[ii]}` )
+        if( bool_missing_file_name == false ) {
+            //the picture file name in context
+            image_name_tmp = `${current_DB_file_list[ii]}`
+            await TAGGING_IDB_MODULE.Delete_Record(image_name_tmp)
+        }
+    }
+    await TAGGING_IDB_MODULE.Delete_Void_MemeChoices() //!!!needs to be optimized
 }
 //called upon app loading
 async function First_Display_Init(n) {
+    await TAGGING_IDB_MODULE.Create_Db()
+    await TAGGING_IDB_MODULE.Get_All_Keys_From_DB()
+    current_file_list_IDB = TAGGING_IDB_MODULE.Read_All_Keys_From_DB()
+    await Check_And_Handle_New_Images_IDB(current_file_list_IDB)
+
     emotion_val_obj = {happy:0, sad:0, confused:0,descriptionInput:'', taglist:'', imgMain:image_files_in_dir[n - 1]}
     //view_annotate_module.Annotation_DOM_Alter(emotion_val_obj)
     TAGGING_VIEW_ANNOTATE_MODULE.Annotation_DOM_Alter(emotion_val_obj)
@@ -83,7 +96,7 @@ async function First_Display_Init(n) {
     //DB entries not in the directory are lingering entries to be deleted
 }
 //called from the gallery widget, where 'n' is the number of images forward or backwards to move
-function New_Image_Display(n) {    
+function New_Image_Display(n) {
     image_index += n;
     if (image_index > image_files_in_dir.length) {
         image_index = 1
