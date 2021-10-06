@@ -47,6 +47,8 @@ function Refresh_File_List() {
 }
 
 //fill the IDB for 'tagging' when loading so new files are taken into account 'eventually', feed it the DB list of files
+//load files in the directory but not DB, into the DB with defaults
+//DB entries not in the directory are lingering entries to be deleted
 async function Check_And_Handle_New_Images_IDB(current_DB_file_list) {
     //default annotation New_Image_Display(n) bj values to use when new file found
     for( ii = 0; ii < image_files_in_dir.length; ii++){
@@ -69,6 +71,7 @@ async function Check_And_Handle_New_Images_IDB(current_DB_file_list) {
     }
     await TAGGING_IDB_MODULE.Delete_Void_MemeChoices() //!!!needs to be optimized
 }
+
 //called upon app loading
 async function First_Display_Init(n) {
     await TAGGING_IDB_MODULE.Create_Db()
@@ -82,9 +85,7 @@ async function First_Display_Init(n) {
     TAGGING_VIEW_ANNOTATE_MODULE.Annotation_DOM_Alter(emotion_val_obj)
     //get IDB current file list
     await Load_State_Of_Image_IDB() 
-    //load files in the directory but not DB, into the DB with defaults
-    Check_And_Handle_New_Images_IDB(current_file_list_IDB)
-    //DB entries not in the directory are lingering entries to be deleted
+
 }
 //called from the gallery widget, where 'n' is the number of images forward or backwards to move
 function New_Image_Display(n) {
