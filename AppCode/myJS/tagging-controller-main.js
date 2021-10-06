@@ -21,7 +21,6 @@ const MY_ARRAY_INSERT_HELPER = require('./myJS/utility-insert-into-sorted-array.
 //the folder to store the taga images (with a commented set of alternative solutions that all appear to work)
 const TAGA_IMAGE_DIRECTORY = PATH.resolve(PATH.resolve(),'images') //PATH.resolve(__dirname, '..', 'images') //PATH.join(__dirname,'..','images')  //PATH.normalize(__dirname+PATH.sep+'..') + PATH.sep + 'images'     //__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
 //holds the last directory the user imported images from
-var last_user_image_directory_chosen = ''
 
 
 var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
@@ -34,15 +33,12 @@ var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
                                     }
 
 var image_files_in_dir = ''
-
+var last_user_image_directory_chosen = ''
 var processed_tag_word_list
 var image_index = 1;
 
-//init methods to run upon loading
-Refresh_File_List() //var image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY)
-//needs to be called to start the DB object within the file
+//init method to run upon loading
 First_Display_Init(image_index); 
-
 
 
 //update the file variable storing the array of all the files in the folder
@@ -78,20 +74,15 @@ async function First_Display_Init(n) {
     await TAGGING_IDB_MODULE.Create_Db()
     await TAGGING_IDB_MODULE.Get_All_Keys_From_DB()
     current_file_list_IDB = TAGGING_IDB_MODULE.Read_All_Keys_From_DB()
+    Refresh_File_List() //var image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY)
     await Check_And_Handle_New_Images_IDB(current_file_list_IDB)
 
     emotion_val_obj = {happy:0, sad:0, confused:0,descriptionInput:'', taglist:'', imgMain:image_files_in_dir[n - 1]}
     //view_annotate_module.Annotation_DOM_Alter(emotion_val_obj)
     TAGGING_VIEW_ANNOTATE_MODULE.Annotation_DOM_Alter(emotion_val_obj)
-    //view_annotate_module.Meme_View_Fill(image_files_in_dir)
-    TAGGING_VIEW_ANNOTATE_MODULE.Meme_View_Fill(image_files_in_dir)
-    //current_file_list = await fns_DB.Get_Stored_File_Names().then(function(results){return results})
     //get IDB current file list
-    await TAGGING_IDB_MODULE.Get_All_Keys_From_DB()
-    current_file_list_IDB = TAGGING_IDB_MODULE.Read_All_Keys_From_DB()
     await Load_State_Of_Image_IDB() 
     //load files in the directory but not DB, into the DB with defaults
-    //Check_And_Handle_New_Images(current_file_list)
     Check_And_Handle_New_Images_IDB(current_file_list_IDB)
     //DB entries not in the directory are lingering entries to be deleted
 }
