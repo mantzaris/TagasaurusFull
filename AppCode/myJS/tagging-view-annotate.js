@@ -4,18 +4,12 @@
 //set view to display image state results of query for a particular file name
 function Display_Image_State_Results(files,select_result){
     Meme_View_Fill(files)
-    happy_val = select_result["taggingEmotions"].happy
     document.getElementById('happy').value = select_result["taggingEmotions"].happy
-    sad_val = select_result["taggingEmotions"].sad
     document.getElementById('sad').value = select_result["taggingEmotions"].sad
-    confused_val = select_result["taggingEmotions"].confused
     document.getElementById('confused').value = select_result["taggingEmotions"].confused
-    tags_list = select_result["taggingTags"]
     document.getElementById('taglist').innerHTML = ''
     document.getElementById('taglist').appendChild(Make_Tag_HTML_UL( select_result["taggingTags"] ))
-    rawDescription_tmp = select_result["taggingRawDescription"]
     document.getElementById('descriptionInput').value = select_result["taggingRawDescription"]
-    image_file_name_tmp = select_result["imageFileName"]
     document.getElementById('imgMain').src = `${TAGA_IMAGE_DIRECTORY}/${select_result["imageFileName"]}`;
     
     meme_array = select_result["taggingMemeChoices"]
