@@ -80,9 +80,7 @@ async function First_Display_Init(n) {
     Refresh_File_List() //var image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY)
     await Check_And_Handle_New_Images_IDB(current_file_list_IDB)
 
-    emotion_val_obj = {happy:0, sad:0, confused:0,descriptionInput:'', taglist:'', imgMain:image_files_in_dir[n - 1]}
     await Load_State_Of_Image_IDB() 
-
 }
 //called from the gallery widget, where 'n' is the number of images forward or backwards to move
 function New_Image_Display(n) {
@@ -93,7 +91,6 @@ function New_Image_Display(n) {
     if (image_index < 1) {
         image_index = image_files_in_dir.length
     };
-    val_obj = {descriptionInput:'', taglist:'', imgMain:image_files_in_dir[image_index - 1]}
     Load_State_Of_Image_IDB()
 }
 
@@ -144,7 +141,6 @@ function Process_Image() {
     user_description = document.getElementById('descriptionInput').value
     new_user_description = DESCRIPTION_PROCESS_MODULE.process_description(user_description)
     tags_split = new_user_description.split(' ')
-    val_obj = {taglist:tags_split}
     processed_tag_word_list = new_user_description.split(' ')
     Save_Pic_State()
 }
