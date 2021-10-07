@@ -27,6 +27,7 @@ function Annotation_DOM_Alter(annotation_obj){
 }
 exports.Annotation_DOM_Alter = Annotation_DOM_Alter
 
+
 //set view to display image state results of query for a particular file name
 function Display_Image_State_Results(files,select_result){
     Meme_View_Fill(files)
@@ -36,8 +37,10 @@ function Display_Image_State_Results(files,select_result){
         confused_val = select_result["taggingEmotions"].confused
         tags_list = select_result["taggingTags"]
         rawDescription_tmp = select_result["taggingRawDescription"]
+        image_file_name_tmp = select_result["imageFileName"]
         val_obj = {happy: happy_val, sad: sad_val, confused: confused_val,
-                        descriptionInput: rawDescription_tmp, taglist: tags_list}
+                        descriptionInput: rawDescription_tmp, taglist: tags_list,
+                        imgMain:image_file_name_tmp}
         
         meme_json_parsed = select_result["taggingMemeChoices"]
         for (var ii = 0; ii < files.length; ii++) {

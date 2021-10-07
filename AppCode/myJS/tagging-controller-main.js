@@ -81,9 +81,6 @@ async function First_Display_Init(n) {
     await Check_And_Handle_New_Images_IDB(current_file_list_IDB)
 
     emotion_val_obj = {happy:0, sad:0, confused:0,descriptionInput:'', taglist:'', imgMain:image_files_in_dir[n - 1]}
-    //view_annotate_module.Annotation_DOM_Alter(emotion_val_obj)
-    TAGGING_VIEW_ANNOTATE_MODULE.Annotation_DOM_Alter(emotion_val_obj)
-    //get IDB current file list
     await Load_State_Of_Image_IDB() 
 
 }
@@ -97,14 +94,13 @@ function New_Image_Display(n) {
         image_index = image_files_in_dir.length
     };
     val_obj = {descriptionInput:'', taglist:'', imgMain:image_files_in_dir[image_index - 1]}
-    //view_annotate_module.Annotation_DOM_Alter(val_obj)
-    TAGGING_VIEW_ANNOTATE_MODULE.Annotation_DOM_Alter(val_obj)
     Load_State_Of_Image_IDB()
 }
 
 //set the emotional sliders values to the emotional vector values stored
 async function Load_State_Of_Image_IDB() {
     image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
+    console.log(JSON.stringify(image_annotations))
     TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_files_in_dir,image_annotations)
 }
 
@@ -149,8 +145,6 @@ function Process_Image() {
     new_user_description = DESCRIPTION_PROCESS_MODULE.process_description(user_description)
     tags_split = new_user_description.split(' ')
     val_obj = {taglist:tags_split}
-    //view_annotate_module.Annotation_DOM_Alter(val_obj)  
-    TAGGING_VIEW_ANNOTATE_MODULE.Annotation_DOM_Alter(val_obj)
     processed_tag_word_list = new_user_description.split(' ')
     Save_Pic_State()
 }
@@ -183,7 +177,7 @@ async function Save_Pic_State() {
     new_record.taggingTags = processed_tag_word_list
 
     await TAGGING_IDB_MODULE.Update_Record(new_record)
-
+    Load_State_Of_Image_IDB()
 }
 
 //delete image from user choice
