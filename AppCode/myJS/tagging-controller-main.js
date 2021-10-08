@@ -197,7 +197,7 @@ async function Add_New_Emotion(){
     console.log(new_emotion_text)
     boolean_included = keys_tmp.includes(new_emotion_text)
     if(boolean_included == false){
-        image_annotations["taggingEmotions"][new_emotion_text] = 0
+        image_annotations["taggingEmotions"][new_emotion_text] = "0"
         console.log('new emotion not used before!')
     }
     console.log('new emotion requested!')
