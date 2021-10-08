@@ -181,9 +181,6 @@ async function Delete_Image() {
     //try to delete the file (image) from the image folder and from the DB
     success = await TAGGING_DELETE_HELPER_MODULE.Delete_Image_File(image_files_in_dir[image_index-1])
     if(success == 1){
-        //Refresh_File_List() //just reload the list of files in the taga img directory        
-        TAGGING_VIEW_ANNOTATE_MODULE.Meme_View_Fill(image_files_in_dir)
-        //refresh the image view to the next image (which is by defaul the 'next' +1)
         New_Image_Display( 0 )
     }
 }

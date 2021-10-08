@@ -17,12 +17,29 @@ function Display_Image_State_Results(files,image_annotation){
         document.getElementById(meme_array[ii]).checked = true
     }
 
+    Emotion_Value_Fill(image_annotation)
     for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
         document.getElementById(key).value = image_annotation["taggingEmotions"][key]
     }
     
 }
 exports.Display_Image_State_Results = Display_Image_State_Results
+
+
+//populate the emotion value view with emotional values
+//the div in the html for the emotion values is id="emotion-values"
+function Emotion_Value_Fill(image_annotation){
+    document.getElementById("emotion-values").innerHTML = ""
+    emotion_div = document.getElementById("emotion-values")
+
+    emotion_html_tmp = ''
+    for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
+
+        emotion_html_tmp += `<label for="customRange1" class="form-label">${key} range</label>
+                                    <input type="range" class="form-range" id="${key}">`
+    }
+    emotion_div.insertAdjacentHTML('beforeend', emotion_html_tmp);
+}
 
 
 //populate the meme switch view with images
