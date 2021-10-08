@@ -4,7 +4,7 @@ const PATH = require('path');
 //const FSE = require('fs-extra');
 
 //the object for the window functionality
-const IPC_RENDERER = require('electron').ipcRenderer
+const IPC_RENDERER = require('electron').ipcRenderer 
 
 //module for the main annotation view alterations-directly affects the DOM
 const TAGGING_VIEW_ANNOTATE_MODULE = require('./myJS/tagging-view-annotate.js');
@@ -13,7 +13,7 @@ const TAGGING_DELETE_HELPER_MODULE = require('./myJS/tagging-delete-helper.js')
 //module for the processing of the description
 const DESCRIPTION_PROCESS_MODULE = require('./myJS/description-processing.js');
 //module functions for DB connectivity
-const TAGGING_IDB_MODULE = require('./myJS/tagging-db-fns.js');
+const TAGGING_IDB_MODULE = require('./myJS/tagging-db-fns.js'); 
 //copies files and adds salt for conflicting same file names
 const MY_FILE_HELPER = require('./myJS/copy-new-file-helper.js')
 //functionality to insert an element into a sorted array with binary search
@@ -183,6 +183,29 @@ async function Delete_Image() {
     if(success == 1){
         New_Image_Display( 0 )
     }
+}
+
+
+//add a new emotion to the emotion set
+async function Add_New_Emotion(){
+
+    new_emotion_text = document.getElementById("new-emotion-label").value
+
+    image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
+    keys_tmp = Object.keys(image_annotations["taggingEmotions"])
+    console.log(keys_tmp)
+    console.log(new_emotion_text)
+    boolean_included = keys_tmp.includes(new_emotion_text)
+    if(boolean_included == false){
+        image_annotations["taggingEmotions"][new_emotion_text] = 0
+        console.log('new emotion not used before!')
+    }
+    console.log('new emotion requested!')
+    console.log(image_annotations["taggingEmotions"])
+    TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_files_in_dir,image_annotations)
+    await TAGGING_IDB_MODULE.Update_Record(image_annotations)
+    document.getElementById("new-emotion-label").value = ""
+
 }
 
 
