@@ -138,12 +138,12 @@ async function Reset_Image(){
 
 
 //process image for saving including the text to tags (Called from the html Save button)
-function Process_Image() {
+async function Process_Image() {
     user_description = document.getElementById('descriptionInput').value
     new_user_description = DESCRIPTION_PROCESS_MODULE.process_description(user_description)
     tags_split = new_user_description.split(' ')
     processed_tag_word_list = new_user_description.split(' ')
-    Save_Pic_State()
+    await Save_Pic_State()
 }
 
 //called by the SAVE button to produce a JSON of the picture description state
@@ -169,6 +169,7 @@ async function Save_Pic_State() {
     new_record.taggingTags = processed_tag_word_list
 
     for( var key of Object.keys(new_record["taggingEmotions"]) ){
+        console.log(`key=${key} value to set = ${new_record["taggingEmotions"][key]}, and the document.getElementById(key).value = ${document.getElementById(key).value}`)
         new_record["taggingEmotions"][key] = document.getElementById(key).value
     }
 
@@ -193,19 +194,25 @@ async function Add_New_Emotion(){
 
     image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
     keys_tmp = Object.keys(image_annotations["taggingEmotions"])
-    console.log(keys_tmp)
-    console.log(new_emotion_text)
     boolean_included = keys_tmp.includes(new_emotion_text)
     if(boolean_included == false){
-        image_annotations["taggingEmotions"][new_emotion_text] = "0"
-        console.log('new emotion not used before!')
+        image_annotations["taggingEmotions"][new_emotion_text] = 0
     }
-    console.log('new emotion requested!')
-    console.log(image_annotations["taggingEmotions"])
-    TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_files_in_dir,image_annotations)
-    await TAGGING_IDB_MODULE.Update_Record(image_annotations)
-    document.getElementById("new-emotion-label").value = ""
+    emotion_div = document.getElementById("emotion-values")
+    emotion_inner_html = document.getElementById("emotion-values").innerHTML
+    emotion_inner_html += `<label for="customRange1" class="form-label">${new_emotion_text} range</label>
+                                    <input type="range" class="form-range" id="${new_emotion_text}">`
+    emotion_div.insertAdjacentHTML('beforeend', emotion_inner_html);
 
+    await TAGGING_IDB_MODULE.Update_Record(image_annotations)
+
+    await Process_Image()
+    
+    //TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_files_in_dir,image_annotations)
+    //await TAGGING_IDB_MODULE.Update_Record(image_annotations)
+    
+    //await TAGGING_IDB_MODULE.Update_Record(image_annotations)
+    document.getElementById("new-emotion-label").value = ""
 }
 
 
