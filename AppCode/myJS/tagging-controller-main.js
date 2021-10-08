@@ -169,7 +169,6 @@ async function Save_Pic_State() {
     new_record.taggingTags = processed_tag_word_list
 
     for( var key of Object.keys(new_record["taggingEmotions"]) ){
-        console.log(`key=${key} value to set = ${new_record["taggingEmotions"][key]}, and the document.getElementById(key).value = ${document.getElementById(key).value}`)
         new_record["taggingEmotions"][key] = document.getElementById(key).value
     }
 
@@ -199,19 +198,16 @@ async function Add_New_Emotion(){
         image_annotations["taggingEmotions"][new_emotion_text] = 0
     }
     emotion_div = document.getElementById("emotion-values")
-    emotion_inner_html = document.getElementById("emotion-values").innerHTML
-    emotion_inner_html += `<label for="customRange1" class="form-label">${new_emotion_text} range</label>
+    emotion_inner_html = `<label for="customRange1" class="form-label">${new_emotion_text} range</label>
                                     <input type="range" class="form-range" id="${new_emotion_text}">`
+    
     emotion_div.insertAdjacentHTML('beforeend', emotion_inner_html);
+    
 
     await TAGGING_IDB_MODULE.Update_Record(image_annotations)
+    document.getElementById(new_emotion_text).value = "0" 
 
     await Process_Image()
-    
-    //TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_files_in_dir,image_annotations)
-    //await TAGGING_IDB_MODULE.Update_Record(image_annotations)
-    
-    //await TAGGING_IDB_MODULE.Update_Record(image_annotations)
     document.getElementById("new-emotion-label").value = ""
 }
 
