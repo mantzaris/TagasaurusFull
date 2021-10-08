@@ -28,7 +28,7 @@ var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
                                     "imageFileHash": '',
                                     "taggingRawDescription": "",
                                     "taggingTags": [],
-                                    "taggingEmotions": { happy: 0, sad: 0, confused: 0 },
+                                    "taggingEmotions": {good:0,bad:0},//{ happy: 0, sad: 0, confused: 0 },
                                     "taggingMemeChoices": []
                                     }
 
@@ -162,7 +162,7 @@ async function Save_Pic_State() {
     //raw user entered text (prior to processing)
     rawDescription = document.getElementById('descriptionInput').value
 
-    new_record = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
+    new_record = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])//JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
     new_record.imageFileName = image_name
     new_record.taggingMemeChoices = meme_switch_booleans
     new_record.taggingRawDescription = rawDescription
