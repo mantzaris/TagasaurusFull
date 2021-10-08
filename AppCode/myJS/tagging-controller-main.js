@@ -131,8 +131,9 @@ async function Load_New_Image() {
 
 
 //bring the image annotation view to the default state (not saving it until confirmed)
-function Reset_Image(){
-    TAGGING_VIEW_ANNOTATE_MODULE.Reset_Image_View(image_files_in_dir)
+async function Reset_Image(){
+    image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
+    TAGGING_VIEW_ANNOTATE_MODULE.Reset_Image_View(image_files_in_dir,image_annotations)
 }
 
 
@@ -148,10 +149,6 @@ function Process_Image() {
 //called by the SAVE button to produce a JSON of the picture description state
 async function Save_Pic_State() {
 
-    emotion_value_array = {
-        happy: document.getElementById('happy').value, sad: document.getElementById('sad').value,
-        confused: document.getElementById('confused').value
-    }    
     //meme selection switch check boxes
     meme_switch_booleans = []
     for (var ii = 0; ii < image_files_in_dir.length; ii++) {
@@ -167,10 +164,13 @@ async function Save_Pic_State() {
 
     new_record = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
     new_record.imageFileName = image_name
-    new_record.taggingEmotions = emotion_value_array
     new_record.taggingMemeChoices = meme_switch_booleans
     new_record.taggingRawDescription = rawDescription
     new_record.taggingTags = processed_tag_word_list
+
+    for( var key of Object.keys(new_record["taggingEmotions"]) ){
+        new_record["taggingEmotions"][key] = document.getElementById(key).value
+    }
 
     await TAGGING_IDB_MODULE.Update_Record(new_record)
     Load_State_Of_Image_IDB()

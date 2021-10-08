@@ -2,21 +2,25 @@
 
 
 //set view to display image state results of query for a particular file name
-function Display_Image_State_Results(files,select_result){
-    Meme_View_Fill(files)
-    document.getElementById('happy').value = select_result["taggingEmotions"].happy
-    document.getElementById('sad').value = select_result["taggingEmotions"].sad
-    document.getElementById('confused').value = select_result["taggingEmotions"].confused
+function Display_Image_State_Results(files,image_annotation){
+
     document.getElementById('taglist').innerHTML = ''
-    document.getElementById('taglist').appendChild(Make_Tag_HTML_UL( select_result["taggingTags"] ))
-    document.getElementById('descriptionInput').value = select_result["taggingRawDescription"]
-    document.getElementById('imgMain').src = `${TAGA_IMAGE_DIRECTORY}/${select_result["imageFileName"]}`;
+    document.getElementById('taglist').appendChild(Make_Tag_HTML_UL( image_annotation["taggingTags"] ))
+
+    document.getElementById('descriptionInput').value = image_annotation["taggingRawDescription"]
+
+    document.getElementById('imgMain').src = `${TAGA_IMAGE_DIRECTORY}/${image_annotation["imageFileName"]}`;
     
-    meme_array = select_result["taggingMemeChoices"]
+    Meme_View_Fill(files)
+    meme_array = image_annotation["taggingMemeChoices"]
     for(ii=0;ii<meme_array.length;ii++){
         document.getElementById(meme_array[ii]).checked = true
     }
 
+    for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
+        document.getElementById(key).value = image_annotation["taggingEmotions"][key]
+    }
+    
 }
 exports.Display_Image_State_Results = Display_Image_State_Results
 
@@ -53,14 +57,20 @@ function Make_Tag_HTML_UL(tag_array) {
 }
 
 //function to reset annotations to default
-function Reset_Image_View(files){
-    val_obj = {happy: 0, sad: 0, confused: 0, descriptionInput:'', taglist:''}
-    Annotation_DOM_Alter(val_obj)
+function Reset_Image_View(files,image_annotation){
+
+    for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
+        document.getElementById(key).value = 0
+    }
+
+    document.getElementById('descriptionInput').value = ''
+    
+    document.getElementById('taglist').innerHTML = ''
+
     for (var ii = 0; ii < files.length; ii++) {
         //val_obj[`${files[ii]}`] = false //each file name is the element ID for the tagging page
         document.getElementById(files[ii]).checked = false 
     }
-    
 
 }
 exports.Reset_Image_View = Reset_Image_View
