@@ -198,20 +198,19 @@ async function Add_New_Emotion(){
             image_annotations["taggingEmotions"][new_emotion_text] = 0
         }
         emotion_div = document.getElementById("emotion-values")
-        emotion_inner_html = `<label for="customRange1" class="form-label" id="emotionlabel-${key}">${new_emotion_text}</label>
-                                    <button type="button" class="close" aria-label="Close" id="delete-${key}" onclick="Delete_Emotion()">
+        emotion_inner_html = `<label for="customRange1" class="form-label" id="emotionlabel-${new_emotion_text}">${new_emotion_text}</label>
+                                    <button type="button" class="close" aria-label="Close" id="delete-${new_emotion_text}" onclick="Delete_Emotion()">
                                                 &#10006
                                                 </button>
                                     <input type="range" class="form-range" id="${new_emotion_text}">`
         
         emotion_div.insertAdjacentHTML('beforeend', emotion_inner_html);   
         //add the delete emotion handler
-        emotion_keys = Object.keys(image_annotation["taggingEmotions"])
-        emotion_keys.forEach(function(key_tmp, index){
-            document.getElementById(`delete-${key_tmp}`).addEventListener("click", function() {
-                Delete_Emotion(`delete-${key_tmp}`);
-            }, false);
-        })
+
+        document.getElementById(`delete-${new_emotion_text}`).addEventListener("click", function() {
+            Delete_Emotion(`delete-${key_tmp}`);
+        }, false);
+
 
         await TAGGING_IDB_MODULE.Update_Record(image_annotations)
         document.getElementById(new_emotion_text).value = "0"
@@ -222,8 +221,8 @@ async function Add_New_Emotion(){
 
 
 //delete an emotion from the emotion set
-function Delete_Emotion(emotion_key){
-
+async function Delete_Emotion(emotion_key){
+    emotion_name = emotion_key.split("-")[1]
     element_slider_delete_btn = document.getElementById(emotion_key);
     element_slider_delete_btn.remove();
 
@@ -236,6 +235,12 @@ function Delete_Emotion(emotion_key){
 
     console.log("delete emotion")
     console.log(emotion_key)
+    image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
+    console.log(image_annotations)
+    delete image_annotations["taggingEmotions"][emotion_name];
+    console.log(image_annotations)
+
+    await TAGGING_IDB_MODULE.Update_Record(image_annotations)
 
 }
 
