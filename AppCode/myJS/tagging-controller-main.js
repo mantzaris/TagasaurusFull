@@ -190,25 +190,24 @@ async function Delete_Image() {
 async function Add_New_Emotion(){
 
     new_emotion_text = document.getElementById("new-emotion-label").value
+    if(new_emotion_text){
+        image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
+        keys_tmp = Object.keys(image_annotations["taggingEmotions"])
+        boolean_included = keys_tmp.includes(new_emotion_text)
+        if(boolean_included == false){
+            image_annotations["taggingEmotions"][new_emotion_text] = 0
+        }
+        emotion_div = document.getElementById("emotion-values")
+        emotion_inner_html = `<label for="customRange1" class="form-label">${new_emotion_text} range</label>
+                                        <input type="range" class="form-range" id="${new_emotion_text}">`
+        
+        emotion_div.insertAdjacentHTML('beforeend', emotion_inner_html);        
 
-    image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
-    keys_tmp = Object.keys(image_annotations["taggingEmotions"])
-    boolean_included = keys_tmp.includes(new_emotion_text)
-    if(boolean_included == false){
-        image_annotations["taggingEmotions"][new_emotion_text] = 0
+        await TAGGING_IDB_MODULE.Update_Record(image_annotations)
+        document.getElementById(new_emotion_text).value = "0"
+        await Process_Image()
+        document.getElementById("new-emotion-label").value = ""
     }
-    emotion_div = document.getElementById("emotion-values")
-    emotion_inner_html = `<label for="customRange1" class="form-label">${new_emotion_text} range</label>
-                                    <input type="range" class="form-range" id="${new_emotion_text}">`
-    
-    emotion_div.insertAdjacentHTML('beforeend', emotion_inner_html);
-    
-
-    await TAGGING_IDB_MODULE.Update_Record(image_annotations)
-    document.getElementById(new_emotion_text).value = "0" 
-
-    await Process_Image()
-    document.getElementById("new-emotion-label").value = ""
 }
 
 
