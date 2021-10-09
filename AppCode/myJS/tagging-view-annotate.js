@@ -35,10 +35,22 @@ function Emotion_Value_Fill(image_annotation){
     emotion_html_tmp = ''
     for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
 
-        emotion_html_tmp += `<label for="customRange1" class="form-label">${key} range</label>
-                                    <input type="range" class="form-range" id="${key}">`
+        emotion_html_tmp += `<label for="customRange1" class="form-label" id="emotionlabel-${key}">${key}</label>
+                                    <button type="button" class="close" aria-label="Close" id="delete-${key}">
+                                    &#10006
+                                    </button>
+                                    <input type="range" class="form-range" id="${key}">
+                                    `
     }
     emotion_div.insertAdjacentHTML('beforeend', emotion_html_tmp);
+
+    emotion_keys = Object.keys(image_annotation["taggingEmotions"])
+    emotion_keys.forEach(function(key_tmp, index){
+        document.getElementById(`delete-${key_tmp}`).addEventListener("click", function() {
+            Delete_Emotion(`delete-${key_tmp}`);
+        }, false);
+    })
+
 }
 
 
