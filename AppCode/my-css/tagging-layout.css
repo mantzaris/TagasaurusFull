@@ -28,6 +28,10 @@ body {
   height: 5%;
   padding-left: 2px;
 }
+.emotion-div {
+  height: 75%;
+  overflow-y: scroll;
+}
 .leftlower {
   height: 50%;
   border-top: 2px solid green;
