@@ -17,9 +17,9 @@ function Display_Image_State_Results(files,image_annotation){
         document.getElementById(meme_array[ii]).checked = true
     }
 
-    Emotion_Value_Fill(image_annotation)
+    Emotion_Display_Fill(image_annotation)
     for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
-        document.getElementById(key).value = image_annotation["taggingEmotions"][key]
+        document.getElementById('emotion_value-'+key).value = image_annotation["taggingEmotions"][key]
     }
     
 }
@@ -28,26 +28,26 @@ exports.Display_Image_State_Results = Display_Image_State_Results
 
 //populate the emotion value view with emotional values
 //the div in the html for the emotion values is id="emotion-values"
-function Emotion_Value_Fill(image_annotation){
+function Emotion_Display_Fill(image_annotation){
     document.getElementById("emotion-values").innerHTML = ""
     emotion_div = document.getElementById("emotion-values")
 
     emotion_html_tmp = ''
     for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
 
-        emotion_html_tmp += `<label for="customRange1" class="form-label" id="emotionlabel-${key}">${key}</label>
-                                    <button type="button" class="close" aria-label="Close" id="delete-${key}">
-                                    &#10006
-                                    </button>
-                                    <input type="range" class="form-range" id="${key}">
-                                    `
+        emotion_html_tmp += `<label for="customRange1" class="form-label" id="emotion_name_label-${key}">${key}</label>
+                                <button type="button" class="close" aria-label="Close" id="emotion_delete_btn-${key}">
+                                &#10006
+                                </button>
+                                <input type="range" class="form-range" id="emotion_value-${key}">
+                                `
     }
     emotion_div.insertAdjacentHTML('beforeend', emotion_html_tmp);
 
     emotion_keys = Object.keys(image_annotation["taggingEmotions"])
     emotion_keys.forEach(function(key_tmp, index){
-        document.getElementById(`delete-${key_tmp}`).addEventListener("click", function() {
-            Delete_Emotion(`delete-${key_tmp}`);
+        document.getElementById(`emotion_delete_btn-${key_tmp}`).addEventListener("click", function() {
+            Delete_Emotion(`${key_tmp}`);
         }, false);
     })
 
