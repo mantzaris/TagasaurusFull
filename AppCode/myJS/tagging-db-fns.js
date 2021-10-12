@@ -285,7 +285,7 @@ async function Delete_Void_MemeChoices(){
             }
         }
         record_tmp.taggingMemeChoices = memes_new
-        Update_Record(record_tmp)
+        await Update_Record(record_tmp)
     });
 }
 exports.Delete_Void_MemeChoices = Delete_Void_MemeChoices

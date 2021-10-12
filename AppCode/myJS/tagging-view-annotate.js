@@ -6,15 +6,12 @@ function Display_Image_State_Results(files,image_annotation){
 
     document.getElementById('taglist').innerHTML = ''
     document.getElementById('taglist').appendChild(Make_Tag_HTML_UL( image_annotation["taggingTags"] ))
-
     document.getElementById('descriptionInput').value = image_annotation["taggingRawDescription"]
-
-    document.getElementById('imgMain').src = `${TAGA_IMAGE_DIRECTORY}/${image_annotation["imageFileName"]}`;
-    
+    document.getElementById('imgMain').src = `${TAGA_IMAGE_DIRECTORY}/${image_annotation["imageFileName"]}`;    
     Meme_View_Fill(files)
     meme_array = image_annotation["taggingMemeChoices"]
     for(ii=0;ii<meme_array.length;ii++){
-        document.getElementById(meme_array[ii]).checked = true
+        document.getElementById(`meme-${meme_array[ii]}`).checked = true
     }
 
     Emotion_Display_Fill(image_annotation)
@@ -31,7 +28,6 @@ exports.Display_Image_State_Results = Display_Image_State_Results
 function Emotion_Display_Fill(image_annotation){
     document.getElementById("emotion-values").innerHTML = ""
     emotion_div = document.getElementById("emotion-values")
-
     emotion_html_tmp = ''
     for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
 
@@ -43,14 +39,12 @@ function Emotion_Display_Fill(image_annotation){
                                 `
     }
     emotion_div.insertAdjacentHTML('beforeend', emotion_html_tmp);
-
     emotion_keys = Object.keys(image_annotation["taggingEmotions"])
     emotion_keys.forEach(function(key_tmp, index){
         document.getElementById(`emotion_delete_btn-${key_tmp}`).addEventListener("click", function() {
             Delete_Emotion(`${key_tmp}`);
         }, false);
     })
-
 }
 
 
@@ -58,11 +52,9 @@ function Emotion_Display_Fill(image_annotation){
 function Meme_View_Fill(files) {
     document.getElementById('memes').innerHTML = ""
     meme_box = document.getElementById('memes')
-
     for (ii = 0; ii < files.length; ii++) {
-
         meme_box.insertAdjacentHTML('beforeend', `<input class="form-check-input" 
-                type="checkbox" value="" id="${files[ii]}">
+                type="checkbox" value="" id="meme-${files[ii]}">
                 <img height="50%" width="80%" src="${TAGA_IMAGE_DIRECTORY}/${files[ii]}" /><br>  `);
     }
 }

@@ -152,7 +152,7 @@ async function Save_Pic_State() {
     //meme selection switch check boxes
     meme_switch_booleans = []
     for (var ii = 0; ii < image_files_in_dir.length; ii++) {
-        meme_boolean_tmp = document.getElementById(`${image_files_in_dir[ii]}`).checked
+        meme_boolean_tmp = document.getElementById(`meme-${image_files_in_dir[ii]}`).checked
         if(meme_boolean_tmp == true){
             meme_switch_booleans.push(image_files_in_dir[ii])
         }
@@ -180,9 +180,11 @@ async function Save_Pic_State() {
 async function Delete_Image() {
     //try to delete the file (image) from the image folder and from the DB
     success = await TAGGING_DELETE_HELPER_MODULE.Delete_Image_File(image_files_in_dir[image_index-1])
+    image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index-1])
+
     if(success == 1){
         New_Image_Display( 0 )
-    }
+    } 
 }
 
 
