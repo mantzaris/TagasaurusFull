@@ -274,7 +274,7 @@ async function Delete_Void_MemeChoices(){
     //console.log('getting ready to get rid of the meme references which no longer are valid')
     await Get_All_Keys_From_DB()
     all_keys = Read_All_Keys_From_DB()
-    all_keys.forEach(async (key) => { 
+    await all_keys.forEach(async (key) => { 
         record_tmp = await Get_Record(key)
         memes_tmp = record_tmp.taggingMemeChoices
         memes_new = []

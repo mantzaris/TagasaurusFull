@@ -9,6 +9,7 @@ function Display_Image_State_Results(files,image_annotation){
     document.getElementById('descriptionInput').value = image_annotation["taggingRawDescription"]
     document.getElementById('imgMain').src = `${TAGA_IMAGE_DIRECTORY}/${image_annotation["imageFileName"]}`;    
     Meme_View_Fill(files)
+
     meme_array = image_annotation["taggingMemeChoices"]
     for(ii=0;ii<meme_array.length;ii++){
         document.getElementById(`meme-${meme_array[ii]}`).checked = true

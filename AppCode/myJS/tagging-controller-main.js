@@ -73,7 +73,7 @@ async function Check_And_Handle_New_Images_IDB(current_DB_file_list) {
 }
 
 //called upon app loading
-async function First_Display_Init(n) {
+async function First_Display_Init() {
     await TAGGING_IDB_MODULE.Create_Db()
     await TAGGING_IDB_MODULE.Get_All_Keys_From_DB()
     current_file_list_IDB = TAGGING_IDB_MODULE.Read_All_Keys_From_DB()
@@ -100,6 +100,21 @@ async function Load_State_Of_Image_IDB() {
     console.log(JSON.stringify(image_annotations))
     TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_files_in_dir,image_annotations)
 }
+
+//load the default image, typically called to avoid having nothing in the DB but can be 
+//deleted by the user later when they have more images stored.
+async function Load_Default_Taga_Image(){
+
+    console.log(PATH.resolve(PATH.resolve())+PATH.sep+'Taga.png')
+    taga_source_path = PATH.resolve(PATH.resolve())+PATH.sep+'Taga.png'
+    FS.copyFileSync(taga_source_path, `${TAGA_IMAGE_DIRECTORY}/${'Taga.png'}`, FS.constants.COPYFILE_EXCL)
+    tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
+    tagging_entry.imageFileName = 'Taga.png'
+    await TAGGING_IDB_MODULE.Insert_Record(tagging_entry)
+    Refresh_File_List()
+
+}
+
 
 //dialog window explorer to select new images to import, and calls the functions to update the view
 //checks whether the directory of the images is the taga image folder and if so returns
@@ -178,13 +193,17 @@ async function Save_Pic_State() {
 
 //delete image from user choice
 async function Delete_Image() {
-    //try to delete the file (image) from the image folder and from the DB
     success = await TAGGING_DELETE_HELPER_MODULE.Delete_Image_File(image_files_in_dir[image_index-1])
-    image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index-1])
-
+    if(image_files_in_dir.length == 0){
+        console.log(`calling Load_Default_Taga_Image()`)
+        Load_Default_Taga_Image()
+    }
+    //Why this is needed?.. I do not know. when I remove it the memes are not update by the time the 
+    //following display call is needed. it appears there is some kind of 'race condition' i cannot track down!!!
+    await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[0])
     if(success == 1){
         New_Image_Display( 0 )
-    } 
+    }
 }
 
 
