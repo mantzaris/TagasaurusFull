@@ -101,7 +101,7 @@ async function Load_State_Of_Image_IDB() {
     TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_files_in_dir,image_annotations)
 }
 
-//load the default image, typically called to avoid having nothing in the DB but can be 
+//load the default image, typically called to avoid having nothing in the DB but can be
 //deleted by the user later when they have more images stored.
 async function Load_Default_Taga_Image(){
 

@@ -9,6 +9,7 @@ function createWindow () {
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 1000,
+    icon: __dirname + '/icons/TagaIcon1024x1024.png',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
