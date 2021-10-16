@@ -48,6 +48,9 @@ body {
   overflow-x: hidden;
   margin-bottom: 0px;
 }
+.tagging-meme-image-class {
+  cursor: pointer;
+}
 
 .center {
   height: 100%;

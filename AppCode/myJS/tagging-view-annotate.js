@@ -61,30 +61,10 @@ function Meme_View_Fill(files) {
     files.forEach(file =>{
                 meme_box.insertAdjacentHTML('beforeend', `<input class="form-check-input" 
                     type="checkbox" value="" id="meme-${file}">
-                    <img id="memeImage-${file}" height="50%" width="80%" src="${TAGA_IMAGE_DIRECTORY}/${file}" /><br>  `);
+                    <img class="tagging-meme-image-class" title="view meme" id="memeImage-${file}" height="50%" width="80%" src="${TAGA_IMAGE_DIRECTORY}/${file}" /><br>  `);
     })
 
-    
-    modal_html = `<div id="myModal" class="modalM">
-                        <!-- Modal content -->
-                        <div class="modal-contentM">
-                        <div class="modal-headerM">
-                            <span class="closeM">&times;</span>
-                            <h2>Modal Header</h2>
-                        </div>
-                        <div class="modal-bodyM">
-                            <p>Some text in the Modal Body</p>
-                            <p>Some other text...</p>
-                        </div>
-                        <div class="modal-footerM">
-                            <h3>Modal Footer</h3>
-                        </div>
-                        </div>
-                    
-                        </div>`
-    meme_box.insertAdjacentHTML('beforeend', modal_html)
-    
-
+    //add an event listener for when a meme image is clicked and send the file name
     files.forEach(file => {
         document.getElementById(`memeImage-${file}`).addEventListener("click", function() {
             Meme_Image_Clicked(file);
@@ -101,8 +81,7 @@ function Meme_Image_Clicked(meme_file_name){
     var modal = document.getElementById("myModal");
     modal.style.display = "block";
     
-    var span = document.getElementsByClassName("close")[0];
-
+    var span = document.getElementsByClassName("closeM")[0];
     span.onclick = function() {
         modal.style.display = "none";
     }
@@ -111,6 +90,14 @@ function Meme_Image_Clicked(meme_file_name){
           modal.style.display = "none";
         }
     }
+
+    document.getElementById("meme-modal-header").innerHTML = 'imageFileName: ' + meme_file_name
+
+    document.getElementById("modal-meme-click-body").innerHTML = ""
+    meme_click_modal_div = document.getElementById("modal-meme-click-body")
+    meme_click_modal_body_html_tmp = ''
+    meme_click_modal_body_html_tmp += `<img id="modalMemeImage-${meme_file_name}" height="50%" width="50%" src="${TAGA_IMAGE_DIRECTORY}/${meme_file_name}"/><br>`
+    meme_click_modal_div.insertAdjacentHTML('beforeend', meme_click_modal_body_html_tmp);
 
 }
 

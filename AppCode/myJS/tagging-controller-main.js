@@ -29,7 +29,7 @@ var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
                                     "imageFileName": '',      
                                     "imageFileHash": '',
                                     "taggingRawDescription": "",
-                                    "taggingTags": [],
+                                    "taggingTags": [""],
                                     "taggingEmotions": {good:0,bad:0},//{ happy: 0, sad: 0, confused: 0 },
                                     "taggingMemeChoices": []
                                     }
@@ -122,7 +122,7 @@ async function Load_Default_Taga_Image(){
 
 function Return_File_Hash(image_file_path){
     taga_image_fileBuffer = FS.readFileSync(image_file_path);
-    HASH_SUM_SHA256 = CRYPTO.createHash('sha256');
+    HASH_SUM_SHA256 = CRYPTO.createHash('sha512');
     HASH_SUM_SHA256.update(taga_image_fileBuffer)
     hex_hash_sum = HASH_SUM_SHA256.digest('hex')
     return hex_hash_sum
