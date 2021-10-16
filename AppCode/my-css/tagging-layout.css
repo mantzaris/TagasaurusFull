@@ -34,6 +34,7 @@ body {
 }
 .leftlower {
   height: 50%;
+  width: 100%;
   border-top: 2px solid green;
 }
 #meme-box-title {

@@ -239,7 +239,7 @@ async function Add_New_Emotion(){
             emotion_div.insertAdjacentHTML('beforeend', emotion_inner_html);   
             //add the delete emotion handler
             document.getElementById(`emotion_delete_btn-${new_emotion_text}`).addEventListener("click", function() {
-                Delete_Emotion(`${key_tmp}`);
+                Delete_Emotion(`${new_emotion_text}`);
             }, false);
             document.getElementById('emotion_value-'+new_emotion_text).value = "0"
             await TAGGING_IDB_MODULE.Update_Record(image_annotations)

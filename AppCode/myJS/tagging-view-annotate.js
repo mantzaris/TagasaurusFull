@@ -33,7 +33,7 @@ function Emotion_Display_Fill(image_annotation){
     for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
 
         emotion_html_tmp += `<label for="customRange1" class="form-label" id="emotion_name_label-${key}">${key}</label>
-                                <button type="button" class="close" aria-label="Close" id="emotion_delete_btn-${key}">
+                                <button type="button" class="close" aria-label="CloseL" id="emotion_delete_btn-${key}">
                                 &#10006
                                 </button>
                                 <input type="range" class="form-range" id="emotion_value-${key}">
@@ -53,13 +53,67 @@ function Emotion_Display_Fill(image_annotation){
 function Meme_View_Fill(files) {
     document.getElementById('memes').innerHTML = ""
     meme_box = document.getElementById('memes')
-    for (ii = 0; ii < files.length; ii++) {
-        meme_box.insertAdjacentHTML('beforeend', `<input class="form-check-input" 
-                type="checkbox" value="" id="meme-${files[ii]}">
-                <img height="50%" width="80%" src="${TAGA_IMAGE_DIRECTORY}/${files[ii]}" /><br>  `);
-    }
+    // for (ii = 0; ii < files.length; ii++) {
+    //     meme_box.insertAdjacentHTML('beforeend', `<input class="form-check-input" 
+    //             type="checkbox" value="" id="meme-${files[ii]}">
+    //             <img height="50%" width="80%" src="${TAGA_IMAGE_DIRECTORY}/${files[ii]}" /><br>  `);
+    // }
+    files.forEach(file =>{
+                meme_box.insertAdjacentHTML('beforeend', `<input class="form-check-input" 
+                    type="checkbox" value="" id="meme-${file}">
+                    <img id="memeImage-${file}" height="50%" width="80%" src="${TAGA_IMAGE_DIRECTORY}/${file}" /><br>  `);
+    })
+
+    
+    modal_html = `<div id="myModal" class="modalM">
+                        <!-- Modal content -->
+                        <div class="modal-contentM">
+                        <div class="modal-headerM">
+                            <span class="closeM">&times;</span>
+                            <h2>Modal Header</h2>
+                        </div>
+                        <div class="modal-bodyM">
+                            <p>Some text in the Modal Body</p>
+                            <p>Some other text...</p>
+                        </div>
+                        <div class="modal-footerM">
+                            <h3>Modal Footer</h3>
+                        </div>
+                        </div>
+                    
+                        </div>`
+    meme_box.insertAdjacentHTML('beforeend', modal_html)
+    
+
+    files.forEach(file => {
+        document.getElementById(`memeImage-${file}`).addEventListener("click", function() {
+            Meme_Image_Clicked(file);
+        }, false);
+    })
 }
 exports.Meme_View_Fill = Meme_View_Fill
+
+
+function Meme_Image_Clicked(meme_file_name){
+    
+    console.log(`${meme_file_name} = meme image clicked!`)
+    
+    var modal = document.getElementById("myModal");
+    modal.style.display = "block";
+    
+    var span = document.getElementsByClassName("close")[0];
+
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+    window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+    }
+
+}
+
 
 
 //helper function to create the inner HTML for the tag list within the tag box
@@ -82,20 +136,18 @@ function Make_Tag_HTML_UL(tag_array) {
 function Reset_Image_View(files,image_annotation){
 
     for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
-        document.getElementById(key).value = 0
+        document.getElementById(`emotion_value-${key}`).value = 0
     }
-
     document.getElementById('descriptionInput').value = ''
-    
     document.getElementById('taglist').innerHTML = ''
-
     for (var ii = 0; ii < files.length; ii++) {
         //val_obj[`${files[ii]}`] = false //each file name is the element ID for the tagging page
-        document.getElementById(files[ii]).checked = false 
+        document.getElementById(`meme-${files[ii]}`).checked = false 
     }
-
 }
 exports.Reset_Image_View = Reset_Image_View
+
+
 
 
 
