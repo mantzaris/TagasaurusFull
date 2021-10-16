@@ -1,5 +1,7 @@
 const FS = require('fs');
 const PATH = require('path');
+const CRYPTO = require('crypto')
+
 //FSE is not being used but should be for the directory batch import
 //const FSE = require('fs-extra');
 
@@ -57,6 +59,7 @@ async function Check_And_Handle_New_Images_IDB(current_DB_file_list) {
             image_name_tmp = `${image_files_in_dir[ii]}`
             tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
             tagging_entry.imageFileName = image_name_tmp
+            tagging_entry.imageFileHash = Return_File_Hash(`${TAGA_IMAGE_DIRECTORY}/${image_name_tmp}`)
             await TAGGING_IDB_MODULE.Insert_Record(tagging_entry)
         }
     }
@@ -110,11 +113,20 @@ async function Load_Default_Taga_Image(){
     FS.copyFileSync(taga_source_path, `${TAGA_IMAGE_DIRECTORY}/${'Taga.png'}`, FS.constants.COPYFILE_EXCL)
     tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
     tagging_entry.imageFileName = 'Taga.png'
+    tagging_entry.imageFileHash = Return_File_Hash(`${TAGA_IMAGE_DIRECTORY}/${'Taga.png'}`)
+
     await TAGGING_IDB_MODULE.Insert_Record(tagging_entry)
     Refresh_File_List()
 
 }
 
+function Return_File_Hash(image_file_path){
+    taga_image_fileBuffer = FS.readFileSync(image_file_path);
+    HASH_SUM_SHA256 = CRYPTO.createHash('sha256');
+    HASH_SUM_SHA256.update(taga_image_fileBuffer)
+    hex_hash_sum = HASH_SUM_SHA256.digest('hex')
+    return hex_hash_sum
+}
 
 //dialog window explorer to select new images to import, and calls the functions to update the view
 //checks whether the directory of the images is the taga image folder and if so returns
@@ -133,6 +145,7 @@ async function Load_New_Image() {
 
         tagging_entry_tmp = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
         tagging_entry_tmp.imageFileName = filename
+        tagging_entry_tmp.imageFileHash = Return_File_Hash(`${TAGA_IMAGE_DIRECTORY}/${filename}`)
         TAGGING_IDB_MODULE.Insert_Record(tagging_entry_tmp)
         MY_ARRAY_INSERT_HELPER.Insert_Into_Sorted_Array(image_files_in_dir,filename)
 
