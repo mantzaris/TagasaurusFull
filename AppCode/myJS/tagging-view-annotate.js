@@ -74,7 +74,7 @@ function Meme_View_Fill(files) {
 exports.Meme_View_Fill = Meme_View_Fill
 
 
-function Meme_Image_Clicked(meme_file_name){
+async function Meme_Image_Clicked(meme_file_name){
     
     console.log(`${meme_file_name} = meme image clicked!`)
     
@@ -87,7 +87,7 @@ function Meme_Image_Clicked(meme_file_name){
     }
     window.onclick = function(event) {
         if (event.target == modal) {
-          modal.style.display = "none";
+            modal.style.display = "none";
         }
     }
 
@@ -98,6 +98,37 @@ function Meme_Image_Clicked(meme_file_name){
     meme_click_modal_body_html_tmp = ''
     meme_click_modal_body_html_tmp += `<img id="modalMemeImage-${meme_file_name}" height="50%" width="50%" src="${TAGA_IMAGE_DIRECTORY}/${meme_file_name}"/><br>`
     meme_click_modal_div.insertAdjacentHTML('beforeend', meme_click_modal_body_html_tmp);
+
+    meme_image_annotations = await TAGGING_IDB_MODULE.Get_Record( meme_file_name )
+    meme_modal_footer_div = document.getElementById("meme-modal-footer-id")
+    modal_html_tmp = ""
+    
+    modal_html_tmp = `emotion values: `
+    emotion_keys = Object.keys(meme_image_annotations["taggingEmotions"])
+    emotion_keys.forEach(function(key_tmp, index){
+        emotion_value = meme_image_annotations["taggingEmotions"][key_tmp]
+        if (index === emotion_keys.length - 1){ 
+            modal_html_tmp += `(${key_tmp}: ${emotion_value}) <br>`
+        } else {
+            modal_html_tmp += `(${key_tmp}: ${emotion_value}), `
+        }
+    })
+    tag_array = meme_image_annotations["taggingTags"]
+    modal_html_tmp += ` tags: `
+    if( tag_array.length != 0 && !(tag_array.length == 1 && tag_array[0] == "") ){
+
+        tag_array.forEach(function(tag, index){
+            if (index === tag_array.length - 1){
+                modal_html_tmp += `#${tag} `
+            } else {
+                modal_html_tmp += `#${tag}, `
+            }
+            
+        })
+    }
+    //console.log(`the modal html tmp = ${modal_html_tmp}`)
+    document.getElementById("meme-modal-footer-id").innerHTML = modal_html_tmp
+    //meme_modal_footer_div.insertAdjacentHTML('beforeend', modal_html_tmp);
 
 }
 
