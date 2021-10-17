@@ -304,7 +304,6 @@ async function Check_File_Hash_Exists(file_hash){
             hash_tmp = record_tmp.imageFileHash
             if( file_hash == hash_tmp ) {
                 hash_exists = true
-                console.log(`hash exists TRUE!!!`)
                 resolve(hash_exists)
                 break
             }
@@ -312,7 +311,6 @@ async function Check_File_Hash_Exists(file_hash){
         resolve(hash_exists)
     });
     return await hash_exists_promise.then(value => { 
-                console.log(`promise return hash exists: ${value}`); 
                 return value
                 })
 }
