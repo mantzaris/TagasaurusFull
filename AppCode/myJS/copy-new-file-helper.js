@@ -17,14 +17,33 @@ function Make_Salt(length) {
 exports.Make_Salt = Make_Salt
 
 
-function Copy_Non_Taga_Files(result,dir_pics){
+async function Copy_Non_Taga_Files(result,dir_pics){
     new_filename_array = []
+
+    file_paths_unique_hash = []
+    file_paths = result.filePaths    
+    for (file_path of file_paths ) {
+
+        console.log(`file paths in copy non taga = ${file_path}`)
+        file_hash_tmp = Return_File_Hash(file_path)
+        console.log(`the foreach first file hash = ${file_hash_tmp}`)
+        hash_exists = await TAGGING_IDB_MODULE.Check_File_Hash_Exists(file_hash_tmp)
+        console.log(`hash exists in for each = ${hash_exists}`)
+        if(hash_exists == false){
+            console.log(`about to push`)
+            file_paths_unique_hash.push(file_path)
+        }
+    
+    }
+    console.log(`unique hash paths = ${file_paths_unique_hash}`)
+
+
     result.filePaths.forEach(filepath_tmp => {
         filename = PATH.parse(filepath_tmp).base;
         filename_path_to_local = `${dir_pics}/${filename}`
         
         if(FS.existsSync(filename_path_to_local)) {
-            //path exists
+            //path exists to same file name so give it a name with salt
             //ADD SALT and use the SALTY image ref varname = salt_fn
             salt_tmp = Make_Salt(SALT_LENGTH)
             new_filename = PATH.parse(filename).name + salt_tmp + PATH.parse(filename).ext

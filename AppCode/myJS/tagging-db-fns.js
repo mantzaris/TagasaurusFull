@@ -267,7 +267,6 @@ async function Get_All_From_DB(){
 exports.Get_All_From_DB = Get_All_From_DB
 
 
-
 //get the name and memeChoices for each file to then update the entry with an altered memeChoice set if they
 //contain a meme choice that is now not a viable choice cause it is missing
 async function Delete_Void_MemeChoices(){
@@ -291,7 +290,33 @@ async function Delete_Void_MemeChoices(){
 exports.Delete_Void_MemeChoices = Delete_Void_MemeChoices
 
 
+//check to see if a file hash is present in the DB already
+//return boolean true or false on the hash check
+async function Check_File_Hash_Exists(file_hash){
+    await Get_All_Keys_From_DB()
+    all_keys = await Read_All_Keys_From_DB()
+    hash_exists = false
 
+    hash_exists_promise = new Promise(async (resolve, reject) => {
+        all_keys = await Read_All_Keys_From_DB()    
+        for(let ii = 0; ii < all_keys.length; ii++) {
+            record_tmp = await Get_Record(all_keys[ii])
+            hash_tmp = record_tmp.imageFileHash
+            if( file_hash == hash_tmp ) {
+                hash_exists = true
+                console.log(`hash exists TRUE!!!`)
+                resolve(hash_exists)
+                break
+            }
+        }
+        resolve(hash_exists)
+    });
+    return await hash_exists_promise.then(value => { 
+                console.log(`promise return hash exists: ${value}`); 
+                return value
+                })
+}
+exports.Check_File_Hash_Exists = Check_File_Hash_Exists
 
 
 

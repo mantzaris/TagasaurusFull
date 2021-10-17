@@ -140,7 +140,7 @@ async function Load_New_Image() {
     }
 
     last_user_image_directory_chosen = PATH.dirname(result.filePaths[0])
-    filenames = MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_IMAGE_DIRECTORY)
+    filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_IMAGE_DIRECTORY)
     filenames.forEach(filename => {
 
         tagging_entry_tmp = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
