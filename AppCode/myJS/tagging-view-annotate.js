@@ -75,19 +75,17 @@ exports.Meme_View_Fill = Meme_View_Fill
 
 
 async function Meme_Image_Clicked(meme_file_name){
+        
+    var meme_modal = document.getElementById("meme-modal");
+    meme_modal.style.display = "block";
     
-    console.log(`${meme_file_name} = meme image clicked!`)
-    
-    var modal = document.getElementById("myModal");
-    modal.style.display = "block";
-    
-    var span = document.getElementsByClassName("closeM")[0];
-    span.onclick = function() {
-        modal.style.display = "none";
+    var close_element = document.getElementsByClassName("meme-modal-close")[0];
+    close_element.onclick = function() {
+        meme_modal.style.display = "none";
     }
     window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
+        if (event.target == meme_modal) {
+            meme_modal.style.display = "none";
         }
     }
 

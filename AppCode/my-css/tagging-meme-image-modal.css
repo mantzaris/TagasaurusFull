@@ -1,5 +1,5 @@
 /* The Modal (background) */
-.modalM {
+.meme-modal {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
@@ -13,7 +13,7 @@
 }
 
 /* Modal Content/Box */
-.modal-contentM {
+.meme-modal-content {
   background-color: #fefefe;
   margin: 15% auto; /* 15% from the top and centered */
   padding: 20px;
@@ -22,34 +22,34 @@
 }
 
 /* The Close Button */
-.closeM {
+.meme-modal-close {
   color: rgb(136, 133, 133);
   float: right;
   font-size: 28px;
   font-weight: bold;
 }
 
-.closeM:hover,
-.closeM:focus {
+.meme-modal-close:hover,
+.meme-modal-close:focus {
   color: black;
   text-decoration: none;
   cursor: pointer;
 }
 
 /* Modal Header */
-.modal-headerM {
+.meme-modal-header {
   padding: 2px 16px;
   background-color: #5cb85c;
   color: white;
 }
 
 /* Modal Body */
-.modal-bodyM {
+.meme-modal-body {
   padding: 2px 16px;
 }
 
 /* Modal Footer */
-.modal-footerM {
+.meme-modal-footer {
   padding: 2px 16px;
   background-color: #5cb85c;
   color: white;
@@ -57,7 +57,7 @@
 }
 
 /* Modal Content */
-.modal-contentM {
+.meme-modal-content {
   position: relative;
   background-color: #fefefe;
   margin: auto;
