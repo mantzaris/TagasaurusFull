@@ -14,22 +14,32 @@ Annotations of image taggings involve inputing a textual description from which 
 The purpose is to streamline the annotation process with the necessary emotional granulatiry required for training ML. This tool is expected to allow teams to produce datasets as training and validation datasets where the annotations are easily organized. 
 
 
-<!---
 
-If you use this work in an academic publication, please use the reference:
+If you use this work in an academic publication, please use the references:
+```
+Mantzaris AV, Pandohie R, Hopwood M, Pho P, Ehling D.
+"Tagasaurus, a tool to assist manual image tagging and the creation of image collections"
+[doi link](  \url{https://www.sciencedirect.com/science/article/pii/S2665963821000658?via%3Dihub}) and the Elsevier webpage [link](https://www.sciencedirect.com/science/article/pii/S2665963821000658?via%3Dihub)
+```
+
 ```
 Mantzaris AV, Pandohie R, Hopwood M, Pho P, Ehling D, Walker TG. 
 "Introducing Tagasaurus, an Approach to Reduce Cognitive Fatigue from Long-Term Interface Usage When Storing Descriptions and Impressions from Photographs."
 Technologies. 2021; 9(3):45. https://doi.org/10.3390/technologies9030045 
 ```
 
+
+(**Check out cool comic books and more from the author Vasexandros at [amazon](https://www.amazon.com/Vasexandros/e/B010RI6W0G%3Fref=dbs_a_mng_rwt_scns_share)**)
+
+
+
+<!---
+
 _also, the books by the author vasexandros are really worth the read_ [link](https://www.amazon.com/Vasexandros/e/B010RI6W0G%3Fref=dbs_a_mng_rwt_scns_share)
 
 # <span style="color:orange">Tagasaurus, the gateway to your semantic multiverse </span>
 
 ### <span style="color:red">let's drop the '**U**' from '**U-RL**' because why do we need a UNI-verse and the UNI-queness it imposes?.. let's break free of that and "Tag the Planet!" </span>
-
-
 
 ---
 
