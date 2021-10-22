@@ -89,7 +89,7 @@ async function Meme_Image_Clicked(meme_file_name){
         }
     }
 
-    document.getElementById("meme-modal-header").innerHTML = 'imageFileName: ' + meme_file_name
+    document.getElementById("meme-modal-footer-id").innerHTML = 'imageFileName: ' + meme_file_name
 
     document.getElementById("modal-meme-click-body").innerHTML = ""
     meme_click_modal_div = document.getElementById("modal-meme-click-body")
@@ -125,7 +125,7 @@ async function Meme_Image_Clicked(meme_file_name){
         })
     }
     //console.log(`the modal html tmp = ${modal_html_tmp}`)
-    document.getElementById("meme-modal-footer-id").innerHTML = modal_html_tmp
+    document.getElementById("meme-modal-header").innerHTML = modal_html_tmp
     //meme_modal_footer_div.insertAdjacentHTML('beforeend', modal_html_tmp);
 
 }

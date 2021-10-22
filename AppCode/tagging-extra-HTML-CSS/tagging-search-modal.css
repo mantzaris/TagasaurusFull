@@ -1,0 +1,71 @@
+/* The Modal (background) */
+.top-tagging-search-modal-class {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.search-modal-content-class {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+  height: 90%;
+}
+
+/* The Close Button */
+.search-close-modal-class {
+  color: rgb(136, 133, 133);
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.search-close-modal-class:hover,
+.search-close-modal-class:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Modal Header */
+.search-modal-header {
+  padding: 2px 16px;
+  background-color: #5cb85c;
+  color: white;
+}
+
+/* Modal Body */
+.search-modal-body-class {
+  padding: 2px 16px;
+}
+
+/* Modal Footer */
+.meme-modal-footer-class {
+  padding: 2px 16px;
+  background-color: #5cb85c;
+  color: white;
+  font-size: large;
+}
+
+/* Modal Content */
+.search-modal-content-class {
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 0;
+  border: 1px solid #888;
+  width: 80%;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  animation-name: animatetop;
+  animation-duration: 0.4s;
+}

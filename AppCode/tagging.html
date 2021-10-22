@@ -12,7 +12,10 @@
         <link rel="stylesheet" href="./my-css/tagging-layout.css">
         
         <!-- meme image click modal css -->
-        <link rel="stylesheet" href="./my-css/tagging-meme-image-modal.css">
+        <link rel="stylesheet" href="./tagging-extra-HTML-CSS/tagging-meme-image-modal.css">
+        <!-- search images modal -->
+        <link rel="stylesheet" href="./tagging-extra-HTML-CSS/tagging-search-modal.css">
+
 
         <title>Tagasaurus</title>
         <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
@@ -44,6 +47,7 @@
                 </div>
             </div>
             <div class="center">
+                <button class="btn btn-primary btn-sm btn-block" id="SearchImages" type="button" onclick="Search_Images()">Search stored images</button>
                 <button class="btn btn-primary btn-sm btn-block" id="loadImage" type="button" onclick="Load_New_Image()">Load new image</button>                
                 <button class="btn btn-primary btn-sm btn-block" id="deleteImage" type="button" onclick="Delete_Image()">Delete image</button>
                 <a href="welcome-screen.html" class="btn btn-info" role="button">Return to Main</a>
@@ -93,7 +97,7 @@
             <!-- Modal content -->
             <div class="meme-modal-content">
                 <div class="meme-modal-header">
-                    <span class="meme-modal-close">&times;</span>
+                    <span class="meme-modal-close">&times; Close &times;</span>
                     <h2 id="meme-modal-header">Modal Header</h2>
                 </div>
                 <div class="meme-modal-body" id="modal-meme-click-body">
@@ -104,6 +108,30 @@
                 </div>
             </div>        
         </div>
+
+
+        <div id="top-tagging-search-modal-id" class="top-tagging-search-modal-class">
+            <!-- Modal content -->
+            <div class="search-modal-content-class">
+                <div class="search-modal-header">
+                    <span id="search-close-modal-id" class="search-close-modal-class">&times; Close &times;</span>
+                    <h2 id="search-modal-header">Search images</h2>
+                </div>
+                
+                <button class="btn btn-primary btn-lg btn-block" id="search-entry-btn" type="button" onclick="Modal_Search_Entry()">Search!</button>
+                <input type="text" class="form-control" id="search-tags-entry-form" aria-describedby="search" placeholder="enter tags">
+                <hr>
+
+                <div class="search-modal-body-class" id="modal-search-click-body-id">
+        
+                </div>
+                <div class="meme-modal-footer-class" id="meme-modal-footer-id">
+                    <!-- <h3>Modal Footer</h3> -->
+                </div>
+            </div>        
+        </div>
+        
+
 
         <!-- You can also require other files to run in this process -->
         <script src="./myJS/tagging-controller-main.js"></script>

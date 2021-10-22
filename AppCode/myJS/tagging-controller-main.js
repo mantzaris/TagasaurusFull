@@ -273,3 +273,29 @@ async function Delete_Emotion(emotion_key){
 
 
 
+//functionality for the searching of the images
+function Search_Images(){
+
+    console.log('search images button pressed!')
+    
+    var search_modal = document.getElementById("top-tagging-search-modal-id");
+    search_modal.style.display = "block";
+    var close_element = document.getElementById("search-close-modal-id");
+    close_element.onclick = function() {
+        search_modal.style.display = "none";
+    }
+    window.onclick = function(event) {
+        if (event.target == search_modal) {
+            search_modal.style.display = "none";
+        }
+    }
+    
+
+}
+
+
+function Modal_Search_Entry() {
+
+    console.log('search for tags and emotions')
+
+}
