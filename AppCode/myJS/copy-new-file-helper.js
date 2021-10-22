@@ -20,13 +20,16 @@ exports.Make_Salt = Make_Salt
 async function Copy_Non_Taga_Files(result,dir_pics){
     new_filename_array = []
 
+    current_file_hashes_tmp = []
     file_paths_unique_hash = []
     file_paths = result.filePaths    
     for (file_path of file_paths ) {
         file_hash_tmp = Return_File_Hash(file_path)
         hash_exists = await TAGGING_IDB_MODULE.Check_File_Hash_Exists(file_hash_tmp)
-        if(hash_exists == false){
+        hash_in_current_set = current_file_hashes_tmp.some( hash => hash == file_hash_tmp )
+        if(hash_exists == false && hash_in_current_set == false){
             file_paths_unique_hash.push(file_path)
+            current_file_hashes_tmp.push(file_hash_tmp)
         }
     }
     //console.log(`unique hash paths = ${file_paths_unique_hash}`)
