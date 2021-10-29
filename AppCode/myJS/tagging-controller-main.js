@@ -273,6 +273,15 @@ async function Delete_Emotion(emotion_key){
 
 
 
+/*
+SEARCH STUFF!!!
+*/
+tagging_search_obj = {
+                        emotions:{},
+                        searchTags:[]
+                    }
+
+
 //functionality for the searching of the images
 function Search_Images(){
 
@@ -290,16 +299,91 @@ function Search_Images(){
         }
     }
     
-
+    //populate the search modal with the fields to insert emotion tags and values
+    search_populate_emotions()
 }
 
-
+//when the tagging search modal 'search' button is pressed
 function Modal_Search_Entry() {
 
     reg_exp_delims = /[#:,;| ]+/
     search_tags_input = document.getElementById("search-tags-entry-form").value
     split_search_string = search_tags_input.split(reg_exp_delims)
     console.log(`the split search string length = ${split_search_string.length}`)
+    search_unique_search_terms = [...new Set(split_search_string)]
+    console.log(`search string unique elements in array = ${search_unique_search_terms}`)
+
+    console.log('add emotions button clicked')
+    selected_emotion_value = document.getElementById("emotion-selector").value
+    console.log(`the emotion selector value in search is = ${selected_emotion_value}`)
+    entered_emotion_label = document.getElementById("emotion-selector").value
+    console.log(`the entered emotion label = ${entered_emotion_label}`)
+    emotion_search_entry_value = document.getElementById("search-emotion-value-entry-id").value
+    console.log(`emotion_search_entry_value = ${emotion_search_entry_value}`)
+
+    tagging_search_obj["searchTags"] = search_unique_search_terms
+
+    console.log(`the search term object is = ${JSON.stringify(tagging_search_obj)}`)
 
 
+}
+
+//
+function search_populate_emotions(){
+
+
+    search_emotion_input_div = document.getElementById("modal-search-emotion-input-div-id")
+    search_emotion_input_div.innerHTML = ""
+    //search_emotion_input_div.innerHTML += `<button class="btn btn-primary btn-lg btn-block" id="search-entry-emotion-add-btn" type="button" onclick=""> &#xFF0B; </button>`
+    search_emotion_input_div.innerHTML += `<div class="input-group mb-3">
+                                                <button class="btn btn-primary btn-lg btn-block" id="search-entry-emotion-add-btn" type="button" onclick=""> &#xFF0B; </button>
+                                                
+                                                <input type="text" list="cars" id="emotion-selector" placeholder="enter emotion" />
+                                                <datalist id="cars" >
+                                                    <option>Good</option>
+                                                    <option>Bad</option>
+                                                    <option>Happy</option>
+                                                    <option>Confused</option>
+                                                </datalist>
+
+                                                <input type="range" class="form-range w-25" id="search-emotion-value-entry-id">
+                                            </div>
+                                            `
+    search_emotion_input_div.innerHTML += `<br>
+                                            <div id="emotion-search-terms">
+                                            
+                                            </div>
+                                            `
+
+    document.getElementById("search-entry-emotion-add-btn").addEventListener("click", function() {
+
+        current_emotion_keys = Object.keys(tagging_search_obj["emotions"])
+        console.log(`the current emotion keys = ${current_emotion_keys}`)
+
+        console.log('add emotions button clicked')
+        selected_emotion_value = document.getElementById("emotion-selector").value
+        console.log(`the emotion selector value in search is = ${selected_emotion_value}`)
+        entered_emotion_label = document.getElementById("emotion-selector").value
+        console.log(`the entered emotion label = ${entered_emotion_label}`)
+        emotion_search_entry_value = document.getElementById("search-emotion-value-entry-id").value
+        console.log(`emotion_search_entry_value = ${emotion_search_entry_value}`)
+
+        redundant_label_bool = current_emotion_keys.includes( entered_emotion_label )
+        console.log(`is the label present alreadyboolean = ${redundant_label_bool}`)
+        tagging_search_obj["emotions"][entered_emotion_label] = emotion_search_entry_value
+        console.log(`the search term object is = ${JSON.stringify(tagging_search_obj)}`)
+
+        search_terms_output = ""
+        Object.keys(tagging_search_obj["emotions"]).forEach(emotion_key => {
+            search_terms_output += `<button type="button" class="close" aria-label="Close" id="remove-emotion-search">
+                                        &#10006
+                                    </button>
+                                    (emotion:${emotion_key}, value:${tagging_search_obj["emotions"][emotion_key]})
+                                    `
+
+        
+        })
+        document.getElementById("emotion-search-terms").innerHTML = search_terms_output
+
+    })
 }
