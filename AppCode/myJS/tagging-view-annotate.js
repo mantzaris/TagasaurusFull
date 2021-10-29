@@ -103,14 +103,19 @@ async function Meme_Image_Clicked(meme_file_name){
     
     modal_html_tmp = `emotion values: `
     emotion_keys = Object.keys(meme_image_annotations["taggingEmotions"])
-    emotion_keys.forEach(function(key_tmp, index){
-        emotion_value = meme_image_annotations["taggingEmotions"][key_tmp]
-        if (index === emotion_keys.length - 1){ 
-            modal_html_tmp += `(${key_tmp}: ${emotion_value}) <br>`
-        } else {
-            modal_html_tmp += `(${key_tmp}: ${emotion_value}), `
-        }
-    })
+    console.log(`the emotion values length = ${emotion_keys.length}`)
+    if( emotion_keys.length == 0 ){
+        modal_html_tmp += `<br>`
+    } else {
+        emotion_keys.forEach(function(key_tmp, index){
+            emotion_value = meme_image_annotations["taggingEmotions"][key_tmp]
+            if (index === emotion_keys.length - 1){ 
+                modal_html_tmp += `(${key_tmp}: ${emotion_value}) <br>`
+            } else {
+                modal_html_tmp += `(${key_tmp}: ${emotion_value}), `
+            }
+        })
+    }
     tag_array = meme_image_annotations["taggingTags"]
     modal_html_tmp += ` tags: `
     if( tag_array.length != 0 && !(tag_array.length == 1 && tag_array[0] == "") ){

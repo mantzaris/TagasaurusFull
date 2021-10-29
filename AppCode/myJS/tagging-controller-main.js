@@ -296,6 +296,10 @@ function Search_Images(){
 
 function Modal_Search_Entry() {
 
-    console.log('search for tags and emotions')
+    reg_exp_delims = /[#:,;| ]+/
+    search_tags_input = document.getElementById("search-tags-entry-form").value
+    split_search_string = search_tags_input.split(reg_exp_delims)
+    console.log(`the split search string length = ${split_search_string.length}`)
+
 
 }
