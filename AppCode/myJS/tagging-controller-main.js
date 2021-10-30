@@ -375,15 +375,20 @@ function search_populate_emotions(){
 
         search_terms_output = ""
         Object.keys(tagging_search_obj["emotions"]).forEach(emotion_key => {
-            search_terms_output += `<button type="button" class="close" aria-label="Close" id="remove-emotion-search">
+            search_terms_output += `<button type="button" class="close" aria-label="Close" id="remove-emotion-search-${emotion_key}">
                                         &#10006
                                     </button>
                                     (emotion:${emotion_key}, value:${tagging_search_obj["emotions"][emotion_key]})
                                     `
 
-        
         })
         document.getElementById("emotion-search-terms").innerHTML = search_terms_output
+
+        Object.keys(tagging_search_obj["emotions"]).forEach(emotion_key => {
+            document.getElementById(`remove-emotion-search-${emotion_key}`).addEventListener("click", function() {
+                console.log(`button id = ${emotion_key}`)
+            })
+        })
 
     })
 }
