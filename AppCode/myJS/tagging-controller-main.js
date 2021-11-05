@@ -331,6 +331,27 @@ function Modal_Search_Entry() {
 
     console.log(`the search term object is = ${JSON.stringify(tagging_search_obj)}`)
 
+
+    
+    //>>SHOW SEARCH RESULTS<<
+    //search images results annotations
+    search_image_results_output = document.getElementById("search-image-results-box-label")
+    
+    image_set_search = PATH.resolve(PATH.resolve())+PATH.sep+'Taga.png'
+    search_image_results_output.insertAdjacentHTML('beforeend',"<br>")
+    tmp = [1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,11,1,1,11,1,1,1,3]
+    tmp.forEach(element => {
+        search_image_results_output.insertAdjacentHTML('beforeend', `<img class="imgSearchResult" src="${image_set_search}">`)   //innerHTML += `<img class="imgSearchResult" src="${image_set_search}">`
+    })
+
+    //search meme results
+    search_meme_results_output = document.getElementById("search-modal-image-memes")
+    search_meme_results_output.insertAdjacentHTML('beforeend',"<br>")
+    tmp = [1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,11,1,1,11,1,1,1,3]
+    tmp.forEach(element => {
+        search_meme_results_output.insertAdjacentHTML('beforeend', `<img class="imgMemeResult" src="${image_set_search}">`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
+    })
+    //meme_box.insertAdjacentHTML   ('beforeend', meme_click_modal_body_html_tmp);
 }
 
 //
