@@ -317,11 +317,62 @@ async function Check_File_Hash_Exists(file_hash){
 exports.Check_File_Hash_Exists = Check_File_Hash_Exists
 
 
+//search term object ex = {"emotions":{"Happy":"76","Confused":"20"},
+//                                  "searchTags":["abc","def"],"searchMemeTags":["dog"]}
+//basic aggregation of relevance for the term overlaps
+async function Search_Images_Basic_Relevances(tagging_search_obj){
+    console.log(`--entering the search basic---`)
+    console.log(`the search obj = ${JSON.stringify(tagging_search_obj)}`)
+    all_keys = await Read_All_Keys_From_DB()
+    console.log(`all_keys = ${all_keys}`)
+    console.log(`length of all_keys ${all_keys.length}`)
+
+    search_description_tags = tagging_search_obj["searchTags"]
+    search_emotions = tagging_search_obj["emotions"]
+    search_meme_tags = tagging_search_obj["searchMemeTags"]
+    
+
+    record_key = all_keys[0]
+    console.log(`looking at image=${record_key}`)
+    record_tmp = await Get_Record(record_key)
+    //image description tag overlap
+    record_tmp_tags = record_tmp["taggingTags"]
+    tags_overlap_score = (record_tmp_tags.filter(x => search_description_tags.includes(x))).length
+    console.log(`the tag overlap score = ${tags_overlap_score}`)
+
+    emotion_overlap_score = 0
+    console.log(`the init emotion overlap score = ${emotion_overlap_score}`)
+    record_tmp_emotions = record_tmp["taggingEmotions"]
+    record_tmp_emotion_keys = Object.keys(record_tmp_emotions)
+    search_emotions_keys = Object.keys(search_emotions)
+    search_emotions_keys.forEach(search_key_emotion_label =>{
+        record_tmp_emotion_keys.forEach(record_emotion_key_label =>{
+            console.log(`looking at emtions ${search_key_emotion_label.toLowerCase()} , ${record_emotion_key_label.toLowerCase()}`)
+            console.log(`looking at emtion scores ${search_emotions[search_key_emotion_label]} , ${record_tmp_emotions[record_emotion_key_label]}`)
+            if(search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()){
+                delta_tmp = (record_tmp_emotions[record_emotion_key_label] - search_emotions[search_key_emotion_label])/50
+                emotion_overlap_score_tmp = 1 - Math.abs( delta_tmp )                
+                console.log(`emotion_overlap_score_tmp = ${emotion_overlap_score_tmp}`)
+                emotion_overlap_score += emotion_overlap_score_tmp
+            }
+        })
+    })
+    console.log(`the final emotion overlap score = ${emotion_overlap_score}`)
 
 
+    //record_tmp_memes = record_tmp["taggingMemeChoices"]
+    
+    //record_meme_tags_overlap = record_tmp_tags.filter(x => search_description_tags.includes(x));
+    
+
+    console.log(`---exiting the search basic---`)
+}
+exports.Search_Images_Basic_Relevances = Search_Images_Basic_Relevances
 
 
-
+function sigmoid(z) {
+    return 1 / (1 + Math.exp(-z));
+  }
 
 
 

@@ -308,7 +308,7 @@ function Search_Images(){
 }
 
 //when the tagging search modal 'search' button is pressed
-function Modal_Search_Entry() {
+async function Modal_Search_Entry() {
 
     reg_exp_delims = /[#:,;| ]+/
 
@@ -332,7 +332,10 @@ function Modal_Search_Entry() {
     console.log(`the search term object is = ${JSON.stringify(tagging_search_obj)}`)
 
 
-    
+    //search the DB according to this set of criteria
+    //look through the keys and find the overlapping set
+    TAGGING_IDB_MODULE.Search_Images_Basic_Relevances(tagging_search_obj)
+
     //>>SHOW SEARCH RESULTS<<
     //search images results annotations
     search_image_results_output = document.getElementById("search-image-results-box-label")
@@ -351,7 +354,9 @@ function Modal_Search_Entry() {
     tmp.forEach(element => {
         search_meme_results_output.insertAdjacentHTML('beforeend', `<img class="imgMemeResult" src="${image_set_search}">`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
     })
-    //meme_box.insertAdjacentHTML   ('beforeend', meme_click_modal_body_html_tmp);
+
+
+
 }
 
 //
