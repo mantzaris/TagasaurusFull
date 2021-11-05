@@ -330,49 +330,53 @@ async function Search_Images_Basic_Relevances(tagging_search_obj){
     search_description_tags = tagging_search_obj["searchTags"]
     search_emotions = tagging_search_obj["emotions"]
     search_meme_tags = tagging_search_obj["searchMemeTags"]
-    
+    console.log(`<<<<<------------>>>>>>>>`)
+    for(let key_ind=0; key_ind<all_keys.length; key_ind++){
+        record_key = all_keys[key_ind]
+        console.log(`looking at image=${record_key}`)
+        record_tmp = await Get_Record(record_key)
+        //image description tag overlap
+        record_tmp_tags = record_tmp["taggingTags"]
+        tags_overlap_score = (record_tmp_tags.filter(x => search_description_tags.includes(x))).length
+        console.log(`the tag overlap score = ${tags_overlap_score}`)
 
-    record_key = all_keys[0]
-    console.log(`looking at image=${record_key}`)
-    record_tmp = await Get_Record(record_key)
-    //image description tag overlap
-    record_tmp_tags = record_tmp["taggingTags"]
-    tags_overlap_score = (record_tmp_tags.filter(x => search_description_tags.includes(x))).length
-    console.log(`the tag overlap score = ${tags_overlap_score}`)
-
-    emotion_overlap_score = 0
-    console.log(`the init emotion overlap score = ${emotion_overlap_score}`)
-    record_tmp_emotions = record_tmp["taggingEmotions"]
-    record_tmp_emotion_keys = Object.keys(record_tmp_emotions)
-    search_emotions_keys = Object.keys(search_emotions)
-    search_emotions_keys.forEach(search_key_emotion_label =>{
-        record_tmp_emotion_keys.forEach(record_emotion_key_label =>{
-            console.log(`looking at emtions ${search_key_emotion_label.toLowerCase()} , ${record_emotion_key_label.toLowerCase()}`)
-            console.log(`looking at emtion scores ${search_emotions[search_key_emotion_label]} , ${record_tmp_emotions[record_emotion_key_label]}`)
-            if(search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()){
-                delta_tmp = (record_tmp_emotions[record_emotion_key_label] - search_emotions[search_key_emotion_label])/50
-                emotion_overlap_score_tmp = 1 - Math.abs( delta_tmp )                
-                console.log(`emotion_overlap_score_tmp = ${emotion_overlap_score_tmp}`)
-                emotion_overlap_score += emotion_overlap_score_tmp
-            }
+        emotion_overlap_score = 0
+        record_tmp_emotions = record_tmp["taggingEmotions"]
+        record_tmp_emotion_keys = Object.keys(record_tmp_emotions)
+        search_emotions_keys = Object.keys(search_emotions)
+        search_emotions_keys.forEach(search_key_emotion_label =>{
+            record_tmp_emotion_keys.forEach(record_emotion_key_label =>{
+                if(search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()){
+                    delta_tmp = (record_tmp_emotions[record_emotion_key_label] - search_emotions[search_key_emotion_label])/50
+                    emotion_overlap_score_tmp = 1 - Math.abs( delta_tmp )                
+                    emotion_overlap_score += emotion_overlap_score_tmp
+                }
+            })
         })
-    })
-    console.log(`the final emotion overlap score = ${emotion_overlap_score}`)
+        console.log(`the final emotion overlap score = ${emotion_overlap_score}`)
 
+        meme_tag_overlap_score = 0
+        record_tmp_memes = record_tmp["taggingMemeChoices"]
+        console.log(`record_tmp tagging meme choices = ${record_tmp_memes}`)
+        for (let rtm=0; rtm<record_tmp_memes.length;rtm++){
+            meme_record_tmp = await Get_Record(record_tmp_memes[rtm])
+            meme_tmp_tags = meme_record_tmp["taggingTags"]
+            console.log(`the meme's tags = ${meme_tmp_tags}`)
+            console.log(`the search_meme_tags = ${search_meme_tags}`)
+            meme_tag_overlap_score_tmp = (meme_tmp_tags.filter(x => search_meme_tags.includes(x))).length
+            meme_tag_overlap_score += meme_tag_overlap_score_tmp
+        }
+        total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score //tags_overlap_score +  +
+        console.log(`the total_image_match_score = ${total_image_match_score}`)    
 
-    //record_tmp_memes = record_tmp["taggingMemeChoices"]
-    
-    //record_meme_tags_overlap = record_tmp_tags.filter(x => search_description_tags.includes(x));
-    
+        console.log(`<<<<<------------>>>>>>>>`)
+    }
 
     console.log(`---exiting the search basic---`)
 }
 exports.Search_Images_Basic_Relevances = Search_Images_Basic_Relevances
 
 
-function sigmoid(z) {
-    return 1 / (1 + Math.exp(-z));
-  }
 
 
 

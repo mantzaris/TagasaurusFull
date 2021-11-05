@@ -286,6 +286,12 @@ tagging_search_obj = {
 //functionality for the searching of the images
 function Search_Images(){
 
+    tagging_search_obj = {
+        emotions:{},
+        searchTags:[],
+        searchMemeTags:[]
+    }
+
     console.log('search images button pressed!')
     
     var search_modal = document.getElementById("top-tagging-search-modal-id");
