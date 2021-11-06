@@ -383,9 +383,9 @@ async function Search_Images_Basic_Relevances(tagging_search_obj){
     sorted_score_file_keys = []
 
     while (key_search_scores_sorted_ranks.reduce((a, b) => a + b, 0) > 0) {
-        max_rank_val = Math.min(...key_search_scores_sorted_ranks)
+        max_rank_val = Math.max(...key_search_scores_sorted_ranks)
         index_max_val = key_search_scores_sorted_ranks.indexOf(max_rank_val)
-        sorted_score_file_keys.push( all_keys[index_max_val] )
+        sorted_score_file_keys.unshift( all_keys[index_max_val] )
         console.log(`pushing file = ${all_keys[index_max_val]}`)
         console.log(`key_search_scores_sorted_ranks = ${key_search_scores_sorted_ranks}`)
         key_search_scores_sorted_ranks[index_max_val] = 0
@@ -393,7 +393,7 @@ async function Search_Images_Basic_Relevances(tagging_search_obj){
     }
     console.log(`drum role file sorted list sorted_score_file_keys = ${sorted_score_file_keys}`)
     console.log(`---exiting the search basic---`)
-    return
+    return sorted_score_file_keys
 }
 exports.Search_Images_Basic_Relevances = Search_Images_Basic_Relevances
 
@@ -401,9 +401,6 @@ exports.Search_Images_Basic_Relevances = Search_Images_Basic_Relevances
 
 
 
-
-
- 
 
 
 

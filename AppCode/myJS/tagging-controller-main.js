@@ -340,17 +340,21 @@ async function Modal_Search_Entry() {
 
     //search the DB according to this set of criteria
     //look through the keys and find the overlapping set
-    TAGGING_IDB_MODULE.Search_Images_Basic_Relevances(tagging_search_obj)
-
+    
+    search_sorted_image_filename_keys = await TAGGING_IDB_MODULE.Search_Images_Basic_Relevances(tagging_search_obj)
+    console.log(`image_set_search done`)
+    console.log(`search_sorted_image_filename_keys = ${search_sorted_image_filename_keys}`)
     //>>SHOW SEARCH RESULTS<<
     //search images results annotations
     search_image_results_output = document.getElementById("search-image-results-box-label")
     
     image_set_search = PATH.resolve(PATH.resolve())+PATH.sep+'Taga.png'
+    search_image_results_output.innerHTML = `<label id="search-image-results-box-label" class="form-label">image matches</label>`
     search_image_results_output.insertAdjacentHTML('beforeend',"<br>")
-    tmp = [1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,11,1,1,11,1,1,1,3]
-    tmp.forEach(element => {
-        search_image_results_output.insertAdjacentHTML('beforeend', `<img class="imgSearchResult" src="${image_set_search}">`)   //innerHTML += `<img class="imgSearchResult" src="${image_set_search}">`
+    //tmp = [1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,11,1,1,11,1,1,1,3]
+    search_sorted_image_filename_keys.forEach(file_key => {
+        console.log(`image file = ${TAGA_IMAGE_DIRECTORY}/${file_key}`)
+        search_image_results_output.insertAdjacentHTML('beforeend', `<img class="imgSearchResult" src="${TAGA_IMAGE_DIRECTORY}/${file_key}">`)   //innerHTML += `<img class="imgSearchResult" src="${image_set_search}">`
     })
 
     //search meme results
