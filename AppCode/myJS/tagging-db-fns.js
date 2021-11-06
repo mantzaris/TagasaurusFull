@@ -323,9 +323,11 @@ exports.Check_File_Hash_Exists = Check_File_Hash_Exists
 async function Search_Images_Basic_Relevances(tagging_search_obj){
     console.log(`--entering the search basic---`)
     console.log(`the search obj = ${JSON.stringify(tagging_search_obj)}`)
+    await Get_All_Keys_From_DB()
     all_keys = await Read_All_Keys_From_DB()
     console.log(`all_keys = ${all_keys}`)
     console.log(`length of all_keys ${all_keys.length}`)
+    key_search_scores = Array(all_keys.length).fill(0)
 
     search_description_tags = tagging_search_obj["searchTags"]
     search_emotions = tagging_search_obj["emotions"]
@@ -368,11 +370,30 @@ async function Search_Images_Basic_Relevances(tagging_search_obj){
         }
         total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score //tags_overlap_score +  +
         console.log(`the total_image_match_score = ${total_image_match_score}`)    
-
+        key_search_scores[key_ind] = total_image_match_score
         console.log(`<<<<<------------>>>>>>>>`)
     }
+    console.log(`the search score array key_search_scores= ${key_search_scores}`)
+    //for ranks where highest score is rank 1
+    key_search_scores_sorted = key_search_scores.slice().sort(function(a,b){return b-a})
+    //for ranks where the highest score is rank N
+    //key_search_scores_sorted = key_search_scores.slice().sort(function(a,b){return a-b})
+    key_search_scores_sorted_ranks = key_search_scores.map(function(v){ return key_search_scores_sorted.indexOf(v)+1 });
+    console.log(`key_search_scores_sorted_ranks = ${key_search_scores_sorted_ranks}`)
+    sorted_score_file_keys = []
 
+    while (key_search_scores_sorted_ranks.reduce((a, b) => a + b, 0) > 0) {
+        max_rank_val = Math.min(...key_search_scores_sorted_ranks)
+        index_max_val = key_search_scores_sorted_ranks.indexOf(max_rank_val)
+        sorted_score_file_keys.push( all_keys[index_max_val] )
+        console.log(`pushing file = ${all_keys[index_max_val]}`)
+        console.log(`key_search_scores_sorted_ranks = ${key_search_scores_sorted_ranks}`)
+        key_search_scores_sorted_ranks[index_max_val] = 0
+        //key_search_scores_sorted_ranks.splice(index_max_val, 1);
+    }
+    console.log(`drum role file sorted list sorted_score_file_keys = ${sorted_score_file_keys}`)
     console.log(`---exiting the search basic---`)
+    return
 }
 exports.Search_Images_Basic_Relevances = Search_Images_Basic_Relevances
 
@@ -382,7 +403,7 @@ exports.Search_Images_Basic_Relevances = Search_Images_Basic_Relevances
 
 
 
-
+ 
 
 
 
