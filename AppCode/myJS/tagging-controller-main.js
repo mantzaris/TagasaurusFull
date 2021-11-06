@@ -341,7 +341,9 @@ async function Modal_Search_Entry() {
     //search the DB according to this set of criteria
     //look through the keys and find the overlapping set
     
-    search_sorted_image_filename_keys = await TAGGING_IDB_MODULE.Search_Images_Basic_Relevances(tagging_search_obj)
+    search_results = await TAGGING_IDB_MODULE.Search_Images_Basic_Relevances(tagging_search_obj)
+    search_sorted_image_filename_keys = search_results[0]
+    search_sorted_meme_image_filename_keys = search_results[1]
     console.log(`image_set_search done`)
     console.log(`search_sorted_image_filename_keys = ${search_sorted_image_filename_keys}`)
     //>>SHOW SEARCH RESULTS<<
@@ -359,10 +361,11 @@ async function Modal_Search_Entry() {
 
     //search meme results
     search_meme_results_output = document.getElementById("search-modal-image-memes")
+    search_meme_results_output.innerHTML = `<label id="search-modal-image-memes-label" class="form-label">meme relevance</label>`
     search_meme_results_output.insertAdjacentHTML('beforeend',"<br>")
-    tmp = [1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,11,1,1,11,1,1,1,3]
-    tmp.forEach(element => {
-        search_meme_results_output.insertAdjacentHTML('beforeend', `<img class="imgMemeResult" src="${image_set_search}">`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
+    //tmp = [1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,11,1,1,11,1,1,1,3]
+    search_sorted_meme_image_filename_keys.forEach(file_key => {
+        search_meme_results_output.insertAdjacentHTML('beforeend', `<img class="imgMemeResult" src="${TAGA_IMAGE_DIRECTORY}/${file_key}">`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
     })
 
 
