@@ -313,6 +313,10 @@ function Search_Images(){
     select_image_search_order.onclick = function() {
         Chose_Image_Search_Results()
     }
+    var select_meme_image_search_order = document.getElementById("search-modal-load-meme-order")
+    select_meme_image_search_order.onclick = function() {
+        Chose_Meme_Image_Search_Results()
+    }
 
     //populate the search modal with the fields to insert emotion tags and values
     Search_Populate_Emotions()
@@ -463,4 +467,18 @@ function Chose_Image_Search_Results(){
     
 }
 
+function Chose_Meme_Image_Search_Results(){
+    //Now update the current file list with the new order of pics 'search_results' which comes from the 
+    //DB search function for MEMEs
+    console.log(`in choose memeimage saerch resutls search_results = ${search_results}, search length = ${search_results.length}`)
+    search_sorted_meme_image_filename_keys = search_results[1] //for memes
+    search_results_selected = search_sorted_meme_image_filename_keys
+    image_files_in_dir = search_results_selected
+    image_index = 1;
+    Load_State_Of_Image_IDB()
+    search_modal = document.getElementById("top-tagging-search-modal-id");
+    search_modal.style.display = "none";
+    
 
+
+}
