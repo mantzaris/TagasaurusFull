@@ -38,6 +38,8 @@ var image_files_in_dir = ''
 var last_user_image_directory_chosen = ''
 var processed_tag_word_list
 var image_index = 1;
+var search_results_selected = ''
+var search_results = ''
 
 //init method to run upon loading
 First_Display_Init(image_index); 
@@ -99,8 +101,10 @@ function New_Image_Display(n) {
 
 //set the emotional sliders values to the emotional vector values stored
 async function Load_State_Of_Image_IDB() {
+    console.log(`in LOAD STATE OF IMAGES image_index = ${image_index}, image_files_in_dir[image_index - 1] = ${image_files_in_dir[image_index - 1]} `)
     image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
     console.log(JSON.stringify(image_annotations))
+    
     TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_files_in_dir,image_annotations)
 }
 
@@ -305,7 +309,11 @@ function Search_Images(){
             search_modal.style.display = "none";
         }
     }
-    
+    var select_image_search_order = document.getElementById("search-modal-load-image-order")
+    select_image_search_order.onclick = function() {
+        Chose_Image_Search_Results()
+    }
+
     //populate the search modal with the fields to insert emotion tags and values
     Search_Populate_Emotions()
     //populate the search modal with the fields to insert meme tags
@@ -367,7 +375,6 @@ async function Modal_Search_Entry() {
     search_sorted_meme_image_filename_keys.forEach(file_key => {
         search_meme_results_output.insertAdjacentHTML('beforeend', `<img class="imgMemeResult" src="${TAGA_IMAGE_DIRECTORY}/${file_key}">`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
     })
-
 
 
 }
@@ -442,7 +449,18 @@ function Search_Populate_Memetic_Component(){
 }
 
 
-
-
+function Chose_Image_Search_Results(){
+    //Now update the current file list with the new order of pics 'search_results' which comes from the 
+    //DB search function
+    console.log(`in choose image saerch resutls search_results = ${search_results}, search length = ${search_results.length}`)
+    search_sorted_image_filename_keys = search_results[0]
+    search_results_selected = search_sorted_image_filename_keys
+    image_files_in_dir = search_results_selected
+    image_index = 1;
+    Load_State_Of_Image_IDB()
+    search_modal = document.getElementById("top-tagging-search-modal-id");
+    search_modal.style.display = "none";
+    
+}
 
 
