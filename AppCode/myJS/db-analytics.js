@@ -19,6 +19,10 @@ function Harmonic_Mean(arr) {
         }
     }
     mu_H = (1 / (sum_reciprocal_nonzero / (n_T - n_0))) * ((n_T - n_0) / n_T)
+    if( isNaN(mu_H) == true || isFinite(mu_H) == false ){
+        mu_H = 0
+    }
+
     return mu_H;
 }
 
