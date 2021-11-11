@@ -15,6 +15,8 @@
         <link rel="stylesheet" href="./tagging-extra-HTML-CSS/tagging-meme-image-modal.css">
         <!-- search images modal -->
         <link rel="stylesheet" href="./tagging-extra-HTML-CSS/tagging-search-modal.css">
+        <!-- search memes modal -->
+        <link rel="stylesheet" href="./tagging-extra-HTML-CSS/tagging-meme-search-modal.css">
 
 
         <title>Tagasaurus</title>
@@ -37,6 +39,8 @@
                 </div>
                 <div class="leftlower">                    
                     <label id="meme-box-title" class="form-label">Memes Connections * &rarr;</label>
+                    <br>
+                    <button class="btn btn-primary btn-lg btn-block " id="add-meme-button" type="button" onclick="Add_New_Meme()">Add new meme</button>
                     <div class="meme-container editable form-check form-switch" id="memes" contenteditable="true">
                         <label class="check1">link 
                             <input type="checkbox" >
@@ -138,7 +142,6 @@
                         <button class="btn btn-primary btn-sm btn-block" id="search-modal-load-image-order" type="button">load this new image order</button>
                         <button class="btn btn-primary btn-sm btn-block" id="search-modal-load-meme-order" type="button">load this >meme< image order</button>
 
-
                     </div>
 
                     <div id="search-modal-image-results">
@@ -157,6 +160,51 @@
             </div>        
         </div>
         
+
+        <!-- the MEME search popup modal -->
+        <div id="top-tagging-meme-search-modal-id" class="top-tagging-meme-search-modal-class">
+            <!-- Modal content -->
+            <div class="search-meme-modal-content-class">
+                <div class="search-meme-modal-header">
+                    <span id="search-meme-close-modal-id" class="search-meme-close-modal-class">&times; Close &times;</span>
+                    <h2 id="search-meme-modal-header">Search memes</h2>
+                </div>
+                
+                <button class="btn btn-primary btn-lg btn-block" id="search-meme-entry-btn" type="button" onclick="Modal_Meme_Search_Entry()">Search!</button>
+                <input type="text" class="form-control" id="search-meme-tags-entry-form" aria-describedby="search" placeholder="enter keywords of memes (tags)">
+                <br>
+                <div id="modal-meme-search-emotion-input-div-id">
+                </div>
+                <div id="modal-meme-search-image-tags-input-div-id">
+                </div>
+                <hr>
+                <div id="modal-meme-search-image-emotions-input-div-id">
+                </div>
+
+                <hr>
+
+                <!-- search results -->
+                <div class="search-meme-modal-body-class" id="modal-meme-search-click-body-id">                    
+                    <div id="search-meme-modal-results-buttons">
+                        <button class="btn btn-primary btn-sm btn-block" id="search-meme-modal-load-image-order" type="button">load these selected memes and images</button>
+                    </div>
+
+                    <div id="search-meme-modal-image-results">
+                        <label id="search-meme-image-results-box-label" class="form-label">dominant memes</label>
+                    </div>
+
+                    <div id="search-meme-modal-image-memes">
+                        <label id="search-meme-modal-image-memes-label" class="form-label">associated images</label>
+                    </div>
+                </div>
+
+                <div class="search-meme-modal-footer-class" id="search-meme-modal-footer-id">
+                    <!-- <h3>Modal Footer</h3> -->
+                </div>
+            </div>        
+        </div>
+
+
 
 
         <!-- You can also require other files to run in this process -->

@@ -480,5 +480,38 @@ function Chose_Meme_Image_Search_Results(){
     search_modal.style.display = "none";
     
 
+}
+
+
+//called from the HTML button onclik
+//add a new meme which is searched for by the user
+function Add_New_Meme(){
+
+    console.log(`add meme button pressed`)
+
+    var search_modal = document.getElementById("top-tagging-meme-search-modal-id");
+    search_modal.style.display = "block";
+    var close_element = document.getElementById("search-meme-close-modal-id");
+    close_element.onclick = function() {
+        search_modal.style.display = "none";
+    }
+    window.onclick = function(event) {
+        if (event.target == search_modal) {
+            search_modal.style.display = "none";
+        }
+    }
 
 }
+
+//the functionality to use the object to
+//search the DB for relevant memes
+function Modal_Meme_Search_Entry(){
+
+    console.log(`search memes now!`)
+
+
+
+}
+
+
+
