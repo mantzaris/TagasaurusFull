@@ -351,7 +351,7 @@ async function Search_Images_Basic_Relevances(tagging_search_obj){
             record_tmp_emotion_keys.forEach(record_emotion_key_label =>{
                 if(search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()){
                     delta_tmp = (record_tmp_emotions[record_emotion_key_label] - search_emotions[search_key_emotion_label])/50
-                    emotion_overlap_score_tmp = 1 - Math.abs( delta_tmp )                
+                    emotion_overlap_score_tmp = 1 - Math.abs( delta_tmp )
                     emotion_overlap_score += emotion_overlap_score_tmp
                 }
             })
@@ -369,14 +369,16 @@ async function Search_Images_Basic_Relevances(tagging_search_obj){
             meme_tag_overlap_score_tmp = (meme_tmp_tags.filter(x => search_meme_tags.includes(x))).length
             meme_tag_overlap_score += meme_tag_overlap_score_tmp            
         }
+        //debatable whether the emotion overlap score should multiply the scores and be additive
         total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score //tags_overlap_score +  +
         console.log(`the total_image_match_score = ${total_image_match_score}`)    
         key_search_scores[key_ind] = total_image_match_score
 
         //now each meme gets a bonus for being present and then for the tag relevance
+        //if an image is present as a meme for an image add +1 to its memetic relevance
         record_tmp_memes.forEach(meme_tmp => {
                 meme_key_ind = all_keys.indexOf(meme_tmp)
-                meme_key_relevance_scores[meme_key_ind] += 1
+                meme_key_relevance_scores[meme_key_ind] += 1 + total_image_match_score
         })
 
         console.log(`<<<<<------------>>>>>>>>`)
@@ -392,9 +394,10 @@ async function Search_Images_Basic_Relevances(tagging_search_obj){
     sorted_score_file_meme_keys = []
 
     //scale the scores of the meme counts based upon the rank
-    for(ii=0;ii<key_search_scores_sorted_ranks.length;ii++){
-        meme_key_relevance_scores[ii] = (1 / key_search_scores_sorted_ranks[ii]) * (meme_key_relevance_scores[ii])
-    }
+    //scores are the rank of the image as a score and the 
+    //for(ii=0;ii<meme_key_relevance_scores.length;ii++){
+    //    meme_key_relevance_scores[ii] = (1 + key_search_scores[ii]) * (meme_key_relevance_scores[ii])
+    //}
     meme_key_relevance_scores_sorted = meme_key_relevance_scores.slice().sort(function(a,b){return b-a})
     meme_key_relevance_scores_sorted_ranks = meme_key_relevance_scores.map(function(v){ return meme_key_relevance_scores_sorted.indexOf(v)+1 });
 
