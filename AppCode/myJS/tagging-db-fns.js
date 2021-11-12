@@ -425,7 +425,17 @@ exports.Search_Images_Basic_Relevances = Search_Images_Basic_Relevances
 
 
 
+//search term object ex = { meme_emotions:{"cool":45,"funny":86},"emotions":{"Happy":"76","Confused":"20"},
+//                                  "searchTags":["abc","def"],"searchMemeTags":["dog"]}
+//basic aggregation of relevance for the term overlaps
+async function Search_Meme_Images_Basic_Relevances(meme_tagging_search_obj){
 
+    console.log(`in search Search_Meme_Images_Basic_Relevances`)
+    console.log(`the meme search term object is = ${JSON.stringify(meme_tagging_search_obj)}`)
+
+
+}
+exports.Search_Meme_Images_Basic_Relevances = Search_Meme_Images_Basic_Relevances
 
 
 

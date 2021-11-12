@@ -505,6 +505,17 @@ search_complete = false
 //add a new meme which is searched for by the user
 function Add_New_Meme(){
 
+    meme_tagging_search_obj = {
+        meme_emotions:{},
+        emotions:{},
+        searchTags:[],
+        searchMemeTags:[]
+    }
+    search_tags_input = document.getElementById("search-meme-tags-entry-form")
+    search_tags_input.value =""
+    search_tags_input = document.getElementById("search-meme-image-tags-entry-form")
+    search_tags_input.value =""
+
     console.log(`add meme button pressed`)
 
     var search_modal = document.getElementById("top-tagging-meme-search-modal-id");
@@ -645,16 +656,13 @@ function Search_Meme_Image_Populate_Emotions(){
             document.getElementById(`remove-meme-image-emotion-search-${emotion_key}`).addEventListener("click", function() {
                 search_emotion_search_span_html_obj = document.getElementById(`emotion-meme-image-text-search-${emotion_key}`);
                 search_emotion_search_span_html_obj.remove();
-                delete meme_tagging_search_obj["meme_emotions"][emotion_key]
+                delete meme_tagging_search_obj["emotions"][emotion_key]
             })
         })
 
     })
 
 }
-
-
-
 
 
 //after the search is done and 
@@ -675,18 +683,71 @@ function Choose_Meme_Search_Results(){
 }
 
 
-
-
-
-
-
 //the functionality to use the object to
 //search the DB for relevant memes
-function Modal_Meme_Search_Entry(){
+async function Modal_Meme_Search_Btn(){
 
     console.log(`search memes now!`)
     //after doing the search
     search_complete = true
+
+
+    reg_exp_delims = /[#:,;| ]+/
+
+    //annotation tags
+    search_tags_input = document.getElementById("search-meme-tags-entry-form").value
+    split_search_string = search_tags_input.split(reg_exp_delims)
+    search_unique_search_terms = [...new Set(split_search_string)]
+    meme_tagging_search_obj["searchMemeTags"] = search_unique_search_terms
+
+    //emotions, the key values should already be in the search object
+    selected_emotion_value = document.getElementById("emotion-meme-selector").value
+    entered_emotion_label = document.getElementById("emotion-meme-selector").value
+    emotion_search_entry_value = document.getElementById("search-meme-emotion-value-entry-id").value
+
+    //meme tags now
+    search_meme_tags_input = document.getElementById("search-meme-image-tags-entry-form").value
+    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
+    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+    meme_tagging_search_obj["searchTags"] = search_unique_meme_search_terms
+
+    console.log(`the meme search term object is = ${JSON.stringify(meme_tagging_search_obj)}`)
+
+
+    //search the DB according to this set of criteria
+    //look through the keys and find the overlapping set
+    
+    
+    search_results = await TAGGING_IDB_MODULE.Search_Meme_Images_Basic_Relevances(meme_tagging_search_obj)
+    /*
+    search_sorted_image_filename_keys = search_results[0]
+    search_sorted_meme_image_filename_keys = search_results[1]
+    console.log(`image_set_search done`)
+    console.log(`search_sorted_image_filename_keys = ${search_sorted_image_filename_keys}`)
+    //>>SHOW SEARCH RESULTS<<
+    //search images results annotations
+    search_image_results_output = document.getElementById("search-image-results-box-label")
+    
+    image_set_search = PATH.resolve(PATH.resolve())+PATH.sep+'Taga.png'
+    search_image_results_output.innerHTML = `<label id="search-image-results-box-label" class="form-label">image matches</label>`
+    search_image_results_output.insertAdjacentHTML('beforeend',"<br>")
+    //tmp = [1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,11,1,1,11,1,1,1,3]
+    search_sorted_image_filename_keys.forEach(file_key => {
+        console.log(`image file = ${TAGA_IMAGE_DIRECTORY}/${file_key}`)
+        search_image_results_output.insertAdjacentHTML('beforeend', `<img class="imgSearchResult" src="${TAGA_IMAGE_DIRECTORY}/${file_key}">`)   //innerHTML += `<img class="imgSearchResult" src="${image_set_search}">`
+    })
+
+    //search meme results
+    search_meme_results_output = document.getElementById("search-modal-image-memes")
+    search_meme_results_output.innerHTML = `<label id="search-modal-image-memes-label" class="form-label">meme relevance</label>`
+    search_meme_results_output.insertAdjacentHTML('beforeend',"<br>")
+    //tmp = [1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,11,1,1,11,1,1,1,3]
+    search_sorted_meme_image_filename_keys.forEach(file_key => {
+        search_meme_results_output.insertAdjacentHTML('beforeend', `<img class="imgMemeResult" src="${TAGA_IMAGE_DIRECTORY}/${file_key}">`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
+    })
+    */
+
+
 
 
 }
