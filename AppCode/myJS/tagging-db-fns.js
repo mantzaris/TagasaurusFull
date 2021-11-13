@@ -425,14 +425,110 @@ exports.Search_Images_Basic_Relevances = Search_Images_Basic_Relevances
 
 
 
-//search term object ex = { meme_emotions:{"cool":45,"funny":86},"emotions":{"Happy":"76","Confused":"20"},
+//search object ex = { meme_emotions:{"cool":45,"funny":86},"emotions":{"Happy":"76","Confused":"20"},
 //                                  "searchTags":["abc","def"],"searchMemeTags":["dog"]}
 //basic aggregation of relevance for the term overlaps
-async function Search_Meme_Images_Basic_Relevances(meme_tagging_search_obj){
+async function Search_Meme_Images_Basic_Relevances(tagging_search_obj){
 
     console.log(`in search Search_Meme_Images_Basic_Relevances`)
-    console.log(`the meme search term object is = ${JSON.stringify(meme_tagging_search_obj)}`)
+    console.log(`the meme search term object is = ${JSON.stringify(tagging_search_obj)}`)
 
+    await Get_All_Keys_From_DB()
+    all_keys = await Read_All_Keys_From_DB()
+    console.log(`all_keys = ${all_keys}`)
+    console.log(`length of all_keys ${all_keys.length}`)
+    key_search_scores = Array(all_keys.length).fill(0)
+    meme_key_relevance_scores = Array(all_keys.length).fill(0)
+
+    search_description_tags = tagging_search_obj["searchTags"]
+    search_emotions = tagging_search_obj["emotions"]
+    search_meme_tags = tagging_search_obj["searchMemeTags"]
+    console.log(`<<<<<------------>>>>>>>>`)
+    for(let key_ind=0; key_ind<all_keys.length; key_ind++){
+        record_key = all_keys[key_ind]
+        console.log(`looking at image=${record_key}`)
+        record_tmp = await Get_Record(record_key)
+        //image description tag overlap
+        record_tmp_tags = record_tmp["taggingTags"]
+        tags_overlap_score = (record_tmp_tags.filter(x => search_description_tags.includes(x))).length
+        //console.log(`the tag overlap score = ${tags_overlap_score}`)
+
+        emotion_overlap_score = 0
+        record_tmp_emotions = record_tmp["taggingEmotions"]
+        record_tmp_emotion_keys = Object.keys(record_tmp_emotions)
+        search_emotions_keys = Object.keys(search_emotions)
+        search_emotions_keys.forEach(search_key_emotion_label =>{
+            record_tmp_emotion_keys.forEach(record_emotion_key_label =>{
+                if(search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()){
+                    delta_tmp = (record_tmp_emotions[record_emotion_key_label] - search_emotions[search_key_emotion_label])/50
+                    emotion_overlap_score_tmp = 1 - Math.abs( delta_tmp )
+                    emotion_overlap_score += emotion_overlap_score_tmp
+                }
+            })
+        })
+        //console.log(`the final emotion overlap score = ${emotion_overlap_score}`)
+
+        meme_tag_overlap_score = 0
+        record_tmp_memes = record_tmp["taggingMemeChoices"]
+        console.log(`record_tmp tagging meme choices = ${record_tmp_memes}`)
+        for (let rtm=0; rtm<record_tmp_memes.length;rtm++){
+            meme_record_tmp = await Get_Record(record_tmp_memes[rtm])
+            meme_tmp_tags = meme_record_tmp["taggingTags"]
+            console.log(`the meme's tags = ${meme_tmp_tags}`)
+            console.log(`the search_meme_tags = ${search_meme_tags}`)
+            meme_tag_overlap_score_tmp = (meme_tmp_tags.filter(x => search_meme_tags.includes(x))).length
+            meme_tag_overlap_score += meme_tag_overlap_score_tmp            
+        }
+        //debatable whether the emotion overlap score should multiply the scores and be additive
+        total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score //tags_overlap_score +  +
+        console.log(`the total_image_match_score = ${total_image_match_score}`)    
+        key_search_scores[key_ind] = total_image_match_score
+
+        //now each meme gets a bonus for being present and then for the tag relevance
+        //if an image is present as a meme for an image add +1 to its memetic relevance
+        record_tmp_memes.forEach(meme_tmp => {
+                meme_key_ind = all_keys.indexOf(meme_tmp)
+                meme_key_relevance_scores[meme_key_ind] += 1 + total_image_match_score
+        })
+
+        console.log(`<<<<<------------>>>>>>>>`)
+    }
+    console.log(`the search score array key_search_scores= ${key_search_scores}`)
+    //for ranks where highest score is rank 1
+    key_search_scores_sorted = key_search_scores.slice().sort(function(a,b){return b-a})
+    //for ranks where the highest score is rank N
+    //key_search_scores_sorted = key_search_scores.slice().sort(function(a,b){return a-b})
+    key_search_scores_sorted_ranks = key_search_scores.map(function(v){ return key_search_scores_sorted.indexOf(v)+1 });
+    console.log(`key_search_scores_sorted_ranks = ${key_search_scores_sorted_ranks}`)
+    sorted_score_file_keys = []
+    sorted_score_file_meme_keys = []
+
+    //scale the scores of the meme counts based upon the rank
+    //scores are the rank of the image as a score and the 
+    //for(ii=0;ii<meme_key_relevance_scores.length;ii++){
+    //    meme_key_relevance_scores[ii] = (1 + key_search_scores[ii]) * (meme_key_relevance_scores[ii])
+    //}
+    meme_key_relevance_scores_sorted = meme_key_relevance_scores.slice().sort(function(a,b){return b-a})
+    meme_key_relevance_scores_sorted_ranks = meme_key_relevance_scores.map(function(v){ return meme_key_relevance_scores_sorted.indexOf(v)+1 });
+
+    while (key_search_scores_sorted_ranks.reduce((a, b) => a + b, 0) > 0) {
+        max_rank_val = Math.max(...key_search_scores_sorted_ranks)
+        index_max_val = key_search_scores_sorted_ranks.indexOf(max_rank_val)
+        sorted_score_file_keys.unshift( all_keys[index_max_val] )
+        key_search_scores_sorted_ranks[index_max_val] = 0
+    }
+
+    while (meme_key_relevance_scores_sorted_ranks.reduce((a, b) => a + b, 0) > 0) {
+        max_rank_val = Math.max(...meme_key_relevance_scores_sorted_ranks)
+        index_max_val = meme_key_relevance_scores_sorted_ranks.indexOf(max_rank_val)
+        sorted_score_file_meme_keys.unshift( all_keys[index_max_val] )
+        meme_key_relevance_scores_sorted_ranks[index_max_val] = 0
+    }
+
+    console.log(`drum role file sorted list sorted_score_file_keys = ${sorted_score_file_keys}`)
+    console.log(`and the meme scores of relevance = ${sorted_score_file_meme_keys}`)
+    console.log(`---exiting the search basic---`)
+    return [sorted_score_file_keys, sorted_score_file_meme_keys]
 
 }
 exports.Search_Meme_Images_Basic_Relevances = Search_Meme_Images_Basic_Relevances

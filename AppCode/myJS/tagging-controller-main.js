@@ -38,8 +38,15 @@ var image_files_in_dir = ''
 var last_user_image_directory_chosen = ''
 var processed_tag_word_list
 var image_index = 1;
+
+
+//For the search results of image searchees
 var search_results_selected = ''
 var search_results = ''
+//meme search results
+var search_meme_results_selected = ''
+var search_meme_results = ''
+
 
 //init method to run upon loading
 First_Display_Init(image_index); 
@@ -531,7 +538,7 @@ function Add_New_Meme(){
     }
     var select_image_search_order = document.getElementById("search-meme-modal-load-image-order")
     select_image_search_order.onclick = function() {
-        Choose_Meme_Search_Results()
+        Meme_Choose_Search_Results()
     }
 
         //populate the search meme modal with the fields to insert emotion tags and values
@@ -666,7 +673,7 @@ function Search_Meme_Image_Populate_Emotions(){
 
 
 //after the search is done and 
-function Choose_Meme_Search_Results(){
+function Meme_Choose_Search_Results(){
     //Now update the current file list with the new order of pics 'search_results' which comes from the 
     //DB search function
     if( search_complete == true ){
@@ -691,7 +698,6 @@ async function Modal_Meme_Search_Btn(){
     //after doing the search
     search_complete = true
 
-
     reg_exp_delims = /[#:,;| ]+/
 
     //annotation tags
@@ -713,42 +719,33 @@ async function Modal_Meme_Search_Btn(){
 
     console.log(`the meme search term object is = ${JSON.stringify(meme_tagging_search_obj)}`)
 
-
     //search the DB according to this set of criteria
     //look through the keys and find the overlapping set
+    search_meme_results = await TAGGING_IDB_MODULE.Search_Meme_Images_Basic_Relevances(meme_tagging_search_obj)
+    console.log(`search_results = ${search_results}`)
     
-    
-    search_results = await TAGGING_IDB_MODULE.Search_Meme_Images_Basic_Relevances(meme_tagging_search_obj)
-    /*
-    search_sorted_image_filename_keys = search_results[0]
-    search_sorted_meme_image_filename_keys = search_results[1]
-    console.log(`image_set_search done`)
+    search_sorted_image_filename_keys = search_meme_results[0]
+    search_sorted_meme_image_filename_keys = search_meme_results[1]
     console.log(`search_sorted_image_filename_keys = ${search_sorted_image_filename_keys}`)
     //>>SHOW SEARCH RESULTS<<
     //search images results annotations
-    search_image_results_output = document.getElementById("search-image-results-box-label")
-    
-    image_set_search = PATH.resolve(PATH.resolve())+PATH.sep+'Taga.png'
-    search_image_results_output.innerHTML = `<label id="search-image-results-box-label" class="form-label">image matches</label>`
+    search_image_results_output = document.getElementById("search-meme-image-results-box-label")
+
+    search_image_results_output.innerHTML = `<label id="search-meme-image-results-box-label" class="form-label">image matches</label>`
     search_image_results_output.insertAdjacentHTML('beforeend',"<br>")
-    //tmp = [1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,11,1,1,11,1,1,1,3]
     search_sorted_image_filename_keys.forEach(file_key => {
         console.log(`image file = ${TAGA_IMAGE_DIRECTORY}/${file_key}`)
         search_image_results_output.insertAdjacentHTML('beforeend', `<img class="imgSearchResult" src="${TAGA_IMAGE_DIRECTORY}/${file_key}">`)   //innerHTML += `<img class="imgSearchResult" src="${image_set_search}">`
     })
 
     //search meme results
-    search_meme_results_output = document.getElementById("search-modal-image-memes")
-    search_meme_results_output.innerHTML = `<label id="search-modal-image-memes-label" class="form-label">meme relevance</label>`
+    search_meme_results_output = document.getElementById("search-meme-modal-image-memes")
+    search_meme_results_output.innerHTML = `<label id="search-meme-modal-image-memes-label" class="form-label">meme relevance</label>`
     search_meme_results_output.insertAdjacentHTML('beforeend',"<br>")
-    //tmp = [1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,11,1,1,11,1,1,1,3]
     search_sorted_meme_image_filename_keys.forEach(file_key => {
         search_meme_results_output.insertAdjacentHTML('beforeend', `<img class="imgMemeResult" src="${TAGA_IMAGE_DIRECTORY}/${file_key}">`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
     })
-    */
-
-
-
+    
 
 }
 
