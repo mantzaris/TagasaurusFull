@@ -676,14 +676,37 @@ function Search_Meme_Image_Populate_Emotions(){
 function Meme_Choose_Search_Results(){
     //Now update the current file list with the new order of pics 'search_results' which comes from the 
     //DB search function
-    if( search_complete == true ){
-        console.log(`in choose image saerch resutls search_results = ${search_results}, search length = ${search_results.length}`)
+    if( search_meme_complete == true ){
+        console.log(`in choose image saerch resutls search_results = ${search_meme_results}, search length = ${search_meme_results.length}`)
+        
+        //meme selection switch check boxes
+        meme_switch_booleans = []
+        for (var ii = 0; ii < image_files_in_dir.length; ii++) {
+            meme_boolean_tmp1 = document.getElementById(`meme-choice-${image_files_in_dir[ii]}`).checked
+            meme_boolean_tmp2 = document.getElementById(`meme-image-choice-${image_files_in_dir[ii]}`).checked
+            if(meme_boolean_tmp1 == true || meme_boolean_tmp2 == true){
+                meme_switch_booleans.push(image_files_in_dir[ii])
+            }
+        }
+        console.log(`meme_switch_booleans = ${meme_switch_booleans}`)
+
+        /*
+        //now for the user meme image selection handling from the switches
+        //add an event listener for when a meme image is clicked and send the file name
+        files.forEach(file => {
+            document.getElementById(`memeImage-${file}`).addEventListener("click", function() {
+                Meme_Image_Clicked(file);
+            }, false);
+        })
+        
+    
         search_sorted_image_filename_keys = search_results[0]
         search_results_selected = search_sorted_image_filename_keys
         image_files_in_dir = search_results_selected
         image_index = 1;
         Load_State_Of_Image_IDB()
-        search_modal = document.getElementById("top-tagging-search-modal-id");
+        */
+        search_modal = document.getElementById("top-tagging-meme-search-modal-id");
         search_modal.style.display = "none";
     }
 
@@ -696,7 +719,7 @@ async function Modal_Meme_Search_Btn(){
 
     console.log(`search memes now!`)
     //after doing the search
-    search_complete = true
+    search_meme_complete = true
 
     reg_exp_delims = /[#:,;| ]+/
 
@@ -724,28 +747,36 @@ async function Modal_Meme_Search_Btn(){
     search_meme_results = await TAGGING_IDB_MODULE.Search_Meme_Images_Basic_Relevances(meme_tagging_search_obj)
     console.log(`search_results = ${search_results}`)
     
-    search_sorted_image_filename_keys = search_meme_results[0]
-    search_sorted_meme_image_filename_keys = search_meme_results[1]
-    console.log(`search_sorted_image_filename_keys = ${search_sorted_image_filename_keys}`)
+    search_sorted_meme_image_filename_keys = search_meme_results[0]
+    search_sorted_image_filename_keys = search_meme_results[1]
+    
     //>>SHOW SEARCH RESULTS<<
     //search images results annotations
     search_image_results_output = document.getElementById("search-meme-image-results-box-label")
 
-    search_image_results_output.innerHTML = `<label id="search-meme-image-results-box-label" class="form-label">image matches</label>`
-    search_image_results_output.insertAdjacentHTML('beforeend',"<br>")
-    search_sorted_image_filename_keys.forEach(file_key => {
-        console.log(`image file = ${TAGA_IMAGE_DIRECTORY}/${file_key}`)
-        search_image_results_output.insertAdjacentHTML('beforeend', `<img class="imgSearchResult" src="${TAGA_IMAGE_DIRECTORY}/${file_key}">`)   //innerHTML += `<img class="imgSearchResult" src="${image_set_search}">`
-    })
 
     //search meme results
     search_meme_results_output = document.getElementById("search-meme-modal-image-memes")
-    search_meme_results_output.innerHTML = `<label id="search-meme-modal-image-memes-label" class="form-label">meme relevance</label>`
+    search_meme_results_output.innerHTML = `<label id="search-meme-modal-image-memes-label" class="form-label">associated images</label>`
     search_meme_results_output.insertAdjacentHTML('beforeend',"<br>")
     search_sorted_meme_image_filename_keys.forEach(file_key => {
-        search_meme_results_output.insertAdjacentHTML('beforeend', `<img class="imgMemeResult" src="${TAGA_IMAGE_DIRECTORY}/${file_key}">`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
+        search_meme_results_output.insertAdjacentHTML('beforeend', `
+        <input class="custom-control custom-switch custom-control-input form-control-lg" type="checkbox" value="" id="meme-choice-${file_key}"> 
+        <img class="imgSearchMemeResult" src="${TAGA_IMAGE_DIRECTORY}/${file_key}"> <br>`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
     })
-    
+
+
+    search_image_results_output.innerHTML = `<label id="search-meme-image-results-box-label" class="form-label">dominant memes</label>`
+    search_image_results_output.insertAdjacentHTML('beforeend',"<br>")
+    search_sorted_image_filename_keys.forEach(file_key => {
+        console.log(`image file = ${TAGA_IMAGE_DIRECTORY}/${file_key}`)
+        search_image_results_output.insertAdjacentHTML('beforeend', ` 
+        <input class="custom-control custom-switch custom-control-input form-control-lg" type="checkbox" value="" id="meme-image-choice-${file_key}">  
+        <img class="imgSearchMemeResult" src="${TAGA_IMAGE_DIRECTORY}/${file_key}"> <br>`)   //innerHTML += `<img class="imgSearchResult" src="${image_set_search}">`
+    })
+
+
+
 
 }
 
