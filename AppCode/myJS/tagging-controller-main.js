@@ -191,12 +191,14 @@ async function Process_Image() {
 //called by the SAVE button to produce a JSON of the picture description state
 async function Save_Pic_State() {
 
+    new_record = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])//JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
+    current_memes = new_record.taggingMemeChoices
     //meme selection switch check boxes
     meme_switch_booleans = []
-    for (var ii = 0; ii < image_files_in_dir.length; ii++) {
-        meme_boolean_tmp = document.getElementById(`meme-${image_files_in_dir[ii]}`).checked
+    for (var ii = 0; ii < current_memes.length; ii++) {
+        meme_boolean_tmp = document.getElementById(`meme-${current_memes[ii]}`).checked
         if(meme_boolean_tmp == true){
-            meme_switch_booleans.push(image_files_in_dir[ii])
+            meme_switch_booleans.push(current_memes[ii])
         }
     }
     //the picture file name in context
@@ -204,7 +206,6 @@ async function Save_Pic_State() {
     //raw user entered text (prior to processing)
     rawDescription = document.getElementById('descriptionInput').value
 
-    new_record = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])//JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
     new_record.imageFileName = image_name
     new_record.taggingMemeChoices = meme_switch_booleans
     new_record.taggingRawDescription = rawDescription
@@ -689,7 +690,6 @@ async function Meme_Choose_Search_Results(){
             }
         }
         console.log(`meme_switch_booleans = ${meme_switch_booleans}`)
-
 
         //the picture file name in context
         image_name = `${image_files_in_dir[image_index - 1]}`

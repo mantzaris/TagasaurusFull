@@ -8,7 +8,7 @@ function Display_Image_State_Results(files,image_annotation){
     document.getElementById('taglist').appendChild(Make_Tag_HTML_UL( image_annotation["taggingTags"] ))
     document.getElementById('descriptionInput').value = image_annotation["taggingRawDescription"]
     document.getElementById('imgMain').src = `${TAGA_IMAGE_DIRECTORY}/${image_annotation["imageFileName"]}`;    
-    Meme_View_Fill(files)
+    Meme_View_Fill(files,image_annotation)
 
     meme_array = image_annotation["taggingMemeChoices"]
     for(ii=0;ii<meme_array.length;ii++){
@@ -50,22 +50,24 @@ function Emotion_Display_Fill(image_annotation){
 
 
 //populate the meme switch view with images
-function Meme_View_Fill(files) {
+function Meme_View_Fill(files,image_annotation) {
     document.getElementById('memes').innerHTML = ""
     meme_box = document.getElementById('memes')
+
+    meme_choices = image_annotation["taggingMemeChoices"]
     // for (ii = 0; ii < files.length; ii++) {
     //     meme_box.insertAdjacentHTML('beforeend', `<input class="form-check-input" 
     //             type="checkbox" value="" id="meme-${files[ii]}">
     //             <img height="50%" width="80%" src="${TAGA_IMAGE_DIRECTORY}/${files[ii]}" /><br>  `);
     // }
-    files.forEach(file =>{
+    meme_choices.forEach(file =>{
                 meme_box.insertAdjacentHTML('beforeend', `<input class="form-check-input" 
                     type="checkbox" value="" id="meme-${file}">
                     <img class="tagging-meme-image-class" title="view meme" id="memeImage-${file}" height="50%" width="80%" src="${TAGA_IMAGE_DIRECTORY}/${file}" /><br>  `);
     })
 
     //add an event listener for when a meme image is clicked and send the file name
-    files.forEach(file => {
+    meme_choices.forEach(file => {
         document.getElementById(`memeImage-${file}`).addEventListener("click", function() {
             Meme_Image_Clicked(file);
         }, false);
