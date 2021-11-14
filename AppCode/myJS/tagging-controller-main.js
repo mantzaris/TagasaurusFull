@@ -673,7 +673,7 @@ function Search_Meme_Image_Populate_Emotions(){
 
 
 //after the search is done and 
-function Meme_Choose_Search_Results(){
+async function Meme_Choose_Search_Results(){
     //Now update the current file list with the new order of pics 'search_results' which comes from the 
     //DB search function
     if( search_meme_complete == true ){
@@ -690,22 +690,20 @@ function Meme_Choose_Search_Results(){
         }
         console.log(`meme_switch_booleans = ${meme_switch_booleans}`)
 
-        /*
-        //now for the user meme image selection handling from the switches
-        //add an event listener for when a meme image is clicked and send the file name
-        files.forEach(file => {
-            document.getElementById(`memeImage-${file}`).addEventListener("click", function() {
-                Meme_Image_Clicked(file);
-            }, false);
-        })
-        
+
+        //the picture file name in context
+        image_name = `${image_files_in_dir[image_index - 1]}`
+        //raw user entered text (prior to processing)
+        rawDescription = document.getElementById('descriptionInput').value
     
-        search_sorted_image_filename_keys = search_results[0]
-        search_results_selected = search_sorted_image_filename_keys
-        image_files_in_dir = search_results_selected
-        image_index = 1;
+        record = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])//JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
+        
+        meme_switch_booleans.push(...record.taggingMemeChoices)        
+        record.taggingMemeChoices = [...new Set(meme_switch_booleans)]
+        await TAGGING_IDB_MODULE.Update_Record(record)
+        
         Load_State_Of_Image_IDB()
-        */
+
         search_modal = document.getElementById("top-tagging-meme-search-modal-id");
         search_modal.style.display = "none";
     }
