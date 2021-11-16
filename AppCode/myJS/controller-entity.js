@@ -3,11 +3,16 @@ const IPC_RENDERER_PICS = require('electron').ipcRenderer
 const PATH = require('path');
 const FSE = require('fs-extra');
 const FS = require('fs');
+const CRYPTO = require('crypto')
+
 
 const ENTITY_DB_FNS = require('./myJS/entity-db-fns.js');
 const MY_FILE_HELPER = require('./myJS/copy-new-file-helper.js')
 
-const DIR_PICS = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
+//TAGGING_IDB_MODULE_COPY = require('./myJS/tagging-db-fns.js'); //for the hash refs of the individual images
+const TAGGING_IDB_MODULE = require('./myJS/tagging-db-fns.js'); 
+
+const DIR_PICS = PATH.resolve(PATH.resolve(),'images') //PATH.resolve(__dirname, '..', 'images') //PATH.join(__dirname,'..','images')  //PATH.normalize(__dirname+PATH.sep+'..') + PATH.sep + 'images'     //__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
 
 //DOES NOT WORK CORRECTLY FOR SOME REASON
 const Toastify = require('toastify-js')
@@ -220,7 +225,7 @@ async function Add_Gallery_Images(){
         directory_of_image = PATH.dirname(result.filePaths[0])
         if(directory_of_image != DIR_PICS){//DIR_PICS
             console.log('files are not in the taga images directory')
-            files_tmp_base = MY_FILE_HELPER.Copy_Non_Taga_Files(result,DIR_PICS)
+            files_tmp_base = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,DIR_PICS)
             files_tmp_base.map(function(filePATH) {
                 filenamebase_tmp = PATH.parse(filePATH).base
                 if(image_set_tmp.includes(filenamebase_tmp) == false){
@@ -255,18 +260,59 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
     document.getElementById("entityName").textContent = '#' + current_entity_obj.entityName;
     //entity profile image
     default_img = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' + current_entity_obj.entityImage
-    document.getElementById("entityProfileImg").src = default_img;
+    
+    //check for missing pictures that are lingering links due to deletion in the image folder delete and default if empty
+    image_set = current_entity_obj.entityImageSet
+    new_image_set_tmp = []
+    for(ii=0;ii<image_set.length;ii++){
+        image_tmp = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' + image_set[ii]
+        if(FS.existsSync(image_tmp) == true){
+            new_image_set_tmp.push(image_set[ii])
+        }
+    }
+    console.log(`image_set = ${image_set}`)
+    console.log(`new_image_set_tmp = ${new_image_set_tmp}`)
+    reset_entity_imageset = false
+    if(image_set.length != new_image_set_tmp.length && new_image_set_tmp.length != 0){ //only some images not found
+        reset_entity_imageset = true
+    } else if(image_set == null || new_image_set_tmp == null){ //something went wrong
+        reset_entity_imageset = true
+        new_image_set_tmp = ['Taga.png']
+    } else if(new_image_set_tmp.length == 0){ //no images found
+        reset_entity_imageset == true
+        new_image_set_tmp.push('Taga.png')
+    }
+    if(reset_entity_imageset == true){
+        current_entity_obj.entityImageSet = new_image_set_tmp
+        image_set = new_image_set_tmp
+    }
+    console.log(`reset_entity_imageset = ${reset_entity_imageset}`)
+    //now the check for the entity image
+    console.log(`default_img exists= ${FS.existsSync(default_img)}`)
+    if(FS.existsSync(default_img) == true){
+        document.getElementById("entityProfileImg").src = default_img;
+    } else {
+        reset_entity_imageset = true
+        rand_ind = Math.floor(Math.random() * image_set.length)
+        current_entity_obj.entityImage = image_set[rand_ind]
+        default_img = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' + current_entity_obj.entityImage
+        document.getElementById("entityProfileImg").src = default_img;
+    }
+    if(reset_entity_imageset == true){ //update the object in the DB
+        ENTITY_DB_FNS.Update_Record(current_entity_obj)
+    }
+
     //include the collection set of images for the gallery of the entity
     gallery_html = `<div class="row">`
     gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="Add_Gallery_Images()">add more images</button><br>`
     gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="New_Gallery_Images()">new image set</button><br>`
     default_PATH = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' 
-    image_set = current_entity_obj.entityImageSet
+    
     image_set.forEach(element => {
         gallery_html += `
         <img class="imgG" src="${default_PATH + element}">
         `
-    });    
+    });
     gallery_html += `</div>`
     document.getElementById("entityGallery").innerHTML  = gallery_html;
     //entity annotations

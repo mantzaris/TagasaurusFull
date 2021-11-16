@@ -524,6 +524,7 @@ function Add_New_Meme(){
     search_tags_input = document.getElementById("search-meme-image-tags-entry-form")
     search_tags_input.value =""
 
+
     console.log(`add meme button pressed`)
 
     var search_modal = document.getElementById("top-tagging-meme-search-modal-id");
