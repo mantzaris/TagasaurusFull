@@ -60,7 +60,11 @@ async function Copy_Non_Taga_Files(result,dir_pics){
 }
 exports.Copy_Non_Taga_Files = Copy_Non_Taga_Files
 
-/*
+
+//this version of the copy non taga files accounts for images that may not be in the tagging DB for the hash 
+//to exist and therefore need to be 'ADDED TO THE TAGGING DB', by including the record of the hash or else
+//it just copies the file over with a new salt to the name allowing for the same image to be added with different 
+//names each time making duplicates. 
 async function Copy_Non_Taga_Files_Entity(result,dir_pics){
     new_filename_array = []
 
@@ -69,6 +73,7 @@ async function Copy_Non_Taga_Files_Entity(result,dir_pics){
     file_paths = result.filePaths    
     for (file_path of file_paths ) {
         file_hash_tmp = Return_File_Hash(file_path)
+        await TAGGING_IDB_MODULE.Create_Db()
         hash_exists = await TAGGING_IDB_MODULE.Check_File_Hash_Exists(file_hash_tmp)
         hash_in_current_set = current_file_hashes_tmp.some( hash => hash == file_hash_tmp )
         if(hash_exists == false && hash_in_current_set == false){
@@ -99,8 +104,7 @@ async function Copy_Non_Taga_Files_Entity(result,dir_pics){
     return new_filename_array
 
 }
-exports.Copy_Non_Taga_Files = Copy_Non_Taga_Files
-*/
+exports.Copy_Non_Taga_Files_Entity = Copy_Non_Taga_Files_Entity
 
 
 

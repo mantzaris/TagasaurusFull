@@ -17,6 +17,15 @@ const DIR_PICS = PATH.resolve(PATH.resolve(),'images') //PATH.resolve(__dirname,
 //DOES NOT WORK CORRECTLY FOR SOME REASON
 const Toastify = require('toastify-js')
 
+TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
+                                            "imageFileName": '',      
+                                            "imageFileHash": '',
+                                            "taggingRawDescription": "",
+                                            "taggingTags": [""],
+                                            "taggingEmotions": {good:0,bad:0},//{ happy: 0, sad: 0, confused: 0 },
+                                            "taggingMemeChoices": []
+                                            }
+
 
 var current_entity_obj; //it holds the object of the entity being in current context
 var all_entity_keys; //holds all the keys to the entities in the DB
@@ -151,21 +160,27 @@ function Set_Entity_Emotion_Values() {
 
 //called from the entity-main.html
 async function New_Entity_Image(){
-    
+    console.log(`<<<<<<----------New_Entity_Image()----------->>>>>>>>>>>`)
+    console.log(`TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = ${JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)}`)
     result = await IPC_RENDERER_PICS.invoke('dialog:openEntity')
     file_tmp = result.filePaths
     if(file_tmp.length > 0){
 
         directory_of_image = PATH.dirname(result.filePaths[0])
+        console.log(`directory_of_image = ${directory_of_image}`)
+        console.log(`result.filePaths = ${result.filePaths}`)
+
         if(directory_of_image != DIR_PICS){//DIR_PICS
             //must pass a string as a filename and not an array which this function returns
-            new_filename = MY_FILE_HELPER.Copy_Non_Taga_Files(result,DIR_PICS)[0]
+            new_filename = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,DIR_PICS)[0]
         } else{
             new_filename = PATH.parse(file_tmp[0]).base
         }
-
+        console.log(`new_filename = ${new_filename}`)
+        console.log(`current_entity_obj.entityImage = ${current_entity_obj.entityImage}`)
         current_entity_obj.entityImage = new_filename
         default_img = DIR_PICS + '/' + current_entity_obj.entityImage
+        console.log(`default_img = ${default_img}`)
         document.getElementById("entityProfileImg").src = default_img
         //include new image in the gallery image set if not already there
         image_set = current_entity_obj.entityImageSet
@@ -176,19 +191,20 @@ async function New_Entity_Image(){
         } else {
             //console.log('IN THE IMAGE SET ALREADY!!!!!')
         }
-        ENTITY_DB_FNS.Update_Record(current_entity_obj)
+        await ENTITY_DB_FNS.Update_Record(current_entity_obj)
         Show_Entity_From_Key_Or_Current_Entity(all_entity_keys[current_key_index],0)
     }
 }
 
 //assign a new set of images to the gallery which includes the entity image (replacement set)
 async function New_Gallery_Images(){
-
+    console.log(`<<<<<<----------New_Gallery_Images()----------->>>>>>>>>>>`)
     result = await IPC_RENDERER_PICS.invoke('dialog:openEntityImageSet')
     files_tmp = result.filePaths
     files_tmp_base = files_tmp.map(function(filePATH) {
         return PATH.parse(filePATH).base
     })
+    console.log(`files_tmp_base = ${files_tmp_base}, and files_tmp = ${files_tmp_base}`)
     if(files_tmp_base.length == 0){
         files_tmp_base = [current_entity_obj.entityImage]
     } else {        
@@ -250,72 +266,78 @@ async function Add_Gallery_Images(){
     }
 }
 
+
+//we use the key to pull the entity object from the DB, or if use_key=0 take the value
+//from the existing entity object global variable. 
 async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=1) {
 
+    //if using the key, the global object for the current entity shown is updated and this is 
+    //used, or else the current view from the data is presented.
     if(use_key == 1){
         current_entity_obj = await ENTITY_DB_FNS.Get_Record(entity_key_or_obj) 
-    } 
+    }
 
-    //entity name
-    document.getElementById("entityName").textContent = '#' + current_entity_obj.entityName;
-    //entity profile image
-    default_img = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' + current_entity_obj.entityImage
-    
-    //check for missing pictures that are lingering links due to deletion in the image folder delete and default if empty
+    //the Gallery image set for the entity
     image_set = current_entity_obj.entityImageSet
-    new_image_set_tmp = []
-    for(ii=0;ii<image_set.length;ii++){
-        image_tmp = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' + image_set[ii]
-        if(FS.existsSync(image_tmp) == true){
-            new_image_set_tmp.push(image_set[ii])
+
+    //a flag that the entity object has been modified or not so the DB is updated as well
+    update_entity_record = false
+    //from the entityImageSet, filter out missing images from Gallery, which images of 'entityImageSet' are missing
+    //which are missing, which are still present
+    image_set_present = []
+    image_set_missing = []
+    image_set.forEach(function(element,index) {
+        image_path_tmp = DIR_PICS + element
+        if(FS.existsSync(image_path_tmp) == true){
+            image_set_present.push(element)
+        } else {
+            image_set_missing.push(element)
         }
+    })
+    //there was at least one missing image so an update is needed
+    if(image_set_missing.length > 0){
+        update_entity_record = true
+        current_entity_obj.entityImageSet = image_set_present
+        image_set = image_set_present
     }
-    console.log(`image_set = ${image_set}`)
-    console.log(`new_image_set_tmp = ${new_image_set_tmp}`)
-    reset_entity_imageset = false
-    if(image_set.length != new_image_set_tmp.length && new_image_set_tmp.length != 0){ //only some images not found
-        reset_entity_imageset = true
-    } else if(image_set == null || new_image_set_tmp == null){ //something went wrong
-        reset_entity_imageset = true
-        new_image_set_tmp = ['Taga.png']
-    } else if(new_image_set_tmp.length == 0){ //no images found
-        reset_entity_imageset == true
-        new_image_set_tmp.push('Taga.png')
+    //if the image set is empty place a default
+    if(image_set.length == 0){
+        current_entity_obj.entityImageSet = ['Taga.png']
+        image_set = ['Taga.png']
     }
-    if(reset_entity_imageset == true){
-        current_entity_obj.entityImageSet = new_image_set_tmp
-        image_set = new_image_set_tmp
-    }
-    console.log(`reset_entity_imageset = ${reset_entity_imageset}`)
-    //now the check for the entity image
-    console.log(`default_img exists= ${FS.existsSync(default_img)}`)
-    if(FS.existsSync(default_img) == true){
-        document.getElementById("entityProfileImg").src = default_img;
-    } else {
-        reset_entity_imageset = true
+    //we don't update the DB of TAGGING but we could do wide update upon the discovery of a missing image
+    //update the object at the end sicne we may update memes as well later on
+
+    //now handle potential issues with the entity profile image
+    entity_profile_pic = current_entity_obj.entityImage
+    image_path_tmp = DIR_PICS + entity_profile_pic
+    //at this stage the image_set should be consistent with the directory and be non-empty
+    //update the profile pic with a sample from the image_set
+    if(FS.existsSync(image_path_tmp) == false){
         rand_ind = Math.floor(Math.random() * image_set.length)
         current_entity_obj.entityImage = image_set[rand_ind]
-        default_img = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' + current_entity_obj.entityImage
-        document.getElementById("entityProfileImg").src = default_img;
-    }
-    if(reset_entity_imageset == true){ //update the object in the DB
-        ENTITY_DB_FNS.Update_Record(current_entity_obj)
     }
 
-    //include the collection set of images for the gallery of the entity
+    //now display the entity profile image
+    document.getElementById("entityProfileImg").src = DIR_PICS + '/' + current_entity_obj.entityImage;
+    //display the entity hastag 'name'
+    document.getElementById("entityName").textContent = '#' + current_entity_obj.entityName;
+
+    //display the collection set of images for the gallery of the entity
     gallery_html = `<div class="row">`
     gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="Add_Gallery_Images()">add more images</button><br>`
     gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="New_Gallery_Images()">new image set</button><br>`
-    default_PATH = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images/' 
     
     image_set.forEach(element => {
         gallery_html += `
-        <img class="imgG" src="${default_PATH + element}">
+        <img class="imgG" src="${DIR_PICS + '/' + element}">
         `
     });
     gallery_html += `</div>`
     document.getElementById("entityGallery").innerHTML  = gallery_html;
-    //entity annotations
+    
+    
+    //entity annotations information
     if( document.getElementById("emotion_page_view") != null ){
         Set_Entity_Emotion_Values()
     } else if( document.getElementById("descriptionInputEntity") != null ){
@@ -323,6 +345,11 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
     } else if( document.getElementById("meme_page_view") != null ){
         Entity_Memes_Page()
     }   
+
+    //update the DB if there was a change
+    if(update_entity_record == true){ //update the object in the DB
+        ENTITY_DB_FNS.Update_Record(current_entity_obj)
+    }
 
 }
 
@@ -346,6 +373,9 @@ async function Next_Image() {
     
 }
 
+
+//The missing image filtering is not done in the initial stage here like in the Tagging where all missing
+//images are removed and the annotation objects removed
 async function Initialize_Entity_Page(){
     await ENTITY_DB_FNS.Create_Db() //sets a global variable in the module to hold the DB for access
     await ENTITY_DB_FNS.Get_All_Keys_From_DB() //gets all entity keys, sets them as a variable available for access later on
