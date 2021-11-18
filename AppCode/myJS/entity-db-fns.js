@@ -329,7 +329,7 @@ async function Check_Presence_Of_Entity_Profile_and_Gallery_Images_and_Memes(){
         });        
         resolve(42)
     })
-    get_record_promise.then(function(value){
+    await get_record_promise.then(function(value){
        //Check_Presence_Of_Gallery_Profile_Images()
         //console.log(`the returned promise value is === ${value}`)
     })

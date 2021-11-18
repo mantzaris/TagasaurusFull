@@ -161,7 +161,26 @@ function Set_Entity_Emotion_Values() {
 //called from the entity-main.html
 async function New_Entity_Image(){
     console.log(`<<<<<<----------New_Entity_Image()----------->>>>>>>>>>>`)
-    console.log(`TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = ${JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)}`)
+    
+    var search_modal = document.getElementById("top-profile-image-choice-modal-id");
+    search_modal.style.display = "block";
+    var close_element = document.getElementById("search-entityprofile-close-modal-id");
+    close_element.onclick = function() {
+        search_modal.style.display = "none";
+    }
+    window.onclick = function(event) {
+        if (event.target == search_modal) {
+            search_modal.style.display = "none";
+        }
+    }
+
+    // var select_image_search_order = document.getElementById("search-modal-load-image-order")
+    // select_image_search_order.onclick = function() {
+    //     Chose_Image_Search_Results()
+    // }
+
+    
+    /*
     result = await IPC_RENDERER_PICS.invoke('dialog:openEntity')
     file_tmp = result.filePaths
     if(file_tmp.length > 0){
@@ -194,6 +213,9 @@ async function New_Entity_Image(){
         await ENTITY_DB_FNS.Update_Record(current_entity_obj)
         Show_Entity_From_Key_Or_Current_Entity(all_entity_keys[current_key_index],0)
     }
+    */
+    
+
 }
 
 //assign a new set of images to the gallery which includes the entity image (replacement set)
@@ -353,6 +375,7 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
 
 }
 
+
 function Prev_Image() {
     if(current_key_index > 0){
         current_key_index += -1
@@ -381,7 +404,7 @@ async function Initialize_Entity_Page(){
     await ENTITY_DB_FNS.Get_All_Keys_From_DB() //gets all entity keys, sets them as a variable available for access later on
     all_entity_keys = ENTITY_DB_FNS.Read_All_Keys_From_DB() //retrieve the key set stored as a global within the module
 
-    ENTITY_DB_FNS.Check_Presence_Of_Entity_Profile_and_Gallery_Images_and_Memes()
+    await ENTITY_DB_FNS.Check_Presence_Of_Entity_Profile_and_Gallery_Images_and_Memes()
 
     await Show_Entity_From_Key_Or_Current_Entity(all_entity_keys[0]) //set the first entity to be seen, populate entity object data on view
     await Entity_Emotion_Page() //the entity annotation is the first page to see alternative is the text description

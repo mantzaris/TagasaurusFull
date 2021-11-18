@@ -1,0 +1,113 @@
+/* The Modal (background) */
+.top-profile-image-choice-modal-class {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.search-modal-entityprofile-content-class {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+  height: 90%;
+}
+
+/* The Close Button */
+.search-close-modal-entityprofile-class {
+  color: rgb(136, 133, 133);
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.search-close-modal-entityprofile-class:hover,
+.search-close-modal-entityprofile-class:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Modal Header */
+.search-modal-entityprofile-header {
+  padding: 2px 16px;
+  background-color: #5cb85c;
+  color: white;
+}
+
+/* Modal Body */
+.search-modal-body-entityprofile-class {
+  padding: 2px 16px;
+}
+
+/* Modal Footer */
+.meme-modal-footer-class {
+  padding: 2px 16px;
+  background-color: #5cb85c;
+  color: white;
+  font-size: large;
+}
+
+/* Modal Content */
+.search-modal-content-class {
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 0;
+  border: 1px solid #888;
+  width: 80%;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  animation-name: animatetop;
+  animation-duration: 0.4s;
+}
+
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+/* for the search results body */
+#modal-search-entityprofile-click-body-id {
+  display: grid;
+  /*grid-template-columns: repeat(3, 1fr);*/
+  gap: 5px;
+  height: 70%;
+  width: 100%;
+  border: 3px solid #4caf50;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+}
+
+#search-modal-entityprofile-results-buttons {
+  grid-row: 1 / 2;
+  grid-column: 1 / 7;
+  border: 3px solid #4caf50;
+}
+
+#search-modal-entityprofile-image-results {
+  grid-column: 1 / 5;
+  grid-row: 2 / 11;
+  border: 3px solid #4caf50;
+  overflow: auto; /* Enable scroll if needed */
+}
+#search-modal-entityprofile-image-memes {
+  grid-column: 5 / 7;
+  grid-row: 2 / 11;
+  border: 3px solid #4caf50;
+  overflow: auto; /* Enable scroll if needed */
+}
+
+.imgSearchResult {
+  width: 30%;
+  height: 30%;
+}
+
+.imgMemeResult {
+  width: 85%;
+  height: 40%;
+}
