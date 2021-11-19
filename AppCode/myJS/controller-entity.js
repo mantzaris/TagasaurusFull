@@ -161,6 +161,12 @@ function Set_Entity_Emotion_Values() {
 //called from the entity-main.html
 async function New_Entity_Image(){
     console.log(`<<<<<<----------New_Entity_Image()----------->>>>>>>>>>>`)
+
+    entity_profile_search_obj = {
+        emotions:{},
+        searchTags:[],
+        searchMemeTags:[]
+    }
     
     var search_modal = document.getElementById("top-profile-image-choice-modal-id");
     search_modal.style.display = "block";
@@ -174,6 +180,8 @@ async function New_Entity_Image(){
         }
     }
 
+    search_tags_input = document.getElementById("search-tags-entity-profileimage-entry-form")
+    search_tags_input.value =""
 
     //populate the search modal with the fields to insert emotion tags and values
     Search_Entity_ProfileImage_Populate_Emotions()
@@ -185,8 +193,24 @@ async function New_Entity_Image(){
     // select_image_search_order.onclick = function() {
     //     Chose_Image_Search_Results()
     // }
+    // var select_image_search_order = document.getElementById("search-modal-load-image-order")
+    // select_image_search_order.onclick = function() {
+    //     Chose_Image_Search_Results()
+    // }
+    // var select_meme_image_search_order = document.getElementById("search-modal-load-meme-order")
+    // select_meme_image_search_order.onclick = function() {
+    //     Chose_Meme_Image_Search_Results()
+    // }
 
-   
+    //populate the zone with images from the Gallery in the default order they are stored
+    search_entity_profileimage_results_output = document.getElementById("search-modal-entityprofile-image-results")
+    search_entity_profileimage_results_output.insertAdjacentHTML('beforeend',"<br>")
+    gallery_files = current_entity_obj.entityImageSet
+    gallery_files.forEach(file_key => {
+        search_entity_profileimage_results_output.insertAdjacentHTML('beforeend', `<img class="imgMemeResult" src="${DIR_PICS}/${file_key}">`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
+    })
+
+
 
 }
 
@@ -227,14 +251,16 @@ async function New_Gallery_Images(){
 
 //include an extra set of images to the gallery (on top of the previous set)
 async function Add_Gallery_Images(){
-
+    console.log(`add more images to the Gallery`)
     image_set_tmp = current_entity_obj.entityImageSet
+    console.log(`image_set_tmp = ${image_set_tmp}`)
     result = await IPC_RENDERER_PICS.invoke('dialog:openEntityImageSet')
     files_tmp = result.filePaths
+    console.log(`files_tmp = ${files_tmp}`)
     files_tmp_base = files_tmp.map(function(filePATH) {
         return PATH.parse(filePATH).base
     })
-
+    console.log(`files_tmp_base = ${files_tmp_base}`)
     if(files_tmp.length != 0){ //if nothing to add do nothing
 
         directory_of_image = PATH.dirname(result.filePaths[0])
@@ -259,8 +285,8 @@ async function Add_Gallery_Images(){
             files_tmp_base.push(current_entity_obj.entityImage)
         }
         current_entity_obj.entityImageSet = image_set_tmp
-
-        ENTITY_DB_FNS.Update_Record(current_entity_obj)
+        console.log(`image_set_tmp preupdate = ${image_set_tmp}`)
+        await ENTITY_DB_FNS.Update_Record(current_entity_obj)
         Show_Entity_From_Key_Or_Current_Entity(all_entity_keys[current_key_index],0)
     }
 }
@@ -275,7 +301,7 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
     if(use_key == 1){
         current_entity_obj = await ENTITY_DB_FNS.Get_Record(entity_key_or_obj) 
     }
-
+    console.log(`in Show Entity, current_entity_obj.entityImageSet = ${current_entity_obj.entityImageSet}`)
     //the Gallery image set for the entity
     image_set = current_entity_obj.entityImageSet
 
@@ -286,7 +312,7 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
     image_set_present = []
     image_set_missing = []
     image_set.forEach(function(element,index) {
-        image_path_tmp = DIR_PICS + element
+        image_path_tmp = DIR_PICS + '/' + element
         if(FS.existsSync(image_path_tmp) == true){
             image_set_present.push(element)
         } else {
@@ -306,7 +332,7 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
     }
     //we don't update the DB of TAGGING but we could do wide update upon the discovery of a missing image
     //update the object at the end sicne we may update memes as well later on
-
+    console.log(`in Show Entity, after missing filter, image_set= ${image_set}`)
     //now handle potential issues with the entity profile image
     entity_profile_pic = current_entity_obj.entityImage
     image_path_tmp = DIR_PICS + entity_profile_pic
