@@ -188,19 +188,10 @@ async function New_Entity_Image(){
     //populate the search modal with the fields to insert meme tags
     Search_Entity_ProfileImage_Populate_Memetic_Component()
 
-
-    // var select_image_search_order = document.getElementById("search-modal-load-image-order")
-    // select_image_search_order.onclick = function() {
-    //     Chose_Image_Search_Results()
-    // }
-    // var select_image_search_order = document.getElementById("search-modal-load-image-order")
-    // select_image_search_order.onclick = function() {
-    //     Chose_Image_Search_Results()
-    // }
-    // var select_meme_image_search_order = document.getElementById("search-modal-load-meme-order")
-    // select_meme_image_search_order.onclick = function() {
-    //     Chose_Meme_Image_Search_Results()
-    // }
+    var select_image_search_order = document.getElementById("search-entity-profileimage-searchorder-btn")
+    select_image_search_order.onclick = function() {
+        Entity_Profile_Image_Search()
+    }
 
     //populate the zone with images from the Gallery in the default order they are stored
     search_entity_profileimage_results_output = document.getElementById("search-modal-entityprofile-image-results")
@@ -210,9 +201,7 @@ async function New_Entity_Image(){
         search_entity_profileimage_results_output.insertAdjacentHTML('beforeend', `<img class="imgMemeResult" src="${DIR_PICS}/${file_key}">`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
     })
 
-
-
-}
+}         
 
 
 
@@ -334,11 +323,12 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
     //update the object at the end sicne we may update memes as well later on
     console.log(`in Show Entity, after missing filter, image_set= ${image_set}`)
     //now handle potential issues with the entity profile image
-    entity_profile_pic = current_entity_obj.entityImage
-    image_path_tmp = DIR_PICS + entity_profile_pic
+    entity_profile_pic = current_entity_obj.entityImage      
+    image_path_tmp = DIR_PICS + '/' + entity_profile_pic
     //at this stage the image_set should be consistent with the directory and be non-empty
     //update the profile pic with a sample from the image_set
-    if(FS.existsSync(image_path_tmp) == false){
+    if(FS.existsSync(image_path_tmp) == false){ 
+        console.log(`choosing random entity image from image_set`)
         rand_ind = Math.floor(Math.random() * image_set.length)
         current_entity_obj.entityImage = image_set[rand_ind]
     }
@@ -412,6 +402,7 @@ async function Initialize_Entity_Page(){
     await Show_Entity_From_Key_Or_Current_Entity(all_entity_keys[0]) //set the first entity to be seen, populate entity object data on view
     await Entity_Emotion_Page() //the entity annotation is the first page to see alternative is the text description
     
+    console.log(`in init, current_entity_obj = ${JSON.stringify(current_entity_obj)}`) 
 }
 
 //the key starting point for the page
@@ -496,6 +487,37 @@ function Search_Entity_ProfileImage_Populate_Memetic_Component(){
 
     meme_search_tags_div = document.getElementById(`modal-search-entity-profileimage-tags-input-div-id`)
     meme_search_tags_div.innerHTML = `<input type="text" class="form-control" id="search-entity-profileimage-tags-entry-form" placeholder="images that contain memes with theses tags">`
+
+}
+
+
+//entity_profile_search_obj = {
+//emotions:{},
+//searchTags:[],
+//searchMemeTags:[]
+//}
+function Entity_Profile_Image_Search(){
+
+    console.log(`choose entity image search`)
+
+    reg_exp_delims = /[#:,;| ]+/
+
+    //annotation tags
+    search_tags_input = document.getElementById("search-tags-entity-profileimage-entry-form").value
+    split_search_string = search_tags_input.split(reg_exp_delims)
+    search_unique_search_terms = [...new Set(split_search_string)]
+    entity_profile_search_obj["searchTags"] = search_unique_search_terms
+
+    //meme tags now    
+    search_meme_tags_input = document.getElementById("search-entity-profileimage-tags-entry-form").value
+    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
+    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+    entity_profile_search_obj["searchMemeTags"] = search_unique_meme_search_terms
+
+
+    console.log(`entity_profile_search_obj = ${JSON.stringify(entity_profile_search_obj)}`)
+
+
 
 }
 

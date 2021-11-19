@@ -348,7 +348,8 @@ async function Modal_Search_Entry() {
     search_unique_search_terms = [...new Set(split_search_string)]
     tagging_search_obj["searchTags"] = search_unique_search_terms
 
-    //emotions, the key values should already be in the search object
+    //!!!REDUNDANT???!!!>>>
+    //emotions, the key values should already be in the search object !!!NOT USED???!!!
     selected_emotion_value = document.getElementById("emotion-selector").value
     entered_emotion_label = document.getElementById("emotion-selector").value
     emotion_search_entry_value = document.getElementById("search-emotion-value-entry-id").value
