@@ -90,13 +90,13 @@
 }
 
 #search-modal-entityprofile-image-results {
-  grid-column: 1 / 5;
+  grid-column: 1 / 7;
   grid-row: 2 / 11;
   border: 3px solid #4caf50;
   overflow: auto; /* Enable scroll if needed */
 }
 #search-modal-entityprofile-image-memes {
-  grid-column: 5 / 7;
+  grid-column: 7 / 7;
   grid-row: 2 / 11;
   border: 3px solid #4caf50;
   overflow: auto; /* Enable scroll if needed */

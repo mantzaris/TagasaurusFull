@@ -174,49 +174,26 @@ async function New_Entity_Image(){
         }
     }
 
+
+    //populate the search modal with the fields to insert emotion tags and values
+    Search_Entity_ProfileImage_Populate_Emotions()
+    //populate the search modal with the fields to insert meme tags
+    Search_Entity_ProfileImage_Populate_Memetic_Component()
+
+
     // var select_image_search_order = document.getElementById("search-modal-load-image-order")
     // select_image_search_order.onclick = function() {
     //     Chose_Image_Search_Results()
     // }
 
-    
-    /*
-    result = await IPC_RENDERER_PICS.invoke('dialog:openEntity')
-    file_tmp = result.filePaths
-    if(file_tmp.length > 0){
-
-        directory_of_image = PATH.dirname(result.filePaths[0])
-        console.log(`directory_of_image = ${directory_of_image}`)
-        console.log(`result.filePaths = ${result.filePaths}`)
-
-        if(directory_of_image != DIR_PICS){//DIR_PICS
-            //must pass a string as a filename and not an array which this function returns
-            new_filename = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,DIR_PICS)[0]
-        } else{
-            new_filename = PATH.parse(file_tmp[0]).base
-        }
-        console.log(`new_filename = ${new_filename}`)
-        console.log(`current_entity_obj.entityImage = ${current_entity_obj.entityImage}`)
-        current_entity_obj.entityImage = new_filename
-        default_img = DIR_PICS + '/' + current_entity_obj.entityImage
-        console.log(`default_img = ${default_img}`)
-        document.getElementById("entityProfileImg").src = default_img
-        //include new image in the gallery image set if not already there
-        image_set = current_entity_obj.entityImageSet
-        if(image_set.includes(current_entity_obj.entityImage) == false){
-            image_set.push(current_entity_obj.entityImage)
-            current_entity_obj.entityImageSet = image_set
-
-        } else {
-            //console.log('IN THE IMAGE SET ALREADY!!!!!')
-        }
-        await ENTITY_DB_FNS.Update_Record(current_entity_obj)
-        Show_Entity_From_Key_Or_Current_Entity(all_entity_keys[current_key_index],0)
-    }
-    */
-    
+   
 
 }
+
+
+
+
+
 
 //assign a new set of images to the gallery which includes the entity image (replacement set)
 async function New_Gallery_Images(){
@@ -417,6 +394,84 @@ Initialize_Entity_Page()
 
 
 
+
+
+
+/*
+SEARCH STUFF ENTITY PROFILE IMAGES!!!
+*/
+entity_profile_search_obj = {
+    emotions:{},
+    searchTags:[],
+    searchMemeTags:[]
+}
+
+function Search_Entity_ProfileImage_Populate_Emotions(){
+
+    search_emotion_input_div = document.getElementById("modal-entity-profileimage-search-emotion-input-div-id")
+    search_emotion_input_div.innerHTML = ""
+    //search_emotion_input_div.innerHTML += `<button class="btn btn-primary btn-lg btn-block" id="search-entry-emotion-add-btn" type="button" onclick=""> &#xFF0B; </button>`
+    search_emotion_input_div.innerHTML += `<div class="input-group mb-3">
+                                                <button class="btn btn-primary btn-lg btn-block" id="search-entry-entity-profileimage-emotion-add-btn" type="button" onclick=""> &#xFF0B; </button>
+                                                
+                                                <input type="text" list="cars" id="emotion-entity-profileimage-selector" placeholder="enter emotion" />
+                                                <datalist id="cars" >
+                                                    <option>Good</option>
+                                                    <option>Bad</option>
+                                                    <option>Happy</option>
+                                                    <option>Confused</option>
+                                                </datalist>
+
+                                                <input type="range" class="form-range w-25" id="search-entity-profileimage-emotion-value-entry-id">
+                                            </div>
+                                            `
+    search_emotion_input_div.innerHTML += `<br>
+                                            <div id="emotion-entity-profileimage-search-terms">
+                                            
+                                            </div>
+                                            `
+
+    document.getElementById("search-entry-entity-profileimage-emotion-add-btn").addEventListener("click", function() {
+
+        current_emotion_keys = Object.keys(entity_profile_search_obj["emotions"])
+
+        selected_emotion_value = document.getElementById("emotion-entity-profileimage-selector").value
+        entered_emotion_label = document.getElementById("emotion-entity-profileimage-selector").value
+        emotion_search_entry_value = document.getElementById("search-entity-profileimage-emotion-value-entry-id").value
+
+        redundant_label_bool = current_emotion_keys.includes( entered_emotion_label )
+        entity_profile_search_obj["emotions"][entered_emotion_label] = emotion_search_entry_value
+
+        search_terms_output = ""
+        Object.keys(entity_profile_search_obj["emotions"]).forEach(emotion_key => {
+            search_terms_output += `<span id="emotion-entity-profileimage-text-search-${emotion_key}" style="white-space:nowrap">
+                                    <button type="button" class="close" aria-label="Close" id="remove-emotion-entity-profileimage-search-${emotion_key}">
+                                        &#10006
+                                    </button>
+                                    (emotion:${emotion_key}, value:${entity_profile_search_obj["emotions"][emotion_key]})</span>
+                                    `
+
+        })
+        document.getElementById("emotion-entity-profileimage-search-terms").innerHTML = search_terms_output
+
+        Object.keys(entity_profile_search_obj["emotions"]).forEach(emotion_key => {
+            document.getElementById(`remove-emotion-entity-profileimage-search-${emotion_key}`).addEventListener("click", function() {
+                search_emotion_search_span_html_obj = document.getElementById(`emotion-entity-profileimage-text-search-${emotion_key}`);
+                search_emotion_search_span_html_obj.remove();
+                delete entity_profile_search_obj["emotions"][emotion_key]
+            })
+        })
+
+    })
+}
+
+
+function Search_Entity_ProfileImage_Populate_Memetic_Component(){
+
+    meme_search_tags_div = document.getElementById(`modal-search-entity-profileimage-tags-input-div-id`)
+    meme_search_tags_div.innerHTML = `<input type="text" class="form-control" id="search-entity-profileimage-tags-entry-form" placeholder="images that contain memes with theses tags">`
+
+}
 
 
 /*
