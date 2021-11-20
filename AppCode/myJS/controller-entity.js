@@ -195,11 +195,19 @@ async function New_Entity_Image(){
 
     //populate the zone with images from the Gallery in the default order they are stored
     search_entity_profileimage_results_output = document.getElementById("search-modal-entityprofile-image-results")
+    search_entity_profileimage_results_output.innerHTML = ""
     search_entity_profileimage_results_output.insertAdjacentHTML('beforeend',"<br>")
     gallery_files = current_entity_obj.entityImageSet
     gallery_files.forEach(file_key => {
-        search_entity_profileimage_results_output.insertAdjacentHTML('beforeend', `<img class="imgMemeResult" src="${DIR_PICS}/${file_key}">`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
+        search_entity_profileimage_results_output.insertAdjacentHTML('beforeend', `<img class="imgMemeResult" id="entity-profile-image-candidate-id-${file_key}" src="${DIR_PICS}/${file_key}">`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
     })
+
+    //add an event listener to the images so that they emit an event to the user clicking on it
+    gallery_files.forEach(filename => {
+        document.getElementById(`entity-profile-image-candidate-id-${filename}`).addEventListener("click", function() {
+            Entity_Profile_Candidate_Image_Clicked(filename);
+        }, false);
+    });
 
 }         
 
@@ -343,14 +351,14 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
     gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="Add_Gallery_Images()">add more images</button><br>`
     gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="New_Gallery_Images()">new image set</button><br>`
     
-    image_set.forEach(element => {
+    image_set.forEach(filename => {
         gallery_html += `
-        <img class="imgG" src="${DIR_PICS + '/' + element}">
-        `
+        <img class="imgG" src="${DIR_PICS + '/' + filename}">
+        `        
     });
     gallery_html += `</div>`
     document.getElementById("entityGallery").innerHTML  = gallery_html;
-    
+
     
     //entity annotations information
     if( document.getElementById("emotion_page_view") != null ){
@@ -521,6 +529,20 @@ function Entity_Profile_Image_Search(){
 
 }
 
+
+//handle images being clicked by the user in choosing a new entity profile image
+function Entity_Profile_Candidate_Image_Clicked(filename){
+
+    console.log(`filename=${filename}, of the image clicked by the user in choosing a new entityprofile image`)
+    //set the current entity object profile image to the new file name, update the DB with the new assignment, redisplay
+    current_entity_obj.entityImage = filename
+    ENTITY_DB_FNS.Update_Record(current_entity_obj)
+    Show_Entity_From_Key_Or_Current_Entity(all_entity_keys[current_key_index])
+    //close modal
+    var search_modal = document.getElementById("top-profile-image-choice-modal-id");
+    search_modal.style.display = "none";
+
+}
 
 /*
     gallery_html = `<div class="row">`
