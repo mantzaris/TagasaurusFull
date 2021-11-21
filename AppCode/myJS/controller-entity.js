@@ -531,55 +531,89 @@ async function Entity_Profile_Image_Search(){
     search_emotions = entity_profile_search_obj["emotions"]
     search_meme_tags = entity_profile_search_obj["searchMemeTags"]
 
-
     //Get the annotation objects for the keys
-    ii = 0
-    await TAGGING_IDB_MODULE.Create_Db()
-    gallery_image_tmp  = gallery_images[ii]
-    gallery_image_tagging_annotation_obj_tmp = await TAGGING_IDB_MODULE.Get_Record(gallery_image_tmp)
-    console.log(`gallery_image_tagging_annotation_obj_tmp = ${JSON.stringify(gallery_image_tagging_annotation_obj_tmp)}`)
+    key_search_scores = Array(gallery_images.length).fill(0)
+    for(key_ind=0;key_ind<gallery_images.length;key_ind++){
+        await TAGGING_IDB_MODULE.Create_Db()
+        gallery_image_tmp  = gallery_images[key_ind]
+        gallery_image_tagging_annotation_obj_tmp = await TAGGING_IDB_MODULE.Get_Record(gallery_image_tmp)
+        console.log(`gallery_image_tagging_annotation_obj_tmp = ${JSON.stringify(gallery_image_tagging_annotation_obj_tmp)}`)
 
-    record_tmp_tags = gallery_image_tagging_annotation_obj_tmp["taggingTags"]
-    record_tmp_emotions = gallery_image_tagging_annotation_obj_tmp["taggingEmotions"]
-    record_tmp_memes = gallery_image_tagging_annotation_obj_tmp["taggingMemeChoices"]
+        record_tmp_tags = gallery_image_tagging_annotation_obj_tmp["taggingTags"]
+        record_tmp_emotions = gallery_image_tagging_annotation_obj_tmp["taggingEmotions"]
+        record_tmp_memes = gallery_image_tagging_annotation_obj_tmp["taggingMemeChoices"]
 
-    //get the score of the overlap of the object with the search terms
-    console.log(`record_tmp_tags = ${record_tmp_tags}`)
-    tags_overlap_score = (record_tmp_tags.filter(x => search_description_tags.includes(x))).length
-    console.log(`tags_overlap_score = ${tags_overlap_score}`)
+        //get the score of the overlap of the object with the search terms
+        console.log(`record_tmp_tags = ${record_tmp_tags}`)
+        tags_overlap_score = (record_tmp_tags.filter(x => search_description_tags.includes(x))).length
+        console.log(`tags_overlap_score = ${tags_overlap_score}`)
 
-    //get the score for the emotions
-    emotion_overlap_score = 0
-    record_tmp_emotion_keys = Object.keys(record_tmp_emotions)
-    search_emotions_keys = Object.keys(search_emotions)
-    search_emotions_keys.forEach(search_key_emotion_label =>{
-        record_tmp_emotion_keys.forEach(record_emotion_key_label =>{
-            if(search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()){
-                delta_tmp = (record_tmp_emotions[record_emotion_key_label] - search_emotions[search_key_emotion_label])/50
-                emotion_overlap_score_tmp = 1 - Math.abs( delta_tmp )
-                emotion_overlap_score += emotion_overlap_score_tmp
-            }
+        //get the score for the emotions
+        emotion_overlap_score = 0
+        record_tmp_emotion_keys = Object.keys(record_tmp_emotions)
+        search_emotions_keys = Object.keys(search_emotions)
+        search_emotions_keys.forEach(search_key_emotion_label =>{
+            record_tmp_emotion_keys.forEach(record_emotion_key_label =>{
+                if(search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()){
+                    delta_tmp = (record_tmp_emotions[record_emotion_key_label] - search_emotions[search_key_emotion_label])/50
+                    emotion_overlap_score_tmp = 1 - Math.abs( delta_tmp )
+                    emotion_overlap_score += emotion_overlap_score_tmp
+                }
+            })
         })
-    })
-    console.log(`emotion_overlap_score = ${emotion_overlap_score}`)
+        console.log(`emotion_overlap_score = ${emotion_overlap_score}`)
 
-    //get the score for the memes
-    meme_tag_overlap_score = 0
-    console.log(`record_tmp tagging meme choices = ${record_tmp_memes}`)
-    for (let rtm=0; rtm<record_tmp_memes.length;rtm++){
-        meme_record_tmp = await TAGGING_IDB_MODULE.Get_Record(record_tmp_memes[rtm])
-        meme_tmp_tags = meme_record_tmp["taggingTags"]
-        console.log(`the meme's tags = ${meme_tmp_tags}`)
-        console.log(`the search_meme_tags = ${search_meme_tags}`)
-        meme_tag_overlap_score_tmp = (meme_tmp_tags.filter(x => search_meme_tags.includes(x))).length
-        meme_tag_overlap_score += meme_tag_overlap_score_tmp            
+        //get the score for the memes
+        meme_tag_overlap_score = 0
+        console.log(`record_tmp tagging meme choices = ${record_tmp_memes}`)
+        for (let rtm=0; rtm<record_tmp_memes.length;rtm++){
+            meme_record_tmp = await TAGGING_IDB_MODULE.Get_Record(record_tmp_memes[rtm])
+            meme_tmp_tags = meme_record_tmp["taggingTags"]
+            console.log(`the meme's tags = ${meme_tmp_tags}`)
+            console.log(`the search_meme_tags = ${search_meme_tags}`)
+            meme_tag_overlap_score_tmp = (meme_tmp_tags.filter(x => search_meme_tags.includes(x))).length
+            meme_tag_overlap_score += meme_tag_overlap_score_tmp            
+        }
+        console.log(`meme_tag_overlap_score = ${meme_tag_overlap_score}`)
+
+        //get the overlap score for this image ii
+        total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score //tags_overlap_score +  +
+        console.log(`the total_image_match_score ${key_ind} = ${total_image_match_score}`)    
+        key_search_scores[key_ind] = total_image_match_score
     }
-    console.log(`meme_tag_overlap_score = ${meme_tag_overlap_score}`)
 
-    //get the overlap score for this image ii
-    total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score //tags_overlap_score +  +
-    console.log(`the total_image_match_score ${ii} = ${total_image_match_score}`)    
+    console.log(`key_search_scores = ${key_search_scores}`)
 
+    //now get the file sorted order via sort
+    //for ranks where highest score is rank 1
+    key_search_scores_sorted = key_search_scores.slice().sort(function(a,b){return b-a})
+    //for ranks where the highest score is rank N
+    //key_search_scores_sorted = key_search_scores.slice().sort(function(a,b){return a-b})
+    key_search_scores_sorted_ranks = key_search_scores.map(function(v){ return key_search_scores_sorted.indexOf(v)+1 });
+    console.log(`key_search_scores_sorted_ranks = ${key_search_scores_sorted_ranks}`)
+    sorted_score_file_keys = []
+    while (key_search_scores_sorted_ranks.reduce((a, b) => a + b, 0) > 0) {
+        max_rank_val = Math.max(...key_search_scores_sorted_ranks)
+        index_max_val = key_search_scores_sorted_ranks.indexOf(max_rank_val)
+        sorted_score_file_keys.unshift( gallery_images[index_max_val] )
+        key_search_scores_sorted_ranks[index_max_val] = 0
+    }
+
+    console.log(`drum role file sorted list sorted_score_file_keys = ${sorted_score_file_keys}`)
+
+    //populate the zone with images from the Gallery in the default order they are stored
+    search_entity_profileimage_results_output = document.getElementById("search-modal-entityprofile-image-results")
+    search_entity_profileimage_results_output.innerHTML = ""
+    search_entity_profileimage_results_output.insertAdjacentHTML('beforeend',"<br>")
+    sorted_score_file_keys.forEach(file_key => {
+        search_entity_profileimage_results_output.insertAdjacentHTML('beforeend', `<img class="imgMemeResult" id="entity-profile-image-candidate-id-${file_key}" src="${DIR_PICS}/${file_key}">`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
+    })
+    //add an event listener to the images so that they emit an event to the user clicking on it
+    sorted_score_file_keys.forEach(filename => {
+        document.getElementById(`entity-profile-image-candidate-id-${filename}`).addEventListener("click", function() {
+            Entity_Profile_Candidate_Image_Clicked(filename);
+        }, false);
+    });
 
 
 
