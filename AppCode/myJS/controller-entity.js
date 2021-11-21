@@ -504,7 +504,7 @@ function Search_Entity_ProfileImage_Populate_Memetic_Component(){
 //searchTags:[],
 //searchMemeTags:[]
 //}
-function Entity_Profile_Image_Search(){
+async function Entity_Profile_Image_Search(){
 
     console.log(`choose entity image search`)
 
@@ -522,8 +522,64 @@ function Entity_Profile_Image_Search(){
     search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
     entity_profile_search_obj["searchMemeTags"] = search_unique_meme_search_terms
 
-
     console.log(`entity_profile_search_obj = ${JSON.stringify(entity_profile_search_obj)}`)
+
+    gallery_images = current_entity_obj.entityImageSet
+    console.log(`gallery_images = ${gallery_images}`)
+
+    search_description_tags = entity_profile_search_obj["searchTags"]
+    search_emotions = entity_profile_search_obj["emotions"]
+    search_meme_tags = entity_profile_search_obj["searchMemeTags"]
+
+
+    //Get the annotation objects for the keys
+    ii = 0
+    await TAGGING_IDB_MODULE.Create_Db()
+    gallery_image_tmp  = gallery_images[ii]
+    gallery_image_tagging_annotation_obj_tmp = await TAGGING_IDB_MODULE.Get_Record(gallery_image_tmp)
+    console.log(`gallery_image_tagging_annotation_obj_tmp = ${JSON.stringify(gallery_image_tagging_annotation_obj_tmp)}`)
+
+    record_tmp_tags = gallery_image_tagging_annotation_obj_tmp["taggingTags"]
+    record_tmp_emotions = gallery_image_tagging_annotation_obj_tmp["taggingEmotions"]
+    record_tmp_memes = gallery_image_tagging_annotation_obj_tmp["taggingMemeChoices"]
+
+    //get the score of the overlap of the object with the search terms
+    console.log(`record_tmp_tags = ${record_tmp_tags}`)
+    tags_overlap_score = (record_tmp_tags.filter(x => search_description_tags.includes(x))).length
+    console.log(`tags_overlap_score = ${tags_overlap_score}`)
+
+    //get the score for the emotions
+    emotion_overlap_score = 0
+    record_tmp_emotion_keys = Object.keys(record_tmp_emotions)
+    search_emotions_keys = Object.keys(search_emotions)
+    search_emotions_keys.forEach(search_key_emotion_label =>{
+        record_tmp_emotion_keys.forEach(record_emotion_key_label =>{
+            if(search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()){
+                delta_tmp = (record_tmp_emotions[record_emotion_key_label] - search_emotions[search_key_emotion_label])/50
+                emotion_overlap_score_tmp = 1 - Math.abs( delta_tmp )
+                emotion_overlap_score += emotion_overlap_score_tmp
+            }
+        })
+    })
+    console.log(`emotion_overlap_score = ${emotion_overlap_score}`)
+
+    //get the score for the memes
+    meme_tag_overlap_score = 0
+    console.log(`record_tmp tagging meme choices = ${record_tmp_memes}`)
+    for (let rtm=0; rtm<record_tmp_memes.length;rtm++){
+        meme_record_tmp = await TAGGING_IDB_MODULE.Get_Record(record_tmp_memes[rtm])
+        meme_tmp_tags = meme_record_tmp["taggingTags"]
+        console.log(`the meme's tags = ${meme_tmp_tags}`)
+        console.log(`the search_meme_tags = ${search_meme_tags}`)
+        meme_tag_overlap_score_tmp = (meme_tmp_tags.filter(x => search_meme_tags.includes(x))).length
+        meme_tag_overlap_score += meme_tag_overlap_score_tmp            
+    }
+    console.log(`meme_tag_overlap_score = ${meme_tag_overlap_score}`)
+
+    //get the overlap score for this image ii
+    total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score //tags_overlap_score +  +
+    console.log(`the total_image_match_score ${ii} = ${total_image_match_score}`)    
+
 
 
 
