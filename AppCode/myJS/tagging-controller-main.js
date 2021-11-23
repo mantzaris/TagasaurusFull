@@ -520,10 +520,14 @@ function Add_New_Meme(){
         searchTags:[],
         searchMemeTags:[]
     }
+    //clear the search form from previous entries
     search_tags_input = document.getElementById("search-meme-tags-entry-form")
     search_tags_input.value =""
     search_tags_input = document.getElementById("search-meme-image-tags-entry-form")
     search_tags_input.value =""
+    //clear the previous search results
+    document.getElementById("search-meme-image-results-box-label").innerHTML = ""
+    document.getElementById("search-meme-modal-image-memes").innerHTML = ""
 
 
     console.log(`add meme button pressed`)
@@ -682,13 +686,18 @@ async function Meme_Choose_Search_Results(){
     if( search_meme_complete == true ){
         console.log(`in choose image saerch resutls search_results = ${search_meme_results}, search length = ${search_meme_results.length}`)
         
+        record = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])//JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
+        memes_current = record.taggingMemeChoices
+
         //meme selection switch check boxes
         meme_switch_booleans = []
         for (var ii = 0; ii < image_files_in_dir.length; ii++) {
-            meme_boolean_tmp1 = document.getElementById(`meme-choice-${image_files_in_dir[ii]}`).checked
-            meme_boolean_tmp2 = document.getElementById(`meme-image-choice-${image_files_in_dir[ii]}`).checked
-            if(meme_boolean_tmp1 == true || meme_boolean_tmp2 == true){
-                meme_switch_booleans.push(image_files_in_dir[ii])
+            if(memes_current.includes(image_files_in_dir[ii]) == false){  //exclude memes already present
+                meme_boolean_tmp1 = document.getElementById(`meme-choice-${image_files_in_dir[ii]}`).checked
+                meme_boolean_tmp2 = document.getElementById(`meme-image-choice-${image_files_in_dir[ii]}`).checked
+                if(meme_boolean_tmp1 == true || meme_boolean_tmp2 == true){
+                    meme_switch_booleans.push(image_files_in_dir[ii])
+                }
             }
         }
         console.log(`meme_switch_booleans = ${meme_switch_booleans}`)
@@ -697,9 +706,7 @@ async function Meme_Choose_Search_Results(){
         image_name = `${image_files_in_dir[image_index - 1]}`
         //raw user entered text (prior to processing)
         rawDescription = document.getElementById('descriptionInput').value
-    
-        record = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])//JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
-        
+            
         meme_switch_booleans.push(...record.taggingMemeChoices)        
         record.taggingMemeChoices = [...new Set(meme_switch_booleans)]
         await TAGGING_IDB_MODULE.Update_Record(record)
@@ -754,15 +761,20 @@ async function Modal_Meme_Search_Btn(){
     //search images results annotations
     search_image_results_output = document.getElementById("search-meme-image-results-box-label")
 
+    //get the record to know the memes that are present to not present any redundancy
+    record = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])//JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
+    memes_current = record.taggingMemeChoices
 
     //search meme results
     search_meme_results_output = document.getElementById("search-meme-modal-image-memes")
     search_meme_results_output.innerHTML = `<label id="search-meme-modal-image-memes-label" class="form-label">associated images</label>`
     search_meme_results_output.insertAdjacentHTML('beforeend',"<br>")
     search_sorted_meme_image_filename_keys.forEach(file_key => {
-        search_meme_results_output.insertAdjacentHTML('beforeend', `
-        <input class="custom-control custom-switch custom-control-input form-control-lg" type="checkbox" value="" id="meme-choice-${file_key}"> 
-        <img class="imgSearchMemeResult" src="${TAGA_IMAGE_DIRECTORY}/${file_key}"> <br>`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
+        if(memes_current.includes(file_key) == false){  //exclude memes already present
+            search_meme_results_output.insertAdjacentHTML('beforeend', `
+            <input class="custom-control custom-switch custom-control-input form-control-lg" type="checkbox" value="" id="meme-choice-${file_key}"> 
+            <img class="imgSearchMemeResult" src="${TAGA_IMAGE_DIRECTORY}/${file_key}"> <br>`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
+        }
     })
 
 
@@ -770,9 +782,11 @@ async function Modal_Meme_Search_Btn(){
     search_image_results_output.insertAdjacentHTML('beforeend',"<br>")
     search_sorted_image_filename_keys.forEach(file_key => {
         console.log(`image file = ${TAGA_IMAGE_DIRECTORY}/${file_key}`)
-        search_image_results_output.insertAdjacentHTML('beforeend', ` 
-        <input class="custom-control custom-switch custom-control-input form-control-lg" type="checkbox" value="" id="meme-image-choice-${file_key}">  
-        <img class="imgSearchMemeResult" src="${TAGA_IMAGE_DIRECTORY}/${file_key}"> <br>`)   //innerHTML += `<img class="imgSearchResult" src="${image_set_search}">`
+        if(memes_current.includes(file_key) == false){  //exclude memes already present
+            search_image_results_output.insertAdjacentHTML('beforeend', ` 
+            <input class="custom-control custom-switch custom-control-input form-control-lg" type="checkbox" value="" id="meme-image-choice-${file_key}">  
+            <img class="imgSearchMemeResult" src="${TAGA_IMAGE_DIRECTORY}/${file_key}"> <br>`)   //innerHTML += `<img class="imgSearchResult" src="${image_set_search}">`
+        }
     })
 
 
