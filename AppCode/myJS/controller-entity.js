@@ -14,6 +14,9 @@ const TAGGING_IDB_MODULE = require('./myJS/tagging-db-fns.js');
 
 const DIR_PICS = PATH.resolve(PATH.resolve(),'images') //PATH.resolve(__dirname, '..', 'images') //PATH.join(__dirname,'..','images')  //PATH.normalize(__dirname+PATH.sep+'..') + PATH.sep + 'images'     //__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
 
+//to produce tags from the textual description
+const DESCRIPTION_PROCESS_MODULE = require('./myJS/description-processing.js');
+
 //DOES NOT WORK CORRECTLY FOR SOME REASON
 const Toastify = require('toastify-js')
 
@@ -110,12 +113,37 @@ function Entity_Description_Page() {
     description_HTML_str += `<button type="button" class="btn btn-primary btn-lg" onclick="Save_Entity_Description()">Save</button>`
     document.getElementById('annotationPages').innerHTML = description_HTML_str
     document.getElementById("descriptionInputEntity").value = current_entity_obj.entityDescription
+
+    //now present the description 'tags' for the object
+    tags_element = document.getElementById("entity-tags")
+    if(tags_element != null){
+        tags_element.remove()
+    }
+    tag_strings_array = current_entity_obj.taggingTags
+    console.log(`in entity description page; tag_strings_array = ${tag_strings_array}`)
+    if(tag_strings_array != undefined){
+        tag_string_display = tag_strings_array.join(' ,')
+        document.getElementById('annotationPages').insertAdjacentHTML("afterend", '<p id="entity-tags">' + tag_string_display + '</p>')
+    } else {
+        document.getElementById('annotationPages').insertAdjacentHTML("afterend", `<p id="entity-tags"> Save a description!</p>`)
+    }
+
 }
 
 //takes the current description and updates the entity object in the DB with it
 function Save_Entity_Description() {
     current_entity_obj.entityDescription = document.getElementById("descriptionInputEntity").value
+
+    //now process  description text in order to have the tags
+    new_user_description = DESCRIPTION_PROCESS_MODULE.process_description(current_entity_obj.entityDescription)
+    tags_split = new_user_description.split(' ')
+    processed_tag_word_list = new_user_description.split(' ')
+    current_entity_obj.taggingTags = processed_tag_word_list
+    console.log(`current_entity_obj.taggingTags = ${current_entity_obj.taggingTags}, current_entity_obj.taggingTags length = ${current_entity_obj.taggingTags.length}`)
+
     ENTITY_DB_FNS.Update_Record(current_entity_obj)
+    Entity_Description_Page()
+
 }
 
 //create the entity emotion HTML view for the entity annotation
@@ -392,8 +420,7 @@ async function Next_Image() {
     } else {
         current_key_index = 0
     }
-    Show_Entity_From_Key_Or_Current_Entity(all_entity_keys[current_key_index])
-    
+    Show_Entity_From_Key_Or_Current_Entity(all_entity_keys[current_key_index])    
     
 }
 
@@ -408,7 +435,7 @@ async function Initialize_Entity_Page(){
     await ENTITY_DB_FNS.Check_Presence_Of_Entity_Profile_and_Gallery_Images_and_Memes()
 
     await Show_Entity_From_Key_Or_Current_Entity(all_entity_keys[0]) //set the first entity to be seen, populate entity object data on view
-    await Entity_Emotion_Page() //the entity annotation is the first page to see alternative is the text description
+    await Entity_Description_Page() //the Text Description annotation is the first page to see alternative is the text description
     
     console.log(`in init, current_entity_obj = ${JSON.stringify(current_entity_obj)}`) 
 }

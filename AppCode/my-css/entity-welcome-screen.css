@@ -92,8 +92,10 @@ html {
 }
 
 .textarea2 {
-  height: 70%;
-  width: 100%;
+  height: 60%;
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .row {
