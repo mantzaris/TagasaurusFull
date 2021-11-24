@@ -123,9 +123,9 @@ function Entity_Description_Page() {
     console.log(`in entity description page; tag_strings_array = ${tag_strings_array}`)
     if(tag_strings_array != undefined){
         tag_string_display = tag_strings_array.join(' ,')
-        document.getElementById('annotationPages').insertAdjacentHTML("afterend", '<p id="entity-tags">' + tag_string_display + '</p>')
+        document.getElementById('annotationPages').insertAdjacentHTML("beforeend", '<p id="entity-tags">' + tag_string_display + '</p>')
     } else {
-        document.getElementById('annotationPages').insertAdjacentHTML("afterend", `<p id="entity-tags"> Save a description!</p>`)
+        document.getElementById('annotationPages').insertAdjacentHTML("beforeend", `<p id="entity-tags"> Save a description!</p>`)
     }
 
 }
