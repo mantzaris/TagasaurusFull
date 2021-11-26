@@ -709,10 +709,6 @@ function Entity_Profile_Candidate_Image_Clicked(filename){
 
 
 
-
-
-
-
 //when the entity memes annotation page is select these page elements are present for the meme view
 function Entity_Memes_Page() {
     annotation_view_ind = 3
@@ -725,17 +721,50 @@ function Entity_Memes_Page() {
     memes_array = current_entity_obj.entityMemes //get the memes of the current object
 
     gallery_html = `<div class="row" id="meme_page_view">`
+    gallery_html += `<br><button type="button" class="btn btn-primary btn-lg" onclick="New_Entity_Memes()">Add new memes</button>`
+    gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="Save_Meme_Edits()">Save Edits</button>`
     memes_array = current_entity_obj.entityMemes
     if(memes_array != ""){
         memes_array.forEach(element => {
             gallery_html += `
+            <input type="checkbox" value="" id="entity-meme-${element}">
             <img class="imgG" src="${DIR_PICS + '/' + element}">
             `
         });
     }
-    gallery_html += `<br><button type="button" class="btn btn-primary btn-lg" onclick="New_Entity_Memes()">Add new memes</button>`
     document.getElementById("annotationPages").innerHTML  = gallery_html;
+    if(memes_array != ""){
+        memes_array.forEach(element => {
+            document.getElementById(`entity-meme-${element}`).checked = true
+        });
+    }
 }
+
+//to save the edits to the memes which is the deletions
+async function Save_Meme_Edits(){
+    console.log(`now saving the meme deletes`)
+
+    current_memes = current_entity_obj.entityMemes //get the memes of the current object
+    console.log(`current_memes = ${current_memes}`)
+    //meme selection switch check boxes
+    meme_switch_booleans = []
+    for (var ii = 0; ii < current_memes.length; ii++) {
+        meme_boolean_tmp = document.getElementById(`entity-meme-${current_memes[ii]}`).checked
+        if(meme_boolean_tmp == true){
+            meme_switch_booleans.push(current_memes[ii])
+        }
+    }
+
+    current_entity_obj.entityMemes = meme_switch_booleans
+
+    // for( var key of Object.keys(new_record["taggingEmotions"]) ){
+    //     new_record["taggingEmotions"][key] = document.getElementById('emotion_value-'+key).value
+    // }
+
+    await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+    Entity_Memes_Page()
+}
+
 
 /******************************
 MEME SEARCH STUFF!!!
