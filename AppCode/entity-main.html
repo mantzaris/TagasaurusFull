@@ -17,6 +17,9 @@
     <!-- model css for the entity profile image selection -->
     <link rel="stylesheet" href="./my-css-entity-collections/entity-profile-image-selection-modal.css">
 
+    <!-- modal css for the entity gallery image collection addition reusing previous CSS -->
+    <link rel="stylesheet" href="./tagging-extra-HTML-CSS/tagging-search-modal.css">
+
     <!-- search memes modal -->
     <link rel="stylesheet" href="./tagging-extra-HTML-CSS/tagging-meme-search-modal.css">
 
@@ -114,6 +117,41 @@
                     <label id="search-image-results-box-label" class="form-label">Click on image to become new collection entity profile image</label>
                 </div>
                 <div id="search-modal-entityprofile-image-results">
+                </div>
+            </div>
+            <div class="search-modal-footer-class" id="search-modal-footer-id">
+                <!-- <h3>Modal Footer</h3> -->
+            </div>
+        </div>        
+    </div>
+
+    <!-- ADD IMAGES TO THE ENTITY GALLERY -->
+    <div id="top-tagging-search-modal-id" class="top-tagging-search-modal-class">
+        <!-- Modal content -->
+        <div class="search-modal-content-class">
+            <div class="search-modal-header">
+                <span id="search-close-modal-id" class="search-close-modal-class">&times; Close &times;</span>
+                <h2 id="search-modal-header">Search images</h2>
+            </div>
+            <button class="btn btn-primary btn-lg btn-block" id="search-entry-btn" type="button" onclick="Search_For_Entity_Gallery_Images()">Search!</button>
+            <input type="text" class="form-control" id="search-tags-entry-form" aria-describedby="search" placeholder="enter search string (tags)">
+            <br>
+            <div id="modal-search-emotion-input-div-id">
+            </div>
+            
+            <div id="modal-search-meme-tags-input-div-id">
+            </div>
+            <hr>
+            <!-- search results -->
+            <div class="search-modal-body-class" id="modal-search-click-body-id">                
+                <div id="search-modal-results-buttons">
+                    <button class="btn btn-primary btn-sm btn-block" id="search-modal-load-image-order" type="button">load these selected images</button>
+                </div>
+                <div id="search-modal-image-results">
+                    <label id="search-image-results-box-label" class="form-label">image matches</label>
+                </div>
+                <div id="search-modal-image-memes">
+                    <label id="search-modal-image-memes-label" class="form-label">meme relevance</label>
                 </div>
             </div>
             <div class="search-modal-footer-class" id="search-modal-footer-id">

@@ -37,6 +37,8 @@ var all_entity_keys; //holds all the keys to the entities in the DB
 var current_key_index = 0; //which key index is currently in view for the current entity
 var annotation_view_ind = 1 //which view should be shown to the user when they flip through entities
 
+//gallery_image search_results
+search_results = []
 
 //meme search results
 var search_meme_results_selected = ''
@@ -312,47 +314,6 @@ async function New_Gallery_Images(){
 
 }
 
-//include an extra set of images to the gallery (on top of the previous set)
-async function Add_Gallery_Images(){
-    console.log(`add more images to the Gallery`)
-    image_set_tmp = current_entity_obj.entityImageSet
-    console.log(`image_set_tmp = ${image_set_tmp}`)
-    result = await IPC_RENDERER_PICS.invoke('dialog:openEntityImageSet')
-    files_tmp = result.filePaths
-    console.log(`files_tmp = ${files_tmp}`)
-    files_tmp_base = files_tmp.map(function(filePATH) {
-        return PATH.parse(filePATH).base
-    })
-    console.log(`files_tmp_base = ${files_tmp_base}`)
-    if(files_tmp.length != 0){ //if nothing to add do nothing
-
-        directory_of_image = PATH.dirname(result.filePaths[0])
-        if(directory_of_image != DIR_PICS){//DIR_PICS
-            console.log('files are not in the taga images directory')
-            files_tmp_base = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,DIR_PICS)
-            files_tmp_base.map(function(filePATH) {
-                filenamebase_tmp = PATH.parse(filePATH).base
-                if(image_set_tmp.includes(filenamebase_tmp) == false){
-                    image_set_tmp.push(filenamebase_tmp)
-                }
-            })
-        } else{
-            files_tmp.map(function(filePATH) {
-                filenamebase_tmp = PATH.parse(filePATH).base
-                if(image_set_tmp.includes(filenamebase_tmp) == false){
-                    image_set_tmp.push(filenamebase_tmp)
-                }
-            })
-        }
-        if(files_tmp_base.includes(current_entity_obj.entityImage) == false){
-            files_tmp_base.push(current_entity_obj.entityImage)
-        }
-        current_entity_obj.entityImageSet = image_set_tmp
-        console.log(`image_set_tmp preupdate = ${image_set_tmp}`)
-        await ENTITY_DB_FNS.Update_Record(current_entity_obj)
-        Show_Entity_From_Key_Or_Current_Entity(all_entity_keys[current_key_index],0)
-    }
-}
 
 
 //we use the key to pull the entity object from the DB, or if use_key=0 take the value
@@ -1048,6 +1009,256 @@ async function Meme_Choose_Search_Results(){
 
 
 
+//GALLERY IMAGE ADDITION
+tagging_search_obj = {
+    emotions:{},
+    searchTags:[],
+    searchMemeTags:[]
+}
+search_complete = false
+
+//include an extra set of images to the gallery (on top of the previous set)
+async function Add_Gallery_Images(){
+    console.log(`add more images to the Gallery`)
+    //XXX
+    tagging_search_obj = {
+        emotions:{},
+        searchTags:[],
+        searchMemeTags:[]
+    }
+    search_tags_input = document.getElementById("search-tags-entry-form")
+    search_tags_input.value =""
+    
+    var search_modal = document.getElementById("top-tagging-search-modal-id");
+    search_modal.style.display = "block";
+    var close_element = document.getElementById("search-close-modal-id");
+    close_element.onclick = function() {
+        search_modal.style.display = "none";
+    }
+    window.onclick = function(event) {
+        if (event.target == search_modal) {
+            search_modal.style.display = "none";
+        }
+    }
+    var select_image_search_order = document.getElementById("search-modal-load-image-order")
+    select_image_search_order.onclick = function() {
+        Choose_Entity_Gallery_Image_Results()
+    }
+
+    //populate the search modal with the fields to insert emotion tags and values
+    Search_Populate_Emotions()
+    //populate the search modal with the fields to insert meme tags
+    Search_Populate_Memetic_Component()
+    
+    Search_For_Entity_Gallery_Images()
+    search_complete = true
+
+}
+
+async function Search_For_Entity_Gallery_Images(){
+
+    console.log(`in function Add_Gallery_Images_Search_Entry()`)
+
+    reg_exp_delims = /[#:,;| ]+/
+
+    //annotation tags
+    search_tags_input = document.getElementById("search-tags-entry-form").value
+    split_search_string = search_tags_input.split(reg_exp_delims)
+    search_unique_search_terms = [...new Set(split_search_string)]
+    tagging_search_obj["searchTags"] = search_unique_search_terms
+
+    //!!!REDUNDANT???!!!>>>
+    //emotions, the key values should already be in the search object !!!NOT USED???!!!
+    selected_emotion_value = document.getElementById("emotion-selector").value
+    entered_emotion_label = document.getElementById("emotion-selector").value
+    emotion_search_entry_value = document.getElementById("search-emotion-value-entry-id").value
+
+    //meme tags now
+    search_meme_tags_input = document.getElementById("search-meme-tags-entry-form").value
+    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
+    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+    tagging_search_obj["searchMemeTags"] = search_unique_meme_search_terms
+
+    console.log(`the search term object is = ${JSON.stringify(tagging_search_obj)}`)
+
+
+    //search the DB according to this set of criteria
+    //look through the keys and find the overlapping set
+    await TAGGING_IDB_MODULE.Create_Db()
+    await TAGGING_IDB_MODULE.Get_All_Keys_From_DB()
+    search_results = await TAGGING_IDB_MODULE.Search_Images_Basic_Relevances(tagging_search_obj)
+    image_set = current_entity_obj.entityImageSet
+    search_sorted_image_filename_keys = search_results[0]
+    search_sorted_meme_image_filename_keys = search_results[1]
+    console.log(`image_set_search done`)
+    console.log(`search_sorted_image_filename_keys = ${search_sorted_image_filename_keys}`)
+    //>>SHOW SEARCH RESULTS<<
+    //search images results annotations
+    search_image_results_output = document.getElementById("search-modal-image-results")
+    
+    search_image_results_output.innerHTML = `<label id="search-image-results-box-label" class="form-label">image matches</label>`
+    search_image_results_output.insertAdjacentHTML('beforeend',"<br>")
+    search_sorted_image_filename_keys.forEach(file_key => {
+        console.log(`image file = ${TAGA_IMAGE_DIRECTORY}/${file_key}`)
+        if( image_set.includes(file_key) == false ){
+            search_image_results_output.insertAdjacentHTML('beforeend', `
+            <input class="custom-control custom-switch custom-control-input form-control-lg" type="checkbox" value="" id="gallery-image-choice-${file_key}">  
+            <img class="imgSearchResult" src="${TAGA_IMAGE_DIRECTORY}/${file_key}">`)   //innerHTML += `<img class="imgSearchResult" src="${image_set_search}">`
+        }
+    })
+
+    //search meme results
+    search_meme_results_output = document.getElementById("search-modal-image-memes")
+    search_meme_results_output.innerHTML = `<label id="search-modal-image-memes-label" class="form-label">meme relevance</label>`
+    search_meme_results_output.insertAdjacentHTML('beforeend',"<br>")
+    search_sorted_meme_image_filename_keys.forEach(file_key => {
+        if( image_set.includes(file_key) == false ){
+            search_meme_results_output.insertAdjacentHTML('beforeend', `
+            <input class="custom-control custom-switch custom-control-input form-control-lg" type="checkbox" value="" id="gallery-meme-image-choice-${file_key}">  
+            <img class="imgMemeResult" src="${TAGA_IMAGE_DIRECTORY}/${file_key}">`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
+        }
+    })
+
+}
+
+
+function Search_Populate_Emotions(){
+
+
+    search_emotion_input_div = document.getElementById("modal-search-emotion-input-div-id")
+    search_emotion_input_div.innerHTML = ""
+    //search_emotion_input_div.innerHTML += `<button class="btn btn-primary btn-lg btn-block" id="search-entry-emotion-add-btn" type="button" onclick=""> &#xFF0B; </button>`
+    search_emotion_input_div.innerHTML += `<div class="input-group mb-3">
+                                                <button class="btn btn-primary btn-lg btn-block" id="search-entry-emotion-add-btn" type="button" onclick=""> &#xFF0B; </button>
+                                                
+                                                <input type="text" list="cars" id="emotion-selector" placeholder="enter emotion" />
+                                                <datalist id="cars" >
+                                                    <option>Good</option>
+                                                    <option>Bad</option>
+                                                    <option>Happy</option>
+                                                    <option>Confused</option>
+                                                </datalist>
+
+                                                <input type="range" class="form-range w-25" id="search-emotion-value-entry-id">
+                                            </div>
+                                            `
+    search_emotion_input_div.innerHTML += `<br>
+                                            <div id="emotion-search-terms">
+                                            
+                                            </div>
+                                            `
+
+    document.getElementById("search-entry-emotion-add-btn").addEventListener("click", function() {
+
+        current_emotion_keys = Object.keys(tagging_search_obj["emotions"])
+
+        selected_emotion_value = document.getElementById("emotion-selector").value
+        entered_emotion_label = document.getElementById("emotion-selector").value
+        emotion_search_entry_value = document.getElementById("search-emotion-value-entry-id").value
+
+        redundant_label_bool = current_emotion_keys.includes( entered_emotion_label )
+        tagging_search_obj["emotions"][entered_emotion_label] = emotion_search_entry_value
+
+        search_terms_output = ""
+        Object.keys(tagging_search_obj["emotions"]).forEach(emotion_key => {
+            search_terms_output += `<span id="emotion-text-search-${emotion_key}" style="white-space:nowrap">
+                                    <button type="button" class="close" aria-label="Close" id="remove-emotion-search-${emotion_key}">
+                                        &#10006
+                                    </button>
+                                    (emotion:${emotion_key}, value:${tagging_search_obj["emotions"][emotion_key]})</span>
+                                    `
+
+        })
+        document.getElementById("emotion-search-terms").innerHTML = search_terms_output
+
+        Object.keys(tagging_search_obj["emotions"]).forEach(emotion_key => {
+            document.getElementById(`remove-emotion-search-${emotion_key}`).addEventListener("click", function() {
+                search_emotion_search_span_html_obj = document.getElementById(`emotion-text-search-${emotion_key}`);
+                search_emotion_search_span_html_obj.remove();
+                delete tagging_search_obj["emotions"][emotion_key]
+            })
+        })
+
+    })
+}
+
+function Search_Populate_Memetic_Component(){
+
+    meme_search_tags_div = document.getElementById(`modal-search-meme-tags-input-div-id`)
+    meme_search_tags_div.innerHTML = `<input type="text" class="form-control" id="search-meme-tags-entry-form" placeholder="images that contain memes with theses tags">`
+
+}
+
+
+async function Choose_Entity_Gallery_Image_Results(){
+
+    console.log(`in Choose_Entity_Gallery_Image_Results = ${search_results}, search length = ${search_results.length}`)
+    
+    if( search_complete == true ){
+        image_set = current_entity_obj.entityImageSet
+        search_sorted_image_filename_keys = search_results[0]
+        search_sorted_image_filename_keys.forEach(filename => {
+            if( image_set.includes(filename) == false ){
+                image_checked = document.getElementById(`gallery-image-choice-${filename}`).checked
+                meme_checked = document.getElementById(`gallery-meme-image-choice-${filename}`).checked
+                if(image_checked == true || meme_checked == true){
+                    image_set.push(filename)
+                }
+            }
+        })
+        current_entity_obj.entityImageSet = image_set
+        await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+        await Show_Entity_From_Key_Or_Current_Entity(all_entity_keys[current_key_index])
+        search_modal = document.getElementById("top-tagging-search-modal-id");
+        search_modal.style.display = "none";
+    }
+    
+    // if( search_complete == true ){
+    //     console.log(`in choose image saerch resutls search_results = ${search_meme_results}, search length = ${search_meme_results.length}`)
+        
+    //     //record = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])//JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
+    //     memes_current = current_entity_obj.entityMemes //memes_current = record.taggingMemeChoices
+
+    //     current_file_list_IDB = TAGGING_IDB_MODULE.Read_All_Keys_From_DB()
+    //     //meme selection switch check boxes
+    //     meme_switch_booleans = []
+    //     for (var ii = 0; ii < current_file_list_IDB.length; ii++) {
+    //         if(memes_current.includes(current_file_list_IDB[ii]) == false){  //exclude memes already present
+    //             meme_boolean_tmp1 = document.getElementById(`meme-choice-${current_file_list_IDB[ii]}`).checked
+    //             meme_boolean_tmp2 = document.getElementById(`meme-image-choice-${current_file_list_IDB[ii]}`).checked
+    //             if(meme_boolean_tmp1 == true || meme_boolean_tmp2 == true){
+    //                 meme_switch_booleans.push(current_file_list_IDB[ii])
+    //             }
+    //         }
+    //     }
+    //     console.log(`meme_switch_booleans = ${meme_switch_booleans}`)
+
+    //     //the picture file name in context
+    //     //image_name = `${image_files_in_dir[image_index - 1]}`
+    //     //raw user entered text (prior to processing)
+    //     //rawDescription = document.getElementById('descriptionInput').value
+        
+    //     meme_switch_booleans.push(...current_entity_obj.entityMemes)
+    //     current_entity_obj.entityMemes = [...new Set(meme_switch_booleans)]
+    //     //await TAGGING_IDB_MODULE.Update_Record(record)
+    //     await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+        
+    //     Entity_Memes_Page() //Load_State_Of_Image_IDB()
+
+    //     search_modal = document.getElementById("top-tagging-meme-search-modal-id");
+    //     search_modal.style.display = "none";
+    // }
+    
+    // search_sorted_image_filename_keys = search_results[0]
+    // search_results_selected = search_sorted_image_filename_keys
+    // image_files_in_dir = search_results_selected
+    // image_index = 1;
+    // Load_State_Of_Image_IDB()
+    // search_modal = document.getElementById("top-tagging-search-modal-id");
+    // search_modal.style.display = "none";
+
+
+}
 
 
 
