@@ -280,37 +280,24 @@ async function New_Entity_Image(){
 }         
 
 
-
-
-
-
 //assign a new set of images to the gallery which includes the entity image (replacement set)
-async function New_Gallery_Images(){
-    console.log(`<<<<<<----------New_Gallery_Images()----------->>>>>>>>>>>`)
-    result = await IPC_RENDERER_PICS.invoke('dialog:openEntityImageSet')
-    files_tmp = result.filePaths
-    files_tmp_base = files_tmp.map(function(filePATH) {
-        return PATH.parse(filePATH).base
-    })
-    console.log(`files_tmp_base = ${files_tmp_base}, and files_tmp = ${files_tmp_base}`)
-    if(files_tmp_base.length == 0){
-        files_tmp_base = [current_entity_obj.entityImage]
-    } else {        
-        directory_of_image = PATH.dirname(result.filePaths[0])
-        if(directory_of_image != DIR_PICS){//DIR_PICS
-            files_tmp_base = MY_FILE_HELPER.Copy_Non_Taga_Files(result,DIR_PICS)
-        } else{
-            //console.log('files are in the taga images directory')
-        }
+async function Remove_Gallery_Images(){
+    console.log(`<<<<<<----------Remove_Gallery_Images()----------->>>>>>>>>>>`)
 
-        if(files_tmp_base.includes(current_entity_obj.entityImage) == false){
-            files_tmp_base.push(current_entity_obj.entityImage)
-        }
+    gallery_files = current_entity_obj.entityImageSet
+    console.log(`gallery_files = ${gallery_files}`)
+    new_gallery_files = []
+    if(gallery_files.length != 0){
+        gallery_files.forEach(filename => {
+            console.log(`filename = ${filename}`)
+            if( document.getElementById(`gallery-view-image-choice-${filename}`).checked == true || filename == current_entity_obj.entityImage ){
+                new_gallery_files.push(filename)
+            }
+        });
+        current_entity_obj.entityImageSet = new_gallery_files
+        await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+        Show_Entity_From_Key_Or_Current_Entity(all_entity_keys[current_key_index])
     }
-
-    current_entity_obj.entityImageSet = files_tmp_base
-    ENTITY_DB_FNS.Update_Record(current_entity_obj)
-    Show_Entity_From_Key_Or_Current_Entity(all_entity_keys[current_key_index],0)
 
 }
 
@@ -384,15 +371,22 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
     //display the collection set of images for the gallery of the entity
     gallery_html = `<div class="row">`
     gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="Add_Gallery_Images()">add more images</button><br>`
-    gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="New_Gallery_Images()">new image set</button><br>`
+    gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="Remove_Gallery_Images()">save Gallery changes</button><br>`
     
     image_set.forEach(filename => {
         gallery_html += `
+        <input class="custom-control custom-switch custom-control-input form-control-lg" type="checkbox" value="" id="gallery-view-image-choice-${filename}">
         <img class="imgG" src="${DIR_PICS + '/' + filename}">
         `        
     });
     gallery_html += `</div>`
     document.getElementById("entityGallery").innerHTML  = gallery_html;
+
+    if(image_set.length != 0){
+        image_set.forEach(filename => {
+            document.getElementById(`gallery-view-image-choice-${filename}`).checked = true
+        });
+    }
 
     
     //entity annotations information
