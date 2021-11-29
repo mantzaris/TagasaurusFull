@@ -28,9 +28,13 @@ Mantzaris AV, Pandohie R, Hopwood M, Pho P, Ehling D, Walker TG.
 Technologies. 2021; 9(3):45. https://doi.org/10.3390/technologies9030045 
 ```
 
+Connect on the social
 
-(**Check out cool comic books and more from the author Vasexandros at [amazon](https://www.amazon.com/Vasexandros/e/B010RI6W0G%3Fref=dbs_a_mng_rwt_scns_share)**)
+- https://twitter.com/Tagasaurus_app
+- https://www.patreon.com/tagasaurus
+- https://www.facebook.com/TagasaurusApp/
 
+### (**Check out cool comic books and more from the author Vasexandros at [amazon](https://www.amazon.com/Vasexandros/e/B010RI6W0G%3Fref=dbs_a_mng_rwt_scns_share)**)
 
 
 <!---
