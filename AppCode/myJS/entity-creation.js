@@ -728,11 +728,11 @@ async function Search_For_Entity_Gallery_Images(){
     search_image_results_output.insertAdjacentHTML('beforeend',"<br>")
     search_sorted_image_filename_keys.forEach(file_key => {
         console.log(`image file = ${TAGA_IMAGE_DIRECTORY}/${file_key}`)
-        //if( image_set.includes(file_key) == false ){
+        if( file_key != entity_file_name ){
             search_image_results_output.insertAdjacentHTML('beforeend', `
             <input class="custom-control custom-switch custom-control-input form-control-lg" type="checkbox" value="" id="gallery-image-choice-${file_key}">  
             <img class="imgSearchResult" src="${TAGA_IMAGE_DIRECTORY}/${file_key}">`)   //innerHTML += `<img class="imgSearchResult" src="${image_set_search}">`
-        //}
+        }
     })
 
     //search meme results
@@ -740,11 +740,11 @@ async function Search_For_Entity_Gallery_Images(){
     search_meme_results_output.innerHTML = `<label id="search-modal-image-memes-label" class="form-label">meme relevance</label>`
     search_meme_results_output.insertAdjacentHTML('beforeend',"<br>")
     search_sorted_meme_image_filename_keys.forEach(file_key => {
-        //if( image_set.includes(file_key) == false ){
+        if( file_key != entity_file_name ){
             search_meme_results_output.insertAdjacentHTML('beforeend', `
             <input class="custom-control custom-switch custom-control-input form-control-lg" type="checkbox" value="" id="gallery-meme-image-choice-${file_key}">  
             <img class="imgMemeResult" src="${TAGA_IMAGE_DIRECTORY}/${file_key}">`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
-        //}
+        }
     })
 
 }
@@ -758,7 +758,8 @@ async function Choose_Entity_Gallery_Image_Results(){
         image_set = []//entity_image_set //current_entity_obj.entityImageSet
         search_sorted_image_filename_keys = search_results[0]
         search_sorted_image_filename_keys.forEach(filename => {
-            if( image_set.includes(filename) == false ){
+            if( image_set.includes(filename) == false && filename != entity_file_name ){
+                console.log(`about to look for: gallery-image-choice-${filename}`)
                 image_checked = document.getElementById(`gallery-image-choice-${filename}`).checked
                 meme_checked = document.getElementById(`gallery-meme-image-choice-${filename}`).checked
                 if(image_checked == true || meme_checked == true){
