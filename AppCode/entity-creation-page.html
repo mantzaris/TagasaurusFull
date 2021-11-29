@@ -20,6 +20,9 @@
     <!-- modal css for the entity gallery image collection addition reusing previous CSS -->
     <link rel="stylesheet" href="./tagging-extra-HTML-CSS/tagging-search-modal.css">
 
+    <!-- search memes modal -->
+    <link rel="stylesheet" href="./tagging-extra-HTML-CSS/tagging-meme-search-modal.css">
+
     <style>
     
     </style>
@@ -137,6 +140,52 @@
                 </div>
             </div>
             <div class="search-modal-footer-class" id="search-modal-footer-id">
+                <!-- <h3>Modal Footer</h3> -->
+            </div>
+        </div>        
+    </div>
+
+
+    <!-- the entity MEME choice popup modal -->
+    <div id="top-tagging-meme-search-modal-id" class="top-tagging-meme-search-modal-class">
+        <!-- Modal content -->
+        <div class="search-meme-modal-content-class">
+            <div class="search-meme-modal-header">
+                <span id="search-meme-close-modal-id" class="search-meme-close-modal-class">&times; Close &times;</span>
+                <h2 id="search-meme-modal-header">Search memes</h2>
+            </div>
+            
+            <button class="btn btn-primary btn-lg btn-block" id="search-meme-entry-btn" type="button" onclick="Modal_Meme_Search_Btn()">Search!</button>
+            <input type="text" class="form-control" id="search-meme-tags-entry-form" aria-describedby="search" placeholder="enter keywords of memes (tags)">
+            <br>
+            <div id="modal-meme-search-emotion-input-div-id">
+            </div>
+            <div id="modal-meme-search-image-tags-input-div-id">
+            </div>
+            <hr style="height:6px;border:none;color:#222;background-color:#222;">
+            <input type="text" class="form-control" id="search-meme-image-tags-entry-form" aria-describedby="search" placeholder="enter keywords of images associated with meme (tags)">
+            <br>
+            <div id="modal-meme-search-image-emotion-input-div-id">
+            </div>
+
+            <hr>
+
+            <!-- meme search results -->
+            <div class="search-meme-modal-body-class" id="modal-meme-search-click-body-id">                    
+                <div id="search-meme-modal-results-buttons">
+                    <button class="btn btn-primary btn-sm btn-block" id="search-meme-modal-load-image-order" type="button">load these selected memes and images</button>
+                </div>
+
+                <div id="search-meme-modal-image-results">
+                    <label id="search-meme-image-results-box-label" class="form-label">dominant memes</label>
+                </div>
+
+                <div id="search-meme-modal-image-memes">
+                    <label id="search-meme-modal-image-memes-label" class="form-label">associated images</label>
+                </div>
+            </div>
+
+            <div class="search-meme-modal-footer-class" id="search-meme-modal-footer-id">
                 <!-- <h3>Modal Footer</h3> -->
             </div>
         </div>        
