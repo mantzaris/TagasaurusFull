@@ -29,8 +29,11 @@ var entity_tag_name = ""
 var entity_file_name = ""
 var entity_description = ""
 var entity_image_set = ""
-var emotion_values = ""
+var emotion_values = {good:0,bad:0}
 var meme_image_set = ""
+
+
+
 
 
 //global variable for which stage in the creation the process the user is in
@@ -67,10 +70,16 @@ function Next_Btn_Step2() {
 
 //the button at the end to finish the entity creation and insert the new entity object as a record in the DB
 async function Finish_Btn() {
-    happy_value = document.getElementById('happy').value //emotion_values
-    sad_value = document.getElementById('sad').value
-    confused_value = document.getElementById('confused').value
-    if(happy_value == 0 && sad_value == 0 && confused_value == 0){
+    var total_emotion_value;
+    for( var key of Object.keys(emotion_values) ){
+        console.log(`key of emotion_values = ${emotion_values[key]}, and the value is ${document.getElementById('emotion_value-'+key).value}`)
+        emotion_values[key] = document.getElementById('emotion_value-'+key).value
+        total_emotion_value += emotion_values[key]
+    }
+    //happy_value = document.getElementById('happy').value //emotion_values
+    //sad_value = document.getElementById('sad').value
+    //confused_value = document.getElementById('confused').value
+    if(total_emotion_value > 0){
         vanilla_notify.vNotify.error({visibleDuration: 1200,fadeOutDuration: 250,
             fadeInDuration: 350, text: 'at least one non-zero emotion!', title:'attention'});
     } else{
@@ -79,9 +88,10 @@ async function Finish_Btn() {
                 "entityImage": entity_file_name,
                 "entityDescription": entity_description,
                 "entityImageSet": entity_image_set,
-                "entityEmotions": {happy:happy_value,sad:sad_value,confused:confused_value},            
+                "entityEmotions": emotion_values, //{happy:happy_value,sad:sad_value,confused:confused_value},            
                 "entityMemes": meme_image_set
             }
+        console.log(`entities_entry  ${JSON.stringify(entities_entry)}`)
         await ENTITY_DB_FNS.Insert_Record(entities_entry)
         //window redirect
         window.location="entity-main.html"
@@ -109,10 +119,14 @@ function Entity_CreationPage_Next() {
 //called to move to the previous step in the entity creation wizard
 function Entity_CreationPage_Previous() {
     if(step_ind == 3){
-        happy_value = document.getElementById('happy').value //we have to set the values manually since there is no event
-        sad_value = document.getElementById('sad').value //during the user interaction with the sliders
-        confused_value = document.getElementById('confused').value
-        emotion_values = {happy:happy_value,sad:sad_value,confused:confused_value}
+        for( var key of Object.keys(emotion_values) ){
+            console.log(`key of emotion_values = ${emotion_values[key]}`)
+            emotion_values[key] = document.getElementById(key).value
+        }
+        //happy_value = document.getElementById('happy').value //we have to set the values manually since there is no event
+        //sad_value = document.getElementById('sad').value //during the user interaction with the sliders
+        //confused_value = document.getElementById('confused').value
+        //emotion_values = {happy:happy_value,sad:sad_value,confused:confused_value}
     }
     if(step_ind > 1) {
         step_ind = step_ind - 1
@@ -170,14 +184,23 @@ function Entity_Fill_Delegation() {
     } else if(step_ind == 3) { //set the html to the components of stage 3 and the data entered by the user
         html_part = Part3_HTML()
         document.getElementById('partBody').innerHTML = html_part
+        Entity_Creation_Populate_Emotions()
         if(emotion_values == ""){ // initialize the emotion values if not already set
-            document.getElementById('happy').value = 0
-            document.getElementById('sad').value = 0
-            document.getElementById('confused').value = 0
+            for( var key of Object.keys(emotion_values) ){
+                console.log(`key of emotion_values = ${emotion_values[key]}`)
+                emotion_values[key] = 0 //document.getElementById(key).value
+            }
+            // document.getElementById('happy').value = 0
+            // document.getElementById('sad').value = 0
+            // document.getElementById('confused').value = 0
         } else { //display emotion values already entered
-            document.getElementById('happy').value = emotion_values.happy
-            document.getElementById('sad').value = emotion_values.sad
-            document.getElementById('confused').value = emotion_values.confused
+            for( var key of Object.keys(emotion_values) ){
+                console.log(`key of emotion_values = ${emotion_values[key]}, key = ${key}`)
+                document.getElementById('emotion_value-'+key).value = emotion_values[key]
+            }
+            // document.getElementById('happy').value = emotion_values.happy
+            // document.getElementById('sad').value = emotion_values.sad
+            // document.getElementById('confused').value = emotion_values.confused
         }
         if(meme_image_set != ""){ //if the meme set exists display it as well
             imgHTML_tmp = ""
@@ -247,12 +270,9 @@ function Part3_HTML() {
         <div class="emotion-page">                    
             <label id="emotion-box-title" class="form-label" style="font-size:2em;">EMOTIONS (*)</label>
             <hr>    
-            <label for="customRange1" class="form-label" style="font-size:1.5em;">happy range</label>
-            <input type="range" class="form-range" id="happy">                        
-            <label for="customRange1" class="form-label" style="font-size:1.5em;">sad range</label>
-            <input type="range" class="form-range" id="sad">
-            <label for="customRange1" class="form-label" style="font-size:1.5em;">confused range</label>
-            <input type="range" class="form-range" id="confused">
+
+            <div id="entity-creation-emotion-input-div-id">
+            </div>
         </div>        
         <hr>
         <label id="meme-box-title" class="form-label" style="font-size:2em;">Memes Connections * &rarr;</label>
@@ -267,7 +287,8 @@ function Part3_HTML() {
         <a type="button" style="background-color: #993333" class="btn btn-primary btn-lg" href="entity-main.html" >
             Cancel
         </a>
-        `        
+        `       
+    
     return htmlpart3
 }
 
@@ -835,6 +856,166 @@ function Search_Populate_Memetic_Component(){
     meme_search_tags_div.innerHTML = `<input type="text" class="form-control" id="search-meme-tags-entry-form" placeholder="images that contain memes with theses tags">`
 
 }
+
+
+//
+function Entity_Creation_Populate_Emotions(){
+
+
+
+    emotion_HTML = `<label id="emotion-box-title" class="form-label">EMOTIONS (*)</label>
+                    <br>
+                    <button class="btn btn-primary btn-sm btn-block" id="addEmotion" type="button" onclick="Add_New_Emotion()">Add new emotion</button>
+                    <input type="text" class="form-control" id="new-emotion-label" aria-describedby="new emotion" placeholder="new emotion">
+                    <hr> 
+                    <div class="emotion-div" id="emotion-values">
+                        
+                    </div>`
+    document.getElementById('entity-creation-emotion-input-div-id').innerHTML = emotion_HTML    
+    emotion_div = document.getElementById("emotion-values")
+    emotion_html_tmp = ''
+    for( var key of Object.keys(emotion_values) ){
+        console.log(`key of the button is: ${key}`)
+        emotion_html_tmp += `<label for="customRange1" class="form-label" id="emotion_name_label-${key}">${key}</label>
+                                <button type="button" class="close" aria-label="CloseL" id="emotion_delete_btn-${key}">
+                                &#10006
+                                </button>
+                                <input type="range" class="form-range" id="emotion_value-${key}">
+                                `
+    }
+    emotion_div.insertAdjacentHTML('beforeend', emotion_html_tmp);
+    console.log(`>>>emotion_values = ${JSON.stringify(emotion_values)}`)
+    
+    //emotion_HTML_tmp = `<button type="button" class="btn btn-primary btn-lg" onclick="Save_Entity_Emotions()">Save</button>`
+    //document.getElementById('entity-creation-emotion-input-div-id').innerHTML += emotion_HTML_tmp
+    for( var key of Object.keys(emotion_values) ){
+        console.log(`emotion_values[key] = ${emotion_values[key]}`)
+        document.getElementById('emotion_value-'+key).value = emotion_values[key]
+    }
+
+    emotion_keys = Object.keys(emotion_values)
+    emotion_keys.forEach(key_tmp => {
+        //key_tmp = emotion_keys[ii]
+        console.log(`key_tmp = ${key_tmp}`)
+        del_btn_element = document.getElementById(`emotion_delete_btn-${key_tmp}`)
+        document.getElementById(`emotion_delete_btn-${key_tmp}`).addEventListener("click", function() {
+            console.log(`about to call Delete_Emotion from Entity_Emotion_Page where key_tmp = ${key_tmp}`)
+            Delete_Emotion(`${key_tmp}`);
+            //test_key(key_tmp + '  (add new emotion)')
+        }, false);
+    })
+}
+
+//add a new emotion to the emotion set
+async function Add_New_Emotion(){
+    new_emotion_text = document.getElementById("new-emotion-label").value
+    console.log(` Add_New_Emotion() new_emotion_text = ${new_emotion_text}`)
+    if(new_emotion_text){
+        keys_tmp = Object.keys(emotion_values)
+        boolean_included = keys_tmp.includes(new_emotion_text)
+        if(boolean_included == false){
+            emotion_values[new_emotion_text] = 0
+            emotion_div = document.getElementById("emotion-values")
+            emotion_inner_html = `<label for="customRange1" class="form-label" id="emotion_name_label-${new_emotion_text}">${new_emotion_text}</label>
+                                        <button type="button" class="close" aria-label="Close" id="emotion_delete_btn-${new_emotion_text}">
+                                            &#10006
+                                        </button>
+                                        <input type="range" class="form-range" id="emotion_value-${new_emotion_text}">`
+            
+            emotion_div.insertAdjacentHTML('beforeend', emotion_inner_html);   
+            //add the delete emotion handler
+            console.log(`again...: Add_New_Emotion() new_emotion_text = ${new_emotion_text}`)
+            document.getElementById(`emotion_delete_btn-${new_emotion_text}`).addEventListener("click", function() {
+                console.log(`trying to delete emotion from Add_New_Emotion where new_emotion_text = ${new_emotion_text}`)
+                Delete_Emotion(`${new_emotion_text}`);
+                //test_key(new_emotion_text + '  (add new emotion)')
+            }, false);
+            document.getElementById('emotion_value-'+new_emotion_text).value = "0"
+            //await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+            //do not save upon addition of a new emotion, the save button is necessary
+            //await Process_Image()
+            document.getElementById("new-emotion-label").value = ""
+        } else {
+            document.getElementById("new-emotion-label").value = ""
+        }
+    }
+
+}
+
+
+//delete an emotion from the emotion set
+async function Delete_Emotion(emotion_key){
+    console.log(`in Delete_Emotion(emotion_key) ,\n emotion_key = ${emotion_key}`)
+    //emotion_name = emotion_key.split("-")[1]
+    element_slider_delete_btn = document.getElementById('emotion_delete_btn-'+emotion_key);
+    element_slider_delete_btn.remove();
+    element_slider_range = document.getElementById('emotion_value-'+emotion_key);
+    element_slider_range.remove();
+    element_emotion_label = document.getElementById('emotion_name_label-'+emotion_key);
+    element_emotion_label.remove();
+    delete emotion_values[emotion_key];
+    console.log(`in delete emotion emotion_values = ${JSON.stringify(emotion_values)}, keys = ${Object.keys(emotion_values)}`)
+    //await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+    Entity_Fill_Delegation() //Entity_Emotion_Page()
+}
+
+    // search_emotion_input_div = document.getElementById("entity-creation-emotion-input-div-id")
+    // search_emotion_input_div.innerHTML = ""
+    // //search_emotion_input_div.innerHTML += `<button class="btn btn-primary btn-lg btn-block" id="search-entry-emotion-add-btn" type="button" onclick=""> &#xFF0B; </button>`
+    // search_emotion_input_div.innerHTML += `<div class="input-group mb-3">
+    //                                             <button class="btn btn-primary btn-lg btn-block" id="search-entry-emotion-add-btn" type="button" onclick=""> &#xFF0B; </button>
+                                                
+    //                                             <input type="text" list="cars" id="emotion-selector" placeholder="enter emotion" />
+    //                                             <datalist id="cars" >
+    //                                                 <option>Good</option>
+    //                                                 <option>Bad</option>
+    //                                                 <option>Happy</option>
+    //                                                 <option>Confused</option>
+    //                                             </datalist>
+    //                                             <input type="range" class="form-range w-25" id="search-emotion-value-entry-id">
+    //                                         </div>
+    //                                         `
+    // search_emotion_input_div.innerHTML += `<br>
+    //                                         <div id="emotion-search-terms">
+                                            
+    //                                         </div>
+    //                                         `
+
+    // document.getElementById("search-entry-emotion-add-btn").addEventListener("click", function() {
+
+    //     current_emotion_keys = Object.keys(emotion_values["emotions"])
+
+    //     selected_emotion_value = document.getElementById("emotion-selector").value
+    //     entered_emotion_label = document.getElementById("emotion-selector").value
+    //     emotion_search_entry_value = document.getElementById("search-emotion-value-entry-id").value
+
+    //     redundant_label_bool = current_emotion_keys.includes( entered_emotion_label )
+    //     emotion_values[entered_emotion_label] = emotion_search_entry_value
+
+    //     search_terms_output = ""
+    //     Object.keys(emotion_values).forEach(emotion_key => {
+    //         search_terms_output += `<span id="emotion-text-search-${emotion_key}" style="white-space:nowrap">
+    //                                 <button type="button" class="close" aria-label="Close" id="remove-emotion-search-${emotion_key}">
+    //                                     &#10006
+    //                                 </button>
+    //                                 (emotion:${emotion_key}, value:${emotion_values[emotion_key]})</span>
+    //                                 `
+
+    //     })
+    //     document.getElementById("emotion-search-terms").innerHTML = search_terms_output
+
+    //     Object.keys(emotion_values).forEach(emotion_key => {
+    //         document.getElementById(`remove-emotion-search-${emotion_key}`).addEventListener("click", function() {
+    //             search_emotion_search_span_html_obj = document.getElementById(`emotion-text-search-${emotion_key}`);
+    //             search_emotion_search_span_html_obj.remove();
+    //             delete emotion_values[emotion_key]
+    //         })
+    //     })
+
+    // })
+
+
+
 
 
 /*
