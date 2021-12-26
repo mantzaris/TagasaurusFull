@@ -1,0 +1,474 @@
+/* <!-- mouth #005000-RGB(0,80,0) body #008800-RGB(0,136,0) iris #009e00-RGB(0,158,0) eyelid #00c600-RGB(0,198,0) background default  -->
+<!--  The gray for the general background 808a80  rgb(128, 138, 128)	-->
+<!--	The button background color	--> */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Verdana, sans-serif;
+}
+
+#tagging-screen-id {
+  display: grid;
+  grid-template-columns: 5fr 10fr 5fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  height: 100vh;
+  width: 100vw;
+  box-sizing: border-box;
+  grid-template-areas:
+    "emotions-gridbox-id   center-gridbox-id  description-gridbox"
+    "emotions-gridbox-id   center-gridbox-id  description-gridbox"
+    "emotions-gridbox-id   center-gridbox-id  description-gridbox"
+    "memes-gridbox-id      center-gridbox-id  description-gridbox"
+    "memes-gridbox-id      center-gridbox-id  hashtags-gridbox-id"
+    "memes-gridbox-id      center-gridbox-id  hashtags-gridbox-id"
+    "memes-gridbox-id      center-gridbox-id  hashtags-gridbox-id";
+  border-style: solid;
+  border-width: thin;
+  border-color: #005000;
+}
+
+#emotions-gridbox-id {
+  background-color: #808a80;
+  grid-area: emotions-gridbox-id;
+  display: grid;
+  grid-template-rows: 2fr 4fr 14fr;
+  box-sizing: border-box;
+  grid-template-areas:
+    "emotions-innerbox-label-id"
+    "emotions-innerbox-newemotions-id"
+    "emotions-innerbox-displayemotions-id";
+}
+
+#emotions-innerbox-newemotions-id {
+  /*background-color: #808a80;*/
+  grid-area: emotions-innerbox-newemotions-id;
+  overflow: hidden;
+}
+
+#hashtags-gridbox-id {
+  /* background-color: #BBBBBB; */
+  grid-area: hashtags-gridbox-id;
+}
+
+#emotions-gridbox-id,
+#center-gridbox-id,
+#description-gridbox-id,
+#memes-gridbox-id,
+#hashtags-gridbox-id {
+  border-color: #005000;
+  border-style: solid;
+  border-width: medium;
+}
+
+#emotions-innerbox-label-id {
+  background-color: #808a80;
+  grid-area: emotions-innerbox-label-id;
+  font-size: 3.75vmin;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+#emotion-text-label-id {
+  display: inline-block;
+  max-width: 60%;
+  max-height: 65%;
+  margin-bottom: 1.5em;
+  box-sizing: border-box;
+}
+
+#emotion-icon-id {
+  overflow: hidden;
+  width: 1em;
+  height: 1em;
+  float: left;
+}
+
+#add-new-emotion-button-id {
+  background-color: #1884ff;
+  display: block;
+  width: 95%;
+  margin-top: -0.2em;
+  border-radius: 12px;
+  font-size: 2vmin;
+  margin-left: auto;
+  margin-right: auto;
+  cursor: pointer;
+}
+
+#emotions-new-emotion-textarea-id {
+  width: 95%;
+  max-width: 95%;
+  height: 2vmin;
+  overflow: hidden;
+  font-size: 2vmin;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0.05em;
+  border-radius: 5px;
+}
+
+#emotion-text-range-value-label-left-id {
+  display: inline-block;
+  font-size: 2vmin;
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1em;
+}
+#emotion-text-range-value-label-right-id {
+  display: inline-block;
+  font-size: 2vmin;
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#new-emotion-range-id {
+  width: 60%;
+  background: #1884ff;
+}
+
+#emotions-innerbox-displayemotions-id {
+  background-color: #808a80;
+  grid-area: emotions-innerbox-displayemotions-id;
+  overflow-y: auto;
+  border-top: 5px #005000 dotted;
+}
+
+.emotion-delete-icon-class {
+  overflow: hidden;
+  width: 1.5em;
+  height: 1.5em;
+  float: left;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+  cursor: pointer;
+}
+
+.emotion-list-class {
+  border-bottom: 5px #005000 dotted;
+  padding-top: 0.3em;
+  padding-bottom: 0.3em;
+}
+
+.emotion-label-view-class {
+  font-size: 2.4vmin;
+}
+
+/* MEME COMPONENT STYLES */
+#memes-gridbox-id {
+  background-color: #808a80;
+  grid-area: memes-gridbox-id;
+  display: grid;
+  grid-template-rows: 1fr 1fr 12fr;
+  box-sizing: border-box;
+  grid-template-areas:
+    "memes-innerbox-label-id"
+    "memes-innerbox-newememes"
+    "memes-innerbox-displaymemes-id";
+}
+
+#memes-text-label-id {
+  display: inline-block;
+  max-width: 60%;
+  max-height: 65%;
+  margin-bottom: 1.5em;
+  box-sizing: border-box;
+}
+#memes-innerbox-label-id {
+  /*background-color: #7d910c;*/
+  grid-area: memes-innerbox-label-id;
+  font-size: 3.75vmin;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+#memes-icon-id {
+  overflow: hidden;
+  width: 1em;
+  height: 1em;
+  float: left;
+}
+#add-new-memes-button-id {
+  background-color: #1884ff;
+  display: block;
+  width: 95%;
+  margin-top: 0.1em;
+  border-radius: 12px;
+  font-size: 2vmin;
+  margin-left: auto;
+  margin-right: auto;
+  cursor: pointer;
+}
+#memes-innerbox-displaymemes-id {
+  background-color: #808a80;
+  grid-area: memes-innerbox-displaymemes-id;
+  overflow-y: auto;
+  border-top: 3px #005000 dotted;
+}
+
+.memes-img-class {
+  width: 100%;
+  object-fit: cover;
+}
+.memes-img-div-class {
+  overflow-y: auto;
+  max-height: 40vh;
+  margin-top: 0.2rem;
+  cursor: pointer;
+}
+
+/* TOGGLE (START) SWITCH FOR THE MEMES IN TAGGING */
+.memeswitch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 5%;
+}
+.memeswitch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ad2021;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 75%;
+  width: 26px;
+  left: 4px;
+  bottom: 0.2em;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+input:checked + .slider {
+  background-color: #1884ff;
+}
+input:focus + .slider {
+  box-shadow: 0 0 1px #1884ff;
+}
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+/* TOGGLE (END) SWITCH FOR THE MEMES IN TAGGING */
+
+/* DESCRIPTION AREA START */
+#description-gridbox-id {
+  grid-area: description-gridbox;
+  background-color: #808a80;
+  display: grid;
+  grid-template-rows: 1fr 15fr 2fr;
+  box-sizing: border-box;
+  grid-template-areas:
+    "description-label-div-gridarea-textentry-id"
+    "description-div-gridarea-textentry-id"
+    "buttons-div-gridarea-textentry";
+}
+#description-label-div-gridarea-textentry-id {
+  background-color: #808a80;
+  grid-area: description-label-div-gridarea-textentry-id;
+  font-size: 3.5vmin;
+  overflow: hidden;
+  box-sizing: border-box;
+  margin-top: -0.1em;
+}
+#description-text-label-id {
+}
+#description-div-gridarea-textentry-id {
+  grid-area: description-div-gridarea-textentry-id;
+}
+#description-textarea-id {
+  width: 95%;
+  max-width: 95%;
+  height: 95%;
+  overflow: hidden;
+  font-size: 2vmin;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0.05em;
+  border-radius: 5px;
+  margin: 0.2em;
+  overflow-y: scroll;
+}
+#buttons-div-gridarea-textentry-id {
+  grid-area: buttons-div-gridarea-textentry;
+}
+#save-button-id {
+  width: 48%;
+  height: 90%;
+  font-weight: bold;
+  font-size: 2vmin;
+  vertical-align: middle;
+  border-radius: 10%;
+  background-color: #1884ff;
+  cursor: pointer;
+}
+#reset-button-id {
+  width: 48%;
+  height: 90%;
+  font-weight: bold;
+  font-size: 2vmin;
+  vertical-align: middle;
+  border-radius: 10%;
+  background-color: #ad2021;
+  cursor: pointer;
+}
+
+/* DESCRIPTION AREA END */
+
+/* HASHTAGS GRID AREA START */
+#hashtags-gridbox-id {
+  background-color: #808a80;
+  grid-area: hashtags-gridbox-id;
+  display: grid;
+  grid-template-rows: 1fr 11fr;
+  box-sizing: border-box;
+  grid-template-areas:
+    "hashtags-innerbox-label-id"
+    "hashtags-innerbox-displayhashtags-id";
+}
+#hashtags-innerbox-label-id {
+  background-color: #808a80;
+  grid-area: hashtags-innerbox-label-id;
+  font-size: 3.75vmin;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+#hashtags-text-label-id {
+  display: inline-block;
+  max-width: 60%;
+  max-height: 65%;
+  margin-bottom: 1.5em;
+  box-sizing: border-box;
+}
+#hashtags-icon-id {
+  overflow: hidden;
+  width: 1em;
+  height: 1em;
+  float: left;
+}
+#hashtags-innerbox-displayhashtags-id {
+  background-color: #808a80;
+  grid-area: hashtags-innerbox-displayhashtags-id;
+  overflow-y: auto;
+  margin-top: 0.2em;
+  margin-bottom: 0em;
+}
+#hashtag-list-id {
+  padding-top: 0px;
+  padding-left: 0.75em;
+  font-weight: bold;
+}
+#hashtag-list-id li {
+  display: block;
+  padding-left: -0.125em;
+  /* background-color: #009e00; */
+  margin-bottom: 0.2em;
+  font-size: 3vmin;
+  word-wrap: break-word;
+}
+/* HASHTAGS GRID AREA END */
+
+/* CENTER GRID AREA START */
+#center-gridbox-id {
+  background-color: #808a80;
+  grid-area: center-gridbox-id;
+  display: grid;
+  grid-template-rows: 2fr 1fr 21fr; /* 1fr */
+  box-sizing: border-box;
+  grid-template-areas:
+    "center-button-area-div-id"
+    "center-lower-button-area-div-id"
+    "center-gallery-area-div-id";
+}
+.center-buttons {
+  font-weight: bold;
+  border-radius: 15%;
+  width: 90%;
+  margin: auto;
+  font-size: 2.5vmin;
+  height: 100%;
+  cursor: pointer;
+}
+#search-images-button-id,
+#load-new-image-button-id,
+#return-to-main-button-id,
+#left-gallery-image-button-id,
+#right-gallery-image-button-id {
+  background-color: #1884ff;
+}
+#delete-image-button-id {
+  background-color: #ad2021;
+}
+#center-button-area-div-id {
+  grid-area: center-button-area-div-id;
+  background-color: #808a80;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+.center-lower-buttons {
+  font-weight: bold;
+  border-radius: 25%;
+  width: 80%;
+  margin: auto;
+  font-size: 2.5vmin;
+  height: 100%;
+  cursor: pointer;
+}
+#center-lower-button-area-div-id {
+  grid-area: center-lower-button-area-div-id;
+  border-top: #005000 solid medium;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas: "left-gallery-image-button-id    right-gallery-image-button-id";
+}
+#left-gallery-image-button-id {
+  grid-area: left-gallery-image-button-id;
+  margin-right: 5px;
+  background-color: #1884ff;
+}
+#right-gallery-image-button-id {
+  grid-area: right-gallery-image-button-id;
+  margin-left: 5px;
+  background-color: #1884ff;
+}
+#center-gallery-area-div-id {
+  grid-area: center-gallery-area-div-id;
+  background-color: #808a80;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  position: relative;
+  border-top: #005000 solid medium;
+}
+
+#center-gallery-image-id {
+  width: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+
+  border-style: solid;
+  border-width: thin;
+  border-color: #00c600;
+}
+
+/* CENTER GRID AREA END */

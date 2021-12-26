@@ -1,0 +1,59 @@
+#modal-meme-clicked-grid-container-id {
+  width: 100%;
+  display: grid;
+  grid-template-rows: 1fr 1fr 9fr;
+  height: 100%;
+  /* box-sizing: border-box; */
+  padding: 0%;
+  grid-template-areas:
+    "modal-meme-clicked-tag-list-div-container-id"
+    "modal-meme-clicked-emotion-list-div-container-id"
+    "modal-meme-clicked-image-gridbox-id";
+}
+
+#modal-meme-clicked-tag-list-div-container-id {
+  background-color: #00c600;
+  grid-area: modal-meme-clicked-tag-list-div-container-id;
+  font-weight: bold;
+  font-size: 3vmin;
+  color: black;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow-x: scroll;
+  scrollbar-width: thin;
+  padding-left: 0.2em;
+}
+
+#modal-meme-clicked-emotion-list-div-container-id {
+  background-color: #00c600;
+  grid-area: modal-meme-clicked-emotion-list-div-container-id;
+  font-weight: bold;
+  font-size: 3vmin;
+  color: black;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow-x: scroll;
+  scrollbar-width: thin;
+  padding-left: 0.2em;
+}
+
+#modal-meme-clicked-image-gridbox-id {
+  background-color: #005000;
+  grid-area: modal-meme-clicked-image-gridbox-id;
+  overflow-y: hidden;
+}
+
+#modal-meme-clicked-displayimg-id {
+  height: 99999px;
+  object-fit: contain;
+  max-height: 100%;
+  max-width: 100%;
+  display: block;
+  margin: auto auto;
+}
