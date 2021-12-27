@@ -6,7 +6,7 @@ function Display_Image_State_Results(files,image_annotation){
 
     // document.getElementById('taglist').innerHTML = ''
     // document.getElementById('taglist').appendChild(Make_Tag_HTML_UL( image_annotation["taggingTags"] ))
-    // document.getElementById('descriptionInput').value = image_annotation["taggingRawDescription"]
+    document.getElementById('description-textarea-id').value = image_annotation["taggingRawDescription"]
     document.getElementById('center-gallery-image-id').src = `${TAGA_IMAGE_DIRECTORY}/${image_annotation["imageFileName"]}`;    
     // Meme_View_Fill(files,image_annotation)
 
@@ -161,7 +161,7 @@ function Reset_Image_View(files,image_annotation){
     for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
         document.getElementById(`emotion_value-${key}`).value = 0
     }
-    document.getElementById('descriptionInput').value = ''
+    document.getElementById('description-textarea-id').value = ''
     document.getElementById('taglist').innerHTML = ''
     for (var ii = 0; ii < files.length; ii++) {
         //val_obj[`${files[ii]}`] = false //each file name is the element ID for the tagging page

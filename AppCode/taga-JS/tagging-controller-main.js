@@ -192,7 +192,7 @@ async function Reset_Image(){
 
 //process image for saving including the text to tags (Called from the html Save button)
 async function Process_Image() {
-    user_description = document.getElementById('descriptionInput').value
+    user_description = document.getElementById('description-textarea-id').value
     new_user_description = DESCRIPTION_PROCESS_MODULE.process_description(user_description)
     tags_split = new_user_description.split(' ')
     processed_tag_word_list = new_user_description.split(' ')
@@ -215,7 +215,7 @@ async function Save_Pic_State() {
     //the picture file name in context
     image_name = `${image_files_in_dir[image_index - 1]}`
     //raw user entered text (prior to processing)
-    rawDescription = document.getElementById('descriptionInput').value
+    rawDescription = document.getElementById('description-textarea-id').value
 
     new_record.imageFileName = image_name
     new_record.taggingMemeChoices = meme_switch_booleans
@@ -716,7 +716,7 @@ async function Meme_Choose_Search_Results(){
         //the picture file name in context
         image_name = `${image_files_in_dir[image_index - 1]}`
         //raw user entered text (prior to processing)
-        rawDescription = document.getElementById('descriptionInput').value
+        rawDescription = document.getElementById('description-textarea-id').value //???
             
         meme_switch_booleans.push(...record.taggingMemeChoices)        
         record.taggingMemeChoices = [...new Set(meme_switch_booleans)]
