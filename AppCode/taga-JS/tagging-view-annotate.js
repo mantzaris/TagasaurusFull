@@ -4,8 +4,8 @@
 //set view to display image state results of query for a particular file name
 function Display_Image_State_Results(files,image_annotation){
 
-    // document.getElementById('taglist').innerHTML = ''
-    // document.getElementById('taglist').appendChild(Make_Tag_HTML_UL( image_annotation["taggingTags"] ))
+    document.getElementById('hashtags-innerbox-displayhashtags-id').innerHTML = ''
+    document.getElementById('hashtags-innerbox-displayhashtags-id').appendChild(Make_Tag_HTML_UL( image_annotation["taggingTags"] ))
     document.getElementById('description-textarea-id').value = image_annotation["taggingRawDescription"]
     document.getElementById('center-gallery-image-id').src = `${TAGA_IMAGE_DIRECTORY}/${image_annotation["imageFileName"]}`;    
     // Meme_View_Fill(files,image_annotation)
@@ -143,10 +143,17 @@ async function Meme_Image_Clicked(meme_file_name){
 function Make_Tag_HTML_UL(tag_array) {
     // Create the list element:
     var list = document.createElement('ul');
+    list.setAttribute("id", "hashtag-list-id");
+
     for (var i = 0; i < tag_array.length; i++) {
         // Create the list item:
         var item = document.createElement('li');
         // Set its contents:
+        // image_el = document.createElement("img");
+        // image_el.setAttribute("id", "hashtags-icon-id");
+        // image_el.setAttribute("src", "../AppCode/taga-ui-icons/HashtagGreen.png");
+        // item.appendChild(image_el);
+
         item.appendChild(document.createTextNode(tag_array[i]));
         // Add it to the list:
         list.appendChild(item);
@@ -162,7 +169,7 @@ function Reset_Image_View(files,image_annotation){
         document.getElementById(`emotion_value-${key}`).value = 0
     }
     document.getElementById('description-textarea-id').value = ''
-    document.getElementById('taglist').innerHTML = ''
+    document.getElementById('hashtags-innerbox-displayhashtags-id').innerHTML = ''
     for (var ii = 0; ii < files.length; ii++) {
         //val_obj[`${files[ii]}`] = false //each file name is the element ID for the tagging page
         document.getElementById(`meme-${files[ii]}`).checked = false 
