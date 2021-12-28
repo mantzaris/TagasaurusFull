@@ -40,13 +40,6 @@ function Emotion_Display_Fill(image_annotation){
                             </div>
                             `
 
-        // emotion_html_tmp += `<label for="customRange1" class="form-label" id="emotion_name_label-${key}">${key}</label>
-        //                         <button type="button" class="close" aria-label="CloseL" id="emotion_delete_btn-${key}">
-        //                         &#10006
-        //                         </button>
-        //                         <input type="range" class="form-range" id="emotion_value-${key}">
-        //                         `
-
     }
     emotion_div.insertAdjacentHTML('beforeend', emotion_html_tmp);
     emotion_keys = Object.keys(image_annotation["taggingEmotions"])

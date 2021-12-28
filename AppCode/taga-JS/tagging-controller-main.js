@@ -282,12 +282,17 @@ async function Add_New_Emotion(){
 //delete an emotion from the emotion set
 async function Delete_Emotion(emotion_key){
     //emotion_name = emotion_key.split("-")[1]
-    element_slider_delete_btn = document.getElementById('emotion_delete_btn-'+emotion_key);
-    element_slider_delete_btn.remove();
-    element_slider_range = document.getElementById('emotion_value-'+emotion_key);
-    element_slider_range.remove();
-    element_emotion_label = document.getElementById('emotion_name_label-'+emotion_key);
-    element_emotion_label.remove();
+
+    element_div = document.getElementById('emotion-entry-div-id-'+emotion_key);
+    element_div.remove();
+
+    // element_slider_delete_btn = document.getElementById('emotion_delete_btn-'+emotion_key);
+    // element_slider_delete_btn.remove();
+    // element_slider_range = document.getElementById('emotion_value-'+emotion_key);
+    // element_slider_range.remove();
+    // element_emotion_label = document.getElementById('emotion_name_label-'+emotion_key);
+    // element_emotion_label.remove();
+
     image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
     delete image_annotations["taggingEmotions"][emotion_key];
     await TAGGING_IDB_MODULE.Update_Record(image_annotations)
