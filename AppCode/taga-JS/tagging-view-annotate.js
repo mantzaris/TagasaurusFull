@@ -15,10 +15,10 @@ function Display_Image_State_Results(files,image_annotation){
     //     document.getElementById(`meme-${meme_array[ii]}`).checked = true
     // }
 
-    // Emotion_Display_Fill(image_annotation)
-    // for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
-    //     document.getElementById('emotion_value-'+key).value = image_annotation["taggingEmotions"][key]
-    // }
+    Emotion_Display_Fill(image_annotation)
+    for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
+        document.getElementById('emotion-range-id-'+key).value = image_annotation["taggingEmotions"][key]
+    }
     
 }
 exports.Display_Image_State_Results = Display_Image_State_Results
@@ -27,22 +27,31 @@ exports.Display_Image_State_Results = Display_Image_State_Results
 //populate the emotion value view with emotional values
 //the div in the html for the emotion values is id="emotion-values"
 function Emotion_Display_Fill(image_annotation){
-    document.getElementById("emotion-values").innerHTML = ""
-    emotion_div = document.getElementById("emotion-values")
+    document.getElementById("emotion-collectionlist-div-id").innerHTML = ""
+    emotion_div = document.getElementById("emotion-collectionlist-div-id")
     emotion_html_tmp = ''
     for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
 
-        emotion_html_tmp += `<label for="customRange1" class="form-label" id="emotion_name_label-${key}">${key}</label>
-                                <button type="button" class="close" aria-label="CloseL" id="emotion_delete_btn-${key}">
-                                &#10006
-                                </button>
-                                <input type="range" class="form-range" id="emotion_value-${key}">
-                                `
+        emotion_html_tmp += `<div class="emotion-list-class" id="emotion-entry-div-id-${key}">
+                                <img class="emotion-delete-icon-class" id="emotion-delete-button-id-${key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+                                    onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" alt="emotions" title="remove"  />
+                                <span class="emotion-label-view-class" id="emotion-id-label-view-name-${key}">${key}</span>
+                                <input id="emotion-range-id-${key}" type="range" min="0" max="100" value="0">
+                            </div>
+                            `
+
+        // emotion_html_tmp += `<label for="customRange1" class="form-label" id="emotion_name_label-${key}">${key}</label>
+        //                         <button type="button" class="close" aria-label="CloseL" id="emotion_delete_btn-${key}">
+        //                         &#10006
+        //                         </button>
+        //                         <input type="range" class="form-range" id="emotion_value-${key}">
+        //                         `
+
     }
     emotion_div.insertAdjacentHTML('beforeend', emotion_html_tmp);
     emotion_keys = Object.keys(image_annotation["taggingEmotions"])
     emotion_keys.forEach(function(key_tmp, index){
-        document.getElementById(`emotion_delete_btn-${key_tmp}`).addEventListener("click", function() {
+        document.getElementById(`emotion-delete-button-id-${key_tmp}`).addEventListener("click", function() {
             Delete_Emotion(`${key_tmp}`);
         }, false);
     })
@@ -149,10 +158,10 @@ function Make_Tag_HTML_UL(tag_array) {
         // Create the list item:
         var item = document.createElement('li');
         // Set its contents:
-        // image_el = document.createElement("img");
-        // image_el.setAttribute("id", "hashtags-icon-id");
-        // image_el.setAttribute("src", "../AppCode/taga-ui-icons/HashtagGreen.png");
-        // item.appendChild(image_el);
+        image_el = document.createElement("img");
+        image_el.setAttribute("id", "hashtags-icon-id");
+        image_el.setAttribute("src", "../AppCode/taga-ui-icons/HashtagGreen.png");
+        item.appendChild(image_el);
 
         item.appendChild(document.createTextNode(tag_array[i]));
         // Add it to the list:
