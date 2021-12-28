@@ -94,8 +94,9 @@ async function First_Display_Init() {
     document.getElementById(`right-gallery-image-button-id`).addEventListener("click", function() {
         New_Image_Display(+1);
     }, false);
-
-    
+    document.getElementById(`add-new-emotion-button-id`).addEventListener("click", function() {
+        Add_New_Emotion();
+    }, false);
 
     await TAGGING_IDB_MODULE.Create_Db()
     await TAGGING_IDB_MODULE.Get_All_Keys_From_DB()
@@ -248,34 +249,49 @@ async function Delete_Image() {
 
 //add a new emotion to the emotion set
 async function Add_New_Emotion(){
-    new_emotion_text = document.getElementById("new-emotion-label").value
+    new_emotion_text = document.getElementById("emotions-new-emotion-textarea-id").value
+    new_emotion_value = document.getElementById("new-emotion-range-id").value
+
     if(new_emotion_text){
         image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
         keys_tmp = Object.keys(image_annotations["taggingEmotions"])
         boolean_included = keys_tmp.includes(new_emotion_text)
         if(boolean_included == false){
-            image_annotations["taggingEmotions"][new_emotion_text] = 0
-            emotion_div = document.getElementById("emotion-values")
-            emotion_inner_html = `<label for="customRange1" class="form-label" id="emotion_name_label-${new_emotion_text}">${new_emotion_text}</label>
-                                        <button type="button" class="close" aria-label="Close" id="emotion_delete_btn-${new_emotion_text}">
-                                            &#10006
-                                        </button>
-                                        <input type="range" class="form-range" id="emotion_value-${new_emotion_text}">`
+            image_annotations["taggingEmotions"][new_emotion_text] = new_emotion_value
+            emotion_div = document.getElementById("emotion-collectionlist-div-id")
+
+            // emotion_inner_html = `<label for="customRange1" class="form-label" id="emotion_name_label-${new_emotion_text}">${new_emotion_text}</label>
+            //                             <button type="button" class="close" aria-label="Close" id="emotion_delete_btn-${new_emotion_text}">
+            //                                 &#10006
+            //                             </button>
+            //                             <input type="range" class="form-range" id="emotion_value-${new_emotion_text}">`
+
+            emotion_inner_html = `<div class="emotion-list-class" id="emotion-entry-div-id-${new_emotion_text}">
+                                    <img class="emotion-delete-icon-class" id="emotion-delete-button-id-${new_emotion_text}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+                                        onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" alt="emotions" title="remove"  />
+                                    <span class="emotion-label-view-class" id="emotion-id-label-view-name-${new_emotion_text}">${new_emotion_text}</span>
+                                    <input id="emotion-range-id-${new_emotion_text}" type="range" min="0" max="100" value="0">
+                                </div>
+                                `
+
             
             emotion_div.insertAdjacentHTML('beforeend', emotion_inner_html);   
             //add the delete emotion handler
-            document.getElementById(`emotion_delete_btn-${new_emotion_text}`).addEventListener("click", function() {
+            document.getElementById(`emotion-delete-button-id-${new_emotion_text}`).addEventListener("click", function() {
                 Delete_Emotion(`${new_emotion_text}`);
             }, false);
-            document.getElementById('emotion_value-'+new_emotion_text).value = "0"
+            document.getElementById('emotion-range-id-'+new_emotion_text).value = `${new_emotion_value}`
             await TAGGING_IDB_MODULE.Update_Record(image_annotations)
             //do not save upon addition of a new emotion, the save button is necessary
             //await Process_Image()
-            document.getElementById("new-emotion-label").value = ""
+            document.getElementById("emotions-new-emotion-textarea-id").value = ""
         } else {
-            document.getElementById("new-emotion-label").value = ""
+            document.getElementById("emotions-new-emotion-textarea-id").value = ""
         }
+         //refresh emotion container fill
+        TAGGING_VIEW_ANNOTATE_MODULE.Emotion_Display_Fill(image_annotations)
     }
+
 }
 
 
@@ -286,16 +302,12 @@ async function Delete_Emotion(emotion_key){
     element_div = document.getElementById('emotion-entry-div-id-'+emotion_key);
     element_div.remove();
 
-    // element_slider_delete_btn = document.getElementById('emotion_delete_btn-'+emotion_key);
-    // element_slider_delete_btn.remove();
-    // element_slider_range = document.getElementById('emotion_value-'+emotion_key);
-    // element_slider_range.remove();
-    // element_emotion_label = document.getElementById('emotion_name_label-'+emotion_key);
-    // element_emotion_label.remove();
-
     image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
     delete image_annotations["taggingEmotions"][emotion_key];
     await TAGGING_IDB_MODULE.Update_Record(image_annotations)
+
+    //refresh emotion container fill
+    TAGGING_VIEW_ANNOTATE_MODULE.Emotion_Display_Fill(image_annotations)
 }
 
 

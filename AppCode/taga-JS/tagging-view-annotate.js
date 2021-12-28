@@ -16,9 +16,9 @@ function Display_Image_State_Results(files,image_annotation){
     // }
 
     Emotion_Display_Fill(image_annotation)
-    for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
-        document.getElementById('emotion-range-id-'+key).value = image_annotation["taggingEmotions"][key]
-    }
+    // for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
+    //     document.getElementById('emotion-range-id-'+key).value = image_annotation["taggingEmotions"][key]
+    // }
     
 }
 exports.Display_Image_State_Results = Display_Image_State_Results
@@ -48,7 +48,12 @@ function Emotion_Display_Fill(image_annotation){
             Delete_Emotion(`${key_tmp}`);
         }, false);
     })
+    //display values
+    for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
+        document.getElementById('emotion-range-id-'+key).value = image_annotation["taggingEmotions"][key]
+    }
 }
+exports.Emotion_Display_Fill = Emotion_Display_Fill
 
 
 //populate the meme switch view with images
