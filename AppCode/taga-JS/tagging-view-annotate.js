@@ -2,14 +2,14 @@
 
 
 //set view to display image state results of query for a particular file name
-function Display_Image_State_Results(files,image_annotation){
+function Display_Image_State_Results(image_annotation){
 
     document.getElementById('hashtags-innerbox-displayhashtags-id').innerHTML = ''
     document.getElementById('hashtags-innerbox-displayhashtags-id').appendChild(Make_Tag_HTML_UL( image_annotation["taggingTags"] ))
     document.getElementById('description-textarea-id').value = image_annotation["taggingRawDescription"]
     document.getElementById('center-gallery-image-id').src = `${TAGA_IMAGE_DIRECTORY}/${image_annotation["imageFileName"]}`;    
     
-    Meme_View_Fill(files,image_annotation)
+    Meme_View_Fill(image_annotation)
 
     Emotion_Display_Fill(image_annotation)
     
@@ -50,7 +50,7 @@ exports.Emotion_Display_Fill = Emotion_Display_Fill
 
 
 //populate the meme switch view with images
-function Meme_View_Fill(files,image_annotation) {
+function Meme_View_Fill(image_annotation) {
     document.getElementById("memes-innerbox-displaymemes-id").innerHTML = ""
     meme_box = document.getElementById("memes-innerbox-displaymemes-id")
 

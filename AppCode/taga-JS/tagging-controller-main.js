@@ -124,7 +124,7 @@ async function Load_State_Of_Image_IDB() {
     image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
     console.log(JSON.stringify(image_annotations))
     
-    TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_files_in_dir,image_annotations)
+    TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_annotations)
 }
 
 //load the default image, typically called to avoid having nothing in the DB but can be
@@ -179,7 +179,7 @@ async function Load_New_Image() {
     filename_index = image_files_in_dir.indexOf(filenames[0]) //set index to first of the new images
     image_index = filename_index + 1
     image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index-1])
-    TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_files_in_dir,image_annotations)
+    TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_annotations)
     New_Image_Display(0)
 }
 
