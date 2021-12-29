@@ -260,12 +260,6 @@ async function Add_New_Emotion(){
             image_annotations["taggingEmotions"][new_emotion_text] = new_emotion_value
             emotion_div = document.getElementById("emotion-collectionlist-div-id")
 
-            // emotion_inner_html = `<label for="customRange1" class="form-label" id="emotion_name_label-${new_emotion_text}">${new_emotion_text}</label>
-            //                             <button type="button" class="close" aria-label="Close" id="emotion_delete_btn-${new_emotion_text}">
-            //                                 &#10006
-            //                             </button>
-            //                             <input type="range" class="form-range" id="emotion_value-${new_emotion_text}">`
-
             emotion_inner_html = `<div class="emotion-list-class" id="emotion-entry-div-id-${new_emotion_text}">
                                     <img class="emotion-delete-icon-class" id="emotion-delete-button-id-${new_emotion_text}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
                                         onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" alt="emotions" title="remove"  />
@@ -273,7 +267,6 @@ async function Add_New_Emotion(){
                                     <input id="emotion-range-id-${new_emotion_text}" type="range" min="0" max="100" value="0">
                                 </div>
                                 `
-
             
             emotion_div.insertAdjacentHTML('beforeend', emotion_inner_html);   
             //add the delete emotion handler
@@ -285,6 +278,7 @@ async function Add_New_Emotion(){
             //do not save upon addition of a new emotion, the save button is necessary
             //await Process_Image()
             document.getElementById("emotions-new-emotion-textarea-id").value = ""
+            document.getElementById("new-emotion-range-id").value = `0`
         } else {
             document.getElementById("emotions-new-emotion-textarea-id").value = ""
         }

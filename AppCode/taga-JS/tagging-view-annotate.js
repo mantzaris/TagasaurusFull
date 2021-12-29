@@ -8,17 +8,10 @@ function Display_Image_State_Results(files,image_annotation){
     document.getElementById('hashtags-innerbox-displayhashtags-id').appendChild(Make_Tag_HTML_UL( image_annotation["taggingTags"] ))
     document.getElementById('description-textarea-id').value = image_annotation["taggingRawDescription"]
     document.getElementById('center-gallery-image-id').src = `${TAGA_IMAGE_DIRECTORY}/${image_annotation["imageFileName"]}`;    
-    // Meme_View_Fill(files,image_annotation)
-
-    // meme_array = image_annotation["taggingMemeChoices"]
-    // for(ii=0;ii<meme_array.length;ii++){
-    //     document.getElementById(`meme-${meme_array[ii]}`).checked = true
-    // }
+    
+    Meme_View_Fill(files,image_annotation)
 
     Emotion_Display_Fill(image_annotation)
-    // for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
-    //     document.getElementById('emotion-range-id-'+key).value = image_annotation["taggingEmotions"][key]
-    // }
     
 }
 exports.Display_Image_State_Results = Display_Image_State_Results
@@ -58,27 +51,33 @@ exports.Emotion_Display_Fill = Emotion_Display_Fill
 
 //populate the meme switch view with images
 function Meme_View_Fill(files,image_annotation) {
-    document.getElementById('memes').innerHTML = ""
-    meme_box = document.getElementById('memes')
+    document.getElementById("memes-innerbox-displaymemes-id").innerHTML = ""
+    meme_box = document.getElementById("memes-innerbox-displaymemes-id")
 
     meme_choices = image_annotation["taggingMemeChoices"]
-    // for (ii = 0; ii < files.length; ii++) {
-    //     meme_box.insertAdjacentHTML('beforeend', `<input class="form-check-input" 
-    //             type="checkbox" value="" id="meme-${files[ii]}">
-    //             <img height="50%" width="80%" src="${TAGA_IMAGE_DIRECTORY}/${files[ii]}" /><br>  `);
-    // }
+
+    //    checked="true"
     meme_choices.forEach(file =>{
-                meme_box.insertAdjacentHTML('beforeend', `<input class="form-check-input" 
-                    type="checkbox" value="" id="meme-${file}">
-                    <img class="tagging-meme-image-class" title="view meme" id="memeImage-${file}" height="50%" width="80%" src="${TAGA_IMAGE_DIRECTORY}/${file}" /><br>  `);
+        meme_box.insertAdjacentHTML('beforeend', `
+                <label class="memeswitch" title="deselect / keep" >   <input id="meme-toggle-id-${file}" type="checkbox"> <span class="slider"></span>   </label>
+                <div class="memes-img-div-class" id="memes-image-div-id-${file}">
+                    <img class="memes-img-class" id="memes-image-img-id-${file}" src="${TAGA_IMAGE_DIRECTORY}/${file}" title="view" alt="meme" />
+                </div>
+            `);
     })
 
     //add an event listener for when a meme image is clicked and send the file name
     meme_choices.forEach(file => {
-        document.getElementById(`memeImage-${file}`).addEventListener("click", function() {
+        document.getElementById(`memes-image-img-id-${file}`).addEventListener("click", function() {
             Meme_Image_Clicked(file);
         }, false);
     })
+
+    //set default meme choice toggle button direction
+    for(ii=0;ii<meme_choices.length;ii++){
+        document.getElementById(`meme-toggle-id-${meme_choices[ii]}`).checked = true
+    }
+
 }
 exports.Meme_View_Fill = Meme_View_Fill
 
