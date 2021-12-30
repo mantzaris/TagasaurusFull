@@ -97,6 +97,10 @@ async function First_Display_Init() {
     document.getElementById(`add-new-emotion-button-id`).addEventListener("click", function() {
         Add_New_Emotion();
     }, false);
+    document.getElementById(`reset-button-id`).addEventListener("click", function() {
+        Reset_Image();
+    }, false);
+
 
     await TAGGING_IDB_MODULE.Create_Db()
     await TAGGING_IDB_MODULE.Get_All_Keys_From_DB()
@@ -187,7 +191,7 @@ async function Load_New_Image() {
 //bring the image annotation view to the default state (not saving it until confirmed)
 async function Reset_Image(){
     image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
-    TAGGING_VIEW_ANNOTATE_MODULE.Reset_Image_View(image_files_in_dir,image_annotations)
+    TAGGING_VIEW_ANNOTATE_MODULE.Reset_Image_View(image_annotations)
 }
 
 

@@ -169,16 +169,20 @@ function Make_Tag_HTML_UL(tag_array) {
 }
 
 //function to reset annotations to default
-function Reset_Image_View(files,image_annotation){
-
+function Reset_Image_View(image_annotation){
+    //reset emotion slider values
     for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
-        document.getElementById(`emotion_value-${key}`).value = 0
+        document.getElementById(`emotion-range-id-${key}`).value = 0
     }
+    document.getElementById(`new-emotion-range-id`).value = 0
+    //reset the text area for the text area description
     document.getElementById('description-textarea-id').value = ''
+    //reset the hashtag area display
     document.getElementById('hashtags-innerbox-displayhashtags-id').innerHTML = ''
-    for (var ii = 0; ii < files.length; ii++) {
-        //val_obj[`${files[ii]}`] = false //each file name is the element ID for the tagging page
-        document.getElementById(`meme-${files[ii]}`).checked = false 
+    //reset the meme toggles to be the checked true which is the default here
+    meme_choices = image_annotation["taggingMemeChoices"]
+    for(ii=0;ii<meme_choices.length;ii++){
+        document.getElementById(`meme-toggle-id-${meme_choices[ii]}`).checked = true
     }
 }
 exports.Reset_Image_View = Reset_Image_View
