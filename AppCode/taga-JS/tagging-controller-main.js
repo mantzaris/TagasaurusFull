@@ -98,7 +98,10 @@ async function First_Display_Init() {
         Add_New_Emotion();
     }, false);
     document.getElementById(`reset-button-id`).addEventListener("click", function() {
-        Reset_Image();
+        Reset_Image_Annotations();
+    }, false);
+    document.getElementById(`save-button-id`).addEventListener("click", function() {
+        Save_Image_Annotation_Changes();
     }, false);
 
 
@@ -189,50 +192,46 @@ async function Load_New_Image() {
 
 
 //bring the image annotation view to the default state (not saving it until confirmed)
-async function Reset_Image(){
+async function Reset_Image_Annotations(){
     image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
     TAGGING_VIEW_ANNOTATE_MODULE.Reset_Image_View(image_annotations)
 }
 
 
 //process image for saving including the text to tags (Called from the html Save button)
-async function Process_Image() {
-    user_description = document.getElementById('description-textarea-id').value
-    new_user_description = DESCRIPTION_PROCESS_MODULE.process_description(user_description)
-    tags_split = new_user_description.split(' ')
-    processed_tag_word_list = new_user_description.split(' ')
-    await Save_Pic_State()
-}
-
-//called by the SAVE button to produce a JSON of the picture description state
-async function Save_Pic_State() {
+async function Save_Image_Annotation_Changes() {
 
     new_record = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])//JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
+    
+    //the picture file name in context
+    image_name = `${image_files_in_dir[image_index - 1]}`
+    
+    //save meme changes
     current_memes = new_record.taggingMemeChoices
-    //meme selection switch check boxes
-    meme_switch_booleans = []
+    meme_switch_booleans = [] //meme selection toggle switch check boxes
     for (var ii = 0; ii < current_memes.length; ii++) {
-        meme_boolean_tmp = document.getElementById(`meme-${current_memes[ii]}`).checked
+        meme_boolean_tmp = document.getElementById(`meme-toggle-id-${current_memes[ii]}`).checked
         if(meme_boolean_tmp == true){
             meme_switch_booleans.push(current_memes[ii])
         }
     }
-    //the picture file name in context
-    image_name = `${image_files_in_dir[image_index - 1]}`
-    //raw user entered text (prior to processing)
+    
+    //handle textual description, process for tag words
     rawDescription = document.getElementById('description-textarea-id').value
+    rawDescription_processed = DESCRIPTION_PROCESS_MODULE.process_description(rawDescription)
+    processed_tag_word_list = rawDescription_processed //.split(' ')
 
+    //change the object fields accordingly
     new_record.imageFileName = image_name
     new_record.taggingMemeChoices = meme_switch_booleans
     new_record.taggingRawDescription = rawDescription
     new_record.taggingTags = processed_tag_word_list
-
     for( var key of Object.keys(new_record["taggingEmotions"]) ){
-        new_record["taggingEmotions"][key] = document.getElementById('emotion_value-'+key).value
+        new_record["taggingEmotions"][key] = document.getElementById('emotion-range-id-'+key).value
     }
 
     await TAGGING_IDB_MODULE.Update_Record(new_record)
-    Load_State_Of_Image_IDB()
+    Load_State_Of_Image_IDB() //TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_annotations)
 }
 
 //delete image from user choice
@@ -280,7 +279,6 @@ async function Add_New_Emotion(){
             document.getElementById('emotion-range-id-'+new_emotion_text).value = `${new_emotion_value}`
             await TAGGING_IDB_MODULE.Update_Record(image_annotations)
             //do not save upon addition of a new emotion, the save button is necessary
-            //await Process_Image()
             document.getElementById("emotions-new-emotion-textarea-id").value = ""
             document.getElementById("new-emotion-range-id").value = `0`
         } else {

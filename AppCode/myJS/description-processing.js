@@ -4,8 +4,9 @@ var stopwords = ["?", ' ', "a", "about", "above", "after", "again", "ain", "all"
 
 exports.process_description = function(str){    
     res = remove_stopwords(str)
-    res_no_duplicates = remove_duplicate_keywords(res) 
-    return ( res_no_duplicates.join(' ') )
+    res_no_duplicates = remove_duplicate_keywords(res)
+
+    return ( res_no_duplicates )
 }
 
 //removes via regex the special characters, and removes the stop words
