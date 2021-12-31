@@ -108,6 +108,7 @@ body {
   margin-right: auto;
   margin-top: 0.05em;
   border-radius: 5px;
+  resize: none;
 }
 
 #emotion-text-range-value-label-left-id {
@@ -305,6 +306,7 @@ input:checked + .slider:before {
   border-radius: 5px;
   margin: 0.2em;
   overflow-y: scroll;
+  resize: none;
 }
 #buttons-div-gridarea-textentry-id {
   grid-area: buttons-div-gridarea-textentry;
