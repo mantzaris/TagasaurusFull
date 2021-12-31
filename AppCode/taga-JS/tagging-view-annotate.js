@@ -83,63 +83,54 @@ exports.Meme_View_Fill = Meme_View_Fill
 
 
 async function Meme_Image_Clicked(meme_file_name){
-        
-    var meme_modal = document.getElementById("meme-modal");
-    meme_modal.style.display = "block";
-    
-    var close_element = document.getElementsByClassName("meme-modal-close")[0];
-    close_element.onclick = function() {
-        meme_modal.style.display = "none";
+
+    // Show the modal
+    var modal_meme_click_top_id_element = document.getElementById("modal-meme-clicked-top-id");
+    modal_meme_click_top_id_element.style.display = "block";
+    // Get the button that opens the modal
+    var meme_modal_close_btn = document.getElementById("modal-meme-clicked-close-button-id");
+    // When the user clicks on the button, close the modal
+    meme_modal_close_btn.onclick = function() {
+        modal_meme_click_top_id_element.style.display = "none";
     }
+    // When the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {
-        if (event.target == meme_modal) {
-            meme_modal.style.display = "none";
+        if (event.target == modal_meme_click_top_id_element) {
+            modal_meme_click_top_id_element.style.display = "none";
         }
     }
-
-    document.getElementById("meme-modal-footer-id").innerHTML = 'imageFileName: ' + meme_file_name
-
-    document.getElementById("modal-meme-click-body").innerHTML = ""
-    meme_click_modal_div = document.getElementById("modal-meme-click-body")
+    
+    document.getElementById("modal-meme-clicked-image-gridbox-id").innerHTML = ""
+    meme_click_modal_div = document.getElementById("modal-meme-clicked-image-gridbox-id")
     meme_click_modal_body_html_tmp = ''
-    meme_click_modal_body_html_tmp += `<img id="modalMemeImage-${meme_file_name}" height="50%" width="50%" src="${TAGA_IMAGE_DIRECTORY}/${meme_file_name}"/><br>`
+    meme_click_modal_body_html_tmp += `<img id="modal-meme-clicked-displayimg-id" src="${TAGA_IMAGE_DIRECTORY}/${meme_file_name}" title="meme" alt="meme" />`
     meme_click_modal_div.insertAdjacentHTML('beforeend', meme_click_modal_body_html_tmp);
 
     meme_image_annotations = await TAGGING_IDB_MODULE.Get_Record( meme_file_name )
-    meme_modal_footer_div = document.getElementById("meme-modal-footer-id")
-    modal_html_tmp = ""
-    
-    modal_html_tmp = `emotion values: `
+    //add emotion tuples to view
+    modal_emotions_html_tmp = `Emotions: `
     emotion_keys = Object.keys(meme_image_annotations["taggingEmotions"])
-    console.log(`the emotion values length = ${emotion_keys.length}`)
-    if( emotion_keys.length == 0 ){
-        modal_html_tmp += `<br>`
-    } else {
+    //console.log(`the emotion values length = ${emotion_keys.length}`)
+    if( emotion_keys.length > 0 ){
         emotion_keys.forEach(function(key_tmp, index){
             emotion_value = meme_image_annotations["taggingEmotions"][key_tmp]
-            if (index === emotion_keys.length - 1){ 
-                modal_html_tmp += `(${key_tmp}: ${emotion_value}) <br>`
+            if( index < emotion_keys.length-1 ) {                
+                modal_emotions_html_tmp += `(${key_tmp}:${emotion_value}), `
             } else {
-                modal_html_tmp += `(${key_tmp}: ${emotion_value}), `
+                modal_emotions_html_tmp += `(${key_tmp}:${emotion_value})`
             }
         })
+    } else {
+        modal_emotions_html_tmp += `no emotions added`
     }
-    tag_array = meme_image_annotations["taggingTags"]
-    modal_html_tmp += ` tags: `
-    if( tag_array.length != 0 && !(tag_array.length == 1 && tag_array[0] == "") ){
+    document.getElementById("modal-meme-clicked-emotion-list-div-container-id").innerHTML = modal_emotions_html_tmp
 
-        tag_array.forEach(function(tag, index){
-            if (index === tag_array.length - 1){
-                modal_html_tmp += `#${tag} `
-            } else {
-                modal_html_tmp += `#${tag}, `
-            }
-            
-        })
-    }
-    //console.log(`the modal html tmp = ${modal_html_tmp}`)
-    document.getElementById("meme-modal-header").innerHTML = modal_html_tmp
-    //meme_modal_footer_div.insertAdjacentHTML('beforeend', modal_html_tmp);
+    tag_array = meme_image_annotations["taggingTags"]
+    modal_tags_html_tmp = `Tags: `
+    tag_array.forEach(function(tag, index){
+            modal_tags_html_tmp += `#${tag} `
+    })
+    document.getElementById("modal-meme-clicked-tag-list-div-container-id").innerHTML = modal_tags_html_tmp
 
 }
 
