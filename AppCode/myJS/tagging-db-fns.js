@@ -542,7 +542,7 @@ async function Search_Meme_Images_Basic_Relevances(tagging_search_obj){
     //console.log(`drum role file sorted list sorted_score_file_keys = ${sorted_score_file_keys}`)
     //console.log(`and the meme scores of relevance = ${sorted_score_file_meme_keys}`)
     console.log(`---exiting the search basic---`)
-    return [sorted_score_file_meme_keys,sorted_score_file_keys]
+    return [sorted_score_file_keys,sorted_score_file_meme_keys]
 
 }
 exports.Search_Meme_Images_Basic_Relevances = Search_Meme_Images_Basic_Relevances
