@@ -14,7 +14,7 @@
     "modal-search-images-results-display-id   modal-search-images-results-display-id";
 }
 
-/* SEARCH BUTTON START */
+/* TOP SEARCH BUTTON and RESET BUTTON START */
 #modal-search-add-memes-main-button-container-div-id {
   background-color: #00c600;
   grid-area: modal-search-add-memes-main-button-container-div-id;
@@ -31,7 +31,16 @@
   font-weight: bold;
   font-size: 2.5vmin;
 }
-/* SEARCH BUTTON END */
+#modal-search-add-memes-reset-button-id {
+  display: block;
+  width: 20%;
+  height: 60%;
+  background-color: #ad2021;
+  border-radius: 25%;
+  font-weight: bold;
+  font-size: 2.5vmin;
+}
+/* TOP SEARCH BUTTON and RESET BUTTON  */
 
 /* TAG SEARCH START */
 #modal-search-add-memes-tag-entry-container-div-id {

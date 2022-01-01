@@ -103,6 +103,10 @@ async function First_Display_Init() {
     document.getElementById(`save-button-id`).addEventListener("click", function() {
         Save_Image_Annotation_Changes();
     }, false);
+    document.getElementById(`add-new-memes-button-id`).addEventListener("click", function() {
+        Add_New_Meme();
+    }, false);
+
 
 
     await TAGGING_IDB_MODULE.Create_Db()
@@ -544,42 +548,57 @@ function Add_New_Meme(){
         searchTags:[],
         searchMemeTags:[]
     }
-    //clear the search form from previous entries
-    search_tags_input = document.getElementById("search-meme-tags-entry-form")
-    search_tags_input.value =""
-    search_tags_input = document.getElementById("search-meme-image-tags-entry-form")
-    search_tags_input.value =""
-    //clear the previous search results
-    document.getElementById("search-meme-image-results-box-label").innerHTML = ""
-    document.getElementById("search-meme-modal-image-memes").innerHTML = ""
+    
 
-
-    console.log(`add meme button pressed`)
-
-    var search_modal = document.getElementById("top-tagging-meme-search-modal-id");
-    search_modal.style.display = "block";
-    var close_element = document.getElementById("search-meme-close-modal-id");
-    close_element.onclick = function() {
-        search_modal.style.display = "none";
+    // Show the modal
+    var modal_add_memes_search_click = document.getElementById("search-add-memes-modal-click-top-id");
+    modal_add_memes_search_click.style.display = "block";
+    // Get the button that opens the modal
+    var meme_modal_close_btn = document.getElementById("modal-search-add-memes-close-exit-view-button-id");
+    // When the user clicks on the button, close the modal
+    meme_modal_close_btn.onclick = function() {
+        modal_add_memes_search_click.style.display = "none";
     }
+    // When the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {
-        if (event.target == search_modal) {
-            search_modal.style.display = "none";
+        if (event.target == modal_add_memes_search_click) {
+            modal_add_memes_search_click.style.display = "none";
         }
     }
-    var select_image_search_order = document.getElementById("search-meme-modal-load-image-order")
-    select_image_search_order.onclick = function() {
-        Meme_Choose_Search_Results()
+
+    var select_search_modal_meme_images = document.getElementById("modal-search-add-memes-images-results-select-images-order-button-id")
+    select_search_modal_meme_images.onclick = function() {
+        //Meme_Choose_Search_Results()
     }
 
-        //populate the search meme modal with the fields to insert emotion tags and values
-        Search_Meme_Populate_Emotions()
-        //and for the emotions of the images
-        Search_Meme_Image_Populate_Emotions()
+    var select_reset_modal_meme_add_images_fields = document.getElementById("modal-search-add-memes-reset-button-id")
+    select_reset_modal_meme_add_images_fields.onclick = function() {
+        Search_Add_Meme_RESET_Modal_Fields()
+    }
+
+    //populate the search meme modal with the fields to insert emotion tags and values
+    // Search_Meme_Populate_Emotions()
+    // //and for the emotions of the images
+    // Search_Meme_Image_Populate_Emotions()
 
 }
 
+//called when the user chooses to 'reset' the fields for the meme search modal
+function Search_Add_Meme_RESET_Modal_Fields(){
+    //clear the search form from previous entries
+    document.getElementById("modal-search-add-memes-tag-textarea-entry-id").value = ""
+    document.getElementById("modal-search-add-memes-tag-textarea-memes-entry-id").value = ""
+    document.getElementById("modal-search-add-memes-emotion-label-value-textarea-entry-id").value = ""
+    document.getElementById("modal-search-add-memes-emotion-meme-label-value-textarea-entry-id").value = ""
+    document.getElementById("modal-search-add-memes-emotion-value-range-entry-id").value = "0"
+    document.getElementById("modal-search-add-memes-emotion-label-value-display-container-div-id").value = ""
+    document.getElementById("modal-search-add-memes-emotion-meme-value-range-entry-id").value = "0"
+    document.getElementById("modal-search-add-memes-emotion-label-value-display-container-div-id").innerHTML = ""
+    document.getElementById("modal-search-add-memes-emotion-meme-label-value-display-container-div-id").innerHTML = ""
+    document.getElementById("modal-search-add-memes-images-results-grid-div-area-id").innerHTML = ""
+    document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id").innerHTML = ""
 
+}
 
 //
 function Search_Meme_Populate_Emotions(){
@@ -737,8 +756,8 @@ async function Meme_Choose_Search_Results(){
         
         Load_State_Of_Image_IDB()
 
-        search_modal = document.getElementById("top-tagging-meme-search-modal-id");
-        search_modal.style.display = "none";
+        modal_add_memes_search_click = document.getElementById("search-add-memes-modal-click-top-id");
+        modal_add_memes_search_click.style.display = "none";
     }
 
 }
