@@ -541,13 +541,6 @@ search_complete = false
 //called from the HTML button onclik
 //add a new meme which is searched for by the user
 function Add_New_Meme(){
-
-    meme_tagging_search_obj = {
-        meme_emotions:{},
-        emotions:{},
-        searchTags:[],
-        searchMemeTags:[]
-    }
     
     // Show the modal
     var modal_add_memes_search_click = document.getElementById("search-add-memes-modal-click-top-id");
@@ -575,16 +568,39 @@ function Add_New_Meme(){
         Search_Add_Meme_RESET_Modal_Fields()
     }
 
-    //populate the search meme modal with the fields to insert emotion tags and values
-    // Search_Meme_Populate_Emotions()
+    //populate the search meme modal with the fields to insert emotion tags and values and handle new emotion entries
     Meme_Addition_Modal_Emotion_Populate_View()
-    // //and for the emotions of the images
-    // Search_Meme_Image_Populate_Emotions()
+    document.getElementById("modal-search-add-memes-emotion-entry-button-id").onclick = function() {
+        Meme_Addition_Modal_Emotion_Entry('image_emotion')
+    }
+    document.getElementById("modal-search-add-memes-emotion-meme-entry-button-id").onclick = function() {
+        Meme_Addition_Modal_Emotion_Entry('meme_emotion')
+    }
 
 }
 
 tmp_images = {aaa:111,bbb:222,ccc:333,ddd:444}
 tmp_memes = {z1:111,z2:222,z3:333,z4:444}
+
+//function to handle entry of new emotions and values for the search entry
+function Meme_Addition_Modal_Emotion_Entry(image_or_meme_emotion) {
+    if( image_or_meme_emotion == 'image_emotion') {
+        entered_emotion_label = document.getElementById("modal-search-add-memes-emotion-label-value-textarea-entry-id").value
+        emotion_search_entry_value = document.getElementById("modal-search-add-memes-emotion-value-range-entry-id").value
+        if( entered_emotion_label != "" ) {
+            meme_tagging_search_obj["emotions"][entered_emotion_label] = emotion_search_entry_value
+            Meme_Addition_Modal_Emotion_Populate_View()
+        }
+    } else if( image_or_meme_emotion == 'meme_emotion') {
+        entered_emotion_label = document.getElementById("modal-search-add-memes-emotion-meme-label-value-textarea-entry-id").value
+        emotion_search_entry_value = document.getElementById("modal-search-add-memes-emotion-meme-value-range-entry-id").value
+        if( entered_emotion_label != "" ) {
+            meme_tagging_search_obj["meme_emotions"][entered_emotion_label] = emotion_search_entry_value
+            Meme_Addition_Modal_Emotion_Populate_View()
+        }
+    }
+}
+
 //For the user entered emotion label-value pair to be displayed on the modal and included into the search object
 function Meme_Addition_Modal_Emotion_Populate_View() {
 
@@ -593,54 +609,57 @@ function Meme_Addition_Modal_Emotion_Populate_View() {
     image_memes_emotions_div_id = document.getElementById("modal-search-add-memes-emotion-meme-label-value-display-container-div-id")
     image_memes_emotions_div_id.innerHTML = ""
 
-    //Object.keys(meme_tagging_search_obj["meme_emotions"])
-    
-
     //Populate for the emotions of the images
-    Object.keys(tmp_images).forEach(emotion_key => {
+    Object.keys(meme_tagging_search_obj["emotions"]).forEach(emotion_key => {
         image_emotions_div_id.innerHTML += `
                                 <span id="modal-search-add-memes-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
                                 <img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
                                     onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
-                                (${emotion_key},${tmp_images[emotion_key]})
+                                (${emotion_key},${meme_tagging_search_obj["emotions"][emotion_key]})
                                 </span>
                                 `
     })
     //Populate for the emotions of the memes of the images
-    Object.keys(tmp_memes).forEach(emotion_key => {
+    Object.keys(meme_tagging_search_obj["meme_emotions"]).forEach(emotion_key => {
         image_memes_emotions_div_id.innerHTML += `
                                 <span id="modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}" style="white-space:nowrap">
                                     <img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
                                         onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
-                                    (${emotion_key},${tmp_memes[emotion_key]})
+                                    (${emotion_key},${meme_tagging_search_obj["meme_emotions"][emotion_key]})
                                 </span>
                                 `
     })
 
     //action listener for the removal of emotions populated from user entry
-    Object.keys(tmp_images).forEach(emotion_key => {
+    Object.keys(meme_tagging_search_obj["emotions"]).forEach(emotion_key => {
         document.getElementById(`modal-search-add-memes-emotion-remove-button-id-${emotion_key}`).addEventListener("click", function() {
             search_emotion_search_span_html_obj = document.getElementById(`modal-search-add-memes-emotion-label-value-span-id-${emotion_key}`);
             search_emotion_search_span_html_obj.remove();
-            delete tmp_images[emotion_key]//delete meme_tagging_search_obj["meme_emotions"][emotion_key]
+            delete meme_tagging_search_obj["emotions"][emotion_key]
             Meme_Addition_Modal_Emotion_Populate_View()
         })
     })
     //action listener for the removal of meme emotions populated from user entry
-    Object.keys(tmp_memes).forEach(emotion_key => {
+    Object.keys(meme_tagging_search_obj["meme_emotions"]).forEach(emotion_key => {
         document.getElementById(`modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}`).addEventListener("click", function() {
             search_meme_emotion_search_span_html_obj = document.getElementById(`modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}`);
             search_meme_emotion_search_span_html_obj.remove();
-            delete tmp_memes[emotion_key]//delete meme_tagging_search_obj["meme_emotions"][emotion_key]
+            delete meme_tagging_search_obj["meme_emotions"][emotion_key]
             Meme_Addition_Modal_Emotion_Populate_View()
         })
     })
-
 
 }
 
 //called when the user chooses to 'reset' the fields for the meme search modal
 function Search_Add_Meme_RESET_Modal_Fields(){
+    //reset object
+    meme_tagging_search_obj = {
+        meme_emotions:{},
+        emotions:{},
+        searchTags:[],
+        searchMemeTags:[]
+    }
     //clear the search form from previous entries
     document.getElementById("modal-search-add-memes-tag-textarea-entry-id").value = ""
     document.getElementById("modal-search-add-memes-tag-textarea-memes-entry-id").value = ""
