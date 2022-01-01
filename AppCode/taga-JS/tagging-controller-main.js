@@ -535,7 +535,7 @@ meme_tagging_search_obj = {
     searchTags:[],
     searchMemeTags:[]
 }
-// search_complete = false
+search_complete = false
 
 
 //called from the HTML button onclik
@@ -673,6 +673,7 @@ function Search_Add_Meme_RESET_Modal_Fields(){
     document.getElementById("modal-search-add-memes-emotion-meme-label-value-display-container-div-id").innerHTML = ""
     document.getElementById("modal-search-add-memes-images-results-grid-div-area-id").innerHTML = ""
     document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id").innerHTML = ""
+    search_meme_complete = false
 }
 
 
@@ -681,7 +682,6 @@ async function Meme_Choose_Search_Results(){
     //Now update the current file list with the new order of pics 'search_results' which comes from the 
     //DB search function
     if( search_meme_complete == true ){
-        console.log(`in choose image saerch resutls search_results = ${search_meme_results}, search length = ${search_meme_results.length}`)
         
         record = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])//JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
         memes_current = record.taggingMemeChoices
@@ -690,21 +690,15 @@ async function Meme_Choose_Search_Results(){
         meme_switch_booleans = []
         for (var ii = 0; ii < image_files_in_dir.length; ii++) {
             if(memes_current.includes(image_files_in_dir[ii]) == false){  //exclude memes already present
-                meme_boolean_tmp1 = document.getElementById(`meme-choice-${image_files_in_dir[ii]}`).checked
-                meme_boolean_tmp2 = document.getElementById(`meme-image-choice-${image_files_in_dir[ii]}`).checked
+                meme_boolean_tmp1 = document.getElementById(`add-memes-images-toggle-id-${image_files_in_dir[ii]}`).checked
+                meme_boolean_tmp2 = document.getElementById(`add-memes-meme-toggle-id-${image_files_in_dir[ii]}`).checked
                 if(meme_boolean_tmp1 == true || meme_boolean_tmp2 == true){
                     meme_switch_booleans.push(image_files_in_dir[ii])
                 }
             }
         }
-        console.log(`meme_switch_booleans = ${meme_switch_booleans}`)
-
-        //the picture file name in context
-        image_name = `${image_files_in_dir[image_index - 1]}`
-        //raw user entered text (prior to processing)
-        rawDescription = document.getElementById('description-textarea-id').value //???
-            
-        meme_switch_booleans.push(...record.taggingMemeChoices)        
+        
+        meme_switch_booleans.push(...record.taggingMemeChoices)
         record.taggingMemeChoices = [...new Set(meme_switch_booleans)]
         await TAGGING_IDB_MODULE.Update_Record(record)
         
@@ -721,7 +715,6 @@ async function Meme_Choose_Search_Results(){
 async function Modal_Meme_Search_Btn(){
 
     //after doing the search
-    // search_meme_complete = true
 
     reg_exp_delims = /[#:,;| ]+/
 
@@ -742,7 +735,7 @@ async function Modal_Meme_Search_Btn(){
     //search the DB according to this set of criteria
     //look through the keys and find the overlapping set
     search_meme_results = await TAGGING_IDB_MODULE.Search_Meme_Images_Basic_Relevances(meme_tagging_search_obj)
-    console.log(`search_results = ${search_results}`)
+    search_meme_complete = true
     
     search_sorted_meme_image_filename_keys = search_meme_results[0]
     search_sorted_image_filename_keys = search_meme_results[1]
@@ -759,7 +752,7 @@ async function Modal_Meme_Search_Btn(){
     search_meme_images_results_output = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
     search_meme_images_results_output.innerHTML = ""
     search_sorted_meme_image_filename_keys.forEach(file_key => {
-        if(memes_current.includes(file_key) == false){  //exclude memes already present
+        if(memes_current.includes(file_key) == false && record.imageFileName != file_key){  //exclude memes already present
             search_meme_images_results_output.insertAdjacentHTML('beforeend', `
                 <label class="add-memes-memeswitch" title="deselect / include" >   
                     <input id="add-memes-images-toggle-id-${file_key}" type="checkbox" > 
@@ -776,7 +769,7 @@ async function Modal_Meme_Search_Btn(){
     search_meme_images_memes_results_output = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
     search_meme_images_memes_results_output.innerHTML = ""
     search_sorted_image_filename_keys.forEach(file_key => {
-        if(memes_current.includes(file_key) == false){  //exclude memes already present
+        if(memes_current.includes(file_key) == false && record.imageFileName != file_key){  //exclude memes already present
             search_meme_images_memes_results_output.insertAdjacentHTML('beforeend', `
                 <label class="add-memes-memeswitch" title="deselect / include" >   
                     <input id="add-memes-meme-toggle-id-${file_key}" type="checkbox" > 
