@@ -549,7 +549,6 @@ function Add_New_Meme(){
         searchMemeTags:[]
     }
     
-
     // Show the modal
     var modal_add_memes_search_click = document.getElementById("search-add-memes-modal-click-top-id");
     modal_add_memes_search_click.style.display = "block";
@@ -565,12 +564,12 @@ function Add_New_Meme(){
             modal_add_memes_search_click.style.display = "none";
         }
     }
-
+    //user presses it after the fields have been entered to search the images to then add memes
     var select_search_modal_meme_images = document.getElementById("modal-search-add-memes-images-results-select-images-order-button-id")
     select_search_modal_meme_images.onclick = function() {
         //Meme_Choose_Search_Results()
     }
-
+    //user presses this to 'reset' the fields of the add memes search modal so that they become the default
     var select_reset_modal_meme_add_images_fields = document.getElementById("modal-search-add-memes-reset-button-id")
     select_reset_modal_meme_add_images_fields.onclick = function() {
         Search_Add_Meme_RESET_Modal_Fields()
@@ -597,7 +596,6 @@ function Search_Add_Meme_RESET_Modal_Fields(){
     document.getElementById("modal-search-add-memes-emotion-meme-label-value-display-container-div-id").innerHTML = ""
     document.getElementById("modal-search-add-memes-images-results-grid-div-area-id").innerHTML = ""
     document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id").innerHTML = ""
-
 }
 
 //
