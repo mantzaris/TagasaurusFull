@@ -109,6 +109,12 @@ async function First_Display_Init() {
     document.getElementById(`return-to-main-button-id`).addEventListener("click", function() {
         location.href = "welcome-screen.html";
     }, false);
+    document.getElementById(`load-new-image-button-id`).addEventListener("click", function() {
+        Load_New_Image();
+    }, false);
+    document.getElementById(`delete-image-button-id`).addEventListener("click", function() {
+        Delete_Image();
+    }, false);
 
 
 
@@ -182,13 +188,11 @@ async function Load_New_Image() {
         return
     }
     filenames.forEach(filename => {
-
         tagging_entry_tmp = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
         tagging_entry_tmp.imageFileName = filename
         tagging_entry_tmp.imageFileHash = Return_File_Hash(`${TAGA_IMAGE_DIRECTORY}/${filename}`)
         TAGGING_IDB_MODULE.Insert_Record(tagging_entry_tmp)
         MY_ARRAY_INSERT_HELPER.Insert_Into_Sorted_Array(image_files_in_dir,filename)
-
     });
     filename_index = image_files_in_dir.indexOf(filenames[0]) //set index to first of the new images
     image_index = filename_index + 1
@@ -245,7 +249,6 @@ async function Save_Image_Annotation_Changes() {
 async function Delete_Image() {
     success = await TAGGING_DELETE_HELPER_MODULE.Delete_Image_File(image_files_in_dir[image_index-1])
     if(image_files_in_dir.length == 0){
-        console.log(`calling Load_Default_Taga_Image()`)
         Load_Default_Taga_Image()
     }
     //Why this is needed?.. I do not know. when I remove it the memes are not update by the time the 
@@ -254,6 +257,7 @@ async function Delete_Image() {
     if(success == 1){
         New_Image_Display( 0 )
     }
+    Refresh_File_List()
 }
 
 
@@ -692,11 +696,14 @@ async function Meme_Choose_Search_Results(){
         //meme selection switch check boxes
         meme_switch_booleans = []
         for (var ii = 0; ii < image_files_in_dir.length; ii++) {
-            if(memes_current.includes(image_files_in_dir[ii]) == false){  //exclude memes already present
-                meme_boolean_tmp1 = document.getElementById(`add-memes-images-toggle-id-${image_files_in_dir[ii]}`).checked
-                meme_boolean_tmp2 = document.getElementById(`add-memes-meme-toggle-id-${image_files_in_dir[ii]}`).checked
-                if(meme_boolean_tmp1 == true || meme_boolean_tmp2 == true){
-                    meme_switch_booleans.push(image_files_in_dir[ii])
+            if(memes_current.includes(image_files_in_dir[ii]) == false && record.imageFileName != image_files_in_dir[ii]){  //exclude memes already present
+                //console.log(`choosing meme: add-memes-images-toggle-id-${image_files_in_dir[ii]}`)
+                if( image_files_in_dir[ii] != '172560424_2049823225154580_3307695187818772708_n.jpg'){
+                    meme_boolean_tmp1 = document.getElementById(`add-memes-images-toggle-id-${image_files_in_dir[ii]}`).checked
+                    meme_boolean_tmp2 = document.getElementById(`add-memes-meme-toggle-id-${image_files_in_dir[ii]}`).checked
+                    if(meme_boolean_tmp1 == true || meme_boolean_tmp2 == true){
+                        meme_switch_booleans.push(image_files_in_dir[ii])
+                    }
                 }
             }
         }
@@ -756,6 +763,7 @@ async function Modal_Meme_Search_Btn(){
     search_meme_images_results_output.innerHTML = ""
     search_sorted_meme_image_filename_keys.forEach(file_key => {
         if(memes_current.includes(file_key) == false && record.imageFileName != file_key){  //exclude memes already present
+            //console.log(`add-memes-images-toggle-id-${file_key}`)
             search_meme_images_results_output.insertAdjacentHTML('beforeend', `
                 <label class="add-memes-memeswitch" title="deselect / include" >   
                     <input id="add-memes-images-toggle-id-${file_key}" type="checkbox" > 
