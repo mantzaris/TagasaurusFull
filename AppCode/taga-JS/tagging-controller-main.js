@@ -106,6 +106,9 @@ async function First_Display_Init() {
     document.getElementById(`add-new-memes-button-id`).addEventListener("click", function() {
         Add_New_Meme();
     }, false);
+    document.getElementById(`return-to-main-button-id`).addEventListener("click", function() {
+        location.href = "welcome-screen.html";
+    }, false);
 
 
 
