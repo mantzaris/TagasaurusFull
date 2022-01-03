@@ -30,6 +30,15 @@
   font-weight: bold;
   font-size: 2.5vmin;
 }
+#modal-search-main-reset-button-id {
+  display: inline-block;
+  text-align: center; /*width: 30%;*/
+  height: 60%;
+  background-color: #ad2021;
+  border-radius: 25%;
+  font-weight: bold;
+  font-size: 2.5vmin;
+}
 /* SEARCH BUTTON END */
 
 /* TAG SEARCH START */
