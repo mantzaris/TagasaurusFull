@@ -29,7 +29,7 @@ var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
                                     "imageFileName": '',      
                                     "imageFileHash": '',
                                     "taggingRawDescription": "",
-                                    "taggingTags": [""],
+                                    "taggingTags": [],
                                     "taggingEmotions": {good:0,bad:0},//{ happy: 0, sad: 0, confused: 0 },
                                     "taggingMemeChoices": []
                                     }
