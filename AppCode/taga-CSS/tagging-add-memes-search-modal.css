@@ -32,8 +32,8 @@
   font-size: 2.5vmin;
 }
 #modal-search-add-memes-reset-button-id {
-  display: block;
-  width: 20%;
+  display: inline-block;
+  text-align: center; /*width: 30%;*/
   height: 60%;
   background-color: #ad2021;
   border-radius: 25%;

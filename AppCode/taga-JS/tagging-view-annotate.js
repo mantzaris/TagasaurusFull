@@ -173,7 +173,7 @@ function Reset_Image_View(image_annotation){
     //reset the meme toggles to be the checked true which is the default here
     meme_choices = image_annotation["taggingMemeChoices"]
     for(ii=0;ii<meme_choices.length;ii++){
-        document.getElementById(`meme-toggle-id-${meme_choices[ii]}`).checked = true
+        document.getElementById(`meme-toggle-id-${meme_choices[ii]}`).checked = false
     }
 }
 exports.Reset_Image_View = Reset_Image_View
