@@ -115,6 +115,9 @@ async function First_Display_Init() {
     document.getElementById(`delete-image-button-id`).addEventListener("click", function() {
         Delete_Image();
     }, false);
+    document.getElementById(`search-images-button-id`).addEventListener("click", function() {
+        Search_Images();
+    }, false);
 
 
 
@@ -339,27 +342,38 @@ function Search_Images(){
         searchTags:[],
         searchMemeTags:[]
     }
-    search_tags_input = document.getElementById("search-tags-entry-form")
-    search_tags_input.value =""
 
-    console.log('search images button pressed!')
-    
-    var search_modal = document.getElementById("top-tagging-search-modal-id");
-    search_modal.style.display = "block";
-    var close_element = document.getElementById("search-close-modal-id");
-    close_element.onclick = function() {
-        search_modal.style.display = "none";
+
+    // Show the modal
+    let modal_search_click = document.getElementById("search-modal-click-top-id");
+    modal_search_click.style.display = "block";
+    // Get the button that opens the modal
+    let meme_modal_close_btn = document.getElementById("modal-search-close-exit-view-button-id");
+    // When the user clicks on the button, close the modal
+    meme_modal_close_btn.onclick = function() {
+        modal_search_click.style.display = "none";
     }
+    // When the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {
-        if (event.target == search_modal) {
-            search_modal.style.display = "none";
+        if (event.target == modal_search_click) {
+            modal_search_click.style.display = "none";
         }
     }
-    var select_image_search_order = document.getElementById("search-modal-load-image-order")
+
+
+
+
+    search_tags_input = document.getElementById("modal-search-tag-textarea-entry-id")
+    search_tags_input.value =""
+
+    search_meme_tags_input = document.getElementById("modal-search-meme-tag-textarea-entry-id")
+    search_meme_tags_input.value =""
+
+    var select_image_search_order = document.getElementById("modal-search-images-results-select-images-order-button-id")
     select_image_search_order.onclick = function() {
         Chose_Image_Search_Results()
     }
-    var select_meme_image_search_order = document.getElementById("search-modal-load-meme-order")
+    var select_meme_image_search_order = document.getElementById("modal-search-images-results-select-meme-images-order-button-id")
     select_meme_image_search_order.onclick = function() {
         Chose_Meme_Image_Search_Results()
     }
@@ -369,7 +383,7 @@ function Search_Images(){
     //populate the search modal with the fields to insert meme tags
     Search_Populate_Memetic_Component()
 
-    search_complete = true
+    // search_complete = true
 }
 
 //when the tagging search modal 'search' button is pressed
