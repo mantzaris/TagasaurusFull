@@ -8,6 +8,9 @@
 	<!-- The main tagging UI style sheet -->
 	<link rel="stylesheet" href="./taga-CSS/tagging-main-ui.css">
 
+	<!-- general styles for buttons etc -->
+	<link rel="stylesheet" href="./taga-CSS/general-styles.css">
+
 	<!-- general style for the modal pop ups -->
 	<link rel="stylesheet" href="./taga-CSS/modal-general-style.css">
 
@@ -97,8 +100,8 @@
 			</div>
 
 			<div id="buttons-div-gridarea-textentry-id">
-				<button type="button" id="save-button-id">SAVE CHANGES</button>
-				<button type="button" id="reset-button-id">RESET</button>
+				<button type="button" class="fun-button-blue" id="save-button-id">SAVE CHANGES</button>
+				<button type="button" class="fun-button-red" id="reset-button-id">RESET</button>
 			</div>
 
 		</div>
@@ -256,38 +259,16 @@
 						<button type="button" id="modal-search-images-results-select-meme-images-order-button-id">Select Related Meme Image Order</button>
 					</div>
 					<!-- for the image annotation matches -->
-					<div id="modal-search-images-results-grid-div-area-id">
-						
-						<div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-Taga.png" >
+					<div id="modal-search-images-results-grid-div-area-id">						
+						<!-- <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-Taga.png" >
 							<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-Taga.png" src="images/Taga.png" title="view" alt="memes" />
-						</div>
-						<div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-paris.jpg" >
-							<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-paris.jpg" src="images/paris.jpg" title="view" alt="memes" />
-						</div>
-						<div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-water.jpg" >
-							<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-water.jpg" src="images/water.jpg" title="view" alt="memes" />
-						</div>
-						<div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-paris2.jpg" >
-							<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-paris2.jpg" src="images/paris2.jpg" title="view" alt="memes" />
-						</div>
-
+						</div> -->
 					</div>
 					<!-- for the meme images matches -->
 					<div id="modal-search-meme-images-results-grid-div-area-id">
-						
-						<div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-Taga.png" >
+						<!-- <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-Taga.png" >
 							<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-Taga.png" src="images/Taga.png" title="view" alt="memes" />
-						</div>
-						<div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-paris.jpg"" >
-							<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-paris.jpg" src="images/paris.jpg" title="view" alt="memes" />
-						</div>
-						<div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-water.jpg" >
-							<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-water.jpg" src="images/water.jpg" title="view" alt="memes" />
-						</div>
-						<div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-paris2.jpg" >
-							<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-paris2.jpg" src="images/paris2.jpg" title="view" alt="memes" />
-						</div>
-
+						</div> -->
 					</div>
 				</div>
 				<!-- IMAGE SEARCH RESULTS END -->
@@ -454,79 +435,9 @@
 
 <script src="./taga-JS/tagging-controller-main.js"></script>
 
-<script type="text/javascript">
+<!-- <script type="text/javascript">
 
-	// reset_btn = document.getElementById("reset-button-id")
-	// reset_btn.onclick = function() {
-	// 	Search_Clicked_Modal_View()
-	// 	console.log('save')
-	// }
-	// save_btn = document.getElementById("save-button-id")
-	// save_btn.onclick = function() {
-	// 	Meme_Clicked_Modal_View()
-	// }
-	// rtn_main_btn = document.getElementById("return-to-main-button-id")
-	// rtn_main_btn.onclick = function() {
-	// 	console.log('yo to')
-	// 	Search_Add_Memes_Clicked_Modal_View()
-	// }
-
-	function Search_Add_Memes_Clicked_Modal_View(){
-		// Show the modal
-		var modal_add_memes_search_click = document.getElementById("search-add-memes-modal-click-top-id");
-		modal_add_memes_search_click.style.display = "block";
-		// Get the button that opens the modal
-		var meme_modal_close_btn = document.getElementById("modal-search-add-memes-close-exit-view-button-id");
-		// When the user clicks on the button, close the modal
-		meme_modal_close_btn.onclick = function() {
-			modal_add_memes_search_click.style.display = "none";
-		}
-		// When the user clicks anywhere outside of the modal, close it
-		window.onclick = function(event) {
-			if (event.target == modal_add_memes_search_click) {
-				modal_add_memes_search_click.style.display = "none";
-			}
-		}
-	}
-
-	function Search_Clicked_Modal_View(){
-		// Show the modal
-		var modal_search_click = document.getElementById("search-modal-click-top-id");
-		modal_search_click.style.display = "block";
-		// Get the button that opens the modal
-		var meme_modal_close_btn = document.getElementById("modal-search-close-exit-view-button-id");
-		// When the user clicks on the button, close the modal
-		meme_modal_close_btn.onclick = function() {
-			modal_search_click.style.display = "none";
-		}
-		// When the user clicks anywhere outside of the modal, close it
-		window.onclick = function(event) {
-			if (event.target == modal_search_click) {
-				modal_search_click.style.display = "none";
-			}
-		}
-	}
-
-	function Meme_Clicked_Modal_View(){
-		// Show the modal
-		var modal_meme_click = document.getElementById("modal-meme-clicked-top-id");
-		modal_meme_click.style.display = "block";
-		// Get the button that opens the modal
-		var meme_modal_close_btn = document.getElementById("modal-meme-clicked-close-button-id");
-		// When the user clicks on the button, close the modal
-		meme_modal_close_btn.onclick = function() {
-			modal_meme_click.style.display = "none";
-		}
-		// When the user clicks anywhere outside of the modal, close it
-		window.onclick = function(event) {
-			if (event.target == modal_meme_click) {
-				modal_meme_click.style.display = "none";
-			}
-		}
-	}
-
-
-</script>
+</script> -->
 
 
 

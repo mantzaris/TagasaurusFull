@@ -310,26 +310,28 @@ input:checked + .slider:before {
 }
 #buttons-div-gridarea-textentry-id {
   grid-area: buttons-div-gridarea-textentry;
+  height: 100%;
 }
 #save-button-id {
   width: 48%;
-  height: 90%;
+  height: 95%;
   font-weight: bold;
   font-size: 2vmin;
   vertical-align: middle;
-  border-radius: 10%;
+  /*border-radius: 10%;
   background-color: #1884ff;
-  cursor: pointer;
+  cursor: pointer; */
 }
 #reset-button-id {
   width: 48%;
-  height: 90%;
+  height: 95%;
+  display: inline-block;
   font-weight: bold;
   font-size: 2vmin;
   vertical-align: middle;
-  border-radius: 10%;
+  /* border-radius: 10%;
   background-color: #ad2021;
-  cursor: pointer;
+  cursor: pointer; */
 }
 
 /* DESCRIPTION AREA END */
