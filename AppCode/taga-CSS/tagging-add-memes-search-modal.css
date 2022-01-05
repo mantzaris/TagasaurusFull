@@ -26,17 +26,17 @@
   display: block;
   width: 50%;
   height: 90%;
-  background-color: #1884ff;
-  border-radius: 15%;
+  /* background-color: #1884ff; */
+  /* border-radius: 15%; */
   font-weight: bold;
   font-size: 2.5vmin;
 }
 #modal-search-add-memes-reset-button-id {
   display: inline-block;
   text-align: center; /*width: 30%;*/
-  height: 60%;
-  background-color: #ad2021;
-  border-radius: 25%;
+  height: 75%;
+  /* background-color: #ad2021; */
+  /* border-radius: 25%; */
   font-weight: bold;
   font-size: 2.5vmin;
 }

@@ -43,7 +43,7 @@
 					name="emotion-new-emotion-textarea-name" oninput="this.value = this.value.replace(/[ \n]/g,'')"></textarea>
 				<span id="emotion-text-range-value-label-left-id">0</span> <input id="new-emotion-range-id" type="range"
 					min="0" max="100" value="0"> <span id="emotion-text-range-value-label-right-id">100</span>
-				<button type="button" id="add-new-emotion-button-id">ADD NEW EMOTION</button>
+				<button type="button" class="fun-button-blue" id="add-new-emotion-button-id">ADD NEW EMOTION</button>
 			</div>
 
 			<!-- EMOTIONS Values List -->
@@ -66,15 +66,15 @@
 		<div id="center-gridbox-id">
 			
 			<div id="center-button-area-div-id">
-				<button class="center-buttons" type="button" id="search-images-button-id">Search stored images</button>
-				<button class="center-buttons" type="button" id="load-new-image-button-id">Load new image</button>
-				<button class="center-buttons" type="button" id="delete-image-button-id">Delete image</button>
-				<button class="center-buttons" type="button" id="return-to-main-button-id">Return to Main</button>
+				<button class="center-buttons fun-button-blue" type="button" id="search-images-button-id">Search stored images</button>
+				<button class="center-buttons fun-button-blue" type="button" id="load-new-image-button-id">Load new image</button>
+				<button class="center-buttons fun-button-red" type="button" id="delete-image-button-id">Delete image</button>
+				<button class="center-buttons fun-button-blue" type="button" id="return-to-main-button-id">Return to Main</button>
 			</div>
 
 			<div id="center-lower-button-area-div-id">
-				<button class="center-lower-buttons" type="button" id="left-gallery-image-button-id"> < < < Prev </button>
-				<button class="center-lower-buttons" type="button" id="right-gallery-image-button-id">  Next > > > </button>
+				<button class="center-lower-buttons fun-button-blue" type="button" id="left-gallery-image-button-id"> < < < Prev </button>
+				<button class="center-lower-buttons fun-button-blue" type="button" id="right-gallery-image-button-id">  Next > > > </button>
 			</div>
 			
 			<div id="center-gallery-area-div-id">
@@ -118,7 +118,7 @@
 
 			<!-- MEMES Add New Meme Button -->
 			<div id="memes-innerbox-newmemes">
-				<button type="button" id="add-new-memes-button-id">ADD NEW MEMES</button>
+				<button type="button" class="fun-button-blue" id="add-new-memes-button-id">ADD NEW MEMES</button>
 			</div>
 			
 			<!-- MEMES Container Scroller -->
@@ -171,8 +171,8 @@
 
 				<!-- search button -->
 				<div id="modal-search-main-button-container-div-id">
-					<button type="button" id="modal-search-main-button-id">SEARCH BUTTON</button>
-					<button type="button" id="modal-search-main-reset-button-id">RESET FIELDS</button>
+					<button type="button" class="fun-button-blue" id="modal-search-main-button-id">SEARCH BUTTON</button>
+					<button type="button" class="fun-button-red" id="modal-search-main-reset-button-id">RESET FIELDS</button>
 				</div>
 
 				<!-- image tag entry -->				
@@ -202,7 +202,7 @@
 				<div id="modal-search-emotion-entry-top-div-id">
 
 					<!-- <div id="grid-emotion-area-1-id"></div> -->
-					<button type="button" id="modal-search-emotion-entry-button-id">INCLUDE EMOTION</button>
+					<button type="button" class="fun-button-blue" id="modal-search-emotion-entry-button-id">INCLUDE EMOTION</button>
 					<!-- </div> -->
 
 					<!-- <div id="grid-emotion-area-2-id"> -->
@@ -253,10 +253,10 @@
 				<!-- IMAGE SEARCH RESULTS START -->
 				<div id="modal-search-images-results-display-id">
 					<div id="modal-search-images-results-button-div-id">
-						<button type="button" id="modal-search-images-results-select-images-order-button-id">Select Image Order</button>
+						<button type="button" class="fun-button-blue" id="modal-search-images-results-select-images-order-button-id">Select Image Order</button>
 					</div>
 					<div id="modal-search-images-memes-results-button-div-id">
-						<button type="button" id="modal-search-images-results-select-meme-images-order-button-id">Select Related Meme Image Order</button>
+						<button type="button" class="fun-button-blue" id="modal-search-images-results-select-meme-images-order-button-id">Select Related Meme Image Order</button>
 					</div>
 					<!-- for the image annotation matches -->
 					<div id="modal-search-images-results-grid-div-area-id">						
@@ -291,8 +291,8 @@
 
 				<!-- search button -->
 				<div id="modal-search-add-memes-main-button-container-div-id">
-					<button type="button" id="modal-search-add-memes-main-button-id">SEARCH BUTTON</button>
-					<button type="button" id="modal-search-add-memes-reset-button-id">RESET FIELDS</button>
+					<button type="button" class="fun-button-blue" id="modal-search-add-memes-main-button-id">SEARCH BUTTON</button>
+					<button type="button" class="fun-button-red" id="modal-search-add-memes-reset-button-id">RESET FIELDS</button>
 				</div>
 
 				<!-- image tag entry -->
@@ -322,7 +322,7 @@
 				<div id="modal-search-add-memes-emotion-entry-top-div-id">
 
 					<div id="grid-emotion-area-1-id">
-						<button type="button" id="modal-search-add-memes-emotion-entry-button-id">+</button>
+						<button type="button" class="fun-button-blue" id="modal-search-add-memes-emotion-entry-button-id">+</button>
 					</div>
 
 					<div id="grid-emotion-area-2-id">
@@ -334,7 +334,7 @@
 					</div>
 					
 					<div id="grid-emotion-area-1-idb">
-						<button type="button" id="modal-search-add-memes-emotion-meme-entry-button-id">+</button>
+						<button type="button" class="fun-button-blue" id="modal-search-add-memes-emotion-meme-entry-button-id">+</button>
 					</div>
 
 					<div id="grid-emotion-area-2-idb">
@@ -370,7 +370,7 @@
 				<!-- IMAGE SEARCH RESULTS START -->
 				<div id="modal-search-add-memes-images-results-display-id">
 					<div id="modal-search-add-memes-images-results-button-div-id">
-						<button type="button" id="modal-search-add-memes-images-results-select-images-order-button-id">Select Toggled Images as Memes</button>
+						<button type="button" class="fun-button-blue" id="modal-search-add-memes-images-results-select-images-order-button-id">Select Toggled Images as Memes</button>
 					</div>
 					<!-- <div id="modal-search-images-memes-results-button-div-id">
 						<button type="button" id="modal-search-images-results-select-meme-images-order-button-id">Select Related Meme Image Order</button>

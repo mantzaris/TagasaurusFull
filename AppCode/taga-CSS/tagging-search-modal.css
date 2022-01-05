@@ -25,17 +25,17 @@
   display: block;
   width: 50%;
   height: 90%;
-  background-color: #1884ff;
-  border-radius: 15%;
+  /* background-color: #1884ff; */
+  /* border-radius: 15%; */
   font-weight: bold;
   font-size: 2.5vmin;
 }
 #modal-search-main-reset-button-id {
   display: inline-block;
   text-align: center; /*width: 30%;*/
-  height: 60%;
-  background-color: #ad2021;
-  border-radius: 25%;
+  height: 75%;
+  /* background-color: #ad2021; */
+  /* border-radius: 25%; */
   font-weight: bold;
   font-size: 2.5vmin;
 }
@@ -78,7 +78,7 @@
   /* display: flex;
   align-items: center; */
   display: grid;
-  grid-template-columns: 1fr 1fr 3fr;
+  grid-template-columns: 3fr 3fr 8fr;
   grid-template-areas:
     "grid-emotion-area-1-id"
     "grid-emotion-area-2-id"
@@ -92,8 +92,8 @@
   display: inline-block;
   text-align: center;
   height: 90%;
-  background-color: #1884ff;
-  border-radius: 15%;
+  /* background-color: #1884ff; */
+  /* border-radius: 15%; */
   font-weight: bold;
   font-size: 2.5vmin;
 }
@@ -209,12 +209,12 @@
 #modal-search-images-results-select-images-order-button-id {
   background-color: #1884ff;
   /* height: 70%; */
-  border-radius: 10%;
+  /* border-radius: 10%; */
   width: 70%;
-  margin: 2px;
+  /* margin: 2px; */
   font-size: 2.75vmin;
   font-weight: bold;
-  border-right: 2px #00c600 solid;
+  /* border-right: 2px #00c600 solid; */
 }
 #modal-search-images-memes-results-button-div-id {
   background-color: #00c600;
@@ -228,12 +228,12 @@
 #modal-search-images-results-select-meme-images-order-button-id {
   background-color: #1884ff;
   /* height: 70%; */
-  border-radius: 10%;
-  margin: 2px;
+  /* border-radius: 10%; */
+  /* margin: 2px; */
   width: 70%;
   font-size: 2.75vmin;
   font-weight: bold;
-  border-left: 2px #00c600 solid;
+  /* border-left: 2px #00c600 solid; */
 }
 #modal-search-images-results-grid-div-area-id {
   background-color: #005000;

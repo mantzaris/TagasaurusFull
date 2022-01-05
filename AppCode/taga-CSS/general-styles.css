@@ -2,17 +2,17 @@
   display: inline-block;
   cursor: pointer;
   position: relative;
-  border-radius: 3.75rem;
+  border-radius: 2rem;
   outline: none;
-  padding: 1px;
-
+  padding: 2px;
   font-weight: bold;
-  border: 1px solid #012880;
+  border: 1px solid #0000ff;
   background-image: linear-gradient(-180deg, #8fb0d6 0%, #1884ff 100%);
 }
 
 .fun-button-blue:active {
   transform: scale(0.95);
+  box-shadow: 0 0 0 1px #0000ff, 0 0 0 1px #0084ff;
 }
 
 .fun-button-red {
@@ -21,8 +21,7 @@
   position: relative;
   border-radius: 3.75rem;
   outline: none;
-  padding: 1px;
-
+  padding: 3px;
   font-weight: bold;
   border: 1px solid #012880;
   background-image: linear-gradient(-180deg, #bd7a7a 0%, #ad2021 100%);
@@ -30,4 +29,5 @@
 
 .fun-button-red:active {
   transform: scale(0.95);
+  box-shadow: 0 0 0 1px #aa0000, 0 0 0 1px #ad0021;
 }
