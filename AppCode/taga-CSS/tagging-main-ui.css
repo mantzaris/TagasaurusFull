@@ -393,6 +393,7 @@ input:checked + .slider:before {
 #center-gridbox-id {
   background-color: #808a80;
   grid-area: center-gridbox-id;
+  min-height: 0;
   display: grid;
   grid-template-rows: 2fr 1fr 21fr; /* 1fr */
   box-sizing: border-box;
@@ -455,24 +456,27 @@ input:checked + .slider:before {
 #center-gallery-area-div-id {
   grid-area: center-gallery-area-div-id;
   background-color: #808a80;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
   position: relative;
   border-top: #005000 solid medium;
+  /* padding: 4px; */
 }
 
 #center-gallery-image-id {
-  width: 100%;
+  /* width: 100%;
+  height: 100%; */
+  height: 99999px;
+  object-fit: contain;
+  max-height: 100%;
+  max-width: 100%;
+  display: block;
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  margin: auto;
-
-  border-style: solid;
-  border-width: thin;
-  border-color: #00c600;
+  margin: auto auto;
 }
 
 /* CENTER GRID AREA END */
