@@ -43,7 +43,7 @@
 		<button class="center-buttons fun-button-blue" type="button" id="collection-control-button-previous-id"><&lt;-PREVIOUS</button>
 		<button class="center-buttons fun-button-blue" type="button" id="collection-control-button-next-id">NEXT->></button>
 	</div>
-	<button class="center-buttons fun-button-blue" type="button" id="collection-control-button-createcollection-id">CREATE COLLECTION</button>
+	<button onclick="location.href='entity-creation-page.html'" class="center-buttons fun-button-blue" type="button" id="collection-control-button-createcollection-id">CREATE COLLECTION</button>
 	<button onclick="location.href='welcome-screen.html'" class="center-buttons fun-button-blue" type="button" id="collection-control-button-returntomain-id">RETURN TO MAIN</button>
 	<button class="center-buttons fun-button-red" type="button" id="collection-control-button-delete-id">DELETE COLLECTION</button>
 </div>
@@ -55,7 +55,7 @@
 		<button type="button" class="fun-button-blue" id="collection-profile-image-change-image-button-id">CHANGE IMAGE</button>
 	</div>
 	<div id="collection-profile-image-display-div-id">
-		<!-- <img id="collection-profile-image-img-id" src="images/water.jpg" title="view" alt="collection-profile-image"/> -->
+		<img id="collection-profile-image-img-id" src="" title="view" alt="collection-profile-image"/>
 	</div>
 </div>
 <!-- COLLECTION PROFILE IMAGE END -->
@@ -726,7 +726,7 @@
 				Emotions: ('good':123), ('bad',321),('good':123), ('bad',321),('good':123), ('bad',321),('good':123), ('bad',321),('good':123), ('bad',321),('good':123), ('bad',321)
 			</div>
 			<div id="modal-image-clicked-image-gridbox-id">
-				<img id="modal-image-clicked-displayimg-id" src="images/paris2.jpg" title="meme" alt="meme"/>
+				<!-- <img id="modal-image-clicked-displayimg-id" src="images/paris2.jpg" title="meme" alt="meme"/> -->
 			</div>
 		</div>
 	</div>
@@ -739,193 +739,194 @@
 
 </body>
 
-<script src="./masonry.pkgd.min.js"></script>
+
+<script src="./taga-JS/collection-controller.js"></script>
 
 <script type="text/javascript">
-	desription_btn = document.getElementById("collection-image-annotation-navbar-description-button-id")
-	emotion_btn = document.getElementById("collection-image-annotation-navbar-emotion-button-id")
-	meme_btn = document.getElementById("collection-image-annotation-navbar-meme-button-id")
+// 	desription_btn = document.getElementById("collection-image-annotation-navbar-description-button-id")
+// 	emotion_btn = document.getElementById("collection-image-annotation-navbar-emotion-button-id")
+// 	meme_btn = document.getElementById("collection-image-annotation-navbar-meme-button-id")
 	
-	desription_btn.classList.add('nav-bar-on')
-	emotion_btn.classList.add('nav-bar-off')
-	meme_btn.classList.add('nav-bar-off')
+// 	desription_btn.classList.add('nav-bar-on')
+// 	emotion_btn.classList.add('nav-bar-off')
+// 	meme_btn.classList.add('nav-bar-off')
 	
-	annotations_div = document.getElementById("collection-image-annotation-mode-div-id")
+// 	annotations_div = document.getElementById("collection-image-annotation-mode-div-id")
 	
-	description_annotations_div = document.getElementById("collection-image-annotation-description-div-id")
-	emotions_annotations_div = document.getElementById("collection-image-annotation-emotions-div-id")
-	memes_annotations_div = document.getElementById("collection-image-annotation-memes-div-id")
+// 	description_annotations_div = document.getElementById("collection-image-annotation-description-div-id")
+// 	emotions_annotations_div = document.getElementById("collection-image-annotation-emotions-div-id")
+// 	memes_annotations_div = document.getElementById("collection-image-annotation-memes-div-id")
 	
-	annotations_div.removeChild(emotions_annotations_div)
-	annotations_div.removeChild(memes_annotations_div)
-	annotations_div.appendChild(description_annotations_div)
+// 	annotations_div.removeChild(emotions_annotations_div)
+// 	annotations_div.removeChild(memes_annotations_div)
+// 	annotations_div.appendChild(description_annotations_div)
 	
-	desription_btn.addEventListener("click", function (event) {
-		desription_btn.classList.remove('nav-bar-off')
-		desription_btn.classList.add('nav-bar-on')
-		emotion_btn.classList.remove('nav-bar-on')
-		emotion_btn.classList.add('nav-bar-off')
-		meme_btn.classList.remove('nav-bar-on')
-		meme_btn.classList.add('nav-bar-off')
+// 	desription_btn.addEventListener("click", function (event) {
+// 		desription_btn.classList.remove('nav-bar-off')
+// 		desription_btn.classList.add('nav-bar-on')
+// 		emotion_btn.classList.remove('nav-bar-on')
+// 		emotion_btn.classList.add('nav-bar-off')
+// 		meme_btn.classList.remove('nav-bar-on')
+// 		meme_btn.classList.add('nav-bar-off')
 		
-		annotations_div.innerHTML = ""
-		annotations_div.appendChild(description_annotations_div)
+// 		annotations_div.innerHTML = ""
+// 		annotations_div.appendChild(description_annotations_div)
 		
-	})
-	emotion_btn.addEventListener("click", function (event) {
-		desription_btn.classList.remove('nav-bar-on')
-		desription_btn.classList.add('nav-bar-off')
-		emotion_btn.classList.remove('nav-bar-off')
-		emotion_btn.classList.add('nav-bar-on')
-		meme_btn.classList.remove('nav-bar-on')
-		meme_btn.classList.add('nav-bar-off')
+// 	})
+// 	emotion_btn.addEventListener("click", function (event) {
+// 		desription_btn.classList.remove('nav-bar-on')
+// 		desription_btn.classList.add('nav-bar-off')
+// 		emotion_btn.classList.remove('nav-bar-off')
+// 		emotion_btn.classList.add('nav-bar-on')
+// 		meme_btn.classList.remove('nav-bar-on')
+// 		meme_btn.classList.add('nav-bar-off')
 		
-		annotations_div.innerHTML = ""
-		annotations_div.appendChild(emotions_annotations_div)
+// 		annotations_div.innerHTML = ""
+// 		annotations_div.appendChild(emotions_annotations_div)
 		
-	})
-	meme_btn.addEventListener("click", function (event) {
-		desription_btn.classList.remove('nav-bar-on')
-		desription_btn.classList.add('nav-bar-off')
-		emotion_btn.classList.remove('nav-bar-on')
-		emotion_btn.classList.add('nav-bar-off')
-		meme_btn.classList.remove('nav-bar-off')
-		meme_btn.classList.add('nav-bar-on')
+// 	})
+// 	meme_btn.addEventListener("click", function (event) {
+// 		desription_btn.classList.remove('nav-bar-on')
+// 		desription_btn.classList.add('nav-bar-off')
+// 		emotion_btn.classList.remove('nav-bar-on')
+// 		emotion_btn.classList.add('nav-bar-off')
+// 		meme_btn.classList.remove('nav-bar-off')
+// 		meme_btn.classList.add('nav-bar-on')
 		
-		annotations_div.innerHTML = ""
-		annotations_div.appendChild(memes_annotations_div)
+// 		annotations_div.innerHTML = ""
+// 		annotations_div.appendChild(memes_annotations_div)
 		
-		/*
-* Since the block (meme tab) is hidden when the page is loaded, JS does not find the necessary class in order to build the grid.
-* */
-		var grid = document.querySelector(".collection-image-annotation-memes-images-grid-class");
-		var msnry = new Masonry(grid, {
-			columnWidth: '.collection-image-annotation-memes-masonry-grid-sizer',
-			itemSelector: '.collection-image-annotation-memes-grid-item-class',
-			percentPosition: true,
-			gutter: 5,
-			transitionDuration: 0
-		});
+// 		/*
+// * Since the block (meme tab) is hidden when the page is loaded, JS does not find the necessary class in order to build the grid.
+// * */
+// 		var grid = document.querySelector(".collection-image-annotation-memes-images-grid-class");
+// 		var msnry = new Masonry(grid, {
+// 			columnWidth: '.collection-image-annotation-memes-masonry-grid-sizer',
+// 			itemSelector: '.collection-image-annotation-memes-grid-item-class',
+// 			percentPosition: true,
+// 			gutter: 5,
+// 			transitionDuration: 0
+// 		});
 		
-		document.getElementById("collection-image-annotation-memes-new-memes-add-button-id").addEventListener("click", function () {
-			console.log('click')
-			// Show the modal
-			var modal_meme_click = document.getElementById("search-add-memes-modal-click-top-id");
-			modal_meme_click.style.display = "block";
-			// Get the button that opens the modal
-			var meme_modal_close_btn = document.getElementById("modal-search-add-memes-close-exit-view-button-id");
-			// When the user clicks on the button, close the modal
-			meme_modal_close_btn.onclick = function () {
-				modal_meme_click.style.display = "none";
-			}
-			// When the user clicks anywhere outside of the modal, close it
-			window.onclick = function (event) {
-				if (event.target == modal_meme_click) {
-					modal_meme_click.style.display = "none";
-				}
-			}
-		})
+// 		document.getElementById("collection-image-annotation-memes-new-memes-add-button-id").addEventListener("click", function () {
+// 			console.log('click')
+// 			// Show the modal
+// 			var modal_meme_click = document.getElementById("search-add-memes-modal-click-top-id");
+// 			modal_meme_click.style.display = "block";
+// 			// Get the button that opens the modal
+// 			var meme_modal_close_btn = document.getElementById("modal-search-add-memes-close-exit-view-button-id");
+// 			// When the user clicks on the button, close the modal
+// 			meme_modal_close_btn.onclick = function () {
+// 				modal_meme_click.style.display = "none";
+// 			}
+// 			// When the user clicks anywhere outside of the modal, close it
+// 			window.onclick = function (event) {
+// 				if (event.target == modal_meme_click) {
+// 					modal_meme_click.style.display = "none";
+// 				}
+// 			}
+// 		})
 		
 		
-	})
-	
-	
-	var grid_gallery = document.querySelector(".collection-images-gallery-grid-class");
-	var msnry = new Masonry(grid_gallery, {
-		columnWidth: '.collection-images-gallery-masonry-grid-sizer',
-		itemSelector: '.collection-images-gallery-grid-item-class',
-		percentPosition: true,
-		gutter: 5,
-		transitionDuration: 0,
-		transitionDuration: 0
-	});
+// 	})
 	
 	
-	//profile image selection
-	document.getElementById("collection-profile-image-img-id").addEventListener("click", function (event) {
-		console.log('click')
-		// Show the modal
-		var modal_meme_click = document.getElementById("modal-image-clicked-top-id");
-		modal_meme_click.style.display = "block";
-		// Get the button that opens the modal
-		var meme_modal_close_btn = document.getElementById("modal-image-clicked-close-button-id");
-		// When the user clicks on the button, close the modal
-		meme_modal_close_btn.onclick = function () {
-			modal_meme_click.style.display = "none";
-		}
-		// When the user clicks anywhere outside of the modal, close it
-		window.onclick = function (event) {
-			if (event.target == modal_meme_click) {
-				modal_meme_click.style.display = "none";
-			}
-		}
-		
-		/*
-* Since the block (modal for profile image) is hidden when the page is loaded, JS does not find the necessary class in order to build the grid.
-* */
-		var grid_profile_img = document.querySelector(".modal-search-profileimage-images-results-grid-class");
-		var msnrygrid_profile_img = new Masonry(grid_profile_img, {
-			columnWidth: '.modal-search-profileimage-images-results-masonry-grid-sizer',
-			itemSelector: '.modal-image-search-profileimageresult-single-image-div-class',
-			percentPosition: true,
-			gutter: 5,
-			transitionDuration: 0
-		});
-		
-		
-	})
+// 	var grid_gallery = document.querySelector(".collection-images-gallery-grid-class");
+// 	var msnry = new Masonry(grid_gallery, {
+// 		columnWidth: '.collection-images-gallery-masonry-grid-sizer',
+// 		itemSelector: '.collection-images-gallery-grid-item-class',
+// 		percentPosition: true,
+// 		gutter: 5,
+// 		transitionDuration: 0,
+// 		transitionDuration: 0
+// 	});
 	
 	
-	document.getElementById("collections-images-gallery-grid-button-addimages-id").addEventListener("click", function (event) {
-		console.log('click')
-		// Show the modal
-		var modal_meme_click = document.getElementById("search-modal-click-top-id");
-		modal_meme_click.style.display = "block";
-		// Get the button that opens the modal
-		var meme_modal_close_btn = document.getElementById("modal-search-close-exit-view-button-id");
-		// When the user clicks on the button, close the modal
-		meme_modal_close_btn.onclick = function () {
-			modal_meme_click.style.display = "none";
-		}
-		// When the user clicks anywhere outside of the modal, close it
-		window.onclick = function (event) {
-			if (event.target == modal_meme_click) {
-				modal_meme_click.style.display = "none";
-			}
-		}
+// 	//profile image selection
+// 	document.getElementById("collection-profile-image-img-id").addEventListener("click", function (event) {
+// 		console.log('click')
+// 		// Show the modal
+// 		var modal_meme_click = document.getElementById("modal-image-clicked-top-id");
+// 		modal_meme_click.style.display = "block";
+// 		// Get the button that opens the modal
+// 		var meme_modal_close_btn = document.getElementById("modal-image-clicked-close-button-id");
+// 		// When the user clicks on the button, close the modal
+// 		meme_modal_close_btn.onclick = function () {
+// 			modal_meme_click.style.display = "none";
+// 		}
+// 		// When the user clicks anywhere outside of the modal, close it
+// 		window.onclick = function (event) {
+// 			if (event.target == modal_meme_click) {
+// 				modal_meme_click.style.display = "none";
+// 			}
+// 		}
 		
-	})
+// 		/*
+// * Since the block (modal for profile image) is hidden when the page is loaded, JS does not find the necessary class in order to build the grid.
+// * */
+// 		var grid_profile_img = document.querySelector(".modal-search-profileimage-images-results-grid-class");
+// 		var msnrygrid_profile_img = new Masonry(grid_profile_img, {
+// 			columnWidth: '.modal-search-profileimage-images-results-masonry-grid-sizer',
+// 			itemSelector: '.modal-image-search-profileimageresult-single-image-div-class',
+// 			percentPosition: true,
+// 			gutter: 5,
+// 			transitionDuration: 0
+// 		});
+		
+		
+// 	})
 	
 	
-	document.getElementById("collection-profile-image-change-image-button-id").addEventListener("click", function (event) {
-		console.log('click')
+// 	document.getElementById("collections-images-gallery-grid-button-addimages-id").addEventListener("click", function (event) {
+// 		console.log('click')
+// 		// Show the modal
+// 		var modal_meme_click = document.getElementById("search-modal-click-top-id");
+// 		modal_meme_click.style.display = "block";
+// 		// Get the button that opens the modal
+// 		var meme_modal_close_btn = document.getElementById("modal-search-close-exit-view-button-id");
+// 		// When the user clicks on the button, close the modal
+// 		meme_modal_close_btn.onclick = function () {
+// 			modal_meme_click.style.display = "none";
+// 		}
+// 		// When the user clicks anywhere outside of the modal, close it
+// 		window.onclick = function (event) {
+// 			if (event.target == modal_meme_click) {
+// 				modal_meme_click.style.display = "none";
+// 			}
+// 		}
 		
-		// Show the modal
-		var modal_meme_click = document.getElementById("search-profileimage-modal-click-top-id");
-		modal_meme_click.style.display = "block";
-		// Get the button that opens the modal
-		var meme_modal_close_btn = document.getElementById("modal-search-profileimage-close-exit-view-button-id");
-		// When the user clicks on the button, close the modal
-		meme_modal_close_btn.onclick = function () {
-			modal_meme_click.style.display = "none";
-		}
-		// When the user clicks anywhere outside of the modal, close it
-		window.onclick = function (event) {
-			if (event.target == modal_meme_click) {
-				modal_meme_click.style.display = "none";
-			}
-		}
+// 	})
+	
+	
+// 	document.getElementById("collection-profile-image-change-image-button-id").addEventListener("click", function (event) {
+// 		console.log('click')
 		
-		var grid_profile_img = document.querySelector("#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-grid-class");
-		var msnrygrid_profile_img = new Masonry(grid_profile_img, {
-			columnWidth: '#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-masonry-grid-sizer',
-			itemSelector: '#modal-search-profileimage-images-results-grid-div-area-id .modal-image-search-profileimageresult-single-image-div-class',
-			percentPosition: true,
-			gutter: 5,
-			transitionDuration: 0
-		});
+// 		// Show the modal
+// 		var modal_meme_click = document.getElementById("search-profileimage-modal-click-top-id");
+// 		modal_meme_click.style.display = "block";
+// 		// Get the button that opens the modal
+// 		var meme_modal_close_btn = document.getElementById("modal-search-profileimage-close-exit-view-button-id");
+// 		// When the user clicks on the button, close the modal
+// 		meme_modal_close_btn.onclick = function () {
+// 			modal_meme_click.style.display = "none";
+// 		}
+// 		// When the user clicks anywhere outside of the modal, close it
+// 		window.onclick = function (event) {
+// 			if (event.target == modal_meme_click) {
+// 				modal_meme_click.style.display = "none";
+// 			}
+// 		}
 		
-	})
+// 		var grid_profile_img = document.querySelector("#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-grid-class");
+// 		var msnrygrid_profile_img = new Masonry(grid_profile_img, {
+// 			columnWidth: '#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-masonry-grid-sizer',
+// 			itemSelector: '#modal-search-profileimage-images-results-grid-div-area-id .modal-image-search-profileimageresult-single-image-div-class',
+// 			percentPosition: true,
+// 			gutter: 5,
+// 			transitionDuration: 0
+// 		});
+		
+// 	})
 
 
 </script>

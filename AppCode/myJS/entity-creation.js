@@ -234,7 +234,7 @@ function Part1_HTML() {
             <br>           
             <button type="button" class="btn btn-primary btn-lg" onclick="Next_Btn_Step1()">Next</button>
         </div>
-        <a type="button" style="background-color: #993333" class="btn btn-primary btn-lg" href="entity-main.html" >
+        <a type="button" style="background-color: #993333" class="btn btn-primary btn-lg" href="collections.html" >
             Cancel
         </a>
         `
