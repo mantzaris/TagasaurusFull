@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	
+	<title>Tagasaurus</title>
+	
+	<!-- The main collections UI style sheet -->
+	<link rel="stylesheet" href="./taga-CSS/collections-main-ui.css">
+	
+	<!-- The general cross app style sheet for things like button design -->
+	<link rel="stylesheet" href="./taga-CSS/general-styles.css">
+	
+	<!-- The general modal app style sheet for things like pop up searches -->
+	<link rel="stylesheet" href="./taga-CSS/modal-general-style.css">
+	
+	<!-- The style sheet for style sheet for having clicked on individual images -->
+	<link rel="stylesheet" href="./taga-CSS/collections-image-clicked-modal.css">
+	
+	<!-- The style sheet for style sheet for having clicked on individual images -->
+	<link rel="stylesheet" href="./taga-CSS/collections-add-memes-search-modal.css">
+	
+	<!-- The style sheet for style sheet for having clicked on individual images -->
+	<link rel="stylesheet" href="./taga-CSS/collections-search-modal.css">
+	
+	<!-- The style sheet for style sheet for having clicked on individual images -->
+	<link rel="stylesheet" href="./taga-CSS/collections-search-profile-image-modal.css">
+
+</head>
+
+
+<body id="collections-screen-id">
+
+
+<div id="collection-name-gridarea-id">
+	<img id="collection-name-hashtags-icon-id" src="taga-ui-icons/HashtagGreen.png" alt="hashtags"/>
+	<span id="collection-name-text-label-id">Famous Celebrity</span>
+</div>
+
+
+<div id="collection-control-buttons-gridarea-id">
+	<div id="collection-control-buttons-nextprev-div-id">
+		<button class="center-buttons fun-button-blue" type="button" id="collection-control-button-previous-id"><&lt;-PREVIOUS</button>
+		<button class="center-buttons fun-button-blue" type="button" id="collection-control-button-next-id">NEXT->></button>
+	</div>
+	<button class="center-buttons fun-button-blue" type="button" id="collection-control-button-createcollection-id">CREATE COLLECTION</button>
+	<button class="center-buttons fun-button-blue" type="button" id="collection-control-button-returntomain-id">RETURN TO MAIN</button>
+	<button class="center-buttons fun-button-red" type="button" id="collection-control-button-delete-id">DELETE COLLECTION</button>
+</div>
+
+
+<!-- COLLECTION PROFILE IMAGE START -->
+<div id="collection-profile-image-gridarea-id"> <!-- id="modal-search-images-results-grid-div-area-id" -->
+	<div id="collection-profile-image-button-div-id">
+		<button type="button" class="fun-button-blue" id="collection-profile-image-change-image-button-id">CHANGE IMAGE</button>
+	</div>
+	<div id="collection-profile-image-display-div-id">
+		<img id="collection-profile-image-img-id" src="images/water.jpg" title="view" alt="memes"/>
+	</div>
+</div>
+<!-- COLLECTION PROFILE IMAGE END -->
+
+<!-- COLLECTION ANNOTATIONS IMAGE START -->
+<div id="collection-annotations-gridarea-id">
+	<div id="collection-image-annotation-navbar-div-id">
+		<button class="fun-button-blue" id="collection-image-annotation-navbar-description-button-id">DESCRIPTION</button>
+		<button class="fun-button-blue" id="collection-image-annotation-navbar-emotion-button-id">EMOTIONS</button>
+		<button class="fun-button-blue" id="collection-image-annotation-navbar-meme-button-id">MEMES</button>
+	</div>
+	<!-- ALL ANNOTATION CONTENT TYPES -->
+	<div id="collection-image-annotation-mode-div-id">
+		
+		<!-- DESCRIPTION ANNOTATION DIV START -->
+		<div id="collection-image-annotation-description-div-id">
+			<div id="collection-image-annotation-description-textarea-div-id">
+				<textarea id="collection-image-annotation-description-textarea-id" placeholder="enter description..."></textarea>
+			</div>
+			<div id="collection-image-annotation-description-save-button-div-id">
+				<button class="fun-button-blue" id="collection-image-annotation-description-textarea-save-button-id">SAVE</button>
+			</div>
+			<div id="collection-description-annotation-hashtags-label-div-id">
+				<img id="hashtags-icon-id" src="taga-ui-icons/HashtagGreen.png" alt="hashtags"/>
+				<span id="collection-description-annotation-hashtags-text-label-span-id">HASHTAGS:</span>
+			</div>
+			<div id="collection-description-annotation-hashtags-div-id" contenteditable="true">
+				<!-- <ul id="collection-description-annotation-hashtags-list-id"> -->tag1, tag2tag2tagg2, tag3, tag4, tag5, tag6, tag7, tag8, tag9, tag10, tag11, tag12, tag13, tag14,
+				<!-- </ul> -->
+			</div>
+		</div>
+		<!-- DESCRIPTION ANNOTATION DIV END -->
+		
+		<!-- EMOTION ANNOTATION DIV START -->
+		<div id="collection-image-annotation-emotions-div-id">
+			
+			<div id="collection-image-annotation-emotions-labels-show-div-id">
+				
+				<div class="emotion-list-class" id="emotion-entry-div-id-good">
+					<div>
+						<img
+								class="emotion-delete-icon-class" id="emotion-delete-button-id-good" onmouseover="this.src='taga-ui-icons/CloseRed.png';" onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" alt="emotions" title="remove"
+						/>
+						<span class="emotion-label-view-class" id="emotion-id-label-view-name-good">good</span>
+					</div>
+					<input class="emotion-range-slider-class" id="emotion-range-id-good" type="range" min="0" max="100" value="0">
+				</div>
+				
+				<div class="emotion-list-class" id="emotion-entry-div-id-bad">
+					<div>
+						<img
+								class="emotion-delete-icon-class" id="emotion-delete-button-id-bad" onmouseover="this.src='taga-ui-icons/CloseRed.png';" onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" alt="emotions" title="remove"
+						/>
+						<span class="emotion-label-view-class" id="emotion-id-label-view-name-bad">bad</span>
+					</div>
+					<input class="emotion-range-slider-class" id="emotion-range-id-bad" type="range" min="0" max="100" value="0">
+				</div>
+				
+				<div class="emotion-list-class" id="emotion-entry-div-id-cool">
+					<div>
+						<img
+								class="emotion-delete-icon-class" id="emotion-delete-button-id-cool" onmouseover="this.src='taga-ui-icons/CloseRed.png';" onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" alt="emotions" title="remove"
+						/>
+						<span class="emotion-label-view-class" id="emotion-id-label-view-name-cool">coolcoolcoolcoolcoolcoolcoolcoolcoolcoolcool</span>
+					</div>
+					<input class="emotion-range-slider-class" id="emotion-range-id-cool" type="range" min="0" max="100" value="0">
+				</div>
+				
+				<div class="emotion-list-class" id="emotion-entry-div-id-nice">
+					<div>
+						<img
+								class="emotion-delete-icon-class" id="emotion-delete-button-id-nice" onmouseover="this.src='taga-ui-icons/CloseRed.png';" onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" alt="emotions" title="remove"
+						/>
+						<span class="emotion-label-view-class" id="emotion-id-label-view-name-nice">nice</span>
+					</div>
+					<input class="emotion-range-slider-class" id="emotion-range-id-nice" type="range" min="0" max="100" value="0">
+				</div>
+				
+				<div class="emotion-list-class" id="emotion-entry-div-id-happy">
+					<div>
+						<img
+								class="emotion-delete-icon-class" id="emotion-delete-button-id-happy" onmouseover="this.src='taga-ui-icons/CloseRed.png';" onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" alt="emotions" title="remove"
+						/>
+						<span class="emotion-label-view-class" id="emotion-id-label-view-name-happy">happy</span>
+					</div>
+					<input class="emotion-range-slider-class" id="emotion-range-id-happy" type="range" min="0" max="100" value="0">
+				</div>
+				
+				<div class="emotion-list-class" id="emotion-entry-div-id-sad">
+					<div>
+						<img
+								class="emotion-delete-icon-class" id="emotion-delete-button-id-sad" onmouseover="this.src='taga-ui-icons/CloseRed.png';" onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" alt="emotions" title="remove"
+						/>
+						<span class="emotion-label-view-class" id="emotion-id-label-view-name-sad">sad</span>
+					</div>
+					<input class="emotion-range-slider-class" id="emotion-range-id-sad" type="range" min="0" max="100" value="0">
+				</div>
+				
+				<div class="emotion-list-class" id="emotion-entry-div-id-hard">
+					<div>
+						<img
+								class="emotion-delete-icon-class" id="emotion-delete-button-id-hard" onmouseover="this.src='taga-ui-icons/CloseRed.png';" onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" alt="emotions" title="remove"
+						/>
+						<span class="emotion-label-view-class" id="emotion-id-label-view-name-hard">hard</span>
+					</div>
+					<input class="emotion-range-slider-class" id="emotion-range-id-hard" type="range" min="0" max="100" value="0">
+				</div>
+			
+			</div>
+			<div id="collection-image-annotation-emotions-new-entry-div-id">
+				<div id="collection-image-annotation-emotions-new-entry-emotion-textlabel-div-id">
+					<textarea
+							list="emotion-recommend" id="collection-image-annotation-emotions-new-entry-emotion-textarea-id" placeholder="emotion label" name="search-modal-emotion-tag-textarea" oninput="this.value = this.value.replace(/[ \n]/g,'')"
+					></textarea>
+				</div>
+				<div id="collection-image-annotation-emotions-new-entry-emotion-value-range-div-id">
+					<span id="collection-image-annotation-emotions-new-entry-emotion-value-label-min-id">0</span>
+					<span id="collection-image-annotation-emotions-new-entry-emotion-value-label-max-id">100</span>
+					<input id="collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id" type="range" min="0" max="100" value="0">
+				</div>
+				<div id="collection-image-annotation-emotions-new-entry-emotion-button-div-id">
+					<button type="button" class="fun-button-blue" id="collection-image-annotation-emotions-new-entry-add-emotion-button-id">ADD EMOTION</button>
+				</div>
+				<div id="collection-image-annotation-emotions-save-button-div-id">
+					<button type="button" class="fun-button-blue" id="collection-image-annotation-emotions-save-emotion-button-id">SAVE</button>
+				</div>
+			</div>
+		
+		</div>
+		<!-- EMOTION ANNOTATION DIV END -->
+		
+		<!-- EMOTION MEMES DIV START -->
+		<div id="collection-image-annotation-memes-div-id">
+			
+			<div class="collection-image-annotation-memes-grid-wrapper-class">
+				<div class="collection-image-annotation-memes-images-grid-class" id="collection-image-annotation-memes-images-show-div-id">
+					<!-- gets the column size for masonry -->
+					<div class="collection-image-annotation-memes-masonry-grid-sizer"></div>
+<!-- 					
+					<div class="collection-image-annotation-memes-grid-item-class">
+						<label class="memeswitch" title="deselect / keep">
+							<input id="meme-toggle-id-planet.jpg" type="checkbox" checked="true">
+							<span class="slider"></span>
+						</label>
+						<img src="images/planet.jpg" id="collection-image-annotation-memes-grid-img-id-planet.jpg" class="collection-image-annotation-meme-grid-img-class"/>
+					</div>
+
+					<div class="collection-image-annotation-memes-grid-item-class">
+						<label class="memeswitch" title="deselect / keep">
+							<input id="meme-toggle-id-planet.jpg" type="checkbox" checked="true">
+							<span class="slider"></span>
+						</label>
+						<img src="images/planet.jpg" id="collection-image-annotation-memes-grid-img-id-planet.jpg" class="collection-image-annotation-meme-grid-img-class"/>
+					</div>
+					<div class="collection-image-annotation-memes-grid-item-class">
+						<label class="memeswitch" title="deselect / keep">
+							<input id="meme-toggle-id-planet.jpg" type="checkbox" checked="true">
+							<span class="slider"></span>
+						</label>
+						<img src="images/planet.jpg" id="collection-image-annotation-memes-grid-img-id-planet.jpg" class="collection-image-annotation-meme-grid-img-class"/>
+					</div> -->
+					
+				
+				</div>
+			</div>
+			
+			<div id="collection-image-annotation-memes-new-memes-add-button-div-id">
+				<button type="button" class="fun-button-blue" id="collection-image-annotation-memes-new-memes-add-button-id">ADD MEMES</button>
+			</div>
+			<div id="collection-image-annotation-memes-save-changes-button-div-id">
+				<button type="button" class="fun-button-blue" id="collection-image-annotation-memes-save-changes-button-id">SAVE CHANGES</button>
+			</div>
+		
+		</div>
+		<!-- EMOTION MEMES DIV END -->
+	
+	</div>
+</div>
+<!-- COLLECTION ANNOTATIONS IMAGE END -->
+
+<div id="collection-images-gallery-gridarea-id">
+	
+	<div class="collection-images-gallery-grid-wrapper-class">
+		<div class="collection-images-gallery-grid-class" id="collections-images-gallery-grid-images-div-id">
+			<div class="collection-images-gallery-masonry-grid-sizer"></div>
+			
+			
+			<!-- <div class="collection-images-gallery-grid-item-class">
+				<label class="memeswitch" title="deselect / keep">
+					<input id="galleryimage-toggle-id-paris.jpg" type="checkbox" checked="true">
+					<span class="slider"></span>
+				</label>
+				<img src="images/paris.jpg" id="collection-image-annotation-memes-grid-img-id-paris.jpg" class="collection-images-gallery-grid-img-class"/>
+			</div>
+			<div class="collection-images-gallery-grid-item-class">
+				<label class="memeswitch" title="deselect / keep">
+					<input id="galleryimage-toggle-id-paris2.jpg" type="checkbox" checked="true">
+					<span class="slider"></span>
+				</label>
+				<img src="images/paris2.jpg" id="collection-image-annotation-memes-grid-img-id-paris2.jpg" class="collection-images-gallery-grid-img-class"/>
+			</div>
+			<div class="collection-images-gallery-grid-item-class">
+				<label class="memeswitch" title="deselect / keep">
+					<input id="galleryimage-toggle-id-water.jpg" type="checkbox" checked="true">
+					<span class="slider"></span>
+				</label>
+				<img src="images/water.jpg" id="collection-image-annotation-memes-grid-img-id-water.jpg" class="collection-images-gallery-grid-img-class"/>
+			</div>			
+			<div class="collection-images-gallery-grid-item-class">
+				<label class="memeswitch" title="deselect / keep">
+					<input id="galleryimage-toggle-id-planet.jpg" type="checkbox" checked="true">
+					<span class="slider"></span>
+				</label>
+				<img src="images/planet.jpg" id="collection-image-annotation-memes-grid-img-id-planet.jpg" class="collection-images-gallery-grid-img-class"/>
+			</div> -->
+		
+		
+		</div>
+	</div>
+	
+	<div id="collections-images-gallery-grid-button-addimages-div-id">
+		<button type="button" class="fun-button-blue" id="collections-images-gallery-grid-button-addimages-id">ADD IMAGES</button>
+	</div>
+	<div id="collections-images-gallery-grid-button-savechanges-div-id">
+		<button type="button" class="fun-button-blue" id="collections-images-gallery-grid-button-savechanges-id">SAVE CHANGES</button>
+	</div>
+
+</div>
+
+
+<!-- MODALS BEGIN -->
+
+
+<!-- MODAL COLLECTION SEARCH IMAGES START -->
+<div id="search-modal-click-top-id" class="modal-top-class">
+	<!-- MEME MODAL CLOSE -->
+	<img
+			class="modal-close-button-class" id="modal-search-close-exit-view-button-id" onmouseover="this.src='taga-ui-icons/CloseRed.png';" onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close"
+	/>
+	<!-- Modal content container -->
+	<div class="modal-content-container">
+		<div id="modal-search-top-grid-div-id">
+			
+			<!-- search button -->
+			<div id="modal-search-main-button-container-div-id">
+				<button type="button" class="fun-button-blue" id="modal-search-main-button-id">SEARCH BUTTON</button>
+				<button type="button" class="fun-button-red" id="modal-search-main-reset-button-id">RESET FIELDS</button>
+			</div>
+			
+			<!-- image tag entry -->
+			<div id="modal-search-tag-entry-container-div-id">
+				<span id="modal-search-tag-label-id">
+					Tag list:
+				</span>
+				<div id="modal-search-tag-textarea-entry-div-id">
+					<textarea
+							id="modal-search-tag-textarea-entry-id" placeholder="enter image #tags to search for" name="search-modal-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')"
+					></textarea>
+				</div>
+			</div>
+			
+			<!-- search meme tag entry start -->
+			<div id="modal-search-meme-tag-entry-top-div-id">
+				<span id="modal-search-meme-tag-label-id">
+					Meme Tag list:
+				</span>
+				<div id="modal-search-meme-tag-textarea-entry-div-id">
+					<textarea
+							id="modal-search-meme-tag-textarea-entry-id" placeholder="enter meme #tags connected to image search" name="search-modal-meme-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')"
+					></textarea>
+				</div>
+			</div>
+			<!-- search meme tag entry start -->
+			
+			<!-- add emotion/value entry -->
+			<div id="modal-search-emotion-entry-top-div-id">
+				
+				<!-- <div id="grid-emotion-area-1-id"></div> -->
+				<button type="button" class="fun-button-blue" id="modal-search-emotion-entry-button-id">INCLUDE EMOTION</button>
+				<!-- </div> -->
+				
+				<!-- <div id="grid-emotion-area-2-id"> -->
+				<div id="modal-search-emotion-label-and-value-entry-container-div-id">
+					<textarea
+							list="emotion-recommend" id="modal-search-emotion-label-value-textarea-entry-id" placeholder="emotion label" name="search-modal-emotion-tag-textarea" oninput="this.value = this.value.replace(/[ \n]/g,'')"
+					></textarea>
+					<input id="modal-search-emotion-value-range-entry-id" type="range" min="0" max="100" value="0">
+				</div>
+				<!-- </div> -->
+				
+				<!-- <div id="grid-emotion-area-3-id"> -->
+				<div id="modal-search-emotion-label-value-display-container-div-id">
+					
+					<!-- <span id="modal-search-emotion-label-value-span-id-EMOTIONKEY" style="white-space:nowrap">
+						<img class="modal-search-emotion-remove-button-class" id="modal-search-emotion-remove-button-id-EMOTIONKEY" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+							onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+						(emotion1,10)
+					</span>  -->
+				
+				</div>
+				<!-- </div> -->
+			</div>
+			
+			<!-- IMAGE SEARCH RESULTS START -->
+			<div id="modal-search-images-results-display-id">
+				<div id="modal-search-images-results-button-div-id">
+					<button type="button" class="fun-button-blue" id="modal-search-images-results-select-images-order-button-id">Select Toggled Images</button>
+				</div>
+				<!-- for the image annotation matches -->
+				<div id="modal-search-images-results-grid-div-area-id">
+					
+					<!-- <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-Taga.png">
+						<label class="add-memes-memeswitch" title="deselect / include">
+							<input id="add-memes-meme-toggle-id-Taga.png" type="checkbox">
+							<span class="add-memes-slider"></span>
+						</label>
+						<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-Taga.png" src="images/water.jpg" title="view" alt="memes"/>
+					</div>
+					<div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-Taga.png">
+						<label class="add-memes-memeswitch" title="deselect / include">
+							<input id="add-memes-meme-toggle-id-Taga.png" type="checkbox">
+							<span class="add-memes-slider"></span>
+						</label>
+						<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-Taga.png" src="images/paris.jpg" title="view" alt="memes"/>
+					</div>
+					<div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-Taga.png">
+						<label class="add-memes-memeswitch" title="deselect / include">
+							<input id="add-memes-meme-toggle-id-Taga.png" type="checkbox">
+							<span class="add-memes-slider"></span>
+						</label>
+						<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-Taga.png" src="images/paris2.jpg" title="view" alt="memes"/>
+					</div> -->
+
+				</div>
+				<!-- for the meme images matches -->
+				<div id="modal-search-meme-images-results-grid-div-area-id">
+					
+					<!-- <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-Taga.png">
+						<label class="add-memes-memeswitch" title="deselect / include">
+							<input id="add-memes-meme-toggle-id-Taga.png" type="checkbox">
+							<span class="add-memes-slider"></span>
+						</label>
+						<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-Taga.png" src="images/water.jpg" title="view" alt="memes"/>
+					</div>
+					<div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-Taga.png">
+						<label class="add-memes-memeswitch" title="deselect / include">
+							<input id="add-memes-meme-toggle-id-Taga.png" type="checkbox">
+							<span class="add-memes-slider"></span>
+						</label>
+						<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-Taga.png" src="images/planet.jpg" title="view" alt="memes"/>
+					</div>
+					<div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-Taga.png">
+						<label class="add-memes-memeswitch" title="deselect / include">
+							<input id="add-memes-meme-toggle-id-Taga.png" type="checkbox">
+							<span class="add-memes-slider"></span>
+						</label>
+						<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-Taga.png" src="images/planet.jpg" title="view" alt="memes"/>
+					</div>
+					<div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-Taga.png">
+						<label class="add-memes-memeswitch" title="deselect / include">
+							<input id="add-memes-meme-toggle-id-Taga.png" type="checkbox">
+							<span class="add-memes-slider"></span>
+						</label>
+						<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-Taga.png" src="images/paris2.jpg" title="view" alt="memes"/>
+					</div>
+					<div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-Taga.png">
+						<label class="add-memes-memeswitch" title="deselect / include">
+							<input id="add-memes-meme-toggle-id-Taga.png" type="checkbox">
+							<span class="add-memes-slider"></span>
+						</label>
+						<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-Taga.png" src="images/paris2.jpg" title="view" alt="memes"/>
+					</div> -->
+
+				</div>
+			</div>
+			<!-- IMAGE SEARCH RESULTS END -->
+		
+		</div>
+	</div>
+</div>
+<!-- MODAL COLLECTION SEARCH IMAGES END -->
+
+
+<!-- MODAL COLLECTION MEME ADDITION SEARCH IMAGES START -->
+<div id="search-add-memes-modal-click-top-id" class="modal-top-class">
+	<!-- MEME MODAL CLOSE -->
+	<img
+			class="modal-close-button-class" id="modal-search-add-memes-close-exit-view-button-id" onmouseover="this.src='taga-ui-icons/CloseRed.png';" onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close"
+	/>
+	<!-- Modal content container -->
+	<div class="modal-content-container">
+		<div id="modal-search-add-memes-top-grid-div-id">
+			
+			<!-- search button -->
+			<div id="modal-search-add-memes-main-button-container-div-id">
+				<button type="button" class="fun-button-blue" id="modal-search-add-memes-main-button-id">SEARCH BUTTON</button>
+				<button type="button" class="fun-button-red" id="modal-search-add-memes-reset-button-id">RESET FIELDS</button>
+			</div>
+			
+			<!-- image tag entry -->
+			<div id="modal-search-add-memes-tag-entry-container-div-id">
+				<span id="modal-search-add-memes-tag-label-id">
+					Tag list:
+				</span>
+				<div id="modal-search-add-memes-tag-textarea-entry-div-id">
+					<textarea
+							id="modal-search-add-memes-tag-textarea-entry-id" placeholder="image #tags" name="search-modal-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')"
+					></textarea>
+				</div>
+			</div>
+			
+			<!-- search meme tag entry start -->
+			<div id="modal-search-add-memes-tag-entry-top-div-id">
+				<span id="modal-search-add-memes-tag-label-id">
+					Meme Tags:
+				</span>
+				<div id="modal-search-add-memes-tag-textarea-memes-entry-div-id">
+					<textarea
+							id="modal-search-add-memes-tag-textarea-memes-entry-id" placeholder="meme #tags connected to image" name="search-modal-meme-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')"
+					></textarea>
+				</div>
+			</div>
+			<!-- search meme tag entry start -->
+			
+			<!-- add emotion/value entry -->
+			<div id="modal-search-add-memes-emotion-entry-top-div-id">
+				
+				<div id="grid-emotion-area-1-id">
+					<button type="button" class="fun-button-blue" id="modal-search-add-memes-emotion-entry-button-id">+</button>
+				</div>
+				
+				<div id="grid-emotion-area-2-id">
+					<div id="modal-search-add-memes-emotion-label-and-value-entry-container-div-id">
+						<textarea
+								list="emotion-recommend" id="modal-search-add-memes-emotion-label-value-textarea-entry-id" placeholder="emotion label" name="search-modal-emotion-tag-textarea" oninput="this.value = this.value.replace(/[ \n]/g,'')"
+						></textarea>
+						<input id="modal-search-add-memes-emotion-value-range-entry-id" type="range" min="0" max="100" value="0">
+					</div>
+				</div>
+				
+				<div id="grid-emotion-area-1-idb">
+					<button type="button" class="fun-button-blue" id="modal-search-add-memes-emotion-meme-entry-button-id">+</button>
+				</div>
+				
+				<div id="grid-emotion-area-2-idb">
+					<div id="modal-search-add-memes-emotion-meme-label-and-value-entry-container-div-id">
+						<textarea
+								list="emotion-recommend" id="modal-search-add-memes-emotion-meme-label-value-textarea-entry-id" placeholder="meme emotion label" name="search-modal-emotion-tag-textarea" oninput="this.value = this.value.replace(/[ \n]/g,'')"
+						></textarea>
+						<input id="modal-search-add-memes-emotion-meme-value-range-entry-id" type="range" min="0" max="100" value="0">
+					</div>
+				</div>
+				<!-- the emotion label and value tuples displayed for the images of the search -->
+				<div id="grid-emotion-area-3-id">
+					<div id="modal-search-add-memes-emotion-label-value-display-container-div-id">
+						<!-- <span id="modal-search-add-memes-emotion-label-value-span-id-EMOTIONKEY" style="white-space:nowrap">
+							<img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-remove-button-id-EMOTIONKEY" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+								onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+							(Emotion1,10)
+						</span> -->
+					</div>
+				</div>
+				<!-- the emotion label and value tuples displayed for the MEMES of the images of the search -->
+				<div id="grid-emotion-area-3-idb">
+					<div id="modal-search-add-memes-emotion-meme-label-value-display-container-div-id">
+						<!-- <span id="modal-search-add-memes-emotion-meme-label-value-span-id-EMOTIONKEY" style="white-space:nowrap">
+							<img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-meme-remove-button-id-EMOTIONKEY" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+								onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+							(emotion1,10)
+						</span> -->
+					</div>
+				</div>
+			
+			</div>
+			
+			<!-- IMAGE SEARCH RESULTS START -->
+			<div id="modal-search-add-memes-images-results-display-id">
+				<div id="modal-search-add-memes-images-results-button-div-id">
+					<button type="button" class="fun-button-blue" id="modal-search-add-memes-images-results-select-images-order-button-id">Select Toggled Images as Memes</button>
+				</div>
+				<!-- <div id="modal-search-images-memes-results-button-div-id">
+					<button type="button" id="modal-search-images-results-select-meme-images-order-button-id">Select Related Meme Image Order</button>
+				</div> -->
+				<div id="modal-search-add-memes-images-results-grid-div-area-id">
+					
+					<!-- <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-Taga.png">
+						<label class="add-memes-memeswitch" title="deselect / include">
+							<input id="add-memes-meme-toggle-id-Taga.png" type="checkbox">
+							<span class="add-memes-slider"></span>
+						</label>
+						<img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-meme-image-img-id-Taga.png" src="images/water.jpg" title="view" alt="memes"/>
+					</div>
+					<div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-Taga.png">
+						<label class="add-memes-memeswitch" title="deselect / include">
+							<input id="add-memes-meme-toggle-id-Taga.png" type="checkbox">
+							<span class="add-memes-slider"></span>
+						</label>
+						<img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-meme-image-img-id-Taga.png" src="images/paris.jpg" title="view" alt="memes"/>
+					</div>
+					<div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-Taga.png">
+						<label class="add-memes-memeswitch" title="deselect / include">
+							<input id="add-memes-meme-toggle-id-Taga.png" type="checkbox">
+							<span class="add-memes-slider"></span>
+						</label>
+						<img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-meme-image-img-id-Taga.png" src="images/paris2.jpg" title="view" alt="memes"/>
+					</div> -->
+					
+				
+				</div>
+				<div id="modal-search-add-memes-meme-images-results-grid-div-area-id">
+					
+					<!-- <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-Taga.png">
+						<label class="add-memes-memeswitch" title="deselect / include">
+							<input id="add-memes-meme-toggle-id-Taga.png" type="checkbox">
+							<span class="add-memes-slider"></span>
+						</label>
+						<img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-meme-image-img-id-Taga.png" src="images/water.jpg" title="view" alt="memes"/>
+					</div>
+					<div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-Taga.png">
+						<label class="add-memes-memeswitch" title="deselect / include">
+							<input id="add-memes-meme-toggle-id-Taga.png" type="checkbox">
+							<span class="add-memes-slider"></span>
+						</label>
+						<img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-meme-image-img-id-Taga.png" src="images/paris.jpg" title="view" alt="memes"/>
+					</div>
+					<div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-Taga.png">
+						<label class="add-memes-memeswitch" title="deselect / include">
+							<input id="add-memes-meme-toggle-id-Taga.png" type="checkbox">
+							<span class="add-memes-slider"></span>
+						</label>
+						<img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-meme-image-img-id-Taga.png" src="images/paris2.jpg" title="view" alt="memes"/>
+					</div> -->
+									
+				</div>
+			</div>
+			<!-- IMAGE SEARCH RESULTS END -->
+		
+		</div>
+	</div>
+</div>
+<!-- MODAL COLLECTION MEME ADDITION SEARCH IMAGES END -->
+
+
+<!-- MODAL COLLECTION PROFILE IMAGE START -->
+<div id="search-profileimage-modal-click-top-id" class="modal-top-class">
+	<!-- MEME MODAL CLOSE -->
+	<img
+			class="modal-close-button-class" id="modal-search-profileimage-close-exit-view-button-id" onmouseover="this.src='taga-ui-icons/CloseRed.png';" onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close"
+	/>
+	<!-- Modal content container -->
+	<div class="modal-content-container">
+		<div id="modal-search-profileimage-top-grid-div-id">
+			
+			<!-- search-profileimage button -->
+			<div id="modal-search-profileimage-main-button-container-div-id">
+				<button type="button" class="fun-button-blue" id="modal-search-profileimage-main-button-id">SEARCH BUTTON</button>
+				<button type="button" class="fun-button-red" id="modal-search-profileimage-main-reset-button-id">RESET FIELDS</button>
+			</div>
+			
+			<!-- image tag entry -->
+			<div id="modal-search-profileimage-tag-entry-container-div-id">
+				<span id="modal-search-profileimage-tag-label-id">
+					Tag list:
+				</span>
+				<div id="modal-search-profileimage-tag-textarea-entry-div-id">
+					<textarea
+							id="modal-search-profileimage-tag-textarea-entry-id" placeholder="enter image #tags to search-profileimage for" name="search-profileimage-modal-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')"
+					></textarea>
+				</div>
+			</div>
+			
+			<!-- search-profileimage meme tag entry start -->
+			<div id="modal-search-profileimage-meme-tag-entry-top-div-id">
+				<span id="modal-search-profileimage-meme-tag-label-id">
+					Meme Tag list:
+				</span>
+				<div id="modal-search-profileimage-meme-tag-textarea-entry-div-id">
+					<textarea
+							id="modal-search-profileimage-meme-tag-textarea-entry-id" placeholder="enter meme #tags connected to image search-profileimage" name="search-profileimage-modal-meme-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')"
+					></textarea>
+				</div>
+			</div>
+			<!-- search-profileimage meme tag entry start -->
+			
+			<!-- add emotion/value entry -->
+			<div id="modal-search-profileimage-emotion-entry-top-div-id">
+				
+				<!-- <div id="grid-emotion-area-1-id"></div> -->
+				<button type="button" class="fun-button-blue" id="modal-search-profileimage-emotion-entry-button-id">INCLUDE EMOTION</button>
+				<!-- </div> -->
+				
+				<!-- <div id="grid-emotion-area-2-id"> -->
+				<div id="modal-search-profileimage-emotion-label-and-value-entry-container-div-id">
+					<textarea
+							list="emotion-recommend" id="modal-search-profileimage-emotion-label-value-textarea-entry-id" placeholder="emotion label" name="search-profileimage-modal-emotion-tag-textarea" oninput="this.value = this.value.replace(/[ \n]/g,'')"
+					></textarea>
+					<input id="modal-search-profileimage-emotion-value-range-entry-id" type="range" min="0" max="100" value="0">
+				</div>
+				<!-- </div> -->
+				
+				<!-- <div id="grid-emotion-area-3-id"> -->
+				<div id="modal-search-profileimage-emotion-label-value-display-container-div-id">
+					
+					<!-- <span id="modal-search-profileimage-emotion-label-value-span-id-EMOTIONKEY" style="white-space:nowrap">
+						<img class="modal-search-profileimage-emotion-remove-button-class" id="modal-search-profileimage-emotion-remove-button-id-EMOTIONKEY" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+							onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+						(emotion1,10)
+					</span>  -->
+				
+				</div>
+				<!-- </div> -->
+			</div>
+			
+			<!-- IMAGE SEARCH RESULTS START -->
+			<div id="modal-search-profileimage-images-results-display-id">
+				<div id="modal-search-profileimage-images-results-title-div-id">
+					CLICK IMAGE TO CHOOSE
+				</div>
+				<!-- <div id="modal-search-profileimageimages-memes-results-button-div-id">
+					<button type="button" class="fun-button-blue" id="modal-search-profileimageimages-results-select-meme-images-order-button-id">Select Related Meme Image Order</button>
+				</div> -->
+				<!-- for the image annotation matches -->
+				<div id="modal-search-profileimage-images-results-grid-div-area-id">
+					<div class="modal-search-profileimage-images-results-grid-wrapper-class">
+						<div class="modal-search-profileimage-images-results-grid-class" id="">
+							<div class="modal-search-profileimage-images-results-masonry-grid-sizer"></div>
+							
+							<!-- <div class="modal-image-search-profileimageresult-single-image-div-class" id="modal-image-search-profileimageresult-single-image-div-id-Taga.png">
+								<img class="modal-image-search-profileimageresult-single-image-img-obj-class" id="modal-image-search-profileimageresult-single-image-img-id-planet.jpg" src="images/planet.jpg" title="view" alt="image"/>
+							</div>
+							<div class="modal-image-search-profileimageresult-single-image-div-class" id="modal-image-search-profileimageresult-single-image-div-id-Taga.png">
+								<img class="modal-image-search-profileimageresult-single-image-img-obj-class" id="modal-image-search-profileimageresult-single-image-img-id-water.jpg" src="images/water.jpg" title="view" alt="image"/>
+							</div>
+							<div div class="modal-image-search-profileimageresult-single-image-div-class" id="modal-image-search-profileimageresult-single-image-div-id-Taga.png">
+								<img class="modal-image-search-profileimageresult-single-image-img-obj-class" id="modal-image-search-profileimageresult-single-image-img-id-paris.jpg" src="images/paris.jpg" title="view" alt="image"/>
+							</div>
+							<div class="modal-image-search-profileimageresult-single-image-div-class" id="modal-image-search-profileimageresult-single-image-div-id-Taga.png">
+								<img class="modal-image-search-profileimageresult-single-image-img-obj-class" id="modal-image-search-profileimageresult-single-image-img-id-paris2.jpg" src="images/paris2.jpg" title="view" alt="image"/>
+							</div> -->
+													
+						</div>
+					</div>
+				</div>
+				<!-- for the meme images matches -->
+			
+			</div>
+			<!-- IMAGE SEARCH RESULTS END -->
+		
+		</div>
+	</div>
+</div>
+<!-- MODAL COLLECTION PROFILE IMAGE END -->
+
+
+<!-- MODAL MEME IMAGE CLICK START -->
+<div id="modal-image-clicked-top-id" class="modal-top-class">
+	<!-- MEME MODAL CLOSE -->
+	<img
+			class="modal-close-button-class" id="modal-image-clicked-close-button-id" onmouseover="this.src='taga-ui-icons/CloseRed.png';" onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close"
+	/>
+	<!-- Modal content container -->
+	<div class="modal-content-container">
+		<div id="modal-image-clicked-grid-container-id">
+			<div id="modal-image-clicked-tag-list-div-container-id">
+				Tags: #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde
+			</div>
+			<div id="modal-image-clicked-emotion-list-div-container-id">
+				Emotions: ('good':123), ('bad',321),('good':123), ('bad',321),('good':123), ('bad',321),('good':123), ('bad',321),('good':123), ('bad',321),('good':123), ('bad',321)
+			</div>
+			<div id="modal-image-clicked-image-gridbox-id">
+				<img id="modal-image-clicked-displayimg-id" src="images/paris2.jpg" title="meme" alt="meme"/>
+			</div>
+		</div>
+	</div>
+
+</div>
+<!-- MODAL MEME IMAGE CLICK END -->
+
+
+<!-- MODALS END -->
+
+</body>
+
+<script src="./masonry.pkgd.min.js"></script>
+
+<script type="text/javascript">
+	desription_btn = document.getElementById("collection-image-annotation-navbar-description-button-id")
+	emotion_btn = document.getElementById("collection-image-annotation-navbar-emotion-button-id")
+	meme_btn = document.getElementById("collection-image-annotation-navbar-meme-button-id")
+	
+	desription_btn.classList.add('nav-bar-on')
+	emotion_btn.classList.add('nav-bar-off')
+	meme_btn.classList.add('nav-bar-off')
+	
+	annotations_div = document.getElementById("collection-image-annotation-mode-div-id")
+	
+	description_annotations_div = document.getElementById("collection-image-annotation-description-div-id")
+	emotions_annotations_div = document.getElementById("collection-image-annotation-emotions-div-id")
+	memes_annotations_div = document.getElementById("collection-image-annotation-memes-div-id")
+	
+	annotations_div.removeChild(emotions_annotations_div)
+	annotations_div.removeChild(memes_annotations_div)
+	annotations_div.appendChild(description_annotations_div)
+	
+	desription_btn.addEventListener("click", function (event) {
+		desription_btn.classList.remove('nav-bar-off')
+		desription_btn.classList.add('nav-bar-on')
+		emotion_btn.classList.remove('nav-bar-on')
+		emotion_btn.classList.add('nav-bar-off')
+		meme_btn.classList.remove('nav-bar-on')
+		meme_btn.classList.add('nav-bar-off')
+		
+		annotations_div.innerHTML = ""
+		annotations_div.appendChild(description_annotations_div)
+		
+	})
+	emotion_btn.addEventListener("click", function (event) {
+		desription_btn.classList.remove('nav-bar-on')
+		desription_btn.classList.add('nav-bar-off')
+		emotion_btn.classList.remove('nav-bar-off')
+		emotion_btn.classList.add('nav-bar-on')
+		meme_btn.classList.remove('nav-bar-on')
+		meme_btn.classList.add('nav-bar-off')
+		
+		annotations_div.innerHTML = ""
+		annotations_div.appendChild(emotions_annotations_div)
+		
+	})
+	meme_btn.addEventListener("click", function (event) {
+		desription_btn.classList.remove('nav-bar-on')
+		desription_btn.classList.add('nav-bar-off')
+		emotion_btn.classList.remove('nav-bar-on')
+		emotion_btn.classList.add('nav-bar-off')
+		meme_btn.classList.remove('nav-bar-off')
+		meme_btn.classList.add('nav-bar-on')
+		
+		annotations_div.innerHTML = ""
+		annotations_div.appendChild(memes_annotations_div)
+		
+		/*
+* Since the block (meme tab) is hidden when the page is loaded, JS does not find the necessary class in order to build the grid.
+* */
+		var grid = document.querySelector(".collection-image-annotation-memes-images-grid-class");
+		var msnry = new Masonry(grid, {
+			columnWidth: '.collection-image-annotation-memes-masonry-grid-sizer',
+			itemSelector: '.collection-image-annotation-memes-grid-item-class',
+			percentPosition: true,
+			gutter: 5,
+			transitionDuration: 0
+		});
+		
+		document.getElementById("collection-image-annotation-memes-new-memes-add-button-id").addEventListener("click", function () {
+			console.log('click')
+			// Show the modal
+			var modal_meme_click = document.getElementById("search-add-memes-modal-click-top-id");
+			modal_meme_click.style.display = "block";
+			// Get the button that opens the modal
+			var meme_modal_close_btn = document.getElementById("modal-search-add-memes-close-exit-view-button-id");
+			// When the user clicks on the button, close the modal
+			meme_modal_close_btn.onclick = function () {
+				modal_meme_click.style.display = "none";
+			}
+			// When the user clicks anywhere outside of the modal, close it
+			window.onclick = function (event) {
+				if (event.target == modal_meme_click) {
+					modal_meme_click.style.display = "none";
+				}
+			}
+		})
+		
+		
+	})
+	
+	
+	var grid_gallery = document.querySelector(".collection-images-gallery-grid-class");
+	var msnry = new Masonry(grid_gallery, {
+		columnWidth: '.collection-images-gallery-masonry-grid-sizer',
+		itemSelector: '.collection-images-gallery-grid-item-class',
+		percentPosition: true,
+		gutter: 5,
+		transitionDuration: 0,
+		transitionDuration: 0
+	});
+	
+	
+	//profile image selection
+	document.getElementById("collection-profile-image-img-id").addEventListener("click", function (event) {
+		console.log('click')
+		// Show the modal
+		var modal_meme_click = document.getElementById("modal-image-clicked-top-id");
+		modal_meme_click.style.display = "block";
+		// Get the button that opens the modal
+		var meme_modal_close_btn = document.getElementById("modal-image-clicked-close-button-id");
+		// When the user clicks on the button, close the modal
+		meme_modal_close_btn.onclick = function () {
+			modal_meme_click.style.display = "none";
+		}
+		// When the user clicks anywhere outside of the modal, close it
+		window.onclick = function (event) {
+			if (event.target == modal_meme_click) {
+				modal_meme_click.style.display = "none";
+			}
+		}
+		
+		/*
+* Since the block (modal for profile image) is hidden when the page is loaded, JS does not find the necessary class in order to build the grid.
+* */
+		var grid_profile_img = document.querySelector(".modal-search-profileimage-images-results-grid-class");
+		var msnrygrid_profile_img = new Masonry(grid_profile_img, {
+			columnWidth: '.modal-search-profileimage-images-results-masonry-grid-sizer',
+			itemSelector: '.modal-image-search-profileimageresult-single-image-div-class',
+			percentPosition: true,
+			gutter: 5,
+			transitionDuration: 0
+		});
+		
+		
+	})
+	
+	
+	document.getElementById("collections-images-gallery-grid-button-addimages-id").addEventListener("click", function (event) {
+		console.log('click')
+		// Show the modal
+		var modal_meme_click = document.getElementById("search-modal-click-top-id");
+		modal_meme_click.style.display = "block";
+		// Get the button that opens the modal
+		var meme_modal_close_btn = document.getElementById("modal-search-close-exit-view-button-id");
+		// When the user clicks on the button, close the modal
+		meme_modal_close_btn.onclick = function () {
+			modal_meme_click.style.display = "none";
+		}
+		// When the user clicks anywhere outside of the modal, close it
+		window.onclick = function (event) {
+			if (event.target == modal_meme_click) {
+				modal_meme_click.style.display = "none";
+			}
+		}
+		
+	})
+	
+	
+	document.getElementById("collection-profile-image-change-image-button-id").addEventListener("click", function (event) {
+		console.log('click')
+		
+		// Show the modal
+		var modal_meme_click = document.getElementById("search-profileimage-modal-click-top-id");
+		modal_meme_click.style.display = "block";
+		// Get the button that opens the modal
+		var meme_modal_close_btn = document.getElementById("modal-search-profileimage-close-exit-view-button-id");
+		// When the user clicks on the button, close the modal
+		meme_modal_close_btn.onclick = function () {
+			modal_meme_click.style.display = "none";
+		}
+		// When the user clicks anywhere outside of the modal, close it
+		window.onclick = function (event) {
+			if (event.target == modal_meme_click) {
+				modal_meme_click.style.display = "none";
+			}
+		}
+		
+		var grid_profile_img = document.querySelector("#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-grid-class");
+		var msnrygrid_profile_img = new Masonry(grid_profile_img, {
+			columnWidth: '#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-masonry-grid-sizer',
+			itemSelector: '#modal-search-profileimage-images-results-grid-div-area-id .modal-image-search-profileimageresult-single-image-div-class',
+			percentPosition: true,
+			gutter: 5,
+			transitionDuration: 0
+		});
+		
+	})
+
+
+</script>
+
+</html>
+
+
+
+

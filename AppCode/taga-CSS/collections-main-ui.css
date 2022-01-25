@@ -1,0 +1,721 @@
+/* <!-- mouth #005000-RGB(0,80,0) body #008800-RGB(0,136,0) iris #009e00-RGB(0,158,0) eyelid #00c600-RGB(0,198,0) background default  -->
+<!--  The gray for the general background 808a80  rgb(128, 138, 128)	-->
+<!--	The button background color	--> */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Verdana, sans-serif;
+  box-sizing: border-box;
+}
+
+#collections-screen-id {
+  display: grid;
+  grid-template-columns: 14fr 24fr;
+  grid-template-rows: 3fr 11fr 22fr;
+  height: 100vh;
+  width: 100vw;
+  box-sizing: border-box;
+  grid-template-areas:
+    "collection-name-gridarea-id            collection-control-buttons-gridarea-id"
+    "collection-profile-image-gridarea-id   collection-images-gallery-gridarea-id"
+    "collection-annotations-gridarea-id     collection-images-gallery-gridarea-id";
+  border-style: solid;
+  border-width: thin;
+  border-color: #005000;
+}
+
+#collection-name-gridarea-id,
+#collection-control-buttons-gridarea-id,
+#collection-profile-image-gridarea-id,
+#collection-annotations-gridarea-id,
+#collection-images-gallery-gridarea-id {
+  border-color: #005000;
+  border-style: solid;
+  border-width: medium;
+}
+
+/* COLLECTION NAME START */
+#collection-name-gridarea-id {
+  background-color: #808a80;
+  grid-area: collection-name-gridarea-id;
+  min-width: 0;
+  padding-left: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+}
+#collection-name-hashtags-icon-id {
+  overflow: hidden;
+  width: 5%;
+  height: 75%;
+  min-height: 0;
+}
+#collection-name-text-label-id {
+  font-weight: bold;
+  overflow-x: auto;
+  width: 90%;
+  /* font-size: 1rem;
+  font-size: 1.5vw; */
+  /* font-size: calc(1.6vw + 1.6vh); */
+  font-size: min(3vw, 3vh);
+}
+/* COLLECTION NAME END */
+
+#collection-control-buttons-gridarea-id {
+  display: inline-block;
+  grid-area: collection-control-buttons-gridarea-id;
+  background-color: #808a80;
+  min-height: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  font-size: min(2vw, 2vh);
+}
+#collection-control-buttons-nextprev-div-id {
+  display: flex;
+  flex-direction: row;
+  font-size: min(2vw, 2vh);
+}
+.center-buttons {
+  font-weight: bold;
+  /* width: 90%; */
+  font-size: min(1.8vw, 1.8vh); /* font-size: 2.5vmin; */
+  height: 100%;
+  cursor: pointer;
+}
+@media screen and (max-width: 767px) {
+  .center-buttons {
+    font-size: min(1vw, 1vh);
+  }
+}
+#collection-control-button-previous-id,
+#collection-control-button-next-id {
+  padding-left: 4px;
+  padding-right: 4px;
+  border-radius: 0.5rem;
+  /* font-size: min(2vw, 2vh); */
+}
+#collection-control-button-delete-id,
+#collection-control-button-returntomain-id,
+#collection-control-button-createcollection-id {
+  padding-left: 10px;
+  padding-right: 10px;
+  /* font-size: min(2vw, 2vh); */
+}
+@media screen and (max-width: 767px) {
+  #collection-control-button-delete-id,
+  #collection-control-button-returntomain-id,
+  #collection-control-button-createcollection-id {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+}
+
+/* COLLECTION PROFILE IMAGE START */
+#collection-profile-image-gridarea-id {
+  background-color: #808a80;
+  grid-area: collection-profile-image-gridarea-id;
+  overflow-y: hidden;
+  display: grid;
+  /* height: 100%; */
+  grid-template-rows: 1fr 10fr;
+  box-sizing: border-box;
+  grid-template-areas:
+    "collection-profile-image-button-div-id"
+    "collection-profile-image-display-div-id";
+}
+#collection-profile-image-display-div-id {
+  grid-area: collection-profile-image-display-div-id;
+  overflow-y: hidden;
+}
+#collection-profile-image-img-id {
+  height: 99999px;
+  object-fit: contain;
+  max-height: 100%;
+  max-width: 100%;
+  display: block;
+  margin: auto auto;
+
+  cursor: pointer;
+}
+#collection-profile-image-button-div-id {
+  grid-area: collection-profile-image-button-div-id;
+  display: flex;
+  text-align: center;
+  align-items: flex-start;
+  justify-content: center;
+}
+#collection-profile-image-change-image-button-id {
+  width: 100%;
+  font-size: 2vmin;
+}
+/* COLLECTION PROFILE IMAGE END */
+
+/* COLLECTION NAV BAR ANNOTATION ID START */
+#collection-annotations-gridarea-id {
+  background-color: #808a80;
+  grid-area: collection-annotations-gridarea-id;
+  min-height: 0; /*  essential for the auto height be disabled and stop it expanding */
+
+  display: grid;
+  grid-template-rows: 1fr 15fr;
+  grid-template-areas:
+    "collection-image-annotation-navbar-div-id"
+    "collection-image-annotation-mode-div-id";
+}
+#collection-image-annotation-navbar-div-id {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-areas: "collection-image-annotation-navbar-description-button-id   collection-image-annotation-navbar-emotion-button-id   collection-image-annotation-navbar-meme-button-id";
+}
+#collection-image-annotation-navbar-description-button-id {
+  grid-area: collection-image-annotation-navbar-description-button-id;
+  font-size: 2.5vmin;
+}
+#collection-image-annotation-navbar-emotion-button-id {
+  grid-area: collection-image-annotation-navbar-emotion-button-id;
+  font-size: 2.5vmin;
+}
+#collection-image-annotation-navbar-meme-button-id {
+  grid-area: collection-image-annotation-navbar-meme-button-id;
+  font-size: 2.5vmin;
+}
+#collection-image-annotation-mode-div-id {
+  grid-area: collection-image-annotation-mode-div-id;
+  min-height: 0; /*  essential for the auto height be disabled and stop it expanding */
+  height: 100%;
+}
+/* descriptions div start */
+#collection-image-annotation-description-div-id {
+  /* visibility: hidden; */
+  height: 100%;
+  padding: 4px;
+  display: grid;
+  grid-template-columns: 2fr 5fr;
+  grid-template-rows: 20fr 3fr 2fr 4fr;
+  box-sizing: border-box;
+  grid-template-areas:
+    "collection-image-annotation-description-textarea-div-id     collection-image-annotation-description-textarea-div-id"
+    "collection-image-annotation-description-save-button-div-id    collection-image-annotation-description-save-button-div-id"
+    "collection-description-annotation-hashtags-label-div-id     collection-description-annotation-hashtags-label-div-id"
+    "collection-description-annotation-hashtags-div-id            collection-description-annotation-hashtags-div-id";
+}
+#collection-image-annotation-description-textarea-div-id {
+  grid-area: collection-image-annotation-description-textarea-div-id;
+  padding-right: 4px;
+  outline: none;
+  /* height: 100%; */
+}
+#collection-image-annotation-description-textarea-id {
+  resize: none;
+  width: 100%;
+  height: 98%;
+  font-size: 3vmin;
+  outline: none;
+}
+@media screen and (max-height: 200px) {
+  #collection-image-annotation-description-textarea-id {
+    height: 40px;
+    font-size: 7.5vmin;
+  }
+  #collection-description-annotation-hashtags-label-div-id {
+    font-size: 1.5vh;
+  }
+}
+@media screen and (max-height: 150px) {
+  #collection-image-annotation-description-textarea-id {
+    height: 15px;
+    font-size: 7.5vmin;
+  }
+}
+#collection-image-annotation-description-save-button-div-id {
+  grid-area: collection-image-annotation-description-save-button-div-id;
+  height: 100%;
+  width: 90%;
+  display: flex;
+  justify-self: center;
+  align-items: center;
+}
+#collection-image-annotation-description-textarea-save-button-id {
+  height: 100%;
+  width: 90%;
+  font-size: 2.4vmin;
+}
+/* hashtags */
+#collection-description-annotation-hashtags-label-div-id {
+  grid-area: collection-description-annotation-hashtags-label-div-id;
+  white-space: nowrap;
+  display: inline-block;
+  height: 100%;
+  background-color: #808a80;
+  font-weight: bold;
+  font-size: 2.5vh;
+}
+#collection-description-annotation-hashtags-text-label-span-id {
+  display: inline-block;
+  box-sizing: border-box;
+  font-size: 3.25vmin;
+}
+#collection-description-annotation-hashtags-div-id {
+  background-color: #808a80;
+  grid-area: collection-description-annotation-hashtags-div-id;
+  display: flex;
+  align-items: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  height: 100%;
+  width: 100%;
+  outline: none;
+  display: flex;
+  align-items: center;
+  /* position: absolute; */
+  /* word-wrap:unset */
+  font-weight: bold;
+  font-size: 3.5vmin;
+}
+#hashtags-icon-id {
+  overflow: hidden;
+  width: 1em;
+  height: 1em;
+  /* float: left; */
+}
+/* descriptions div end */
+
+/* emotions div start */
+#collection-image-annotation-emotions-div-id {
+  background-color: #808a80;
+  min-height: 0; /*  essential for the auto height be disabled and stop it expanding */
+
+  height: 100%;
+  padding: 4px;
+  display: grid;
+  grid-template-rows: 11fr 2fr;
+  box-sizing: border-box;
+  grid-template-areas:
+    "collection-image-annotation-emotions-labels-show-div-id"
+    "collection-image-annotation-emotions-new-entry-div-id";
+}
+#collection-image-annotation-emotions-labels-show-div-id {
+  grid-area: collection-image-annotation-emotions-labels-show-div-id;
+  overflow-y: scroll;
+  /* min-height: 0;  essential for the auto height be disabled and stop it expanding */
+  /* height: 100%; */
+}
+
+.emotion-list-class {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 10px;
+}
+
+.emotion-list-class div {
+  display: flex;
+  align-items: center;
+}
+
+.emotion-delete-icon-class {
+  width: 1.5em;
+  height: 1.5em;
+  float: left;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+  cursor: pointer;
+}
+.emotion-label-view-class {
+  /* font-size: 2.75vmin; */
+  word-break: break-all;
+  font-size: 1.4rem;
+}
+.emotion-range-slider-class {
+  max-width: 40%;
+}
+
+#collection-image-annotation-emotions-new-entry-div-id {
+  grid-area: collection-image-annotation-emotions-new-entry-div-id;
+  /* border-top: 3px solid rgb(68, 68, 68); */
+  height: 100%;
+  display: grid;
+  grid-template-rows: 6fr 4fr;
+  grid-template-columns: 1fr 1fr;
+  box-sizing: border-box;
+  grid-template-areas:
+    "collection-image-annotation-emotions-new-entry-emotion-textlabel-div-id   collection-image-annotation-emotions-new-entry-emotion-value-range-div-id"
+    "collection-image-annotation-emotions-new-entry-emotion-button-div-id      collection-image-annotation-emotions-save-button-div-id";
+}
+#collection-image-annotation-emotions-new-entry-emotion-textlabel-div-id {
+  grid-area: collection-image-annotation-emotions-new-entry-emotion-textlabel-div-id;
+  width: 100%;
+  margin-top: 5px;
+}
+#collection-image-annotation-emotions-new-entry-emotion-textarea-id {
+  height: 3vmin;
+  overflow: hidden;
+  margin-top: 0.3rem;
+  font-size: 3vmin;
+  border-radius: 2px;
+  white-space: nowrap;
+  display: inline-block;
+  resize: none;
+  width: 100%;
+  border-width: 3px;
+  border-color: black;
+}
+#collection-image-annotation-emotions-new-entry-emotion-button-div-id {
+  grid-area: collection-image-annotation-emotions-new-entry-emotion-button-div-id;
+  white-space: nowrap;
+  height: 100%;
+  text-align: center;
+}
+#collection-image-annotation-emotions-new-entry-add-emotion-button-id {
+  font-size: 2.4vmin;
+  height: 80%;
+  width: 90%;
+}
+#collection-image-annotation-emotions-save-button-div-id {
+  grid-area: collection-image-annotation-emotions-save-button-div-id;
+  white-space: nowrap;
+  height: 100%;
+  text-align: center;
+}
+#collection-image-annotation-emotions-save-emotion-button-id {
+  font-size: 2.4vmin;
+  height: 80%;
+  width: 90%;
+}
+#collection-image-annotation-emotions-new-entry-emotion-value-range-div-id {
+  grid-area: collection-image-annotation-emotions-new-entry-emotion-value-range-div-id;
+  width: 100%;
+  margin-left: 5%;
+  margin-top: 1vmin;
+}
+#collection-image-annotation-emotions-new-entry-emotion-value-label-min-id {
+  box-sizing: border-box;
+  padding-left: 1%;
+  margin-left: 5px;
+  float: left;
+  font-weight: bold;
+  font-size: 3.5vmin;
+}
+#collection-image-annotation-emotions-new-entry-emotion-value-label-max-id {
+  box-sizing: border-box;
+  padding-right: 10%;
+  float: right;
+  font-weight: bold;
+  font-size: 3.5vmin;
+}
+#collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id {
+  display: inline-block;
+  width: 90%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* emotions div end */
+
+/* memes div start */
+#collection-image-annotation-memes-div-id {
+  background-color: #808a80;
+  min-height: 0; /*  essential for the auto height be disabled and stop it expanding */
+  height: 100%;
+  padding: 4px;
+
+  overflow: hidden;
+  position: relative;
+
+  display: grid;
+  grid-template-rows: 11fr 1fr;
+  grid-template-columns: 1fr 1fr;
+  box-sizing: border-box;
+  grid-template-areas:
+    "collection-image-annotation-memes-images-show-div-id             collection-image-annotation-memes-images-show-div-id"
+    "collection-image-annotation-memes-new-memes-add-button-div-id    collection-image-annotation-memes-save-changes-button-div-id";
+}
+
+#collection-image-annotation-memes-images-show-div-id {
+  grid-area: collection-image-annotation-memes-images-show-div-id;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* #collection-image-annotation-memes-div-id {
+  overflow: hidden;
+  position: relative;
+} */
+.collection-image-annotation-meme-grid-img-class {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
+  cursor: pointer;
+}
+.collection-image-annotation-memes-grid-wrapper-class {
+  overflow: hidden;
+  overflow-y: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 90%; /*calc(100% - 5.5vh);*/
+}
+.collection-image-annotation-memes-images-grid-class {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 5px;
+}
+.collection-image-annotation-memes-grid-item-class {
+  /*
+    --- (5px * 3) - The indent to the right of one block is 5 pixels, since there are 4 elements in a row, there are only three indents
+    --- + 10px - The parent's padding on the right and left is 5 pixels, in total they give 10
+    For example, if we want 3 elements in one row:
+    --- max-width: calc((100% - ((5px * 2) + 10px)) / 3);
+    For example, if we want 5 elements in one row:
+    --- max-width: calc((100% - ((5px * 4) + 10px)) / 5);
+  */
+  width: 100%;
+  max-width: calc((100% - ((5px * 3) + 10px)) / 4);
+  margin-bottom: 5px;
+}
+@media screen and (max-width: 1200px) {
+  .collection-image-annotation-memes-grid-item-class {
+    max-width: calc((100% - ((5px * 2) + 10px)) / 3);
+  }
+}
+@media screen and (max-width: 800px) {
+  .collection-image-annotation-memes-grid-item-class {
+    max-width: calc((100% - ((5px) + 10px)) / 2);
+  }
+}
+/* TOGGLE (START) SWITCH FOR THE MEMES IN TAGGING */
+.memeswitch {
+  /* position: relative; */
+  display: inline-block;
+  width: 60px;
+  height: 5%;
+  min-height: 20px;
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  /* height: 22px; */
+}
+.memeswitch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ad2021;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 75%;
+  width: 26px;
+  left: 4px;
+  bottom: 0.2em;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+input:checked + .slider {
+  background-color: #1884ff;
+}
+input:focus + .slider {
+  box-shadow: 0 0 1px #1884ff;
+}
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+/* TOGGLE (END) SWITCH FOR THE MEMES IN TAGGING */
+
+#collection-image-annotation-memes-new-memes-add-button-div-id {
+  grid-area: collection-image-annotation-memes-new-memes-add-button-div-id;
+  height: 100%;
+  width: 100%;
+  max-height: 10vh;
+}
+#collection-image-annotation-memes-new-memes-add-button-id {
+  height: 100%;
+  width: 100%;
+  font-size: 2.4vmin;
+  margin-right: 2px;
+  max-height: 10vh;
+}
+#collection-image-annotation-memes-save-changes-button-div-id {
+  grid-area: collection-image-annotation-memes-save-changes-button-div-id;
+  height: 100%;
+  width: 100%;
+  max-height: 10vh;
+}
+#collection-image-annotation-memes-save-changes-button-id {
+  height: 100%;
+  width: 100%;
+  font-size: 2.4vmin;
+  margin-left: 2px;
+  max-height: 10vh;
+}
+
+/* memes div end */
+
+/* COLLECTION NAV BAR ANNOTATION ID START */
+
+#collection-images-gallery-gridarea-id {
+  grid-area: collection-images-gallery-gridarea-id;
+  background-color: #808a80;
+
+  min-height: 0; /*  essential for the auto height be disabled and stop it expanding */
+  height: 100%;
+  padding: 4px;
+
+  overflow: hidden;
+  position: relative;
+
+  display: grid;
+  grid-template-rows: 13fr 1fr;
+  grid-template-columns: 1fr 1fr;
+  box-sizing: border-box;
+  grid-template-areas:
+    "collections-images-gallery-grid-images-div-id     collections-images-gallery-grid-images-div-id"
+    "collections-images-gallery-grid-button-addimages-div-id    collections-images-gallery-grid-button-savechanges-div-id";
+}
+#collections-images-gallery-grid-button-addimages-div-id {
+  grid-area: collections-images-gallery-grid-button-addimages-div-id;
+}
+#collections-images-gallery-grid-button-addimages-id {
+  height: 100%;
+  width: 100%;
+  font-size: 2.4vmin;
+  margin-left: 2px;
+  max-height: 10vh;
+}
+#collections-images-gallery-grid-button-savechanges-div-id {
+  grid-area: collections-images-gallery-grid-button-savechanges-div-id;
+}
+#collections-images-gallery-grid-button-savechanges-id {
+  height: 100%;
+  width: 100%;
+  font-size: 2.4vmin;
+  margin-left: 2px;
+  max-height: 10vh;
+}
+/* gallery grid start */
+#collections-images-gallery-grid-images-div-id {
+  grid-area: collections-images-gallery-grid-images-div-id;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+/* #collection-image-annotation-memes-div-id {
+  overflow: hidden;
+  position: relative;
+} */
+.collection-images-gallery-grid-wrapper-class {
+  overflow: hidden;
+  overflow-y: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 92%; /*calc(100% - 5.5vh); /* xxx XXX  */
+}
+.collection-images-gallery-grid-class {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 5px;
+}
+.collection-images-gallery-grid-item-class {
+  /*
+    --- (5px * 3) - The indent to the right of one block is 5 pixels, since there are 4 elements in a row, there are only three indents
+    --- + 10px - The parent's padding on the right and left is 5 pixels, in total they give 10
+    For example, if we want 3 elements in one row:
+    --- max-width: calc((100% - ((5px * 2) + 10px)) / 3);
+    For example, if we want 5 elements in one row:
+    --- max-width: calc((100% - ((5px * 4) + 10px)) / 5);
+  */
+  width: 100%;
+  max-width: calc((100% - ((5px * 3) + 10px)) / 4);
+  margin-bottom: 5px;
+}
+@media screen and (max-width: 1500px) {
+  .collection-images-gallery-grid-item-class {
+    max-width: calc((100% - ((5px * 2) + 10px)) / 3);
+  }
+}
+@media screen and (max-width: 1200px) {
+  .collection-images-gallery-grid-item-class {
+    max-width: calc((100% - ((5px) + 10px)) / 2);
+  }
+}
+@media screen and (max-width: 900px) {
+  .collection-images-gallery-grid-item-class {
+    max-width: calc((100% - ((5px) * 0 + 10px)) / 1);
+  }
+}
+.collection-images-gallery-grid-img-class {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  cursor: pointer;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.modal-image-search-profileimageresult-single-image-div-class {
+  /*
+    --- (5px * 3) - The indent to the right of one block is 5 pixels, since there are 4 elements in a row, there are only three indents
+    --- + 10px - The parent's padding on the right and left is 5 pixels, in total they give 10
+    For example, if we want 3 elements in one row:
+    --- max-width: calc((100% - ((5px * 2) + 10px)) / 3);
+    For example, if we want 5 elements in one row:
+    --- max-width: calc((100% - ((5px * 4) + 10px)) / 5);
+  */
+  width: 100%;
+  max-width: calc((100% - ((5px * 3) + 10px)) / 4);
+  margin-bottom: 5px;
+}
+@media screen and (max-width: 1500px) {
+  .modal-image-search-profileimageresult-single-image-div-class {
+    max-width: calc((100% - ((5px * 2) + 10px)) / 3);
+  }
+}
+@media screen and (max-width: 1200px) {
+  .modal-image-search-profileimageresult-single-image-div-class {
+    max-width: calc((100% - ((5px) + 10px)) / 2);
+  }
+}
+@media screen and (max-width: 900px) {
+  .modal-image-search-profileimageresult-single-image-div-class {
+    max-width: calc((100% - ((5px) * 0 + 10px)) / 1);
+  }
+}
+
+.modal-image-search-profileimageresult-single-image-div-class img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  cursor: pointer;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  object-position: center;
+}

@@ -9,7 +9,6 @@
   border: 1px solid #0000ff;
   background-image: linear-gradient(-180deg, #8fb0d6 0%, #1884ff 100%);
 }
-
 .fun-button-blue:active {
   transform: scale(0.95);
   box-shadow: 0 0 0 1px #0000ff, 0 0 0 1px #0084ff;
@@ -26,8 +25,18 @@
   border: 1px solid #012880;
   background-image: linear-gradient(-180deg, #bd7a7a 0%, #ad2021 100%);
 }
-
 .fun-button-red:active {
   transform: scale(0.95);
   box-shadow: 0 0 0 1px #aa0000, 0 0 0 1px #ad0021;
+}
+
+.nav-bar-on {
+  border-radius: 0;
+  border: 4px solid #0000ff;
+  background-image: linear-gradient(-180deg, #8fb0d6 0%, #18f4ff 100%);
+}
+.nav-bar-off {
+  border-radius: 0;
+  border: 4px solid #0000ff;
+  background-image: linear-gradient(-180deg, #1884ff 0%, #1884ff 100%);
 }
