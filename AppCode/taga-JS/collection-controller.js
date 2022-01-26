@@ -29,7 +29,7 @@ TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
                                             "imageFileName": '',      
                                             "imageFileHash": '',
                                             "taggingRawDescription": "",
-                                            "taggingTags": [""],
+                                            "taggingTags": [],
                                             "taggingEmotions": {good:0,bad:0},//{ happy: 0, sad: 0, confused: 0 },
                                             "taggingMemeChoices": []
                                             }
@@ -73,14 +73,32 @@ async function Delete_Entity() {
 //entity annotation page where the user describes the entity
 function Entity_Description_Page() {
     annotation_view_ind = 1
-    document.getElementById('entity-description-view').className += " active"; //activate correct pagination label
-    document.getElementById('entity-emotion-view').classList.remove("active")
-    document.getElementById('entity-meme-view').classList.remove("active")
 
-    description_HTML_str = '<textarea class="form-control textarea2" id="descriptionInputEntity" ></textarea>'
-    description_HTML_str += `<button type="button" class="btn btn-primary btn-lg" onclick="Save_Entity_Description()">Save</button>`
-    document.getElementById('annotationPages').innerHTML = description_HTML_str
-    document.getElementById("descriptionInputEntity").value = current_entity_obj.entityDescription
+    //colors the annotation menu buttons appropriately (highlights)
+    desription_btn = document.getElementById("collection-image-annotation-navbar-description-button-id")
+	emotion_btn = document.getElementById("collection-image-annotation-navbar-emotion-button-id")
+	meme_btn = document.getElementById("collection-image-annotation-navbar-meme-button-id")
+    desription_btn.classList.remove('nav-bar-off')
+    desription_btn.classList.add('nav-bar-on')
+    emotion_btn.classList.remove('nav-bar-on')
+    emotion_btn.classList.add('nav-bar-off')
+    meme_btn.classList.remove('nav-bar-on')
+    meme_btn.classList.add('nav-bar-off')
+    
+	description_annotations_div = document.getElementById("collection-image-annotation-description-div-id")
+    description_annotations_div.style.visibility = 'inline-block'
+	emotions_annotations_div = document.getElementById("collection-image-annotation-emotions-div-id")
+    emotions_annotations_div.style.display = "none";
+	memes_annotations_div = document.getElementById("collection-image-annotation-memes-div-id")
+	memes_annotations_div.style.display = "none";
+	
+    description_text_area_element = document.getElementById("collection-image-annotation-description-textarea-id")
+    description_text_area_element.value = current_entity_obj.entityDescription
+
+    hashtag_div = document.getElementById("collection-description-annotation-hashtags-div-id")
+    
+    hashtag_div.innerHTML = "tag1, tag2, tag3, tag4, tag5, tag6" // current_entity_obj.taggingTags
+
 
     //now present the description 'tags' for the object
     tags_element = document.getElementById("entity-tags")
@@ -426,7 +444,7 @@ async function Next_Image() {
     } else {
         current_key_index = 0
     }
-    Show_Entity_From_Key_Or_Current_Entity(all_collection_keys[current_key_index])    
+    Show_Entity_From_Key_Or_Current_Entity(all_collection_keys[current_key_index])
     
 }
 
@@ -434,6 +452,13 @@ async function Next_Image() {
 //The missing image filtering is not done in the initial stage here like in the Tagging where all missing
 //images are removed and the annotation objects removed
 async function Initialize_Entity_Page(){
+
+    desription_btn = document.getElementById("collection-image-annotation-navbar-description-button-id")
+	emotion_btn = document.getElementById("collection-image-annotation-navbar-emotion-button-id")
+	meme_btn = document.getElementById("collection-image-annotation-navbar-meme-button-id")
+	desription_btn.classList.add('nav-bar-on')
+	emotion_btn.classList.add('nav-bar-off')
+	meme_btn.classList.add('nav-bar-off')
     
     document.getElementById("collection-control-button-previous-id").addEventListener("click", function (event) {
         Prev_Image()
