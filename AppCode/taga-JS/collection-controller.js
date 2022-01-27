@@ -95,41 +95,21 @@ function Entity_Description_Page() {
     description_text_area_element = document.getElementById("collection-image-annotation-description-textarea-id")
     description_text_area_element.value = current_entity_obj.entityDescription
 
-    hashtag_div = document.getElementById("collection-description-annotation-hashtags-div-id")
-    
-    hashtag_div.innerHTML = "tag1, tag2, tag3, tag4, tag5, tag6" // current_entity_obj.taggingTags
-
-
-    //now present the description 'tags' for the object
-    tags_element = document.getElementById("entity-tags")
-    if(tags_element != null){
-        tags_element.remove()
-    }
-    tag_strings_array = current_entity_obj.taggingTags
-    console.log(`in entity description page; tag_strings_array = ${tag_strings_array}`)
-    if(tag_strings_array != undefined){
-        tag_string_display = tag_strings_array.join(' ,')
-        document.getElementById('annotationPages').insertAdjacentHTML("beforeend", '<p id="entity-tags">' + tag_string_display + '</p>')
+    hashtag_div = document.getElementById("collection-description-annotation-hashtags-div-id")    
+    if(current_entity_obj.taggingTags != undefined){
+        hashtag_div.innerHTML = (current_entity_obj.taggingTags).join(' ,')
     } else {
-        document.getElementById('annotationPages').insertAdjacentHTML("beforeend", `<p id="entity-tags"> Save a description!</p>`)
+        hashtag_div.innerHTML = ""
     }
-
+    console.log(`current_entity_obj.taggingTags = ${current_entity_obj.taggingTags}`)
 }
-
 //takes the current description and updates the entity object in the DB with it
 function Save_Entity_Description() {
-    current_entity_obj.entityDescription = document.getElementById("descriptionInputEntity").value
-
+    current_entity_obj.entityDescription = document.getElementById("collection-image-annotation-description-textarea-id").value
     //now process  description text in order to have the tags
-    new_user_description = DESCRIPTION_PROCESS_MODULE.process_description(current_entity_obj.entityDescription)
-    tags_split = new_user_description.split(' ')
-    processed_tag_word_list = new_user_description.split(' ')
-    current_entity_obj.taggingTags = processed_tag_word_list
-    console.log(`current_entity_obj.taggingTags = ${current_entity_obj.taggingTags}, current_entity_obj.taggingTags length = ${current_entity_obj.taggingTags.length}`)
-
+    current_entity_obj.taggingTags = DESCRIPTION_PROCESS_MODULE.process_description(current_entity_obj.entityDescription)
     ENTITY_DB_FNS.Update_Record(current_entity_obj)
     Entity_Description_Page()
-
 }
 
 //create the entity emotion HTML view for the entity annotation
@@ -392,24 +372,24 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
     }
 
     //display the collection set of images for the gallery of the entity
-    gallery_html = `<div class="row">`
-    gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="Add_Gallery_Images()">add more images</button><br>`
-    gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="Remove_Gallery_Images()">save Gallery changes</button><br>`
+    // gallery_html = `<div class="row">`
+    // gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="Add_Gallery_Images()">add more images</button><br>`
+    // gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="Remove_Gallery_Images()">save Gallery changes</button><br>`
     
-    image_set.forEach(filename => {
-        gallery_html += `
-        <input class="custom-control custom-switch custom-control-input form-control-lg" type="checkbox" value="" id="gallery-view-image-choice-${filename}">
-        <img class="imgG" src="${DIR_PICS + '/' + filename}">
-        `        
-    });
-    gallery_html += `</div>`
-    document.getElementById("entityGallery").innerHTML  = gallery_html;
+    // image_set.forEach(filename => {
+    //     gallery_html += `
+    //     <input class="custom-control custom-switch custom-control-input form-control-lg" type="checkbox" value="" id="gallery-view-image-choice-${filename}">
+    //     <img class="imgG" src="${DIR_PICS + '/' + filename}">
+    //     `        
+    // });
+    // gallery_html += `</div>`
+    // document.getElementById("entityGallery").innerHTML  = gallery_html;
 
-    if(image_set.length != 0){
-        image_set.forEach(filename => {
-            document.getElementById(`gallery-view-image-choice-${filename}`).checked = true
-        });
-    }
+    // if(image_set.length != 0){
+    //     image_set.forEach(filename => {
+    //         document.getElementById(`gallery-view-image-choice-${filename}`).checked = true
+    //     });
+    // }
 
     
     //entity annotations information
@@ -465,6 +445,9 @@ async function Initialize_Entity_Page(){
     })
     document.getElementById("collection-control-button-next-id").addEventListener("click", function (event) {
         Next_Image()
+    })
+    document.getElementById("collection-image-annotation-description-textarea-save-button-id").addEventListener("click", function (event) {
+        Save_Entity_Description()
     })
     
 
