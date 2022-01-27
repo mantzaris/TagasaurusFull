@@ -119,7 +119,6 @@ function Entity_Emotion_Page() {
     meme_btn.classList.remove('nav-bar-on')
     meme_btn.classList.add('nav-bar-off')
 
-
     description_annotations_div = document.getElementById("collection-image-annotation-description-div-id")
     description_annotations_div.style.display = 'none'	
     emotions_annotations_div = document.getElementById("collection-image-annotation-emotions-div-id")
@@ -292,94 +291,52 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
     //the Gallery image set for the entity
     image_set = current_entity_obj.entityImageSet
 
-    //a flag that the entity object has been modified or not so the DB is updated as well
-    update_entity_record = false
-    //from the entityImageSet, filter out missing images from Gallery, which images of 'entityImageSet' are missing
-    //which are missing, which are still present
-    image_set_present = []
-    image_set_missing = []
-    image_set.forEach(function(element,index) {
-        image_path_tmp = DIR_PICS + '/' + element
-        if(FS.existsSync(image_path_tmp) == true){
-            image_set_present.push(element)
-        } else {
-            image_set_missing.push(element)
-        }
-    })
-    //there was at least one missing image so an update is needed
-    if(image_set_missing.length > 0){
-        update_entity_record = true
-        current_entity_obj.entityImageSet = image_set_present
-        image_set = image_set_present
-    }
-    //if the image set is empty place a default
     if(image_set.length == 0){
         current_entity_obj.entityImageSet = ['Taga.png']
         image_set = ['Taga.png']
-    }
-    //we don't update the DB of TAGGING but we could do wide update upon the discovery of a missing image
-    //update the object at the end sicne we may update memes as well later on
-    console.log(`in Show Entity, after missing filter, image_set= ${image_set}`)
-    //now handle potential issues with the entity profile image
-    entity_profile_pic = current_entity_obj.entityImage      
-    image_path_tmp = DIR_PICS + '/' + entity_profile_pic
-    //at this stage the image_set should be consistent with the directory and be non-empty
-    //update the profile pic with a sample from the image_set
-    if(FS.existsSync(image_path_tmp) == false){ 
-        console.log(`choosing random entity image from image_set`)
-        rand_ind = Math.floor(Math.random() * image_set.length)
-        current_entity_obj.entityImage = image_set[rand_ind]
+        ENTITY_DB_FNS.Update_Record(current_entity_obj)
     }
 
-    //now display the entity profile image
-    console.log(`entity image = ${current_entity_obj.entityImage}`)
+    //place the gallery images in the html and ignore the missing images (leave the lingering links)
+    gallery_div = document.getElementById("collections-images-gallery-grid-images-div-id")
+    gallery_html_tmp = ''
+    image_set.forEach(function(image_filename) {
+        image_path_tmp = DIR_PICS + '/' + image_filename
+        if(FS.existsSync(image_path_tmp) == true){
+            gallery_html_tmp += `
+                                <div class="collection-images-gallery-grid-item-class">
+                                    <label class="memeswitch" title="deselect / keep">
+                                        <input id="galleryimage-toggle-id-${image_filename}" type="checkbox" checked="true">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <img src="${image_path_tmp}" id="collection-image-annotation-memes-grid-img-id-${image_filename}" class="collection-images-gallery-grid-img-class"/>
+                                </div>
+                                `
+        }
+    })
+    gallery_div.innerHTML = gallery_html_tmp
+
+    entity_profile_pic = current_entity_obj.entityImage      
+    image_path_tmp = DIR_PICS + '/' + entity_profile_pic
+    //If entity profile image is not present select a random image from the gallery
+    if(FS.existsSync(image_path_tmp) == false){ 
+        console.log(`choosing random entity image from image_set`)
+        present_img_inds = image_set.map( (image_filename,ind) => {
+                                                    path_tmp = DIR_PICS + '/' + image_filename
+                                                    if(FS.existsSync(path_tmp) == true){
+                                                        return ind
+                                                    } else {
+                                                        return -1
+                                                    }
+                                                    }).filter( (e) => e>=0)
+        rand_ind = Math.floor(Math.random() * present_img_inds.length)
+        new_image_ind = present_img_inds[rand_ind]
+        current_entity_obj.entityImage = image_set[new_image_ind]
+        ENTITY_DB_FNS.Update_Record(current_entity_obj)
+    }
     document.getElementById("collection-profile-image-img-id").src = DIR_PICS + '/' + current_entity_obj.entityImage;
     //display the entity hastag 'name'
     document.getElementById("collection-name-text-label-id").textContent = current_entity_obj.entityName;
-
-    //display the description by default
-    if(annotation_view_ind == 1){
-        Entity_Description_Page()
-    } else if (annotation_view_ind == 2){
-        Entity_Emotion_Page()
-    } else {
-        Entity_Memes_Page()
-    }
-
-    //display the collection set of images for the gallery of the entity
-    // gallery_html = `<div class="row">`
-    // gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="Add_Gallery_Images()">add more images</button><br>`
-    // gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="Remove_Gallery_Images()">save Gallery changes</button><br>`
-    
-    // image_set.forEach(filename => {
-    //     gallery_html += `
-    //     <input class="custom-control custom-switch custom-control-input form-control-lg" type="checkbox" value="" id="gallery-view-image-choice-${filename}">
-    //     <img class="imgG" src="${DIR_PICS + '/' + filename}">
-    //     `        
-    // });
-    // gallery_html += `</div>`
-    // document.getElementById("entityGallery").innerHTML  = gallery_html;
-
-    // if(image_set.length != 0){
-    //     image_set.forEach(filename => {
-    //         document.getElementById(`gallery-view-image-choice-${filename}`).checked = true
-    //     });
-    // }
-
-    
-    //entity annotations information
-    if( document.getElementById("emotion_page_view") != null ){
-        Set_Entity_Emotion_Values()
-    } else if( document.getElementById("descriptionInputEntity") != null ){
-        Entity_Description_Page()
-    } else if( document.getElementById("meme_page_view") != null ){
-        Entity_Memes_Page()
-    }   
-
-    //update the DB if there was a change
-    if(update_entity_record == true){ //update the object in the DB
-        ENTITY_DB_FNS.Update_Record(current_entity_obj)
-    }
 
 }
 
@@ -436,6 +393,11 @@ async function Initialize_Entity_Page(){
     document.getElementById("collection-image-annotation-emotions-new-entry-add-emotion-button-id").addEventListener("click", function (event) {
         Add_New_Emotion()
     })
+    document.getElementById("collection-image-annotation-navbar-meme-button-id").addEventListener("click", function (event) {
+        Entity_Memes_Page()
+    })
+
+    
     
     
     await ENTITY_DB_FNS.Create_Db() //sets a global variable in the module to hold the DB for access
@@ -677,31 +639,43 @@ function Entity_Profile_Candidate_Image_Clicked(filename){
 function Entity_Memes_Page() {
     annotation_view_ind = 3
     //make only the meme view pagination button active and the rest have active removed to not be highlighted
-    document.getElementById('entity-meme-view').className += " active";
-    document.getElementById('entity-emotion-view').classList.remove("active")
-    document.getElementById('entity-description-view').classList.remove("active")
-    document.getElementById("annotationPages").textContent = "show the memes now"
+    //colors the annotation menu buttons appropriately (highlights)
+    desription_btn = document.getElementById("collection-image-annotation-navbar-description-button-id")
+    emotion_btn = document.getElementById("collection-image-annotation-navbar-emotion-button-id")
+    meme_btn = document.getElementById("collection-image-annotation-navbar-meme-button-id")
+    desription_btn.classList.remove('nav-bar-on')
+    desription_btn.classList.add('nav-bar-off')
+    emotion_btn.classList.remove('nav-bar-on')
+    emotion_btn.classList.add('nav-bar-off')
+    meme_btn.classList.remove('nav-bar-off')
+    meme_btn.classList.add('nav-bar-on')
+
+    description_annotations_div = document.getElementById("collection-image-annotation-description-div-id")
+    description_annotations_div.style.display = 'none'	
+    emotions_annotations_div = document.getElementById("collection-image-annotation-emotions-div-id")
+    emotions_annotations_div.style.display = 'none';
+    memes_annotations_div = document.getElementById("collection-image-annotation-memes-div-id")
+    memes_annotations_div.style.display = "grid";
     
     memes_array = current_entity_obj.entityMemes //get the memes of the current object
-
-    gallery_html = `<div class="row" id="meme_page_view">`
-    gallery_html += `<br><button type="button" class="btn btn-primary btn-lg" onclick="New_Entity_Memes()">Add new memes</button>`
-    gallery_html += `<button type="button" class="btn btn-primary btn-lg" onclick="Save_Meme_Edits()">Save Edits</button>`
-    memes_array = current_entity_obj.entityMemes
-    if(memes_array != ""){
-        memes_array.forEach(element => {
+    console.log(`memes_array= ${memes_array}`)
+    console.log(`memes_array type = ${typeof(memes_array)}`)
+    console.log(`memes_array length = ${memes_array.length}`)
+    gallery_html = ''
+    if(memes_array != "" || memes_array.length > 0){
+        memes_array.forEach(meme_path => {
             gallery_html += `
-            <input type="checkbox" value="" id="entity-meme-${element}">
-            <img class="imgG" src="${DIR_PICS + '/' + element}">
-            `
+                        <div class="collection-image-annotation-memes-grid-item-class">
+                        <label class="memeswitch" title="deselect / keep">
+                            <input id="meme-toggle-id-${meme_path}" type="checkbox" checked="true">
+                            <span class="slider"></span>
+                        </label>
+                        <img src="${DIR_PICS + '/' + meme_path}" id="collection-image-annotation-memes-grid-img-id-${meme_path}" class="collection-image-annotation-meme-grid-img-class"/>
+                        </div>
+                        `
         });
     }
-    document.getElementById("annotationPages").innerHTML  = gallery_html;
-    if(memes_array != ""){
-        memes_array.forEach(element => {
-            document.getElementById(`entity-meme-${element}`).checked = true
-        });
-    }
+    document.getElementById("collection-image-annotation-memes-images-show-div-id").innerHTML = gallery_html
 }
 
 //to save the edits to the memes which is the deletions
@@ -718,7 +692,6 @@ async function Save_Meme_Edits(){
             meme_switch_booleans.push(current_memes[ii])
         }
     }
-
     current_entity_obj.entityMemes = meme_switch_booleans
 
     // for( var key of Object.keys(new_record["taggingEmotions"]) ){
