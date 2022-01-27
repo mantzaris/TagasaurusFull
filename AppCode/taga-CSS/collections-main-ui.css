@@ -300,7 +300,7 @@ body {
 }
 #collection-image-annotation-emotions-labels-show-div-id {
   grid-area: collection-image-annotation-emotions-labels-show-div-id;
-  overflow-y: scroll;
+  overflow-y: auto;
   /* min-height: 0;  essential for the auto height be disabled and stop it expanding */
   /* height: 100%; */
 }

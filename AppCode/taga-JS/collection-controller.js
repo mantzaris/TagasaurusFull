@@ -12,8 +12,10 @@ const MY_FILE_HELPER = require('./myJS/copy-new-file-helper.js')
 //TAGGING_IDB_MODULE_COPY = require('./myJS/tagging-db-fns.js'); //for the hash refs of the individual images
 const TAGGING_IDB_MODULE = require('./myJS/tagging-db-fns.js'); 
 
+
 //<script src="./masonry.pkgd.min.js"></script>
-//const MASONRY = require('./masonry.pkgd.min.js')
+const MASONRY = require('masonry-layout') // require('./masonry.pkgd.min.js')
+
 
 const DIR_PICS = PATH.resolve(PATH.resolve(),'images') //PATH.resolve(__dirname, '..', 'images') //PATH.join(__dirname,'..','images')  //PATH.normalize(__dirname+PATH.sep+'..') + PATH.sep + 'images'     //__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
 //the folder to store the taga images (with a commented set of alternative solutions that all appear to work)
@@ -22,8 +24,6 @@ const TAGA_IMAGE_DIRECTORY = PATH.resolve(PATH.resolve(),'images') //PATH.resolv
 //to produce tags from the textual description
 const DESCRIPTION_PROCESS_MODULE = require('./myJS/description-processing.js');
 
-//DOES NOT WORK CORRECTLY FOR SOME REASON
-const Toastify = require('toastify-js')
 
 TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
                                             "imageFileName": '',      
@@ -44,7 +44,6 @@ var annotation_view_ind = 1 //which view should be shown to the user when they f
 search_results = []
 
 //meme search results
-var search_meme_results_selected = ''
 var search_meme_results = ''
 
 
@@ -59,13 +58,6 @@ async function Delete_Entity() {
     if(current_key_index >= all_collection_keys.length) { current_key_index = 0 }
     Show_Entity_From_Key_Or_Current_Entity(all_collection_keys[current_key_index]) //current index for keys will be 1 ahead from before delete
 
-    //notification
-    Toastify({
-        text: "This is a toast", duration: 1500, newWindow: true,
-        close: true, gravity: "top", position: "left",
-        backgroundColor: "#96c93d", stopOnFocus: true
-        //onClick: function(){} // Callback after click
-    }).showToast();
 
 }
 
@@ -86,7 +78,7 @@ function Entity_Description_Page() {
     meme_btn.classList.add('nav-bar-off')
     
 	description_annotations_div = document.getElementById("collection-image-annotation-description-div-id")
-    description_annotations_div.style.visibility = 'inline-block'
+    description_annotations_div.style.display = 'grid'
 	emotions_annotations_div = document.getElementById("collection-image-annotation-emotions-div-id")
     emotions_annotations_div.style.display = "none";
 	memes_annotations_div = document.getElementById("collection-image-annotation-memes-div-id")
@@ -115,116 +107,99 @@ function Save_Entity_Description() {
 //create the entity emotion HTML view for the entity annotation
 function Entity_Emotion_Page() {
     annotation_view_ind = 2
-    document.getElementById('entity-emotion-view').className += " active"; //activate the correct pagination label
-    document.getElementById('entity-description-view').classList.remove("active")
-    document.getElementById('entity-meme-view').classList.remove("active")
 
-    emotion_HTML = `<label id="emotion-box-title" class="form-label">EMOTIONS (*)</label>
-                    <br>
-                    <button class="btn btn-primary btn-sm btn-block" id="addEmotion" type="button" onclick="Add_New_Emotion()">Add new emotion</button>
-                    <input type="text" class="form-control" id="new-emotion-label" aria-describedby="new emotion" placeholder="new emotion">
-                    <hr> 
-                    <div class="emotion-div" id="emotion-values">
-                        
-                    </div>`
-    document.getElementById('annotationPages').innerHTML = emotion_HTML    
-    emotion_div = document.getElementById("emotion-values")
-    emotion_html_tmp = ''
-    for( var key of Object.keys(current_entity_obj["entityEmotions"]) ){
-        console.log(`key of the button is: ${key}`)
-        emotion_html_tmp += `<label for="customRange1" class="form-label" id="emotion_name_label-${key}">${key}</label>
-                                <button type="button" class="close" aria-label="CloseL" id="emotion_delete_btn-${key}">
-                                &#10006
-                                </button>
-                                <input type="range" class="form-range" id="emotion_value-${key}">
-                                `
-    }
-    emotion_div.insertAdjacentHTML('beforeend', emotion_html_tmp);
-    console.log(`>>>current_entity_obj = ${JSON.stringify(current_entity_obj)}`)
-    
-    emotion_HTML_tmp = `<button type="button" class="btn btn-primary btn-lg" onclick="Save_Entity_Emotions()">Save</button>`
-    document.getElementById('annotationPages').innerHTML += emotion_HTML_tmp
-    for( var key of Object.keys(current_entity_obj["entityEmotions"]) ){
-        console.log(`current_entity_obj["entityEmotions"][key] = ${current_entity_obj["entityEmotions"][key]}`)
-        document.getElementById('emotion_value-'+key).value = current_entity_obj["entityEmotions"][key]
+    //colors the annotation menu buttons appropriately (highlights)
+    desription_btn = document.getElementById("collection-image-annotation-navbar-description-button-id")
+    emotion_btn = document.getElementById("collection-image-annotation-navbar-emotion-button-id")
+    meme_btn = document.getElementById("collection-image-annotation-navbar-meme-button-id")
+    desription_btn.classList.remove('nav-bar-on')
+    desription_btn.classList.add('nav-bar-off')
+    emotion_btn.classList.remove('nav-bar-off')
+    emotion_btn.classList.add('nav-bar-on')
+    meme_btn.classList.remove('nav-bar-on')
+    meme_btn.classList.add('nav-bar-off')
+
+
+    description_annotations_div = document.getElementById("collection-image-annotation-description-div-id")
+    description_annotations_div.style.display = 'none'	
+    emotions_annotations_div = document.getElementById("collection-image-annotation-emotions-div-id")
+    emotions_annotations_div.style.display = 'grid';
+	memes_annotations_div = document.getElementById("collection-image-annotation-memes-div-id")
+	memes_annotations_div.style.display = "none";
+
+    console.log(`current_entity_obj["entityEmotions"] = ${JSON.stringify(current_entity_obj["entityEmotions"])}`)
+    emotions_collection = current_entity_obj["entityEmotions"]
+    emotion_HTML = ''
+    for( let key in emotions_collection ){        
+        emotion_HTML += `
+                        <div class="emotion-list-class" id="emotion-entry-div-id-${key}">
+                        <div>
+                            <img onclick="" class="emotion-delete-icon-class" id="emotion-delete-button-id-${key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';" onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" alt="emotion-${key}" title="remove"/>
+                            <span class="emotion-label-view-class" id="emotion-id-label-view-name-${key}">${key}</span>
+                        </div>
+                        <input class="emotion-range-slider-class" id="emotion-range-id-${key}" type="range" min="0" max="100" value="0">
+                        </div>
+                        `
     }
 
-    emotion_keys = Object.keys(current_entity_obj["entityEmotions"])
-    emotion_keys.forEach(key_tmp => {
-        //key_tmp = emotion_keys[ii]
-        console.log(`key_tmp = ${key_tmp}`)
-        del_btn_element = document.getElementById(`emotion_delete_btn-${key_tmp}`)
-        document.getElementById(`emotion_delete_btn-${key_tmp}`).addEventListener("click", function() {
-            console.log(`about to call Delete_Emotion from Entity_Emotion_Page where key_tmp = ${key_tmp}`)
+    emotions_show_div = document.getElementById("collection-image-annotation-emotions-labels-show-div-id")
+    emotions_show_div.innerHTML = emotion_HTML
+
+    //set up the delete operation per emotion AND set values of slider
+    Object.keys(emotions_collection).forEach(key_tmp => {
+        document.getElementById(`emotion-delete-button-id-${key_tmp}`).addEventListener("click", function() {
             Delete_Emotion(`${key_tmp}`);
-            //test_key(key_tmp + '  (add new emotion)')
         }, false);
+        document.getElementById(`emotion-range-id-${key_tmp}`).value = current_entity_obj["entityEmotions"][key_tmp]
     })
-    
 }
-
-//will take the current emotion values, and store it into an object to replace the current entity object's emotions
-//then update the record in the Database
-function Save_Entity_Emotions() {    
-    for( var key of Object.keys(current_entity_obj["entityEmotions"]) ){
-        console.log(`current_entity_obj["entityEmotions"][key] = ${current_entity_obj["entityEmotions"][key]}`)
-        current_entity_obj["entityEmotions"][key] = document.getElementById('emotion_value-'+key).value
-    }
-    ENTITY_DB_FNS.Update_Record(current_entity_obj)
-}
-
-//add a new emotion to the emotion set
-async function Add_New_Emotion(){
-    new_emotion_text = document.getElementById("new-emotion-label").value
-    console.log(` Add_New_Emotion() new_emotion_text = ${new_emotion_text}`)
-    if(new_emotion_text){
-        keys_tmp = Object.keys(current_entity_obj["entityEmotions"])
-        boolean_included = keys_tmp.includes(new_emotion_text)
-        if(boolean_included == false){
-            current_entity_obj["entityEmotions"][new_emotion_text] = 0
-            emotion_div = document.getElementById("emotion-values")
-            emotion_inner_html = `<label for="customRange1" class="form-label" id="emotion_name_label-${new_emotion_text}">${new_emotion_text}</label>
-                                        <button type="button" class="close" aria-label="Close" id="emotion_delete_btn-${new_emotion_text}">
-                                            &#10006
-                                        </button>
-                                        <input type="range" class="form-range" id="emotion_value-${new_emotion_text}">`
-            
-            emotion_div.insertAdjacentHTML('beforeend', emotion_inner_html);   
-            //add the delete emotion handler
-            console.log(`again...: Add_New_Emotion() new_emotion_text = ${new_emotion_text}`)
-            document.getElementById(`emotion_delete_btn-${new_emotion_text}`).addEventListener("click", function() {
-                console.log(`trying to delete emotion from Add_New_Emotion where new_emotion_text = ${new_emotion_text}`)
-                Delete_Emotion(`${new_emotion_text}`);
-                //test_key(new_emotion_text + '  (add new emotion)')
-            }, false);
-            document.getElementById('emotion_value-'+new_emotion_text).value = "0"
-            await ENTITY_DB_FNS.Update_Record(current_entity_obj)
-            //do not save upon addition of a new emotion, the save button is necessary
-            //await Process_Image()
-            document.getElementById("new-emotion-label").value = ""
-        } else {
-            document.getElementById("new-emotion-label").value = ""
-        }
-    }
-
-}
-
-
 //delete an emotion from the emotion set
 async function Delete_Emotion(emotion_key){
     console.log(`in Delete_Emotion(emotion_key) ,\n emotion_key = ${emotion_key}`)
-    //emotion_name = emotion_key.split("-")[1]
-    element_slider_delete_btn = document.getElementById('emotion_delete_btn-'+emotion_key);
+    element_slider_delete_btn = document.getElementById('emotion-delete-button-id-'+emotion_key);
     element_slider_delete_btn.remove();
-    element_slider_range = document.getElementById('emotion_value-'+emotion_key);
+    element_slider_range = document.getElementById('emotion-range-id-'+emotion_key);
     element_slider_range.remove();
-    element_emotion_label = document.getElementById('emotion_name_label-'+emotion_key);
+    element_emotion_label = document.getElementById('emotion-id-label-view-name-'+emotion_key);
     element_emotion_label.remove();
     delete current_entity_obj["entityEmotions"][emotion_key];
     console.log(`in delete emotion current_entity_obj = ${JSON.stringify(current_entity_obj)}, keys = ${Object.keys(current_entity_obj["entityEmotions"])}`)
     await ENTITY_DB_FNS.Update_Record(current_entity_obj)
     Entity_Emotion_Page()
 }
+//will take the current emotion values, and store it into an object to replace the current entity object's emotions
+//then update the record in the Database
+function Save_Entity_Emotions() {    
+    for( var key of Object.keys(current_entity_obj["entityEmotions"]) ){
+        console.log(`current_entity_obj["entityEmotions"][key] = ${current_entity_obj["entityEmotions"][key]}`)
+        current_entity_obj["entityEmotions"][key] = document.getElementById('emotion-range-id-'+key).value
+    }
+    ENTITY_DB_FNS.Update_Record(current_entity_obj)
+    Entity_Emotion_Page()
+}
+//add a new emotion to the emotion set
+async function Add_New_Emotion(){
+    new_emotion_text = document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value
+    console.log(` Add_New_Emotion() new_emotion_text = ${new_emotion_text}`)
+    if(new_emotion_text){
+        keys_tmp = Object.keys(current_entity_obj["entityEmotions"])
+        boolean_included = keys_tmp.includes(new_emotion_text)
+        if(boolean_included == false){            
+            new_emotion_value = document.getElementById("collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id").value
+            current_entity_obj["entityEmotions"][new_emotion_text] = new_emotion_value
+            await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+            //do not save upon addition of a new emotion, the save button is necessary
+            document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value = ""
+            document.getElementById("collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id").value = "0"
+            Entity_Emotion_Page()
+        } else {
+            document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value = ""
+        }
+    }
+}
+
+
+
 
 
 //called from the entity-main.html
@@ -417,7 +392,6 @@ function Prev_Image() {
     }
     Show_Entity_From_Key_Or_Current_Entity(all_collection_keys[current_key_index])
 }
-
 async function Next_Image() {
     if(current_key_index < all_collection_keys.length-1){
         current_key_index += 1
@@ -439,6 +413,13 @@ async function Initialize_Entity_Page(){
 	desription_btn.classList.add('nav-bar-on')
 	emotion_btn.classList.add('nav-bar-off')
 	meme_btn.classList.add('nav-bar-off')
+
+	desription_btn.addEventListener("click", function (event) {
+		Entity_Description_Page()		
+	})
+    emotion_btn.addEventListener("click", function (event) {
+		Entity_Emotion_Page()
+	})
     
     document.getElementById("collection-control-button-previous-id").addEventListener("click", function (event) {
         Prev_Image()
@@ -449,8 +430,14 @@ async function Initialize_Entity_Page(){
     document.getElementById("collection-image-annotation-description-textarea-save-button-id").addEventListener("click", function (event) {
         Save_Entity_Description()
     })
+    document.getElementById("collection-image-annotation-emotions-save-emotion-button-id").addEventListener("click", function (event) {
+        Save_Entity_Emotions()
+    })
+    document.getElementById("collection-image-annotation-emotions-new-entry-add-emotion-button-id").addEventListener("click", function (event) {
+        Add_New_Emotion()
+    })
     
-
+    
     await ENTITY_DB_FNS.Create_Db() //sets a global variable in the module to hold the DB for access
     await ENTITY_DB_FNS.Get_All_Keys_From_DB() //gets all entity keys, sets them as a variable available for access later on
     all_collection_keys = ENTITY_DB_FNS.Read_All_Keys_From_DB() //retrieve the key set stored as a global within the module
