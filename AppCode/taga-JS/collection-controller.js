@@ -15,7 +15,7 @@ const TAGGING_IDB_MODULE = require('./myJS/tagging-db-fns.js');
 
 //<script src="./masonry.pkgd.min.js"></script>
 const MASONRY = require('masonry-layout') // require('./masonry.pkgd.min.js')
-
+console.log(MASONRY)
 
 const DIR_PICS = PATH.resolve(PATH.resolve(),'images') //PATH.resolve(__dirname, '..', 'images') //PATH.join(__dirname,'..','images')  //PATH.normalize(__dirname+PATH.sep+'..') + PATH.sep + 'images'     //__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
 //the folder to store the taga images (with a commented set of alternative solutions that all appear to work)
@@ -313,6 +313,7 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
                                 </div>
                                 `
         }
+        console.log('+++++++++++++++++++++++')
     })
     gallery_div.innerHTML = gallery_html_tmp
 
@@ -337,6 +338,22 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
     document.getElementById("collection-profile-image-img-id").src = DIR_PICS + '/' + current_entity_obj.entityImage;
     //display the entity hastag 'name'
     document.getElementById("collection-name-text-label-id").textContent = current_entity_obj.entityName;
+
+    Entity_Description_Page()
+
+    setTimeout(() => { 
+    var grid_gallery = document.querySelector(".collection-images-gallery-grid-class");
+	var msnry = new MASONRY(grid_gallery, {
+		columnWidth: '.collection-images-gallery-masonry-grid-sizer',
+		itemSelector: '.collection-images-gallery-grid-item-class',
+		percentPosition: true,
+		gutter: 5,
+		transitionDuration: 0
+        
+	});
+    }, 3000);
+
+console.log('XXXXX!!!!!')
 
 }
 
@@ -396,15 +413,18 @@ async function Initialize_Entity_Page(){
     document.getElementById("collection-image-annotation-navbar-meme-button-id").addEventListener("click", function (event) {
         Entity_Memes_Page()
     })
-
-    
-    
     
     await ENTITY_DB_FNS.Create_Db() //sets a global variable in the module to hold the DB for access
     await ENTITY_DB_FNS.Get_All_Keys_From_DB() //gets all entity keys, sets them as a variable available for access later on
     all_collection_keys = ENTITY_DB_FNS.Read_All_Keys_From_DB() //retrieve the key set stored as a global within the module
 
     await ENTITY_DB_FNS.Check_Presence_Of_Entity_Profile_and_Gallery_Images_and_Memes()
+
+    
+    //HANDLE EMPTY DB AT START HANDLE EMPTY DB!!!!!XXXX!!!!!
+    //handle EMPTY!!!XXX
+    //MAKE A DEFAULT COLLECTION
+
 
     await Show_Entity_From_Key_Or_Current_Entity(all_collection_keys[0]) //set the first entity to be seen, populate entity object data on view
     await Entity_Description_Page() //the Text Description annotation is the first page to see alternative is the text description

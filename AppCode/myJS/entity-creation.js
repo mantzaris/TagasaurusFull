@@ -94,7 +94,7 @@ async function Finish_Btn() {
         console.log(`entities_entry  ${JSON.stringify(entities_entry)}`)
         await ENTITY_DB_FNS.Insert_Record(entities_entry)
         //window redirect
-        window.location="entity-main.html"
+        window.location="collections.html"
     }
 }
 
