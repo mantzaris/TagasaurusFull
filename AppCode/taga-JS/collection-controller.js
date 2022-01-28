@@ -25,13 +25,14 @@ const TAGA_IMAGE_DIRECTORY = PATH.resolve(PATH.resolve(),'images') //PATH.resolv
 const DESCRIPTION_PROCESS_MODULE = require('./myJS/description-processing.js');
 
 
-TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
-                                            "imageFileName": '',      
-                                            "taggingRawDescription": "",
-                                            "taggingTags": [],
-                                            "taggingEmotions": {good:0,bad:0},//{ happy: 0, sad: 0, confused: 0 },
-                                            "taggingMemeChoices": []
-                                            }
+COLLECTION_DEFAULT_EMPTY_OBJECT = {
+                                        "entityName": '',
+                                        "entityImage": '',
+                                        "entityDescription": '',
+                                        "entityImageSet": [],
+                                        "entityEmotions": {good:0,bad:0}, //{happy:happy_value,sad:sad_value,confused:confused_value},            
+                                        "entityMemes": []
+                                    }
 
 
 var current_entity_obj; //it holds the object of the entity being in current context
@@ -54,10 +55,12 @@ async function Delete_Entity() {
     await ENTITY_DB_FNS.Get_All_Keys_From_DB() //refresh the current key list
     all_collection_keys = ENTITY_DB_FNS.Read_All_Keys_From_DB() //retrieve that key list and set to the local global variable
 
+    if(all_collection_keys.length == 0){
+        Handle_Empty_DB()
+    }
+
     if(current_key_index >= all_collection_keys.length) { current_key_index = 0 }
     Show_Entity_From_Key_Or_Current_Entity(all_collection_keys[current_key_index]) //current index for keys will be 1 ahead from before delete
-
-
 }
 
 
@@ -276,7 +279,6 @@ async function Remove_Gallery_Images(){
 }
 
 
-
 //we use the key to pull the entity object from the DB, or if use_key=0 take the value
 //from the existing entity object global variable. 
 //also handles empty cases
@@ -325,7 +327,7 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
     })
     gallery_div.innerHTML += gallery_html_tmp //gallery_div.innerHTML = gallery_html_tmp
 
-    entity_profile_pic = current_entity_obj.entityImage      
+    entity_profile_pic = current_entity_obj.entityImage
     image_path_tmp = DIR_PICS + '/' + entity_profile_pic
     //If entity profile image is not present select a random image from the gallery
     if(FS.existsSync(image_path_tmp) == false){ 
@@ -346,9 +348,6 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
     //display the entity hastag 'name'
     document.getElementById("collection-name-text-label-id").textContent = current_entity_obj.entityName;
 
-    //default present 
-    Entity_Description_Page()
-    
     var grid_gallery = document.querySelector(".collection-images-gallery-grid-class");
 	var msnry = new MASONRY(grid_gallery, {
 		columnWidth: '.collection-images-gallery-masonry-grid-sizer',
@@ -357,6 +356,8 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
 		gutter: 5,
 		transitionDuration: 0
 	});
+     //default present 
+    Entity_Description_Page()
 }
 
 
@@ -415,16 +416,17 @@ async function Initialize_Entity_Page(){
     document.getElementById("collection-image-annotation-navbar-meme-button-id").addEventListener("click", function (event) {
         Entity_Memes_Page()
     })
+    document.getElementById("collection-control-button-delete-id").addEventListener("click", function (event) {
+        Delete_Entity()
+    })
     
     await ENTITY_DB_FNS.Create_Db() //sets a global variable in the module to hold the DB for access
     await ENTITY_DB_FNS.Get_All_Keys_From_DB() //gets all entity keys, sets them as a variable available for access later on
-    all_collection_keys = ENTITY_DB_FNS.Read_All_Keys_From_DB() //retrieve the key set stored as a global within the module
+    all_collection_keys = await ENTITY_DB_FNS.Read_All_Keys_From_DB() //retrieve the key set stored as a global within the module
 
-    await ENTITY_DB_FNS.Check_Presence_Of_Entity_Profile_and_Gallery_Images_and_Memes()
-    
-    //HANDLE EMPTY DB AT START HANDLE EMPTY DB!!!!!XXXX!!!!!
-    //handle EMPTY!!!XXX
-    //MAKE A DEFAULT COLLECTION
+    if(all_collection_keys.length == 0){
+        await Handle_Empty_DB()
+    }
 
     await Show_Entity_From_Key_Or_Current_Entity(all_collection_keys[0]) //set the first entity to be seen, populate entity object data on view
     await Entity_Description_Page() //the Text Description annotation is the first page to see alternative is the text description
@@ -435,7 +437,14 @@ async function Initialize_Entity_Page(){
 Initialize_Entity_Page()
 
 
-
+async function Handle_Empty_DB(){
+    new_default_obj = {...COLLECTION_DEFAULT_EMPTY_OBJECT}
+    new_default_obj.entityName = 'Taga' + Math.floor(Math.random() * max);
+    new_default_obj.entityImage = 'Taga.png'
+    new_default_obj.entityImageSet = ['Taga.png']
+    await ENTITY_DB_FNS.Insert_Record(new_default_obj)
+    all_collection_keys = [new_default_obj.entityName]
+}
 
 
 
