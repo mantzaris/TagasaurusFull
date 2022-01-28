@@ -297,6 +297,9 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
         ENTITY_DB_FNS.Update_Record(current_entity_obj)
     }
 
+    //clear gallery of gallery image objects
+    document.querySelectorAll(".collection-images-gallery-grid-item-class").forEach(el => el.remove());
+
     //place the gallery images in the html and ignore the missing images (leave the lingering links)
     gallery_div = document.getElementById("collections-images-gallery-grid-images-div-id")
     gallery_html_tmp = ''
