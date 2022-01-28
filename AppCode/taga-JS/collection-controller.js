@@ -315,7 +315,7 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
         }
         console.log('+++++++++++++++++++++++')
     })
-    gallery_div.innerHTML = gallery_html_tmp
+    gallery_div.innerHTML += gallery_html_tmp //gallery_div.innerHTML = gallery_html_tmp
 
     entity_profile_pic = current_entity_obj.entityImage      
     image_path_tmp = DIR_PICS + '/' + entity_profile_pic
@@ -339,9 +339,10 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
     //display the entity hastag 'name'
     document.getElementById("collection-name-text-label-id").textContent = current_entity_obj.entityName;
 
+    //default present 
     Entity_Description_Page()
 
-    setTimeout(() => { 
+    
     var grid_gallery = document.querySelector(".collection-images-gallery-grid-class");
 	var msnry = new MASONRY(grid_gallery, {
 		columnWidth: '.collection-images-gallery-masonry-grid-sizer',
@@ -351,9 +352,7 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
 		transitionDuration: 0
         
 	});
-    }, 3000);
 
-console.log('XXXXX!!!!!')
 
 }
 
