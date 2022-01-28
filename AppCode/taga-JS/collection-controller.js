@@ -27,7 +27,6 @@ const DESCRIPTION_PROCESS_MODULE = require('./myJS/description-processing.js');
 
 TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
                                             "imageFileName": '',      
-                                            "imageFileHash": '',
                                             "taggingRawDescription": "",
                                             "taggingTags": [],
                                             "taggingEmotions": {good:0,bad:0},//{ happy: 0, sad: 0, confused: 0 },
@@ -280,6 +279,7 @@ async function Remove_Gallery_Images(){
 
 //we use the key to pull the entity object from the DB, or if use_key=0 take the value
 //from the existing entity object global variable. 
+//also handles empty cases
 async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=1) {
 
     //if using the key, the global object for the current entity shown is updated and this is 
@@ -288,18 +288,24 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
         current_entity_obj = await ENTITY_DB_FNS.Get_Record(entity_key_or_obj) 
     }
     console.log(`in Show Entity, current_entity_obj.entityImageSet = ${current_entity_obj.entityImageSet}`)
+    
     //the Gallery image set for the entity
     image_set = current_entity_obj.entityImageSet
-
+    //handle empty issues or 
     if(image_set.length == 0){
         current_entity_obj.entityImageSet = ['Taga.png']
         image_set = ['Taga.png']
-        ENTITY_DB_FNS.Update_Record(current_entity_obj)
+        await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+    }
+    any_images_present = image_set.some( fn => FS.existsSync(DIR_PICS+'/'+fn) == true)
+    if(any_images_present == false){
+        current_entity_obj.entityImageSet.push('Taga.png')
+        current_entity_obj.entityImage = 'Taga.png'
+        await ENTITY_DB_FNS.Update_Record(current_entity_obj)
     }
 
     //clear gallery of gallery image objects
     document.querySelectorAll(".collection-images-gallery-grid-item-class").forEach(el => el.remove());
-
     //place the gallery images in the html and ignore the missing images (leave the lingering links)
     gallery_div = document.getElementById("collections-images-gallery-grid-images-div-id")
     gallery_html_tmp = ''
@@ -316,7 +322,6 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
                                 </div>
                                 `
         }
-        console.log('+++++++++++++++++++++++')
     })
     gallery_div.innerHTML += gallery_html_tmp //gallery_div.innerHTML = gallery_html_tmp
 
@@ -324,7 +329,6 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
     image_path_tmp = DIR_PICS + '/' + entity_profile_pic
     //If entity profile image is not present select a random image from the gallery
     if(FS.existsSync(image_path_tmp) == false){ 
-        console.log(`choosing random entity image from image_set`)
         present_img_inds = image_set.map( (image_filename,ind) => {
                                                     path_tmp = DIR_PICS + '/' + image_filename
                                                     if(FS.existsSync(path_tmp) == true){
@@ -344,7 +348,6 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
 
     //default present 
     Entity_Description_Page()
-
     
     var grid_gallery = document.querySelector(".collection-images-gallery-grid-class");
 	var msnry = new MASONRY(grid_gallery, {
@@ -353,10 +356,7 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
 		percentPosition: true,
 		gutter: 5,
 		transitionDuration: 0
-        
 	});
-
-
 }
 
 
@@ -421,17 +421,14 @@ async function Initialize_Entity_Page(){
     all_collection_keys = ENTITY_DB_FNS.Read_All_Keys_From_DB() //retrieve the key set stored as a global within the module
 
     await ENTITY_DB_FNS.Check_Presence_Of_Entity_Profile_and_Gallery_Images_and_Memes()
-
     
     //HANDLE EMPTY DB AT START HANDLE EMPTY DB!!!!!XXXX!!!!!
     //handle EMPTY!!!XXX
     //MAKE A DEFAULT COLLECTION
 
-
     await Show_Entity_From_Key_Or_Current_Entity(all_collection_keys[0]) //set the first entity to be seen, populate entity object data on view
     await Entity_Description_Page() //the Text Description annotation is the first page to see alternative is the text description
     
-    console.log(`in init, current_collection_obj = ${JSON.stringify(current_entity_obj)}`)
 }
 
 //the key starting point for the page
