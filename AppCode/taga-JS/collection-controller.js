@@ -289,7 +289,7 @@ async function Save_Meme_Changes(){
 
 
 
-
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!????????????????????
 //called from the entity-main.html
 async function New_Entity_Image(){
     console.log(`<<<<<<----------New_Entity_Image()----------->>>>>>>>>>>`)
@@ -343,26 +343,10 @@ async function New_Entity_Image(){
 
 }         
 
-//assign a new set of images to the gallery which includes the entity image (replacement set)
-async function Remove_Gallery_Images(){
-    console.log(`<<<<<<----------Remove_Gallery_Images()----------->>>>>>>>>>>`)
 
-    gallery_files = current_entity_obj.entityImageSet
-    console.log(`gallery_files = ${gallery_files}`)
-    new_gallery_files = []
-    if(gallery_files.length != 0){
-        gallery_files.forEach(filename => {
-            console.log(`filename = ${filename}`)
-            if( document.getElementById(`gallery-view-image-choice-${filename}`).checked == true || filename == current_entity_obj.entityImage ){
-                new_gallery_files.push(filename)
-            }
-        });
-        current_entity_obj.entityImageSet = new_gallery_files
-        await ENTITY_DB_FNS.Update_Record(current_entity_obj)
-        Show_Entity_From_Key_Or_Current_Entity(all_collection_keys[current_key_index])
-    }
 
-}
+
+
 
 
 //we use the key to pull the entity object from the DB, or if use_key=0 take the value
@@ -377,26 +361,33 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
     }
     console.log(`in Show Entity, current_entity_obj.entityImageSet = ${current_entity_obj.entityImageSet}`)
     
-    //the Gallery image set for the entity
-    image_set = current_entity_obj.entityImageSet
-    //handle empty issues or 
-    if(image_set.length == 0){
-        current_entity_obj.entityImageSet = ['Taga.png']
-        image_set = ['Taga.png']
-        await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+    //check for issues
+    reload_bool = Check_Gallery_And_Profile_Image_Integrity()
+    if(reload_bool == true){
+        current_entity_obj = await ENTITY_DB_FNS.Get_Record(entity_key_or_obj) 
     }
-    any_images_present = image_set.some( fn => FS.existsSync(DIR_PICS+'/'+fn) == true)
-    if(any_images_present == false){
-        current_entity_obj.entityImageSet.push('Taga.png')
-        current_entity_obj.entityImage = 'Taga.png'
-        await ENTITY_DB_FNS.Update_Record(current_entity_obj)
-    }
+
+    document.getElementById("collection-profile-image-img-id").src = DIR_PICS + '/' + current_entity_obj.entityImage;
+    document.getElementById("collection-profile-image-img-id").addEventListener("click", function (event) {
+        Image_Clicked_Modal(current_entity_obj.entityImage)    
+    })
+    //display the entity hastag 'name'
+    document.getElementById("collection-name-text-label-id").textContent = current_entity_obj.entityName;
+
+    //display gallery images
+    Display_Gallery_Images()
+    //default present 
+    Entity_Description_Page()
+}
+//display gallery images
+function Display_Gallery_Images() {
 
     //clear gallery of gallery image objects
     document.querySelectorAll(".collection-images-gallery-grid-item-class").forEach(el => el.remove());
     //place the gallery images in the html and ignore the missing images (leave the lingering links)
     gallery_div = document.getElementById("collections-images-gallery-grid-images-div-id")
     gallery_html_tmp = ''
+    image_set = current_entity_obj.entityImageSet
     image_set.forEach(function(image_filename) {
         image_path_tmp = DIR_PICS + '/' + image_filename
         if(FS.existsSync(image_path_tmp) == true){
@@ -422,41 +413,92 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
         }
     })
 
-    entity_profile_pic = current_entity_obj.entityImage
-    image_path_tmp = DIR_PICS + '/' + entity_profile_pic
-    //If entity profile image is not present select a random image from the gallery
-    if(FS.existsSync(image_path_tmp) == false){ 
-        present_img_inds = image_set.map( (image_filename,ind) => {
-                                                    path_tmp = DIR_PICS + '/' + image_filename
-                                                    if(FS.existsSync(path_tmp) == true){
-                                                        return ind
-                                                    } else {
-                                                        return -1
-                                                    }
-                                                    }).filter( (e) => e>=0)
-        rand_ind = Math.floor(Math.random() * present_img_inds.length)
-        new_image_ind = present_img_inds[rand_ind]
-        current_entity_obj.entityImage = image_set[new_image_ind]
-        ENTITY_DB_FNS.Update_Record(current_entity_obj)
-    }
-    document.getElementById("collection-profile-image-img-id").src = DIR_PICS + '/' + current_entity_obj.entityImage;
-    document.getElementById("collection-profile-image-img-id").addEventListener("click", function (event) {
-        Image_Clicked_Modal(current_entity_obj.entityImage)    
-    })
-    //display the entity hastag 'name'
-    document.getElementById("collection-name-text-label-id").textContent = current_entity_obj.entityName;
-
-    var grid_gallery = document.querySelector(".collection-images-gallery-grid-class");
-	var msnry = new MASONRY(grid_gallery, {
-		columnWidth: '.collection-images-gallery-masonry-grid-sizer',
-		itemSelector: '.collection-images-gallery-grid-item-class',
-		percentPosition: true,
-		gutter: 5,
-		transitionDuration: 0
-	});
-     //default present 
-    Entity_Description_Page()
+    setTimeout(() => {
+        var grid_gallery = document.querySelector(".collection-images-gallery-grid-class");
+        var msnry = new MASONRY(grid_gallery, {
+            columnWidth: '.collection-images-gallery-masonry-grid-sizer',
+            itemSelector: '.collection-images-gallery-grid-item-class',
+            percentPosition: true,
+            gutter: 5,
+            transitionDuration: 0
+        });
+    },300);
 }
+//to save the edits to the gallery images which is the deletions
+async function Save_Gallery_Changes(){
+    current_images = current_entity_obj.entityImageSet //get the memes of the current object
+    length_original = current_images.length
+    gallery_switch_booleans = []
+    for (var ii = 0; ii < current_images.length; ii++) {
+        image_path_tmp = DIR_PICS + '/' + current_images[ii]
+        if(FS.existsSync(image_path_tmp) == true){
+            image_boolean_tmp = document.getElementById(`galleryimage-toggle-id-${current_images[ii]}`).checked
+            if(image_boolean_tmp == true){
+                gallery_switch_booleans.push(current_images[ii])
+            }
+        } else {
+            gallery_switch_booleans.push(current_images[ii])
+        }
+    }
+    length_new = gallery_switch_booleans.length
+    if(length_new < length_original){
+        current_entity_obj.entityImageSet = gallery_switch_booleans
+        await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+        await Check_Gallery_And_Profile_Image_Integrity()
+        Display_Gallery_Images()
+    }
+}
+async function Check_Gallery_And_Profile_Image_Integrity(){
+    changes_made = false
+    //the Gallery image set for the entity
+    image_set = current_entity_obj.entityImageSet
+    image_set_present = image_set.map( (image_filename) => {
+                                                path_tmp = DIR_PICS + '/' + image_filename
+                                                if(FS.existsSync(path_tmp) == true){
+                                                    return image_filename
+                                                } else {
+                                                    return false
+                                                }
+                                                }).filter( (e) => e != false)
+    entity_profile_pic = current_entity_obj.entityImage
+    image_path_profile_pic = DIR_PICS + '/' + entity_profile_pic
+    profile_pic_present_bool = FS.existsSync(image_path_profile_pic)
+    
+    //1-profile image is missing, and image set is empty (or none present to show)
+    if(profile_pic_present_bool == false && image_set_present.length == 0) {
+        current_entity_obj.entityImage = 'Taga.png'
+        current_entity_obj.entityImageSet.push('Taga.png')
+        changes_made = true
+    } //2-profile image is missing and image set is not empty (some shown)
+    else if(profile_pic_present_bool == false && image_set_present.length > 0) {
+        rand_ind = Math.floor(Math.random() * image_set_present.length)
+        current_entity_obj.entityImage = image_set_present[rand_ind]
+        changes_made = true
+    } //3-profile image is not missing and image set is empty (or none to show)
+    else if(profile_pic_present_bool == true && image_set_present.length == 0){
+        current_entity_obj.entityImageSet.push(current_entity_obj.entityImage)
+        changes_made = true
+    } //4-profile image is not missing and image set does not include profile image
+    else if(image_set_present.includes(current_entity_obj.entityImage) == false) {
+        current_entity_obj.entityImageSet.push(current_entity_obj.entityImage)
+        changes_made = true
+    }
+
+    if(changes_made == true){
+        await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+    }
+    return(changes_made)
+}
+
+
+
+
+
+
+
+
+
+
 
 
 function Prev_Image() {
@@ -521,6 +563,10 @@ async function Initialize_Entity_Page(){
     document.getElementById("collection-image-annotation-memes-save-changes-button-id").addEventListener("click", function (event) {
         Save_Meme_Changes()
     })
+    document.getElementById("collections-images-gallery-grid-button-savechanges-id").addEventListener("click", function (event) {
+        Save_Gallery_Changes()
+    })
+    
         
     await ENTITY_DB_FNS.Create_Db() //sets a global variable in the module to hold the DB for access
     await ENTITY_DB_FNS.Get_All_Keys_From_DB() //gets all entity keys, sets them as a variable available for access later on
