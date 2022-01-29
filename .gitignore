@@ -1,1 +1,6 @@
 node_modules
+/.idea/.gitignore
+/.idea/modules.xml
+/.idea/Tagasaurus.iml
+/.idea/vcs.xml
+/yarn.lock
