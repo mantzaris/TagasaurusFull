@@ -200,6 +200,83 @@ async function Add_New_Emotion(){
 }
 
 
+//when the entity memes annotation page is select these page elements are present for the meme view
+function Entity_Memes_Page() {
+    annotation_view_ind = 3
+    //make only the meme view pagination button active and the rest have active removed to not be highlighted
+    //colors the annotation menu buttons appropriately (highlights)
+    desription_btn = document.getElementById("collection-image-annotation-navbar-description-button-id")
+    emotion_btn = document.getElementById("collection-image-annotation-navbar-emotion-button-id")
+    meme_btn = document.getElementById("collection-image-annotation-navbar-meme-button-id")
+    desription_btn.classList.remove('nav-bar-on')
+    desription_btn.classList.add('nav-bar-off')
+    emotion_btn.classList.remove('nav-bar-on')
+    emotion_btn.classList.add('nav-bar-off')
+    meme_btn.classList.remove('nav-bar-off')
+    meme_btn.classList.add('nav-bar-on')
+
+    description_annotations_div = document.getElementById("collection-image-annotation-description-div-id")
+    description_annotations_div.style.display = 'none'	
+    emotions_annotations_div = document.getElementById("collection-image-annotation-emotions-div-id")
+    emotions_annotations_div.style.display = 'none';
+    memes_annotations_div = document.getElementById("collection-image-annotation-memes-div-id")
+    memes_annotations_div.style.display = "grid";
+    
+    memes_array = current_entity_obj.entityMemes //get the memes of the current object
+    console.log(`memes_array= ${memes_array}`)
+    document.querySelectorAll(".collection-image-annotation-memes-grid-item-class").forEach(el => el.remove());
+    gallery_html = ''
+    if(memes_array != "" && memes_array.length > 0){
+        memes_array.forEach(meme_key => {
+            image_path_tmp = DIR_PICS + '/' + meme_key
+            if(FS.existsSync(image_path_tmp) == true){
+                        gallery_html += `
+                                    <div class="collection-image-annotation-memes-grid-item-class">
+                                    <label class="memeswitch" title="deselect / keep">
+                                        <input id="meme-toggle-id-${meme_key}" type="checkbox" checked="true">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <img src="${image_path_tmp}" id="collection-image-annotation-memes-grid-img-id-${meme_key}" class="collection-image-annotation-meme-grid-img-class"/>
+                                    </div>
+                                    `
+            }
+        });
+    }
+    document.getElementById("collection-image-annotation-memes-images-show-div-id").innerHTML += gallery_html
+    
+    var grid_gallery = document.querySelector(".collection-image-annotation-memes-images-grid-class");
+	var msnry = new MASONRY(grid_gallery, {
+		columnWidth: '.collection-image-annotation-memes-masonry-grid-sizer',
+		itemSelector: '.collection-image-annotation-memes-grid-item-class',
+		percentPosition: true,
+		gutter: 5,
+		transitionDuration: 0
+	});
+}
+//to save the edits to the memes which is the deletions
+async function Save_Meme_Changes(){
+    console.log(`now saving the meme deletes`)
+    current_memes = current_entity_obj.entityMemes //get the memes of the current object
+    meme_switch_booleans = []
+    for (var ii = 0; ii < current_memes.length; ii++) {
+        image_path_tmp = DIR_PICS + '/' + current_memes[ii]
+        if(FS.existsSync(image_path_tmp) == true){
+            meme_boolean_tmp = document.getElementById(`meme-toggle-id-${current_memes[ii]}`).checked
+            if(meme_boolean_tmp == true){
+                meme_switch_booleans.push(current_memes[ii])
+            }
+        } else {
+            meme_switch_booleans.push(current_memes[ii])
+        }
+    }
+    current_entity_obj.entityMemes = meme_switch_booleans
+
+    await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+    Entity_Memes_Page()
+}
+
+
+
 
 
 
@@ -419,7 +496,10 @@ async function Initialize_Entity_Page(){
     document.getElementById("collection-control-button-delete-id").addEventListener("click", function (event) {
         Delete_Entity()
     })
-    
+    document.getElementById("collection-image-annotation-memes-save-changes-button-id").addEventListener("click", function (event) {
+        Save_Meme_Changes()
+    })
+        
     await ENTITY_DB_FNS.Create_Db() //sets a global variable in the module to hold the DB for access
     await ENTITY_DB_FNS.Get_All_Keys_From_DB() //gets all entity keys, sets them as a variable available for access later on
     all_collection_keys = await ENTITY_DB_FNS.Read_All_Keys_From_DB() //retrieve the key set stored as a global within the module
@@ -432,7 +512,6 @@ async function Initialize_Entity_Page(){
     await Entity_Description_Page() //the Text Description annotation is the first page to see alternative is the text description
     
 }
-
 //the key starting point for the page
 Initialize_Entity_Page()
 
@@ -661,74 +740,6 @@ function Entity_Profile_Candidate_Image_Clicked(filename){
 
 }
 
-
-
-//when the entity memes annotation page is select these page elements are present for the meme view
-function Entity_Memes_Page() {
-    annotation_view_ind = 3
-    //make only the meme view pagination button active and the rest have active removed to not be highlighted
-    //colors the annotation menu buttons appropriately (highlights)
-    desription_btn = document.getElementById("collection-image-annotation-navbar-description-button-id")
-    emotion_btn = document.getElementById("collection-image-annotation-navbar-emotion-button-id")
-    meme_btn = document.getElementById("collection-image-annotation-navbar-meme-button-id")
-    desription_btn.classList.remove('nav-bar-on')
-    desription_btn.classList.add('nav-bar-off')
-    emotion_btn.classList.remove('nav-bar-on')
-    emotion_btn.classList.add('nav-bar-off')
-    meme_btn.classList.remove('nav-bar-off')
-    meme_btn.classList.add('nav-bar-on')
-
-    description_annotations_div = document.getElementById("collection-image-annotation-description-div-id")
-    description_annotations_div.style.display = 'none'	
-    emotions_annotations_div = document.getElementById("collection-image-annotation-emotions-div-id")
-    emotions_annotations_div.style.display = 'none';
-    memes_annotations_div = document.getElementById("collection-image-annotation-memes-div-id")
-    memes_annotations_div.style.display = "grid";
-    
-    memes_array = current_entity_obj.entityMemes //get the memes of the current object
-    console.log(`memes_array= ${memes_array}`)
-    console.log(`memes_array type = ${typeof(memes_array)}`)
-    console.log(`memes_array length = ${memes_array.length}`)
-    gallery_html = ''
-    if(memes_array != "" || memes_array.length > 0){
-        memes_array.forEach(meme_path => {
-            gallery_html += `
-                        <div class="collection-image-annotation-memes-grid-item-class">
-                        <label class="memeswitch" title="deselect / keep">
-                            <input id="meme-toggle-id-${meme_path}" type="checkbox" checked="true">
-                            <span class="slider"></span>
-                        </label>
-                        <img src="${DIR_PICS + '/' + meme_path}" id="collection-image-annotation-memes-grid-img-id-${meme_path}" class="collection-image-annotation-meme-grid-img-class"/>
-                        </div>
-                        `
-        });
-    }
-    document.getElementById("collection-image-annotation-memes-images-show-div-id").innerHTML = gallery_html
-}
-
-//to save the edits to the memes which is the deletions
-async function Save_Meme_Edits(){
-    console.log(`now saving the meme deletes`)
-
-    current_memes = current_entity_obj.entityMemes //get the memes of the current object
-    console.log(`current_memes = ${current_memes}`)
-    //meme selection switch check boxes
-    meme_switch_booleans = []
-    for (var ii = 0; ii < current_memes.length; ii++) {
-        meme_boolean_tmp = document.getElementById(`entity-meme-${current_memes[ii]}`).checked
-        if(meme_boolean_tmp == true){
-            meme_switch_booleans.push(current_memes[ii])
-        }
-    }
-    current_entity_obj.entityMemes = meme_switch_booleans
-
-    // for( var key of Object.keys(new_record["taggingEmotions"]) ){
-    //     new_record["taggingEmotions"][key] = document.getElementById('emotion_value-'+key).value
-    // }
-
-    await ENTITY_DB_FNS.Update_Record(current_entity_obj)
-    Entity_Memes_Page()
-}
 
 
 /******************************
