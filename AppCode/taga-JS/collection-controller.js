@@ -12,10 +12,8 @@ const MY_FILE_HELPER = require('./myJS/copy-new-file-helper.js')
 //TAGGING_IDB_MODULE_COPY = require('./myJS/tagging-db-fns.js'); //for the hash refs of the individual images
 const TAGGING_IDB_MODULE = require('./myJS/tagging-db-fns.js'); 
 
-
 //<script src="./masonry.pkgd.min.js"></script>
 const MASONRY = require('masonry-layout') // require('./masonry.pkgd.min.js')
-console.log(MASONRY)
 
 const DIR_PICS = PATH.resolve(PATH.resolve(),'images') //PATH.resolve(__dirname, '..', 'images') //PATH.join(__dirname,'..','images')  //PATH.normalize(__dirname+PATH.sep+'..') + PATH.sep + 'images'     //__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
 //the folder to store the taga images (with a commented set of alternative solutions that all appear to work)
@@ -95,7 +93,6 @@ function Entity_Description_Page() {
     } else {
         hashtag_div.innerHTML = ""
     }
-    console.log(`current_entity_obj.taggingTags = ${current_entity_obj.taggingTags}`)
 }
 //takes the current description and updates the entity object in the DB with it
 function Save_Entity_Description() {
@@ -128,7 +125,6 @@ function Entity_Emotion_Page() {
 	memes_annotations_div = document.getElementById("collection-image-annotation-memes-div-id")
 	memes_annotations_div.style.display = "none";
 
-    console.log(`current_entity_obj["entityEmotions"] = ${JSON.stringify(current_entity_obj["entityEmotions"])}`)
     emotions_collection = current_entity_obj["entityEmotions"]
     emotion_HTML = ''
     for( let key in emotions_collection ){        
@@ -156,7 +152,6 @@ function Entity_Emotion_Page() {
 }
 //delete an emotion from the emotion set
 async function Delete_Emotion(emotion_key){
-    console.log(`in Delete_Emotion(emotion_key) ,\n emotion_key = ${emotion_key}`)
     element_slider_delete_btn = document.getElementById('emotion-delete-button-id-'+emotion_key);
     element_slider_delete_btn.remove();
     element_slider_range = document.getElementById('emotion-range-id-'+emotion_key);
@@ -164,7 +159,6 @@ async function Delete_Emotion(emotion_key){
     element_emotion_label = document.getElementById('emotion-id-label-view-name-'+emotion_key);
     element_emotion_label.remove();
     delete current_entity_obj["entityEmotions"][emotion_key];
-    console.log(`in delete emotion current_entity_obj = ${JSON.stringify(current_entity_obj)}, keys = ${Object.keys(current_entity_obj["entityEmotions"])}`)
     await ENTITY_DB_FNS.Update_Record(current_entity_obj)
     Entity_Emotion_Page()
 }
@@ -172,7 +166,6 @@ async function Delete_Emotion(emotion_key){
 //then update the record in the Database
 function Save_Entity_Emotions() {    
     for( var key of Object.keys(current_entity_obj["entityEmotions"]) ){
-        console.log(`current_entity_obj["entityEmotions"][key] = ${current_entity_obj["entityEmotions"][key]}`)
         current_entity_obj["entityEmotions"][key] = document.getElementById('emotion-range-id-'+key).value
     }
     ENTITY_DB_FNS.Update_Record(current_entity_obj)
@@ -181,7 +174,6 @@ function Save_Entity_Emotions() {
 //add a new emotion to the emotion set
 async function Add_New_Emotion(){
     new_emotion_text = document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value
-    console.log(` Add_New_Emotion() new_emotion_text = ${new_emotion_text}`)
     if(new_emotion_text){
         keys_tmp = Object.keys(current_entity_obj["entityEmotions"])
         boolean_included = keys_tmp.includes(new_emotion_text)
@@ -223,7 +215,6 @@ function Entity_Memes_Page() {
     memes_annotations_div.style.display = "grid";
     
     memes_array = current_entity_obj.entityMemes //get the memes of the current object
-    console.log(`memes_array= ${memes_array}`)
     document.querySelectorAll(".collection-image-annotation-memes-grid-item-class").forEach(el => el.remove());
     gallery_html = ''
     if(memes_array != "" && memes_array.length > 0){
@@ -265,7 +256,6 @@ function Entity_Memes_Page() {
 }
 //to save the edits to the memes which is the deletions
 async function Save_Meme_Changes(){
-    console.log(`now saving the meme deletes`)
     current_memes = current_entity_obj.entityMemes //get the memes of the current object
     meme_switch_booleans = []
     for (var ii = 0; ii < current_memes.length; ii++) {
@@ -288,67 +278,6 @@ async function Save_Meme_Changes(){
 
 
 
-
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!????????????????????
-//called from the entity-main.html
-async function New_Entity_Image(){
-    console.log(`<<<<<<----------New_Entity_Image()----------->>>>>>>>>>>`)
-
-    entity_profile_search_obj = {
-        emotions:{},
-        searchTags:[],
-        searchMemeTags:[]
-    }
-    
-    var search_modal = document.getElementById("top-profile-image-choice-modal-id");
-    search_modal.style.display = "block";
-    var close_element = document.getElementById("search-entityprofile-close-modal-id");
-    close_element.onclick = function() {
-        search_modal.style.display = "none";
-    }
-    window.onclick = function(event) {
-        if (event.target == search_modal) {
-            search_modal.style.display = "none";
-        }
-    }
-
-    search_tags_input = document.getElementById("search-tags-entity-profileimage-entry-form")
-    search_tags_input.value =""
-
-    //populate the search modal with the fields to insert emotion tags and values
-    Search_Entity_ProfileImage_Populate_Emotions()
-    //populate the search modal with the fields to insert meme tags
-    Search_Entity_ProfileImage_Populate_Memetic_Component()
-
-    var select_image_search_order = document.getElementById("search-entity-profileimage-searchorder-btn")
-    select_image_search_order.onclick = function() {
-        Entity_Profile_Image_Search()
-    }
-
-    //populate the zone with images from the Gallery in the default order they are stored
-    search_entity_profileimage_results_output = document.getElementById("search-modal-entityprofile-image-results")
-    search_entity_profileimage_results_output.innerHTML = ""
-    search_entity_profileimage_results_output.insertAdjacentHTML('beforeend',"<br>")
-    gallery_files = current_entity_obj.entityImageSet
-    gallery_files.forEach(file_key => {
-        search_entity_profileimage_results_output.insertAdjacentHTML('beforeend', `<img class="imgMemeResult" id="entity-profile-image-candidate-id-${file_key}" src="${DIR_PICS}/${file_key}">`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
-    })
-
-    //add an event listener to the images so that they emit an event to the user clicking on it
-    gallery_files.forEach(filename => {
-        document.getElementById(`entity-profile-image-candidate-id-${filename}`).addEventListener("click", function() {
-            Entity_Profile_Candidate_Image_Clicked(filename);
-        }, false);
-    });
-
-}         
-
-
-
-
-
-
-
 //we use the key to pull the entity object from the DB, or if use_key=0 take the value
 //from the existing entity object global variable. 
 //also handles empty cases
@@ -359,7 +288,6 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
     if(use_key == 1){
         current_entity_obj = await ENTITY_DB_FNS.Get_Record(entity_key_or_obj) 
     }
-    console.log(`in Show Entity, current_entity_obj.entityImageSet = ${current_entity_obj.entityImageSet}`)
     
     //check for issues
     reload_bool = Check_Gallery_And_Profile_Image_Integrity()
@@ -376,8 +304,14 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
 
     //display gallery images
     Display_Gallery_Images()
-    //default present 
-    Entity_Description_Page()
+    //
+    if(annotation_view_ind == 1){
+        Entity_Description_Page()
+    } else if(annotation_view_ind == 2){
+        Entity_Emotion_Page()
+    } else if(annotation_view_ind == 3){
+        Entity_Memes_Page()
+    }
 }
 //display gallery images
 function Display_Gallery_Images() {
@@ -533,12 +467,17 @@ async function Initialize_Entity_Page(){
 	meme_btn.classList.add('nav-bar-off')
 
 	desription_btn.addEventListener("click", function (event) {
+        annotation_view_ind = 1
 		Entity_Description_Page()		
 	})
     emotion_btn.addEventListener("click", function (event) {
+        annotation_view_ind = 2
 		Entity_Emotion_Page()
 	})
-    
+    document.getElementById("collection-image-annotation-navbar-meme-button-id").addEventListener("click", function (event) {
+        annotation_view_ind = 3
+        Entity_Memes_Page()
+    })
     document.getElementById("collection-control-button-previous-id").addEventListener("click", function (event) {
         Prev_Image()
     })
@@ -553,9 +492,6 @@ async function Initialize_Entity_Page(){
     })
     document.getElementById("collection-image-annotation-emotions-new-entry-add-emotion-button-id").addEventListener("click", function (event) {
         Add_New_Emotion()
-    })
-    document.getElementById("collection-image-annotation-navbar-meme-button-id").addEventListener("click", function (event) {
-        Entity_Memes_Page()
     })
     document.getElementById("collection-control-button-delete-id").addEventListener("click", function (event) {
         Delete_Entity()
@@ -592,6 +528,7 @@ async function Handle_Empty_DB(){
     await ENTITY_DB_FNS.Insert_Record(new_default_obj)
     all_collection_keys = [new_default_obj.entityName]
 }
+
 
 //whenever an image is clicked to pop up a modal to give a big display of the image
 //and list the tags and emotions
@@ -638,6 +575,71 @@ async function Image_Clicked_Modal(filename){
     }
     document.getElementById("modal-image-clicked-emotion-list-div-container-id").innerHTML = modal_html_tmp
 }
+
+
+
+
+
+
+
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!????????????????????
+//called from the entity-main.html
+async function New_Entity_Image(){
+    console.log(`<<<<<<----------New_Entity_Image()----------->>>>>>>>>>>`)
+
+    entity_profile_search_obj = {
+        emotions:{},
+        searchTags:[],
+        searchMemeTags:[]
+    }
+    
+    var search_modal = document.getElementById("top-profile-image-choice-modal-id");
+    search_modal.style.display = "block";
+    var close_element = document.getElementById("search-entityprofile-close-modal-id");
+    close_element.onclick = function() {
+        search_modal.style.display = "none";
+    }
+    window.onclick = function(event) {
+        if (event.target == search_modal) {
+            search_modal.style.display = "none";
+        }
+    }
+
+    search_tags_input = document.getElementById("search-tags-entity-profileimage-entry-form")
+    search_tags_input.value =""
+
+    //populate the search modal with the fields to insert emotion tags and values
+    Search_Entity_ProfileImage_Populate_Emotions()
+    //populate the search modal with the fields to insert meme tags
+    Search_Entity_ProfileImage_Populate_Memetic_Component()
+
+    var select_image_search_order = document.getElementById("search-entity-profileimage-searchorder-btn")
+    select_image_search_order.onclick = function() {
+        Entity_Profile_Image_Search()
+    }
+
+    //populate the zone with images from the Gallery in the default order they are stored
+    search_entity_profileimage_results_output = document.getElementById("search-modal-entityprofile-image-results")
+    search_entity_profileimage_results_output.innerHTML = ""
+    search_entity_profileimage_results_output.insertAdjacentHTML('beforeend',"<br>")
+    gallery_files = current_entity_obj.entityImageSet
+    gallery_files.forEach(file_key => {
+        search_entity_profileimage_results_output.insertAdjacentHTML('beforeend', `<img class="imgMemeResult" id="entity-profile-image-candidate-id-${file_key}" src="${DIR_PICS}/${file_key}">`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
+    })
+
+    //add an event listener to the images so that they emit an event to the user clicking on it
+    gallery_files.forEach(filename => {
+        document.getElementById(`entity-profile-image-candidate-id-${filename}`).addEventListener("click", function() {
+            Entity_Profile_Candidate_Image_Clicked(filename);
+        }, false);
+    });
+
+}         
+
+
+
+
+
 
 
 
