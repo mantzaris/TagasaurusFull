@@ -243,6 +243,16 @@ function Entity_Memes_Page() {
         });
     }
     document.getElementById("collection-image-annotation-memes-images-show-div-id").innerHTML += gallery_html
+
+    //event listener to modal focus image upon click
+    memes_array.forEach(function(meme_key) {
+        image_path_tmp = DIR_PICS + '/' + meme_key
+        if(FS.existsSync(image_path_tmp) == true){
+            document.getElementById(`collection-image-annotation-memes-grid-img-id-${meme_key}`).addEventListener("click", function (event) {
+                Image_Clicked_Modal(meme_key)    
+            })
+        }
+    })
     
     var grid_gallery = document.querySelector(".collection-image-annotation-memes-images-grid-class");
 	var msnry = new MASONRY(grid_gallery, {
@@ -333,7 +343,6 @@ async function New_Entity_Image(){
 
 }         
 
-
 //assign a new set of images to the gallery which includes the entity image (replacement set)
 async function Remove_Gallery_Images(){
     console.log(`<<<<<<----------Remove_Gallery_Images()----------->>>>>>>>>>>`)
@@ -403,6 +412,15 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
         }
     })
     gallery_div.innerHTML += gallery_html_tmp //gallery_div.innerHTML = gallery_html_tmp
+    //event listener to modal focus image upon click
+    image_set.forEach(function(image_filename) {
+        image_path_tmp = DIR_PICS + '/' + image_filename
+        if(FS.existsSync(image_path_tmp) == true){
+            document.getElementById(`collection-image-annotation-memes-grid-img-id-${image_filename}`).addEventListener("click", function (event) {
+                Image_Clicked_Modal(image_filename)    
+            })
+        }
+    })
 
     entity_profile_pic = current_entity_obj.entityImage
     image_path_tmp = DIR_PICS + '/' + entity_profile_pic
@@ -422,6 +440,9 @@ async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=
         ENTITY_DB_FNS.Update_Record(current_entity_obj)
     }
     document.getElementById("collection-profile-image-img-id").src = DIR_PICS + '/' + current_entity_obj.entityImage;
+    document.getElementById("collection-profile-image-img-id").addEventListener("click", function (event) {
+        Image_Clicked_Modal(current_entity_obj.entityImage)    
+    })
     //display the entity hastag 'name'
     document.getElementById("collection-name-text-label-id").textContent = current_entity_obj.entityName;
 
@@ -460,6 +481,7 @@ async function Next_Image() {
 //The missing image filtering is not done in the initial stage here like in the Tagging where all missing
 //images are removed and the annotation objects removed
 async function Initialize_Entity_Page(){
+    await TAGGING_IDB_MODULE.Create_Db()
 
     desription_btn = document.getElementById("collection-image-annotation-navbar-description-button-id")
 	emotion_btn = document.getElementById("collection-image-annotation-navbar-emotion-button-id")
@@ -524,6 +546,54 @@ async function Handle_Empty_DB(){
     await ENTITY_DB_FNS.Insert_Record(new_default_obj)
     all_collection_keys = [new_default_obj.entityName]
 }
+
+//whenever an image is clicked to pop up a modal to give a big display of the image
+//and list the tags and emotions
+async function Image_Clicked_Modal(filename){
+
+    document.getElementById("modal-image-clicked-displayimg-id").src = DIR_PICS+'/'+filename
+    
+    // Show the modal
+    var modal_meme_click = document.getElementById("modal-image-clicked-top-id");
+    modal_meme_click.style.display = "block";
+    // Get the button that opens the modal
+    var meme_modal_close_btn = document.getElementById("modal-image-clicked-close-button-id");
+    // When the user clicks on the button, close the modal
+    meme_modal_close_btn.onclick = function () {
+        modal_meme_click.style.display = "none";
+    }
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+        if (event.target == modal_meme_click) {
+            modal_meme_click.style.display = "none";
+        }
+    }  
+
+    img_record_obj = await TAGGING_IDB_MODULE.Get_Record(filename)
+    tag_array = img_record_obj["taggingTags"]
+    modal_html_tmp = `Tags: `
+    if( tag_array.length != 0 && !(tag_array.length == 1 && tag_array[0] == "") ){
+        tag_array.forEach(function(tag, index){
+                modal_html_tmp += `#${tag} `
+        })
+    }
+    document.getElementById("modal-image-clicked-tag-list-div-container-id").innerHTML = modal_html_tmp
+    modal_html_tmp = `Emotions:`
+    emotion_keys = Object.keys(img_record_obj["taggingEmotions"])
+    if( emotion_keys.length > 0 ){        
+        emotion_keys.forEach(function(key_tmp, index){
+            emotion_value = img_record_obj["taggingEmotions"][key_tmp]
+            if (index === emotion_keys.length - 1){ 
+                modal_html_tmp += `(${key_tmp}: ${emotion_value})`
+            } else {
+                modal_html_tmp += `(${key_tmp}: ${emotion_value}), `
+            }
+        })
+    }
+    document.getElementById("modal-image-clicked-emotion-list-div-container-id").innerHTML = modal_html_tmp
+}
+
+
 
 
 
