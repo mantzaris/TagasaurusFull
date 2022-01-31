@@ -244,15 +244,20 @@ function Entity_Memes_Page() {
             })
         }
     })
+
+    //masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
+    //solution from: https://stackoverflow.com/a/60949881/410975
+    Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+        var grid_gallery = document.querySelector(".collection-image-annotation-memes-images-grid-class");
+        var msnry = new MASONRY(grid_gallery, {
+            columnWidth: '.collection-image-annotation-memes-masonry-grid-sizer',
+            itemSelector: '.collection-image-annotation-memes-grid-item-class',
+            percentPosition: true,
+            gutter: 5,
+            transitionDuration: 0
+        });
+    });
     
-    var grid_gallery = document.querySelector(".collection-image-annotation-memes-images-grid-class");
-	var msnry = new MASONRY(grid_gallery, {
-		columnWidth: '.collection-image-annotation-memes-masonry-grid-sizer',
-		itemSelector: '.collection-image-annotation-memes-grid-item-class',
-		percentPosition: true,
-		gutter: 5,
-		transitionDuration: 0
-	});
 }
 //to save the edits to the memes which is the deletions
 async function Save_Meme_Changes(){
@@ -337,6 +342,20 @@ function Display_Gallery_Images() {
         }
     })
     gallery_div.innerHTML += gallery_html_tmp //gallery_div.innerHTML = gallery_html_tmp
+
+    //masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
+    //solution from: https://stackoverflow.com/a/60949881/410975
+    Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+        var grid_gallery = document.querySelector(".collection-images-gallery-grid-class");
+        var msnry = new MASONRY(grid_gallery, {
+            columnWidth: '.collection-images-gallery-masonry-grid-sizer',
+            itemSelector: '.collection-images-gallery-grid-item-class',
+            percentPosition: true,
+            gutter: 5,
+            transitionDuration: 0
+        });
+    });
+
     //event listener to modal focus image upon click
     image_set.forEach(function(image_filename) {
         image_path_tmp = DIR_PICS + '/' + image_filename
@@ -346,18 +365,13 @@ function Display_Gallery_Images() {
             })
         }
     })
-
-    setTimeout(() => {
-        var grid_gallery = document.querySelector(".collection-images-gallery-grid-class");
-        var msnry = new MASONRY(grid_gallery, {
-            columnWidth: '.collection-images-gallery-masonry-grid-sizer',
-            itemSelector: '.collection-images-gallery-grid-item-class',
-            percentPosition: true,
-            gutter: 5,
-            transitionDuration: 0
-        });
-    },300);
+    
 }
+
+
+
+
+
 //to save the edits to the gallery images which is the deletions
 async function Save_Gallery_Changes(){
     current_images = current_entity_obj.entityImageSet //get the memes of the current object
@@ -423,11 +437,6 @@ async function Check_Gallery_And_Profile_Image_Integrity(){
     }
     return(changes_made)
 }
-
-
-
-
-
 
 
 
