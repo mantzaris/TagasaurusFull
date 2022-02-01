@@ -44,6 +44,9 @@ search_results = []
 //meme search results
 var search_meme_results = ''
 
+//for filtering out chars in the search modals
+reg_exp_delims = /[#:,;| ]+/
+
 
 //this function deletes the entity object currently in focus from var 'current_key_index', and calls for the refresh
 //of the next entity to be in view
@@ -256,8 +259,7 @@ function Entity_Memes_Page() {
             gutter: 5,
             transitionDuration: 0
         });
-    });
-    
+    });    
 }
 //to save the edits to the memes which is the deletions
 async function Save_Meme_Changes(){
@@ -511,7 +513,9 @@ async function Initialize_Entity_Page(){
     document.getElementById("collections-images-gallery-grid-button-savechanges-id").addEventListener("click", function (event) {
         Save_Gallery_Changes()
     })
-    
+    document.getElementById("collection-profile-image-change-image-button-id").addEventListener("click", function (event) {
+        Change_Profile_Image()
+    })
         
     await ENTITY_DB_FNS.Create_Db() //sets a global variable in the module to hold the DB for access
     await ENTITY_DB_FNS.Get_All_Keys_From_DB() //gets all entity keys, sets them as a variable available for access later on
@@ -584,6 +588,109 @@ async function Image_Clicked_Modal(filename){
     }
     document.getElementById("modal-image-clicked-emotion-list-div-container-id").innerHTML = modal_html_tmp
 }
+
+
+
+//Change the collection profile image which allows for a search order as well to order the image according to features
+collection_profile_search_obj = {
+    emotions:{},
+    searchTags:[],
+    searchMemeTags:[]
+}
+//the collection profile image gets changed
+function Change_Profile_Image() {
+
+    // Show the modal
+    var modal_profile_img_change = document.getElementById("search-profileimage-modal-click-top-id");
+    modal_profile_img_change.style.display = "block";
+    // Get the button that opens the modal
+    var meme_modal_close_btn = document.getElementById("modal-search-profileimage-close-exit-view-button-id");
+    // When the user clicks on the button, close the modal
+    meme_modal_close_btn.onclick = function () {
+        modal_profile_img_change.style.display = "none";
+    }
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+        if (event.target == modal_profile_img_change) {
+            modal_profile_img_change.style.display = "none";
+        }
+    }
+
+    //handler for the emotion label and value entry additions and then the deletion handling
+    document.getElementById("modal-search-profileimage-emotion-entry-button-id").addEventListener("click", function (event) {        
+        emotion_key_tmp = document.getElementById("modal-search-profileimage-emotion-label-value-textarea-entry-id").value
+        emotion_value_tmp = document.getElementById("modal-search-profileimage-emotion-value-range-entry-id").value
+        collection_profile_search_obj["emotions"][emotion_key_tmp] = emotion_value_tmp //update the global profile image search object with the new key value
+        emotion_div_id = document.getElementById("modal-search-profileimage-emotion-label-value-display-container-div-id")
+        emotions_html_tmp = ""
+        Object.keys(collection_profile_search_obj["emotions"]).forEach(emotion_key => {
+                    emotions_html_tmp += `
+                                        <span id="modal-search-profileimage-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
+                                            <img class="modal-search-profileimage-emotion-remove-button-class" id="modal-search-profileimage-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+                                                onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+                                            (${emotion_key},${collection_profile_search_obj["emotions"][emotion_key]})
+                                        </span>
+                                        `
+        })
+        emotion_div_id.innerHTML = emotions_html_tmp       
+        //handler for the emotion deletion from search term and view on modal
+        Object.keys(collection_profile_search_obj["emotions"]).forEach(emotion_key => {
+            document.getElementById(`modal-search-profileimage-emotion-remove-button-id-${emotion_key}`).addEventListener("click", function() {
+                document.getElementById(`modal-search-profileimage-emotion-label-value-span-id-${emotion_key}`).remove();
+                delete collection_profile_search_obj["emotions"][emotion_key]
+            })
+        })
+    })    
+    //present default ordering first
+    profile_search_display_div = document.getElementById("collections-profileimages-gallery-grid-images-div-id")
+    profile_search_display_inner_tmp = ''
+    current_entity_obj.entityImageSet.forEach( image_filename => {
+        image_path_tmp = DIR_PICS + '/' + image_filename
+        if(FS.existsSync(image_path_tmp) == true){
+            profile_search_display_inner_tmp += `
+                                                <div class="modal-image-search-profileimageresult-single-image-div-class" id="modal-image-search-profileimageresult-single-image-div-id-${image_filename}">
+                                                    <img class="modal-image-search-profileimageresult-single-image-img-obj-class" id="modal-image-search-profileimageresult-single-image-img-id-${image_filename}" src="${image_path_tmp}" title="view" alt="image"/>
+                                                </div>
+                                                `
+        }
+    })
+    profile_search_display_div.innerHTML += profile_search_display_inner_tmp
+    //masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
+    //solution from: https://stackoverflow.com/a/60949881/410975
+    Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+        var grid_profile_img = document.querySelector("#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-grid-class");
+		var msnry = new MASONRY(grid_profile_img, {
+			columnWidth: '#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-masonry-grid-sizer',
+			itemSelector: '#modal-search-profileimage-images-results-grid-div-area-id .modal-image-search-profileimageresult-single-image-div-class',
+			percentPosition: true,
+			gutter: 5,
+			transitionDuration: 0
+		});
+    });
+
+}
+
+
+function Collection_Profile_Image_Search_Action() {
+
+
+    //get the tags input and get rid of nuissance chars
+    search_tags_input = document.getElementById("modal-search-profileimage-tag-textarea-entry-id").value
+    split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
+    search_unique_search_terms = [...new Set(split_search_string)]
+    collection_profile_search_obj["searchTags"] = search_unique_search_terms
+    //meme tags now    
+    search_meme_tags_input = document.getElementById("modal-search-profileimage-meme-tag-textarea-entry-id").value
+    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
+    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+    collection_profile_search_obj["searchMemeTags"] = search_unique_meme_search_terms
+    //emotion key value
+
+
+
+}
+
+
 
 
 
