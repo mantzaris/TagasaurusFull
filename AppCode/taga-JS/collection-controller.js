@@ -599,7 +599,6 @@ collection_profile_search_obj = {
 }
 //the collection profile image gets changed
 async function Change_Profile_Image() {
-
     // Show the modal
     var modal_profile_img_change = document.getElementById("search-profileimage-modal-click-top-id");
     modal_profile_img_change.style.display = "block";
@@ -614,6 +613,17 @@ async function Change_Profile_Image() {
         if (event.target == modal_profile_img_change) {
             modal_profile_img_change.style.display = "none";
         }
+    }
+    //clear the search obj to make it fresh and reset the fields
+    document.getElementById("modal-search-profileimage-tag-textarea-entry-id").value = ""
+    document.getElementById("modal-search-profileimage-meme-tag-textarea-entry-id").value = ""
+    document.getElementById("modal-search-profileimage-emotion-label-value-textarea-entry-id").value = ""
+    document.getElementById("modal-search-profileimage-emotion-value-range-entry-id").value = "0"
+    document.getElementById("modal-search-profileimage-emotion-label-value-display-container-div-id").innerHTML = ""
+    collection_profile_search_obj = {
+        emotions:{},
+        searchTags:[],
+        searchMemeTags:[]
     }
 
     //handler for the emotion label and value entry additions and then the deletion handling
@@ -673,21 +683,16 @@ async function Change_Profile_Image() {
         image_path_tmp = DIR_PICS + '/' + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).addEventListener("click",async function() {
-                console.log(image_path_tmp)
                 current_entity_obj.entityImage = image_filename
                 await ENTITY_DB_FNS.Update_Record(current_entity_obj)
                 document.getElementById("collection-profile-image-img-id").src = DIR_PICS + '/' + image_filename
                 modal_profile_img_change.style.display = "none";
             })
         }
-        
     })
-
-
-
 }
 
-
+//
 function Collection_Profile_Image_Search_Action() {
 
 
