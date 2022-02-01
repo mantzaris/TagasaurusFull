@@ -598,7 +598,7 @@ collection_profile_search_obj = {
     searchMemeTags:[]
 }
 //the collection profile image gets changed
-function Change_Profile_Image() {
+async function Change_Profile_Image() {
 
     // Show the modal
     var modal_profile_img_change = document.getElementById("search-profileimage-modal-click-top-id");
@@ -643,6 +643,7 @@ function Change_Profile_Image() {
     })    
     //present default ordering first
     profile_search_display_div = document.getElementById("collections-profileimages-gallery-grid-images-div-id")
+    document.querySelectorAll(".modal-image-search-profileimageresult-single-image-div-class").forEach(el => el.remove());
     profile_search_display_inner_tmp = ''
     current_entity_obj.entityImageSet.forEach( image_filename => {
         image_path_tmp = DIR_PICS + '/' + image_filename
@@ -667,6 +668,22 @@ function Change_Profile_Image() {
 			transitionDuration: 0
 		});
     });
+    //add image event listener so that a click on it makes it a choice
+    current_entity_obj.entityImageSet.forEach( image_filename => {
+        image_path_tmp = DIR_PICS + '/' + image_filename
+        if(FS.existsSync(image_path_tmp) == true){
+            document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).addEventListener("click",async function() {
+                console.log(image_path_tmp)
+                current_entity_obj.entityImage = image_filename
+                await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+                document.getElementById("collection-profile-image-img-id").src = DIR_PICS + '/' + image_filename
+                modal_profile_img_change.style.display = "none";
+            })
+        }
+        
+    })
+
+
 
 }
 
