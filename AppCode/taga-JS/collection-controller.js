@@ -726,6 +726,8 @@ async function Change_Profile_Image() {
 }
 //the event function for the search function on the profile image search button press
 async function Collection_Profile_Image_Search_Action() {    
+    search_memetags_lowercase = collection_profile_search_obj["searchMemeTags"].map(function(x){return x.toLowerCase();})
+    search_tags_lowercase = collection_profile_search_obj["searchTags"].map(function(x){return x.toLowerCase();})
     //empty array to store the scores of the images against the search
     img_search_scores = Array(current_entity_obj.entityImageSet.length).fill(0)
     for(img_ind=0; img_ind<current_entity_obj.entityImageSet.length; img_ind++){
@@ -734,8 +736,9 @@ async function Collection_Profile_Image_Search_Action() {
         record_tmp_tags = gallery_image_tagging_annotation_obj_tmp["taggingTags"]
         record_tmp_emotions = gallery_image_tagging_annotation_obj_tmp["taggingEmotions"]
         record_tmp_memes = gallery_image_tagging_annotation_obj_tmp["taggingMemeChoices"]
+        //scores for the tags/emotions/memes
         //get the score of the overlap of the object with the search terms
-        tags_overlap_score = (record_tmp_tags.filter(tag => (collection_profile_search_obj["searchTags"].toLowerCase()).includes(tag.toLowerCase()))).length
+        tags_overlap_score = (record_tmp_tags.filter(tag => (search_tags_lowercase).includes(tag.toLowerCase()))).length
         //get the score for the emotions overlap scores range [-1,1] for each emotion that is accumulated
         emotion_overlap_score = 0
         record_tmp_emotion_keys = Object.keys(record_tmp_emotions)
@@ -754,310 +757,67 @@ async function Collection_Profile_Image_Search_Action() {
         for (let rtm=0; rtm<record_tmp_memes.length; rtm++){
             meme_record_tmp = await TAGGING_IDB_MODULE.Get_Record(record_tmp_memes[rtm])
             meme_tmp_tags = meme_record_tmp["taggingTags"]
-            meme_tag_overlap_score += (meme_tmp_tags.filter(tag => (collection_profile_search_obj["searchMemeTags"].toLowerCase()).includes(tag.toLowerCase()))).length
+            meme_tag_overlap_score += (meme_tmp_tags.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length
         }
         //get the overlap score for this image tmp
         total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score
         img_search_scores[img_ind] = total_image_match_score
     }
-    //
-    // test = [3,4,1,2];
-    // var result = Array.from(Array(test.length).keys()).sort((a, b) => test[a] < test[b] ? -1 : (test[b] < test[a]) | 0)
+    //sort the scores and return the indices order from largest to smallest
+    img_indices_sorted = new Array(img_search_scores.length);
+    for (i = 0; i < img_search_scores.length; ++i) img_indices_sorted[i] = i;
+    img_indices_sorted.sort(function (a, b) { return img_search_scores[a] < img_search_scores[b] ? 1 : img_search_scores[a] > img_search_scores[b] ? -1 : 0; });
 
-    // var test = [3, 4, 1, 2];
-    // var len = test.length;
-    // var indices = new Array(len);
-    // for (var i = 0; i < len; ++i) indices[i] = i;
-    // indices.sort(function (a, b) { return test[a] < test[b] ? -1 : test[a] > test[b] ? 1 : 0; });
-    // console.log(indices); // prints [2,3,0,1]
-
-
-
-}
-
-
-
-
-
-
-
-
-
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!????????????????????
-//called from the entity-main.html
-async function New_Entity_Image(){
-    console.log(`<<<<<<----------New_Entity_Image()----------->>>>>>>>>>>`)
-
-    entity_profile_search_obj = {
-        emotions:{},
-        searchTags:[],
-        searchMemeTags:[]
-    }
-    
-    var search_modal = document.getElementById("top-profile-image-choice-modal-id");
-    search_modal.style.display = "block";
-    var close_element = document.getElementById("search-entityprofile-close-modal-id");
-    close_element.onclick = function() {
-        search_modal.style.display = "none";
-    }
-    window.onclick = function(event) {
-        if (event.target == search_modal) {
-            search_modal.style.display = "none";
+    //present new sorted ordering now!
+    profile_search_display_div = document.getElementById("collections-profileimages-gallery-grid-images-div-id")
+    document.querySelectorAll(".modal-image-search-profileimageresult-single-image-div-class").forEach(el => el.remove());
+    profile_search_display_inner_tmp = ''
+    img_indices_sorted.forEach( index => {
+        image_filename = current_entity_obj.entityImageSet[index]
+        image_path_tmp = DIR_PICS + '/' + image_filename
+        if(FS.existsSync(image_path_tmp) == true){
+            profile_search_display_inner_tmp += `
+                                                <div class="modal-image-search-profileimageresult-single-image-div-class" id="modal-image-search-profileimageresult-single-image-div-id-${image_filename}">
+                                                    <img class="modal-image-search-profileimageresult-single-image-img-obj-class" id="modal-image-search-profileimageresult-single-image-img-id-${image_filename}" src="${image_path_tmp}" title="view" alt="image"/>
+                                                </div>
+                                                `
         }
-    }
-
-    search_tags_input = document.getElementById("search-tags-entity-profileimage-entry-form")
-    search_tags_input.value =""
-
-    //populate the search modal with the fields to insert emotion tags and values
-    Search_Entity_ProfileImage_Populate_Emotions()
-    //populate the search modal with the fields to insert meme tags
-    Search_Entity_ProfileImage_Populate_Memetic_Component()
-
-    var select_image_search_order = document.getElementById("search-entity-profileimage-searchorder-btn")
-    select_image_search_order.onclick = function() {
-        Entity_Profile_Image_Search()
-    }
-
-    //populate the zone with images from the Gallery in the default order they are stored
-    search_entity_profileimage_results_output = document.getElementById("search-modal-entityprofile-image-results")
-    search_entity_profileimage_results_output.innerHTML = ""
-    search_entity_profileimage_results_output.insertAdjacentHTML('beforeend',"<br>")
-    gallery_files = current_entity_obj.entityImageSet
-    gallery_files.forEach(file_key => {
-        search_entity_profileimage_results_output.insertAdjacentHTML('beforeend', `<img class="imgMemeResult" id="entity-profile-image-candidate-id-${file_key}" src="${DIR_PICS}/${file_key}">`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
     })
-
-    //add an event listener to the images so that they emit an event to the user clicking on it
-    gallery_files.forEach(filename => {
-        document.getElementById(`entity-profile-image-candidate-id-${filename}`).addEventListener("click", function() {
-            Entity_Profile_Candidate_Image_Clicked(filename);
-        }, false);
+    profile_search_display_div.innerHTML += profile_search_display_inner_tmp
+    //masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
+    //solution from: https://stackoverflow.com/a/60949881/410975
+    Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+        var grid_profile_img = document.querySelector("#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-grid-class");
+		var msnry = new MASONRY(grid_profile_img, {
+			columnWidth: '#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-masonry-grid-sizer',
+			itemSelector: '#modal-search-profileimage-images-results-grid-div-area-id .modal-image-search-profileimageresult-single-image-div-class',
+			percentPosition: true,
+			gutter: 5,
+			transitionDuration: 0
+		});
     });
-
-}         
-
-
-
-
-
-
-
-
-
-
-
-/*
-SEARCH STUFF ENTITY PROFILE IMAGES!!!
-*/
-entity_profile_search_obj = {
-    emotions:{},
-    searchTags:[],
-    searchMemeTags:[]
-}
-
-function Search_Entity_ProfileImage_Populate_Emotions(){
-
-    search_emotion_input_div = document.getElementById("modal-entity-profileimage-search-emotion-input-div-id")
-    search_emotion_input_div.innerHTML = ""
-    //search_emotion_input_div.innerHTML += `<button class="btn btn-primary btn-lg btn-block" id="search-entry-emotion-add-btn" type="button" onclick=""> &#xFF0B; </button>`
-    search_emotion_input_div.innerHTML += `<div class="input-group mb-3">
-                                                <button class="btn btn-primary btn-lg btn-block" id="search-entry-entity-profileimage-emotion-add-btn" type="button" onclick=""> &#xFF0B; </button>
-                                                
-                                                <input type="text" list="cars" id="emotion-entity-profileimage-selector" placeholder="enter emotion" />
-                                                <datalist id="cars" >
-                                                    <option>Good</option>
-                                                    <option>Bad</option>
-                                                    <option>Happy</option>
-                                                    <option>Confused</option>
-                                                </datalist>
-
-                                                <input type="range" class="form-range w-25" id="search-entity-profileimage-emotion-value-entry-id">
-                                            </div>
-                                            `
-    search_emotion_input_div.innerHTML += `<br>
-                                            <div id="emotion-entity-profileimage-search-terms">
-                                            
-                                            </div>
-                                            `
-
-    document.getElementById("search-entry-entity-profileimage-emotion-add-btn").addEventListener("click", function() {
-
-        current_emotion_keys = Object.keys(entity_profile_search_obj["emotions"])
-
-        selected_emotion_value = document.getElementById("emotion-entity-profileimage-selector").value
-        entered_emotion_label = document.getElementById("emotion-entity-profileimage-selector").value
-        emotion_search_entry_value = document.getElementById("search-entity-profileimage-emotion-value-entry-id").value
-
-        redundant_label_bool = current_emotion_keys.includes( entered_emotion_label )
-        entity_profile_search_obj["emotions"][entered_emotion_label] = emotion_search_entry_value
-
-        search_terms_output = ""
-        Object.keys(entity_profile_search_obj["emotions"]).forEach(emotion_key => {
-            search_terms_output += `<span id="emotion-entity-profileimage-text-search-${emotion_key}" style="white-space:nowrap">
-                                    <button type="button" class="close" aria-label="Close" id="remove-emotion-entity-profileimage-search-${emotion_key}">
-                                        &#10006
-                                    </button>
-                                    (emotion:${emotion_key}, value:${entity_profile_search_obj["emotions"][emotion_key]})</span>
-                                    `
-
-        })
-        document.getElementById("emotion-entity-profileimage-search-terms").innerHTML = search_terms_output
-
-        Object.keys(entity_profile_search_obj["emotions"]).forEach(emotion_key => {
-            document.getElementById(`remove-emotion-entity-profileimage-search-${emotion_key}`).addEventListener("click", function() {
-                search_emotion_search_span_html_obj = document.getElementById(`emotion-entity-profileimage-text-search-${emotion_key}`);
-                search_emotion_search_span_html_obj.remove();
-                delete entity_profile_search_obj["emotions"][emotion_key]
+    //add image event listener so that a click on it makes it a choice
+    current_entity_obj.entityImageSet.forEach( image_filename => {
+        image_path_tmp = DIR_PICS + '/' + image_filename
+        if(FS.existsSync(image_path_tmp) == true){
+            document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).addEventListener("click",async function() {
+                current_entity_obj.entityImage = image_filename
+                await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+                document.getElementById("collection-profile-image-img-id").src = DIR_PICS + '/' + image_filename
+                document.getElementById("search-profileimage-modal-click-top-id").style.display = "none";
             })
-        })
-
-    })
-}
-
-
-function Search_Entity_ProfileImage_Populate_Memetic_Component(){
-
-    meme_search_tags_div = document.getElementById(`modal-search-entity-profileimage-tags-input-div-id`)
-    meme_search_tags_div.innerHTML = `<input type="text" class="form-control" id="search-entity-profileimage-tags-entry-form" placeholder="images that contain memes with theses tags">`
-
-}
-
-
-//entity_profile_search_obj = {
-//emotions:{},
-//searchTags:[],
-//searchMemeTags:[]
-//}
-async function Entity_Profile_Image_Search(){
-
-    console.log(`choose entity image search`)
-
-    reg_exp_delims = /[#:,;| ]+/
-
-    //annotation tags
-    search_tags_input = document.getElementById("search-tags-entity-profileimage-entry-form").value
-    split_search_string = search_tags_input.split(reg_exp_delims)
-    search_unique_search_terms = [...new Set(split_search_string)]
-    entity_profile_search_obj["searchTags"] = search_unique_search_terms
-
-    //meme tags now    
-    search_meme_tags_input = document.getElementById("search-entity-profileimage-tags-entry-form").value
-    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
-    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
-    entity_profile_search_obj["searchMemeTags"] = search_unique_meme_search_terms
-
-    console.log(`entity_profile_search_obj = ${JSON.stringify(entity_profile_search_obj)}`)
-
-    gallery_images = current_entity_obj.entityImageSet
-    console.log(`gallery_images = ${gallery_images}`)
-
-    search_description_tags = entity_profile_search_obj["searchTags"]
-    search_emotions = entity_profile_search_obj["emotions"]
-    search_meme_tags = entity_profile_search_obj["searchMemeTags"]
-
-    //Get the annotation objects for the keys
-    key_search_scores = Array(gallery_images.length).fill(0)
-    for(key_ind=0;key_ind<gallery_images.length;key_ind++){
-        await TAGGING_IDB_MODULE.Create_Db()
-        gallery_image_tmp  = gallery_images[key_ind]
-        gallery_image_tagging_annotation_obj_tmp = await TAGGING_IDB_MODULE.Get_Record(gallery_image_tmp)
-        console.log(`gallery_image_tagging_annotation_obj_tmp = ${JSON.stringify(gallery_image_tagging_annotation_obj_tmp)}`)
-
-        record_tmp_tags = gallery_image_tagging_annotation_obj_tmp["taggingTags"]
-        record_tmp_emotions = gallery_image_tagging_annotation_obj_tmp["taggingEmotions"]
-        record_tmp_memes = gallery_image_tagging_annotation_obj_tmp["taggingMemeChoices"]
-
-        //get the score of the overlap of the object with the search terms
-        console.log(`record_tmp_tags = ${record_tmp_tags}`)
-        tags_overlap_score = (record_tmp_tags.filter(x => search_description_tags.includes(x))).length
-        console.log(`tags_overlap_score = ${tags_overlap_score}`)
-
-        //get the score for the emotions
-        emotion_overlap_score = 0
-        record_tmp_emotion_keys = Object.keys(record_tmp_emotions)
-        search_emotions_keys = Object.keys(search_emotions)
-        search_emotions_keys.forEach(search_key_emotion_label =>{
-            record_tmp_emotion_keys.forEach(record_emotion_key_label =>{
-                if(search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()){
-                    delta_tmp = (record_tmp_emotions[record_emotion_key_label] - search_emotions[search_key_emotion_label])/50
-                    emotion_overlap_score_tmp = 1 - Math.abs( delta_tmp )
-                    emotion_overlap_score += emotion_overlap_score_tmp
-                }
-            })
-        })
-        console.log(`emotion_overlap_score = ${emotion_overlap_score}`)
-
-        //get the score for the memes
-        meme_tag_overlap_score = 0
-        console.log(`record_tmp tagging meme choices = ${record_tmp_memes}`)
-        for (let rtm=0; rtm<record_tmp_memes.length;rtm++){
-            meme_record_tmp = await TAGGING_IDB_MODULE.Get_Record(record_tmp_memes[rtm])
-            meme_tmp_tags = meme_record_tmp["taggingTags"]
-            console.log(`the meme's tags = ${meme_tmp_tags}`)
-            console.log(`the search_meme_tags = ${search_meme_tags}`)
-            meme_tag_overlap_score_tmp = (meme_tmp_tags.filter(x => search_meme_tags.includes(x))).length
-            meme_tag_overlap_score += meme_tag_overlap_score_tmp            
         }
-        console.log(`meme_tag_overlap_score = ${meme_tag_overlap_score}`)
-
-        //get the overlap score for this image ii
-        total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score //tags_overlap_score +  +
-        console.log(`the total_image_match_score ${key_ind} = ${total_image_match_score}`)    
-        key_search_scores[key_ind] = total_image_match_score
-    }
-
-    console.log(`key_search_scores = ${key_search_scores}`)
-
-    //now get the file sorted order via sort
-    //for ranks where highest score is rank 1
-    key_search_scores_sorted = key_search_scores.slice().sort(function(a,b){return b-a})
-    //for ranks where the highest score is rank N
-    //key_search_scores_sorted = key_search_scores.slice().sort(function(a,b){return a-b})
-    key_search_scores_sorted_ranks = key_search_scores.map(function(v){ return key_search_scores_sorted.indexOf(v)+1 });
-    console.log(`key_search_scores_sorted_ranks = ${key_search_scores_sorted_ranks}`)
-    sorted_score_file_keys = []
-    while (key_search_scores_sorted_ranks.reduce((a, b) => a + b, 0) > 0) {
-        max_rank_val = Math.max(...key_search_scores_sorted_ranks)
-        index_max_val = key_search_scores_sorted_ranks.indexOf(max_rank_val)
-        sorted_score_file_keys.unshift( gallery_images[index_max_val] )
-        key_search_scores_sorted_ranks[index_max_val] = 0
-    }
-
-    console.log(`drum role file sorted list sorted_score_file_keys = ${sorted_score_file_keys}`)
-
-    //populate the zone with images from the Gallery in the default order they are stored
-    search_entity_profileimage_results_output = document.getElementById("search-modal-entityprofile-image-results")
-    search_entity_profileimage_results_output.innerHTML = ""
-    search_entity_profileimage_results_output.insertAdjacentHTML('beforeend',"<br>")
-    sorted_score_file_keys.forEach(file_key => {
-        search_entity_profileimage_results_output.insertAdjacentHTML('beforeend', `<img class="imgMemeResult" id="entity-profile-image-candidate-id-${file_key}" src="${DIR_PICS}/${file_key}">`)//+= `<img class="imgMemeResult" src="${image_set_search}">`
     })
-    //add an event listener to the images so that they emit an event to the user clicking on it
-    sorted_score_file_keys.forEach(filename => {
-        document.getElementById(`entity-profile-image-candidate-id-${filename}`).addEventListener("click", function() {
-            Entity_Profile_Candidate_Image_Clicked(filename);
-        }, false);
-    });
-
-
-
 }
 
 
-//handle images being clicked by the user in choosing a new entity profile image
-function Entity_Profile_Candidate_Image_Clicked(filename){
 
-    console.log(`filename=${filename}, of the image clicked by the user in choosing a new entityprofile image`)
-    //set the current entity object profile image to the new file name, update the DB with the new assignment, redisplay
-    current_entity_obj.entityImage = filename
-    ENTITY_DB_FNS.Update_Record(current_entity_obj)
-    Show_Entity_From_Key_Or_Current_Entity(all_collection_keys[current_key_index])
-    //close modal
-    var search_modal = document.getElementById("top-profile-image-choice-modal-id");
-    search_modal.style.display = "none";
 
-}
+
+
+
+
+
 
 
 
@@ -1699,3 +1459,16 @@ async function Load_Entity_Gallery(){
     gallery_html += `</div>`
     document.getElementById("entityGallery").innerHTML  = gallery_html;    
 } */
+
+
+
+ //takes 5042 ms on 10M random numbers
+    
+    
+    //takes 4656 ms on 10M random numbers
+    // var test = [3, 4, 1, 2];
+    // var len = test.length;
+    // var indices = new Array(len);
+    // for (var i = 0; i < len; ++i) indices[i] = i;
+    // indices.sort(function (a, b) { return test[a] < test[b] ? -1 : test[a] > test[b] ? 1 : 0; });
+    // console.log(indices); // prints [2,3,0,1]
