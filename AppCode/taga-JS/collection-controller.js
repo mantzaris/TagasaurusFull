@@ -239,15 +239,16 @@ function Entity_Memes_Page() {
     document.getElementById("collection-image-annotation-memes-images-show-div-id").innerHTML += gallery_html
 
     //event listener to modal focus image upon click
-    memes_array.forEach(function(meme_key) {
-        image_path_tmp = DIR_PICS + '/' + meme_key
-        if(FS.existsSync(image_path_tmp) == true){
-            document.getElementById(`collection-image-annotation-memes-grid-img-id-${meme_key}`).addEventListener("click", function (event) {
-                Image_Clicked_Modal(meme_key)    
-            })
-        }
-    })
-
+    if(memes_array != "" && memes_array.length > 0){
+        memes_array.forEach(function(meme_key) {
+            image_path_tmp = DIR_PICS + '/' + meme_key
+            if(FS.existsSync(image_path_tmp) == true){
+                document.getElementById(`collection-image-annotation-memes-grid-img-id-${meme_key}`).addEventListener("click", function (event) {
+                    Image_Clicked_Modal(meme_key)    
+                })
+            }
+        })
+    }
     //masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
     //solution from: https://stackoverflow.com/a/60949881/410975
     Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
