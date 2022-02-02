@@ -468,7 +468,6 @@ async function Next_Image() {
 //The missing image filtering is not done in the initial stage here like in the Tagging where all missing
 //images are removed and the annotation objects removed
 async function Initialize_Entity_Page(){
-    await TAGGING_IDB_MODULE.Create_Db()
 
     desription_btn = document.getElementById("collection-image-annotation-navbar-description-button-id")
 	emotion_btn = document.getElementById("collection-image-annotation-navbar-emotion-button-id")
@@ -517,6 +516,7 @@ async function Initialize_Entity_Page(){
         Change_Profile_Image()
     })
         
+    await TAGGING_IDB_MODULE.Create_Db()
     await ENTITY_DB_FNS.Create_Db() //sets a global variable in the module to hold the DB for access
     await ENTITY_DB_FNS.Get_All_Keys_From_DB() //gets all entity keys, sets them as a variable available for access later on
     all_collection_keys = await ENTITY_DB_FNS.Read_All_Keys_From_DB() //retrieve the key set stored as a global within the module
@@ -526,8 +526,7 @@ async function Initialize_Entity_Page(){
     }
 
     await Show_Entity_From_Key_Or_Current_Entity(all_collection_keys[0]) //set the first entity to be seen, populate entity object data on view
-    await Entity_Description_Page() //the Text Description annotation is the first page to see alternative is the text description
-    
+    await Entity_Description_Page() //the Text Description annotation is the first page to see alternative is the text description    
 }
 //the key starting point for the page
 Initialize_Entity_Page()
@@ -626,30 +625,34 @@ async function Change_Profile_Image() {
         searchMemeTags:[]
     }
 
-    //handler for the emotion label and value entry additions and then the deletion handling
+    //handler for the emotion label and value entry additions and then the deletion handling, all emotions are added by default and handled 
     document.getElementById("modal-search-profileimage-emotion-entry-button-id").addEventListener("click", function (event) {        
         emotion_key_tmp = document.getElementById("modal-search-profileimage-emotion-label-value-textarea-entry-id").value
-        emotion_value_tmp = document.getElementById("modal-search-profileimage-emotion-value-range-entry-id").value
-        collection_profile_search_obj["emotions"][emotion_key_tmp] = emotion_value_tmp //update the global profile image search object with the new key value
-        emotion_div_id = document.getElementById("modal-search-profileimage-emotion-label-value-display-container-div-id")
-        emotions_html_tmp = ""
-        Object.keys(collection_profile_search_obj["emotions"]).forEach(emotion_key => {
-                    emotions_html_tmp += `
-                                        <span id="modal-search-profileimage-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
-                                            <img class="modal-search-profileimage-emotion-remove-button-class" id="modal-search-profileimage-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
-                                                onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
-                                            (${emotion_key},${collection_profile_search_obj["emotions"][emotion_key]})
-                                        </span>
-                                        `
-        })
-        emotion_div_id.innerHTML = emotions_html_tmp       
-        //handler for the emotion deletion from search term and view on modal
-        Object.keys(collection_profile_search_obj["emotions"]).forEach(emotion_key => {
-            document.getElementById(`modal-search-profileimage-emotion-remove-button-id-${emotion_key}`).addEventListener("click", function() {
-                document.getElementById(`modal-search-profileimage-emotion-label-value-span-id-${emotion_key}`).remove();
-                delete collection_profile_search_obj["emotions"][emotion_key]
+        if(emotion_key_tmp != "") { 
+            emotion_value_tmp = document.getElementById("modal-search-profileimage-emotion-value-range-entry-id").value
+            collection_profile_search_obj["emotions"][emotion_key_tmp] = emotion_value_tmp //update the global profile image search object with the new key value
+            emotion_div_id = document.getElementById("modal-search-profileimage-emotion-label-value-display-container-div-id")
+            emotions_html_tmp = ""
+            Object.keys(collection_profile_search_obj["emotions"]).forEach(emotion_key => {
+                        emotions_html_tmp += `
+                                            <span id="modal-search-profileimage-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
+                                                <img class="modal-search-profileimage-emotion-remove-button-class" id="modal-search-profileimage-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+                                                    onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+                                                (${emotion_key},${collection_profile_search_obj["emotions"][emotion_key]})
+                                            </span>
+                                            `
             })
-        })
+            emotion_div_id.innerHTML = emotions_html_tmp   
+            document.getElementById("modal-search-profileimage-emotion-label-value-textarea-entry-id").value = ""
+            document.getElementById("modal-search-profileimage-emotion-value-range-entry-id").value = "0"
+            //handler for the emotion deletion from search term and view on modal
+            Object.keys(collection_profile_search_obj["emotions"]).forEach(emotion_key => {
+                document.getElementById(`modal-search-profileimage-emotion-remove-button-id-${emotion_key}`).addEventListener("click", function() {
+                    document.getElementById(`modal-search-profileimage-emotion-label-value-span-id-${emotion_key}`).remove();
+                    delete collection_profile_search_obj["emotions"][emotion_key]
+                })
+            })
+        }
     })    
     //present default ordering first
     profile_search_display_div = document.getElementById("collections-profileimages-gallery-grid-images-div-id")
@@ -690,23 +693,43 @@ async function Change_Profile_Image() {
             })
         }
     })
+    //add the event listener for the SEARCH BUTTON on the modal
+    document.getElementById("modal-search-profileimage-main-button-id").addEventListener("click", function() {
+        //get the tags input and get rid of nuissance chars
+        search_tags_input = document.getElementById("modal-search-profileimage-tag-textarea-entry-id").value
+        split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
+        search_unique_search_terms = [...new Set(split_search_string)]
+        search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
+        collection_profile_search_obj["searchTags"] = search_unique_search_terms
+        //meme tags now    
+        search_meme_tags_input = document.getElementById("modal-search-profileimage-meme-tag-textarea-entry-id").value
+        split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
+        search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+        search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
+        collection_profile_search_obj["searchMemeTags"] = search_unique_meme_search_terms
+        //emotion key value already is in: collection_profile_search_obj
+        Collection_Profile_Image_Search_Action()
+    })
+    //add the event listener for the RESET BUTTON on the modal
+    document.getElementById("modal-search-profileimage-main-reset-button-id").addEventListener("click", function() {
+        document.getElementById("modal-search-profileimage-tag-textarea-entry-id").value = ""
+        document.getElementById("modal-search-profileimage-meme-tag-textarea-entry-id").value = ""
+        document.getElementById("modal-search-profileimage-emotion-label-value-textarea-entry-id").value = ""
+        document.getElementById("modal-search-profileimage-emotion-value-range-entry-id").value = "0"
+        document.getElementById("modal-search-profileimage-emotion-label-value-display-container-div-id").innerHTML = ""
+        collection_profile_search_obj = {
+            emotions:{},
+            searchTags:[],
+            searchMemeTags:[]
+        }
+    })
 }
-
-//
+//the event function for the search function on the profile image search button press
 function Collection_Profile_Image_Search_Action() {
 
-
-    //get the tags input and get rid of nuissance chars
-    search_tags_input = document.getElementById("modal-search-profileimage-tag-textarea-entry-id").value
-    split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
-    search_unique_search_terms = [...new Set(split_search_string)]
-    collection_profile_search_obj["searchTags"] = search_unique_search_terms
-    //meme tags now    
-    search_meme_tags_input = document.getElementById("modal-search-profileimage-meme-tag-textarea-entry-id").value
-    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
-    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
-    collection_profile_search_obj["searchMemeTags"] = search_unique_meme_search_terms
-    //emotion key value
+    console.log('do profile image search')
+    
+    
 
 
 
