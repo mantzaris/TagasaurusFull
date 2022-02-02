@@ -694,22 +694,10 @@ async function Change_Profile_Image() {
         }
     })
     //add the event listener for the SEARCH BUTTON on the modal
-    document.getElementById("modal-search-profileimage-main-button-id").addEventListener("click", function() {
-        //get the tags input and get rid of nuissance chars
-        search_tags_input = document.getElementById("modal-search-profileimage-tag-textarea-entry-id").value
-        split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
-        search_unique_search_terms = [...new Set(split_search_string)]
-        search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
-        collection_profile_search_obj["searchTags"] = search_unique_search_terms
-        //meme tags now    
-        search_meme_tags_input = document.getElementById("modal-search-profileimage-meme-tag-textarea-entry-id").value
-        split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
-        search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
-        search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
-        collection_profile_search_obj["searchMemeTags"] = search_unique_meme_search_terms
-        //emotion key value already is in: collection_profile_search_obj
-        Collection_Profile_Image_Search_Action()
-    })
+    document.getElementById("modal-search-profileimage-main-button-id").onclick = function() {        
+                                                                                                Collection_Profile_Image_Search_Action()
+                                                                                            }
+
     //add the event listener for the RESET BUTTON on the modal
     document.getElementById("modal-search-profileimage-main-reset-button-id").addEventListener("click", function() {
         document.getElementById("modal-search-profileimage-tag-textarea-entry-id").value = ""
@@ -726,6 +714,20 @@ async function Change_Profile_Image() {
 }
 //the event function for the search function on the profile image search button press
 async function Collection_Profile_Image_Search_Action() {    
+    //get the tags input and get rid of nuissance chars
+    search_tags_input = document.getElementById("modal-search-profileimage-tag-textarea-entry-id").value
+    split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
+    search_unique_search_terms = [...new Set(split_search_string)]
+    search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
+    collection_profile_search_obj["searchTags"] = search_unique_search_terms
+    //meme tags now    
+    search_meme_tags_input = document.getElementById("modal-search-profileimage-meme-tag-textarea-entry-id").value
+    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
+    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+    search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
+    collection_profile_search_obj["searchMemeTags"] = search_unique_meme_search_terms
+    //emotion key value already is in: collection_profile_search_obj
+
     search_memetags_lowercase = collection_profile_search_obj["searchMemeTags"].map(function(x){return x.toLowerCase();})
     search_tags_lowercase = collection_profile_search_obj["searchTags"].map(function(x){return x.toLowerCase();})
     //empty array to store the scores of the images against the search
