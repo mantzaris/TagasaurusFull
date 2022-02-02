@@ -725,11 +725,51 @@ async function Change_Profile_Image() {
     })
 }
 //the event function for the search function on the profile image search button press
-function Collection_Profile_Image_Search_Action() {
+async function Collection_Profile_Image_Search_Action() {    
+    //empty array to store the scores of the images against the search
+    img_search_scores = Array(current_entity_obj.entityImageSet.length).fill(0)
+    for(img_ind=0; img_ind<current_entity_obj.entityImageSet.length; img_ind++){
+        gallery_image_tmp = current_entity_obj.entityImageSet[img_ind]
+        gallery_image_tagging_annotation_obj_tmp = await TAGGING_IDB_MODULE.Get_Record(gallery_image_tmp)
+        record_tmp_tags = gallery_image_tagging_annotation_obj_tmp["taggingTags"]
+        record_tmp_emotions = gallery_image_tagging_annotation_obj_tmp["taggingEmotions"]
+        record_tmp_memes = gallery_image_tagging_annotation_obj_tmp["taggingMemeChoices"]
+        //get the score of the overlap of the object with the search terms
+        tags_overlap_score = (record_tmp_tags.filter(tag => (collection_profile_search_obj["searchTags"].toLowerCase()).includes(tag.toLowerCase()))).length
+        //get the score for the emotions overlap scores range [-1,1] for each emotion that is accumulated
+        emotion_overlap_score = 0
+        record_tmp_emotion_keys = Object.keys(record_tmp_emotions)
+        search_emotions_keys = Object.keys(collection_profile_search_obj["emotions"])
+        search_emotions_keys.forEach(search_key_emotion_label => {
+            record_tmp_emotion_keys.forEach(record_emotion_key_label => {
+                if(search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()) {
+                    delta_tmp = (record_tmp_emotions[record_emotion_key_label] - collection_profile_search_obj["emotions"][search_key_emotion_label]) / 50
+                    emotion_overlap_score_tmp = 1 - Math.abs( delta_tmp )
+                    emotion_overlap_score += emotion_overlap_score_tmp //scores range [-1,1]
+                }
+            })
+        })
+        //get the score for the memes
+        meme_tag_overlap_score = 0
+        for (let rtm=0; rtm<record_tmp_memes.length; rtm++){
+            meme_record_tmp = await TAGGING_IDB_MODULE.Get_Record(record_tmp_memes[rtm])
+            meme_tmp_tags = meme_record_tmp["taggingTags"]
+            meme_tag_overlap_score += (meme_tmp_tags.filter(tag => (collection_profile_search_obj["searchMemeTags"].toLowerCase()).includes(tag.toLowerCase()))).length
+        }
+        //get the overlap score for this image tmp
+        total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score
+        img_search_scores[img_ind] = total_image_match_score
+    }
+    //
+    // test = [3,4,1,2];
+    // var result = Array.from(Array(test.length).keys()).sort((a, b) => test[a] < test[b] ? -1 : (test[b] < test[a]) | 0)
 
-    console.log('do profile image search')
-    
-    
+    // var test = [3, 4, 1, 2];
+    // var len = test.length;
+    // var indices = new Array(len);
+    // for (var i = 0; i < len; ++i) indices[i] = i;
+    // indices.sort(function (a, b) { return test[a] < test[b] ? -1 : test[a] > test[b] ? 1 : 0; });
+    // console.log(indices); // prints [2,3,0,1]
 
 
 
