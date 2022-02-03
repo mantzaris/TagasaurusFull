@@ -430,8 +430,6 @@ async function Next_Collection() {
     
 }
 
-
-
 async function Handle_Empty_DB(){
     new_default_obj = {...COLLECTION_DEFAULT_EMPTY_OBJECT}
     new_default_obj.entityName = 'Taga' + Math.floor(Math.random() * max);
@@ -782,7 +780,7 @@ async function Collection_Profile_Image_Search_Action() {
 
 
 //GALLERY IMAGE ADDITION
-gallery_search_obj = {
+collection_gallery_search_obj = {
     emotions:{},
     searchTags:[],
     searchMemeTags:[]
@@ -810,7 +808,7 @@ async function Add_Gallery_Images() {
     document.getElementById("modal-search-emotion-label-value-textarea-entry-id").value = ""
     document.getElementById("modal-search-emotion-value-range-entry-id").value = "0"
     document.getElementById("modal-search-emotion-label-value-display-container-div-id").innerHTML = ""
-    gallery_search_obj = {
+    collection_gallery_search_obj = {
         emotions:{},
         searchTags:[],
         searchMemeTags:[]
@@ -821,15 +819,15 @@ async function Add_Gallery_Images() {
         emotion_key_tmp = document.getElementById("modal-search-emotion-label-value-textarea-entry-id").value
         if(emotion_key_tmp != "") { 
             emotion_value_tmp = document.getElementById("modal-search-emotion-value-range-entry-id").value
-            gallery_search_obj["emotions"][emotion_key_tmp] = emotion_value_tmp //update the global profile image search object with the new key value
+            collection_gallery_search_obj["emotions"][emotion_key_tmp] = emotion_value_tmp //update the global profile image search object with the new key value
             emotion_div_id = document.getElementById("modal-search-emotion-label-value-display-container-div-id")
             emotions_html_tmp = ""
-            Object.keys(gallery_search_obj["emotions"]).forEach(emotion_key => {
+            Object.keys(collection_gallery_search_obj["emotions"]).forEach(emotion_key => {
                         emotions_html_tmp += `
                                             <span id="modal-search-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
                                                 <img class="modal-search-emotion-remove-button-class" id="modal-search-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
                                                     onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
-                                                (${emotion_key},${gallery_search_obj["emotions"][emotion_key]})
+                                                (${emotion_key},${collection_gallery_search_obj["emotions"][emotion_key]})
                                             </span>
                                             `
             })
@@ -837,10 +835,10 @@ async function Add_Gallery_Images() {
             document.getElementById("modal-search-emotion-label-value-textarea-entry-id").value = ""
             document.getElementById("modal-search-emotion-value-range-entry-id").value = "0"
             //handler for the emotion deletion from search term and view on modal
-            Object.keys(gallery_search_obj["emotions"]).forEach(emotion_key => {
+            Object.keys(collection_gallery_search_obj["emotions"]).forEach(emotion_key => {
                 document.getElementById(`modal-search-emotion-remove-button-id-${emotion_key}`).addEventListener("click", function() {
                     document.getElementById(`modal-search-emotion-label-value-span-id-${emotion_key}`).remove();
-                    delete gallery_search_obj["emotions"][emotion_key]
+                    delete collection_gallery_search_obj["emotions"][emotion_key]
                 })
             })
         }
@@ -913,7 +911,7 @@ async function Add_Gallery_Images() {
         document.getElementById("modal-search-emotion-label-value-textarea-entry-id").value = ""
         document.getElementById("modal-search-emotion-value-range-entry-id").value = "0"
         document.getElementById("modal-search-emotion-label-value-display-container-div-id").innerHTML = ""
-        gallery_search_obj = {
+        collection_gallery_search_obj = {
             emotions:{},
             searchTags:[],
             searchMemeTags:[]
@@ -937,8 +935,66 @@ async function Add_Gallery_Images() {
     }
 }
 //the search for the add images modal of the gallery of the collections
-function Collection_Add_Image_Search_Action() {
+async function Collection_Add_Image_Search_Action() {
     console.log('add images to gallery collection')
+    //get the tags input and get rid of nuissance chars
+    search_tags_input = document.getElementById("modal-search-tag-textarea-entry-id").value
+    split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
+    search_unique_search_terms = [...new Set(split_search_string)]
+    search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
+    collection_gallery_search_obj["searchTags"] = search_unique_search_terms
+    //meme tags now    
+    search_meme_tags_input = document.getElementById("modal-search-meme-tag-textarea-entry-id").value
+    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
+    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+    search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
+    collection_gallery_search_obj["searchMemeTags"] = search_unique_meme_search_terms
+    //emotion key value already is in: collection_gallery_search_obj
+
+    search_memetags_lowercase = collection_gallery_search_obj["searchMemeTags"].map(function(x){return x.toLowerCase();})
+    search_tags_lowercase = collection_gallery_search_obj["searchTags"].map(function(x){return x.toLowerCase();})
+    //empty array to store the scores of the images against the search
+    img_search_scores = Array(all_image_keys.length).fill(0)
+    for(img_ind=0; img_ind<all_image_keys.length; img_ind++){
+        image_tmp = all_image_keys[img_ind]
+        image_tagging_annotation_obj_tmp = await TAGGING_IDB_MODULE.Get_Record(image_tmp)
+        record_tmp_tags = image_tagging_annotation_obj_tmp["taggingTags"]
+        record_tmp_emotions = image_tagging_annotation_obj_tmp["taggingEmotions"]
+        record_tmp_memes = image_tagging_annotation_obj_tmp["taggingMemeChoices"]
+        //scores for the tags/emotions/memes
+        //get the score of the overlap of the object with the search terms
+        tags_overlap_score = (record_tmp_tags.filter(tag => (search_tags_lowercase).includes(tag.toLowerCase()))).length
+        //get the score for the emotions overlap scores range [-1,1] for each emotion that is accumulated
+        emotion_overlap_score = 0
+        record_tmp_emotion_keys = Object.keys(record_tmp_emotions)
+        search_emotions_keys = Object.keys(collection_gallery_search_obj["emotions"])
+        search_emotions_keys.forEach(search_key_emotion_label => {
+            record_tmp_emotion_keys.forEach(record_emotion_key_label => {
+                if(search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()) {
+                    delta_tmp = (record_tmp_emotions[record_emotion_key_label] - collection_gallery_search_obj["emotions"][search_key_emotion_label]) / 50
+                    emotion_overlap_score_tmp = 1 - Math.abs( delta_tmp )
+                    emotion_overlap_score += emotion_overlap_score_tmp //scores range [-1,1]
+                }
+            })
+        })
+        //get the score for the memes
+        meme_tag_overlap_score = 0
+        for (let rtm=0; rtm<record_tmp_memes.length; rtm++){
+            meme_record_tmp = await TAGGING_IDB_MODULE.Get_Record(record_tmp_memes[rtm])
+            meme_tmp_tags = meme_record_tmp["taggingTags"]
+            meme_tag_overlap_score += (meme_tmp_tags.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length
+        }
+        //get the overlap score for this image tmp
+        total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score
+        img_search_scores[img_ind] = total_image_match_score
+    }
+    //sort the scores and return the indices order from largest to smallest
+    img_indices_sorted = new Array(img_search_scores.length);
+    for (i = 0; i < img_search_scores.length; ++i) img_indices_sorted[i] = i;
+    img_indices_sorted.sort(function (a, b) { return img_search_scores[a] < img_search_scores[b] ? 1 : img_search_scores[a] > img_search_scores[b] ? -1 : 0; });
+
+
+
 
 }
 
