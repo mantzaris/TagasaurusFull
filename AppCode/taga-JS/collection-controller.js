@@ -50,7 +50,7 @@ reg_exp_delims = /[#:,;| ]+/
 
 //this function deletes the entity object currently in focus from var 'current_key_index', and calls for the refresh
 //of the next entity to be in view
-async function Delete_Entity() {
+async function Delete_Collection() {
     entity_key = current_entity_obj.entityName
     await ENTITY_DB_FNS.Delete_Record(entity_key)
     await ENTITY_DB_FNS.Get_All_Keys_From_DB() //refresh the current key list
@@ -61,14 +61,13 @@ async function Delete_Entity() {
     }
 
     if(current_key_index >= all_collection_keys.length) { current_key_index = 0 }
-    Show_Entity_From_Key_Or_Current_Entity(all_collection_keys[current_key_index]) //current index for keys will be 1 ahead from before delete
+    Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index]) //current index for keys will be 1 ahead from before delete
 }
 
 
 //entity annotation page where the user describes the entity
-function Entity_Description_Page() {
+function Collection_Description_Page() {
     annotation_view_ind = 1
-
     //colors the annotation menu buttons appropriately (highlights)
     desription_btn = document.getElementById("collection-image-annotation-navbar-description-button-id")
 	emotion_btn = document.getElementById("collection-image-annotation-navbar-emotion-button-id")
@@ -78,18 +77,15 @@ function Entity_Description_Page() {
     emotion_btn.classList.remove('nav-bar-on')
     emotion_btn.classList.add('nav-bar-off')
     meme_btn.classList.remove('nav-bar-on')
-    meme_btn.classList.add('nav-bar-off')
-    
+    meme_btn.classList.add('nav-bar-off')    
 	description_annotations_div = document.getElementById("collection-image-annotation-description-div-id")
     description_annotations_div.style.display = 'grid'
 	emotions_annotations_div = document.getElementById("collection-image-annotation-emotions-div-id")
     emotions_annotations_div.style.display = "none";
 	memes_annotations_div = document.getElementById("collection-image-annotation-memes-div-id")
 	memes_annotations_div.style.display = "none";
-	
     description_text_area_element = document.getElementById("collection-image-annotation-description-textarea-id")
     description_text_area_element.value = current_entity_obj.entityDescription
-
     hashtag_div = document.getElementById("collection-description-annotation-hashtags-div-id")    
     if(current_entity_obj.taggingTags != undefined){
         hashtag_div.innerHTML = (current_entity_obj.taggingTags).join(' ,')
@@ -98,18 +94,17 @@ function Entity_Description_Page() {
     }
 }
 //takes the current description and updates the entity object in the DB with it
-function Save_Entity_Description() {
+function Save_Collection_Description() {
     current_entity_obj.entityDescription = document.getElementById("collection-image-annotation-description-textarea-id").value
     //now process  description text in order to have the tags
     current_entity_obj.taggingTags = DESCRIPTION_PROCESS_MODULE.process_description(current_entity_obj.entityDescription)
     ENTITY_DB_FNS.Update_Record(current_entity_obj)
-    Entity_Description_Page()
+    Collection_Description_Page()
 }
 
 //create the entity emotion HTML view for the entity annotation
-function Entity_Emotion_Page() {
+function Collection_Emotion_Page() {
     annotation_view_ind = 2
-
     //colors the annotation menu buttons appropriately (highlights)
     desription_btn = document.getElementById("collection-image-annotation-navbar-description-button-id")
     emotion_btn = document.getElementById("collection-image-annotation-navbar-emotion-button-id")
@@ -120,14 +115,12 @@ function Entity_Emotion_Page() {
     emotion_btn.classList.add('nav-bar-on')
     meme_btn.classList.remove('nav-bar-on')
     meme_btn.classList.add('nav-bar-off')
-
     description_annotations_div = document.getElementById("collection-image-annotation-description-div-id")
     description_annotations_div.style.display = 'none'	
     emotions_annotations_div = document.getElementById("collection-image-annotation-emotions-div-id")
     emotions_annotations_div.style.display = 'grid';
 	memes_annotations_div = document.getElementById("collection-image-annotation-memes-div-id")
 	memes_annotations_div.style.display = "none";
-
     emotions_collection = current_entity_obj["entityEmotions"]
     emotion_HTML = ''
     for( let key in emotions_collection ){        
@@ -141,10 +134,8 @@ function Entity_Emotion_Page() {
                         </div>
                         `
     }
-
     emotions_show_div = document.getElementById("collection-image-annotation-emotions-labels-show-div-id")
     emotions_show_div.innerHTML = emotion_HTML
-
     //set up the delete operation per emotion AND set values of slider
     Object.keys(emotions_collection).forEach(key_tmp => {
         document.getElementById(`emotion-delete-button-id-${key_tmp}`).addEventListener("click", function() {
@@ -163,16 +154,16 @@ async function Delete_Emotion(emotion_key){
     element_emotion_label.remove();
     delete current_entity_obj["entityEmotions"][emotion_key];
     await ENTITY_DB_FNS.Update_Record(current_entity_obj)
-    Entity_Emotion_Page()
+    Collection_Emotion_Page()
 }
 //will take the current emotion values, and store it into an object to replace the current entity object's emotions
 //then update the record in the Database
-function Save_Entity_Emotions() {    
+function Save_Collection_Emotions() {    
     for( var key of Object.keys(current_entity_obj["entityEmotions"]) ){
         current_entity_obj["entityEmotions"][key] = document.getElementById('emotion-range-id-'+key).value
     }
     ENTITY_DB_FNS.Update_Record(current_entity_obj)
-    Entity_Emotion_Page()
+    Collection_Emotion_Page()
 }
 //add a new emotion to the emotion set
 async function Add_New_Emotion(){
@@ -187,7 +178,7 @@ async function Add_New_Emotion(){
             //do not save upon addition of a new emotion, the save button is necessary
             document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value = ""
             document.getElementById("collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id").value = "0"
-            Entity_Emotion_Page()
+            Collection_Emotion_Page()
         } else {
             document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value = ""
         }
@@ -196,7 +187,7 @@ async function Add_New_Emotion(){
 
 
 //when the entity memes annotation page is select these page elements are present for the meme view
-function Entity_Memes_Page() {
+function Collection_Memes_Page() {
     annotation_view_ind = 3
     //make only the meme view pagination button active and the rest have active removed to not be highlighted
     //colors the annotation menu buttons appropriately (highlights)
@@ -209,14 +200,12 @@ function Entity_Memes_Page() {
     emotion_btn.classList.add('nav-bar-off')
     meme_btn.classList.remove('nav-bar-off')
     meme_btn.classList.add('nav-bar-on')
-
     description_annotations_div = document.getElementById("collection-image-annotation-description-div-id")
     description_annotations_div.style.display = 'none'	
     emotions_annotations_div = document.getElementById("collection-image-annotation-emotions-div-id")
     emotions_annotations_div.style.display = 'none';
     memes_annotations_div = document.getElementById("collection-image-annotation-memes-div-id")
     memes_annotations_div.style.display = "grid";
-    
     memes_array = current_entity_obj.entityMemes //get the memes of the current object
     document.querySelectorAll(".collection-image-annotation-memes-grid-item-class").forEach(el => el.remove());
     gallery_html = ''
@@ -237,7 +226,6 @@ function Entity_Memes_Page() {
         });
     }
     document.getElementById("collection-image-annotation-memes-images-show-div-id").innerHTML += gallery_html
-
     //event listener to modal focus image upon click
     if(memes_array != "" && memes_array.length > 0){
         memes_array.forEach(function(meme_key) {
@@ -278,52 +266,43 @@ async function Save_Meme_Changes(){
         }
     }
     current_entity_obj.entityMemes = meme_switch_booleans
-
     await ENTITY_DB_FNS.Update_Record(current_entity_obj)
-    Entity_Memes_Page()
+    Collection_Memes_Page()
 }
-
-
-
 
 //we use the key to pull the entity object from the DB, or if use_key=0 take the value
 //from the existing entity object global variable. 
 //also handles empty cases
-async function Show_Entity_From_Key_Or_Current_Entity(entity_key_or_obj,use_key=1) {
-
+async function Show_Collection_From_Key_Or_Current_Collection(entity_key_or_obj,use_key=1) {
     //if using the key, the global object for the current entity shown is updated and this is 
     //used, or else the current view from the data is presented.
     if(use_key == 1){
         current_entity_obj = await ENTITY_DB_FNS.Get_Record(entity_key_or_obj) 
     }
-    
     //check for issues
     reload_bool = Check_Gallery_And_Profile_Image_Integrity()
     if(reload_bool == true){
         current_entity_obj = await ENTITY_DB_FNS.Get_Record(entity_key_or_obj) 
     }
-
     document.getElementById("collection-profile-image-img-id").src = DIR_PICS + '/' + current_entity_obj.entityImage;
     document.getElementById("collection-profile-image-img-id").addEventListener("click", function (event) {
         Image_Clicked_Modal(current_entity_obj.entityImage)    
     })
     //display the entity hastag 'name'
     document.getElementById("collection-name-text-label-id").textContent = current_entity_obj.entityName;
-
     //display gallery images
     Display_Gallery_Images()
     //
     if(annotation_view_ind == 1){
-        Entity_Description_Page()
+        Collection_Description_Page()
     } else if(annotation_view_ind == 2){
-        Entity_Emotion_Page()
+        Collection_Emotion_Page()
     } else if(annotation_view_ind == 3){
-        Entity_Memes_Page()
+        Collection_Memes_Page()
     }
 }
 //display gallery images
 function Display_Gallery_Images() {
-
     //clear gallery of gallery image objects
     document.querySelectorAll(".collection-images-gallery-grid-item-class").forEach(el => el.remove());
     //place the gallery images in the html and ignore the missing images (leave the lingering links)
@@ -345,7 +324,6 @@ function Display_Gallery_Images() {
         }
     })
     gallery_div.innerHTML += gallery_html_tmp //gallery_div.innerHTML = gallery_html_tmp
-
     //masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
     //solution from: https://stackoverflow.com/a/60949881/410975
     Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
@@ -358,7 +336,6 @@ function Display_Gallery_Images() {
             transitionDuration: 0
         });
     });
-
     //event listener to modal focus image upon click
     image_set.forEach(function(image_filename) {
         image_path_tmp = DIR_PICS + '/' + image_filename
@@ -368,13 +345,7 @@ function Display_Gallery_Images() {
             })
         }
     })
-    
 }
-
-
-
-
-
 //to save the edits to the gallery images which is the deletions
 async function Save_Gallery_Changes(){
     current_images = current_entity_obj.entityImageSet //get the memes of the current object
@@ -414,7 +385,6 @@ async function Check_Gallery_And_Profile_Image_Integrity(){
     entity_profile_pic = current_entity_obj.entityImage
     image_path_profile_pic = DIR_PICS + '/' + entity_profile_pic
     profile_pic_present_bool = FS.existsSync(image_path_profile_pic)
-    
     //1-profile image is missing, and image set is empty (or none present to show)
     if(profile_pic_present_bool == false && image_set_present.length == 0) {
         current_entity_obj.entityImage = 'Taga.png'
@@ -441,35 +411,38 @@ async function Check_Gallery_And_Profile_Image_Integrity(){
     return(changes_made)
 }
 
-
-
-
-
-
-
-function Prev_Image() {
+//functions for the button calls to go through the collections
+function Prev_Collection() {
     if(current_key_index > 0){
         current_key_index += -1
     } else {
         current_key_index = all_collection_keys.length-1
     }
-    Show_Entity_From_Key_Or_Current_Entity(all_collection_keys[current_key_index])
+    Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index])
 }
-async function Next_Image() {
+async function Next_Collection() {
     if(current_key_index < all_collection_keys.length-1){
         current_key_index += 1
     } else {
         current_key_index = 0
     }
-    Show_Entity_From_Key_Or_Current_Entity(all_collection_keys[current_key_index])
+    Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index])
     
 }
 
 
+
+async function Handle_Empty_DB(){
+    new_default_obj = {...COLLECTION_DEFAULT_EMPTY_OBJECT}
+    new_default_obj.entityName = 'Taga' + Math.floor(Math.random() * max);
+    new_default_obj.entityImage = 'Taga.png'
+    new_default_obj.entityImageSet = ['Taga.png']
+    await ENTITY_DB_FNS.Insert_Record(new_default_obj)
+    all_collection_keys = [new_default_obj.entityName]
+}
 //The missing image filtering is not done in the initial stage here like in the Tagging where all missing
 //images are removed and the annotation objects removed
-async function Initialize_Entity_Page(){
-
+async function Initialize_Collection_Page(){
     desription_btn = document.getElementById("collection-image-annotation-navbar-description-button-id")
 	emotion_btn = document.getElementById("collection-image-annotation-navbar-emotion-button-id")
 	meme_btn = document.getElementById("collection-image-annotation-navbar-meme-button-id")
@@ -479,33 +452,33 @@ async function Initialize_Entity_Page(){
 
 	desription_btn.addEventListener("click", function (event) {
         annotation_view_ind = 1
-		Entity_Description_Page()		
+		Collection_Description_Page()		
 	})
     emotion_btn.addEventListener("click", function (event) {
         annotation_view_ind = 2
-		Entity_Emotion_Page()
+		Collection_Emotion_Page()
 	})
     document.getElementById("collection-image-annotation-navbar-meme-button-id").addEventListener("click", function (event) {
         annotation_view_ind = 3
-        Entity_Memes_Page()
+        Collection_Memes_Page()
     })
     document.getElementById("collection-control-button-previous-id").addEventListener("click", function (event) {
-        Prev_Image()
+        Prev_Collection()
     })
     document.getElementById("collection-control-button-next-id").addEventListener("click", function (event) {
-        Next_Image()
+        Next_Collection()
     })
     document.getElementById("collection-image-annotation-description-textarea-save-button-id").addEventListener("click", function (event) {
-        Save_Entity_Description()
+        Save_Collection_Description()
     })
     document.getElementById("collection-image-annotation-emotions-save-emotion-button-id").addEventListener("click", function (event) {
-        Save_Entity_Emotions()
+        Save_Collection_Emotions()
     })
     document.getElementById("collection-image-annotation-emotions-new-entry-add-emotion-button-id").addEventListener("click", function (event) {
         Add_New_Emotion()
     })
     document.getElementById("collection-control-button-delete-id").addEventListener("click", function (event) {
-        Delete_Entity()
+        Delete_Collection()
     })
     document.getElementById("collection-image-annotation-memes-save-changes-button-id").addEventListener("click", function (event) {
         Save_Meme_Changes()
@@ -515,6 +488,9 @@ async function Initialize_Entity_Page(){
     })
     document.getElementById("collection-profile-image-change-image-button-id").addEventListener("click", function (event) {
         Change_Profile_Image()
+    })
+    document.getElementById("collections-images-gallery-grid-button-addimages-id").addEventListener("click", function (event) {
+        Add_Gallery_Images()
     })
         
     await TAGGING_IDB_MODULE.Create_Db()
@@ -526,21 +502,12 @@ async function Initialize_Entity_Page(){
         await Handle_Empty_DB()
     }
 
-    await Show_Entity_From_Key_Or_Current_Entity(all_collection_keys[0]) //set the first entity to be seen, populate entity object data on view
-    await Entity_Description_Page() //the Text Description annotation is the first page to see alternative is the text description    
+    await Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[0]) //set the first entity to be seen, populate entity object data on view
+    await Collection_Description_Page() //the Text Description annotation is the first page to see alternative is the text description    
 }
 //the key starting point for the page
-Initialize_Entity_Page()
+Initialize_Collection_Page()
 
-
-async function Handle_Empty_DB(){
-    new_default_obj = {...COLLECTION_DEFAULT_EMPTY_OBJECT}
-    new_default_obj.entityName = 'Taga' + Math.floor(Math.random() * max);
-    new_default_obj.entityImage = 'Taga.png'
-    new_default_obj.entityImageSet = ['Taga.png']
-    await ENTITY_DB_FNS.Insert_Record(new_default_obj)
-    all_collection_keys = [new_default_obj.entityName]
-}
 
 
 //whenever an image is clicked to pop up a modal to give a big display of the image
@@ -812,6 +779,28 @@ async function Collection_Profile_Image_Search_Action() {
         }
     })
 }
+
+
+//called when the user want to add more images to the collections gallery
+function Add_Gallery_Images() {
+    console.log("adding more collection gallery images!")
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1096,7 +1085,7 @@ async function Meme_Choose_Search_Results(){
         //await TAGGING_IDB_MODULE.Update_Record(record)
         await ENTITY_DB_FNS.Update_Record(current_entity_obj)
         
-        Entity_Memes_Page() //Load_State_Of_Image_IDB()
+        Collection_Memes_Page() //Load_State_Of_Image_IDB()
 
         search_modal = document.getElementById("top-tagging-meme-search-modal-id");
         search_modal.style.display = "none";
@@ -1115,7 +1104,7 @@ tagging_search_obj = {
 search_complete = false
 
 //include an extra set of images to the gallery (on top of the previous set)
-async function Add_Gallery_Images(){
+async function Add_Gallery_Images_OLD(){
     console.log(`add more images to the Gallery`)
     //XXX
     tagging_search_obj = {
@@ -1305,7 +1294,7 @@ async function Choose_Entity_Gallery_Image_Results(){
         })
         current_entity_obj.entityImageSet = image_set
         await ENTITY_DB_FNS.Update_Record(current_entity_obj)
-        await Show_Entity_From_Key_Or_Current_Entity(all_collection_keys[current_key_index])
+        await Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index])
         search_modal = document.getElementById("top-tagging-search-modal-id");
         search_modal.style.display = "none";
     }
@@ -1340,7 +1329,7 @@ async function Choose_Entity_Gallery_Image_Results(){
     //     //await TAGGING_IDB_MODULE.Update_Record(record)
     //     await ENTITY_DB_FNS.Update_Record(current_entity_obj)
         
-    //     Entity_Memes_Page() //Load_State_Of_Image_IDB()
+    //     Collection_Memes_Page() //Load_State_Of_Image_IDB()
 
     //     search_modal = document.getElementById("top-tagging-meme-search-modal-id");
     //     search_modal.style.display = "none";
@@ -1383,7 +1372,7 @@ async function New_Entity_Memes_OLD(){
 
     current_entity_obj.entityMemes = files_tmp_base
     ENTITY_DB_FNS.Update_Record(current_entity_obj) //update the DB with the new meme file names
-    Entity_Memes_Page() //update the meme annotation subview with the new updated entity meme records
+    Collection_Memes_Page() //update the meme annotation subview with the new updated entity meme records
 }
 */
 
