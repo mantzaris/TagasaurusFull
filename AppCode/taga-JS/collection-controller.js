@@ -936,7 +936,8 @@ async function Add_Gallery_Images() {
 }
 //the search for the add images modal of the gallery of the collections
 async function Collection_Add_Image_Search_Action() {
-    console.log('add images to gallery collection')
+    await TAGGING_IDB_MODULE.Get_All_Keys_From_DB()
+    all_image_keys = TAGGING_IDB_MODULE.Read_All_Keys_From_DB()
     //get the tags input and get rid of nuissance chars
     search_tags_input = document.getElementById("modal-search-tag-textarea-entry-id").value
     split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
@@ -955,6 +956,7 @@ async function Collection_Add_Image_Search_Action() {
     search_tags_lowercase = collection_gallery_search_obj["searchTags"].map(function(x){return x.toLowerCase();})
     //empty array to store the scores of the images against the search
     img_search_scores = Array(all_image_keys.length).fill(0)
+    meme_key_relevance_scores = Array(all_image_keys.length).fill(0)
     for(img_ind=0; img_ind<all_image_keys.length; img_ind++){
         image_tmp = all_image_keys[img_ind]
         image_tagging_annotation_obj_tmp = await TAGGING_IDB_MODULE.Get_Record(image_tmp)
@@ -985,17 +987,88 @@ async function Collection_Add_Image_Search_Action() {
             meme_tag_overlap_score += (meme_tmp_tags.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length
         }
         //get the overlap score for this image tmp
+        //debatable whether the emotion overlap score should multiply the scores and be additive
         total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score
         img_search_scores[img_ind] = total_image_match_score
+
+        //now each meme gets a bonus for being present and then for the tag relevance
+        //if an image is present as a meme for an (image add or multiply or some proportional metric) to its memetic relevance of that image accumulation
+        //choosing multiply since the total aggregate takes in memes which are popular but irrelevant to the image search criteria
+        record_tmp_memes.forEach(meme_tmp => {
+            meme_key_ind = all_image_keys.indexOf(meme_tmp)
+            meme_key_relevance_scores[meme_key_ind] += 1 * total_image_match_score
+        })
     }
     //sort the scores and return the indices order from largest to smallest
     img_indices_sorted = new Array(img_search_scores.length);
     for (i = 0; i < img_search_scores.length; ++i) img_indices_sorted[i] = i;
     img_indices_sorted.sort(function (a, b) { return img_search_scores[a] < img_search_scores[b] ? 1 : img_search_scores[a] > img_search_scores[b] ? -1 : 0; });
-
-
-
-
+    //sort the meme image scores and return the indices order from largest to smallest
+    meme_img_indices_sorted = new Array(meme_key_relevance_scores.length);
+    for (i = 0; i < meme_key_relevance_scores.length; ++i) meme_img_indices_sorted[i] = i;
+    meme_img_indices_sorted.sort(function (a, b) { return meme_key_relevance_scores[a] < meme_key_relevance_scores[b] ? 1 : meme_key_relevance_scores[a] > meme_key_relevance_scores[b] ? -1 : 0; });
+    
+    //display the search order with the image order first and then the memes that are relevant
+    search_display_div = document.getElementById("modal-search-images-results-grid-div-area-id")
+    search_display_div.innerHTML = ""
+    search_display_inner_tmp = ''
+    img_indices_sorted.forEach( index => {
+        image_filename = all_image_keys[index]
+        image_path_tmp = DIR_PICS + '/' + image_filename
+        if(FS.existsSync(image_path_tmp) == true && current_entity_obj.entityImageSet.includes(image_filename)==false) {
+            search_display_inner_tmp += `
+                                        <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${image_filename}">
+                                            <label class="add-memes-memeswitch" title="deselect / include">
+                                                <input id="add-image-toggle-id-${image_filename}" type="checkbox">
+                                                <span class="add-memes-slider"></span>
+                                            </label>
+                                            <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-${image_filename}" src="${image_path_tmp}" title="view" alt="memes"/>
+                                        </div>
+                                        `
+        }
+    })
+    search_display_div.innerHTML += search_display_inner_tmp
+    //memes section
+    search_meme_display_div = document.getElementById("modal-search-meme-images-results-grid-div-area-id")
+    search_meme_display_div.innerHTML = ""
+    search_display_inner_tmp = ''
+    meme_img_indices_sorted.forEach( index => {
+        image_filename = all_image_keys[index]
+        image_path_tmp = DIR_PICS + '/' + image_filename
+        if(FS.existsSync(image_path_tmp) == true && current_entity_obj.entityImageSet.includes(image_filename)==false) {
+            search_display_inner_tmp += `
+                                        <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${image_filename}">
+                                            <label class="add-memes-memeswitch" title="deselect / include">
+                                                <input id="add-memes-meme-toggle-id-${image_filename}" type="checkbox">
+                                                <span class="add-memes-slider"></span>
+                                            </label>
+                                            <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-${image_filename}" src="${image_path_tmp}" title="view" alt="memes"/>
+                                        </div>
+                                        `
+        }
+    })
+    search_meme_display_div.innerHTML += search_display_inner_tmp
+    //listen for the user saying that the images are selected
+    document.getElementById("modal-search-images-results-select-images-order-button-id").addEventListener("click", async function() {
+        update = false
+        all_image_keys.forEach( image_filename => {
+            image_path_tmp = DIR_PICS + '/' + image_filename
+            if(FS.existsSync(image_path_tmp) == true && current_entity_obj.entityImageSet.includes(image_filename)==false) {
+                if(document.getElementById(`add-image-toggle-id-${image_filename}`).checked){
+                    current_entity_obj.entityImageSet.push(image_filename)
+                    update = true
+                } else if(document.getElementById(`add-memes-meme-toggle-id-${image_filename}`).checked){
+                    current_entity_obj.entityImageSet.push(image_filename)
+                    update = true
+                }
+            }
+        })
+        if(update == true) {
+            await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+            await Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index])            
+        }
+        document.getElementById("search-profileimage-modal-click-top-id").style.display = "none";
+    })
 }
 
 
