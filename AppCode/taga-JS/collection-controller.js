@@ -490,6 +490,9 @@ async function Initialize_Collection_Page(){
     document.getElementById("collections-images-gallery-grid-button-addimages-id").addEventListener("click", function (event) {
         Add_Gallery_Images()
     })
+    document.getElementById("collection-image-annotation-memes-new-memes-add-button-id").addEventListener("click", function (event) {
+        Add_Meme_Images()
+    })
         
     await TAGGING_IDB_MODULE.Create_Db()
     await ENTITY_DB_FNS.Create_Db() //sets a global variable in the module to hold the DB for access
@@ -1080,6 +1083,50 @@ async function Collection_Add_Image_Search_Action() {
 
 
 
+
+
+
+//now when the user wants to add more images to the meme set of the collection
+collection_meme_search_obj = {
+    emotions:{},
+    meme_emotions:{},
+    searchTags:[],
+    searchMemeTags:[]
+}
+function Add_Meme_Images() {
+    // Show the modal
+    var modal_meme_img_add = document.getElementById("search-add-memes-modal-click-top-id");
+    modal_meme_img_add.style.display = "block";
+    // Get the button that opens the modal
+    var modal_meme_img_add_close_btn = document.getElementById("modal-search-add-memes-close-exit-view-button-id");
+    // When the user clicks on the button, close the modal
+    modal_meme_img_add_close_btn.onclick = function () {
+        modal_meme_img_add.style.display = "none";
+    }
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+        if (event.target == modal_meme_img_add) {
+            modal_meme_img_add.style.display = "none";
+        }
+    }
+    //clear the search obj to make it fresh and reset the fields
+    document.getElementById("modal-search-add-memes-tag-textarea-entry-id").value = ""
+    document.getElementById("modal-search-add-memes-tag-textarea-memes-entry-id").value = ""
+    document.getElementById("modal-search-add-memes-emotion-label-value-textarea-entry-id").value = ""
+    document.getElementById("modal-search-add-memes-emotion-value-range-entry-id").value = "0"
+    document.getElementById("modal-search-add-memes-emotion-meme-label-value-textarea-entry-id").value = ""
+    document.getElementById("modal-search-add-memes-emotion-meme-value-range-entry-id").value = "0"
+    document.getElementById("modal-search-add-memes-emotion-label-value-display-container-div-id").innerHTML = ""
+    document.getElementById("modal-search-add-memes-emotion-meme-label-value-display-container-div-id").innerHTML = ""
+    collection_meme_search_obj = {
+        emotions:{},
+        meme_emotions:{},
+        searchTags:[],
+        searchMemeTags:[]
+    }
+
+
+}
 
 
 
