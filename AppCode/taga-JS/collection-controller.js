@@ -1125,6 +1125,73 @@ function Add_Meme_Images() {
         searchMemeTags:[]
     }
 
+    //handler for the image tag emotion labels and value entry additions and then the deletion handling, all emotions are added by default and handled 
+    document.getElementById("modal-search-add-memes-emotion-entry-button-id").addEventListener("click", function (event) {        
+        emotion_key_tmp = document.getElementById("modal-search-add-memes-emotion-label-value-textarea-entry-id").value
+        if(emotion_key_tmp != "") { 
+            emotion_value_tmp = document.getElementById("modal-search-add-memes-emotion-value-range-entry-id").value
+            collection_meme_search_obj["emotions"][emotion_key_tmp] = emotion_value_tmp //update the global profile image search object with the new key value
+            emotion_div_id = document.getElementById("modal-search-add-memes-emotion-label-value-display-container-div-id")
+            emotions_html_tmp = ""
+            Object.keys(collection_meme_search_obj["emotions"]).forEach(emotion_key => {
+                        emotions_html_tmp += `
+                                            <span id="modal-search-add-memes-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
+                                                <img class="modal-search-emotion-remove-button-class" id="modal-search-add-memes-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+                                                    onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+                                                (${emotion_key},${collection_meme_search_obj["emotions"][emotion_key]})
+                                            </span>
+                                            `
+            })
+            emotion_div_id.innerHTML = emotions_html_tmp   
+            document.getElementById("modal-search-add-memes-emotion-label-value-textarea-entry-id").value = ""
+            document.getElementById("modal-search-add-memes-emotion-value-range-entry-id").value = "0"
+            //handler for the emotion deletion from search term and view on modal
+            Object.keys(collection_meme_search_obj["emotions"]).forEach(emotion_key => {
+                document.getElementById(`modal-search-add-memes-emotion-remove-button-id-${emotion_key}`).addEventListener("click", function() {
+                    document.getElementById(`modal-search-add-memes-emotion-label-value-span-id-${emotion_key}`).remove();
+                    delete collection_meme_search_obj["emotions"][emotion_key]
+                })
+            })
+        }
+    })
+    //handler for the 'meme' tag emotion labels and value entry additions and then the deletion handling, all meme_emotions are added by default and handled 
+    document.getElementById("modal-search-add-memes-emotion-meme-entry-button-id").addEventListener("click", function (event) {        
+        emotion_key_tmp = document.getElementById("modal-search-add-memes-emotion-meme-label-value-textarea-entry-id").value
+        if(emotion_key_tmp != "") { 
+            emotion_value_tmp = document.getElementById("modal-search-add-memes-emotion-meme-value-range-entry-id").value
+            collection_meme_search_obj["meme_emotions"][emotion_key_tmp] = emotion_value_tmp //update the global profile image search object with the new key value
+            emotion_div_id = document.getElementById("modal-search-add-memes-emotion-meme-label-value-display-container-div-id")
+            emotions_html_tmp = ""
+            Object.keys(collection_meme_search_obj["meme_emotions"]).forEach(emotion_key => {
+                        emotions_html_tmp += `
+                                            <span id="modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}" style="white-space:nowrap">
+                                                <img class="modal-search-emotion-remove-button-class" id="modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+                                                    onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+                                                (${emotion_key},${collection_meme_search_obj["meme_emotions"][emotion_key]})
+                                            </span>
+                                            `
+            })
+            emotion_div_id.innerHTML = emotions_html_tmp   
+            document.getElementById("modal-search-add-memes-emotion-meme-label-value-textarea-entry-id").value = ""
+            document.getElementById("modal-search-add-memes-emotion-meme-value-range-entry-id").value = "0"
+            //handler for the emotion deletion from search term and view on modal
+            Object.keys(collection_meme_search_obj["meme_emotions"]).forEach(emotion_key => {
+                document.getElementById(`modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}`).addEventListener("click", function() {
+                    document.getElementById(`modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}`).remove();
+                    delete collection_meme_search_obj["meme_emotions"][emotion_key]
+                })
+            })
+        }
+    })
+
+
+
+
+
+
+
+
+
 
 }
 
