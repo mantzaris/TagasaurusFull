@@ -38,28 +38,18 @@ var all_collection_keys; //holds all the keys to the entities in the DB
 var current_key_index = 0; //which key index is currently in view for the current entity
 var annotation_view_ind = 1 //which view should be shown to the user when they flip through entities
 
-//gallery_image search_results
-search_results = []
-
-//meme search results
-var search_meme_results = ''
-
 //for filtering out chars in the search modals
 reg_exp_delims = /[#:,;| ]+/
 
 
-//this function deletes the entity object currently in focus from var 'current_key_index', and calls for the refresh
-//of the next entity to be in view
+//this function deletes the entity object currently in focus from var 'current_key_index', and calls for the refresh of the next entity to be in view
 async function Delete_Collection() {
-    entity_key = current_entity_obj.entityName
-    await ENTITY_DB_FNS.Delete_Record(entity_key)
+    await ENTITY_DB_FNS.Delete_Record(current_entity_obj.entityName)
     await ENTITY_DB_FNS.Get_All_Keys_From_DB() //refresh the current key list
     all_collection_keys = ENTITY_DB_FNS.Read_All_Keys_From_DB() //retrieve that key list and set to the local global variable
-
     if(all_collection_keys.length == 0){
         Handle_Empty_DB()
     }
-
     if(current_key_index >= all_collection_keys.length) { current_key_index = 0 }
     Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index]) //current index for keys will be 1 ahead from before delete
 }
