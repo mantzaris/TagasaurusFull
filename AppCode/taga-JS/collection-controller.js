@@ -1070,7 +1070,7 @@ async function Collection_Add_Image_Search_Action() {
             await ENTITY_DB_FNS.Update_Record(current_entity_obj)
             await Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index])            
         }
-        document.getElementById("search-profileimage-modal-click-top-id").style.display = "none";
+        document.getElementById("search-modal-click-top-id").style.display = "none";
     })
 }
 
@@ -1272,10 +1272,141 @@ async function Add_Meme_Images() {
         Collection_Add_Memes_Search_Action()
     }
 }
+async function Collection_Add_Memes_Search_Action(){
+    await TAGGING_IDB_MODULE.Get_All_Keys_From_DB()
+    all_image_keys = TAGGING_IDB_MODULE.Read_All_Keys_From_DB()
+    //get the tags input and get rid of nuissance chars
+    search_tags_input = document.getElementById("modal-search-add-memes-tag-textarea-entry-id").value
+    split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
+    search_unique_search_terms = [...new Set(split_search_string)]
+    search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
+    collection_meme_search_obj["searchTags"] = search_unique_search_terms
+    //meme tags now    
+    search_meme_tags_input = document.getElementById("modal-search-add-memes-tag-textarea-memes-entry-id").value
+    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
+    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+    search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
+    collection_meme_search_obj["searchMemeTags"] = search_unique_meme_search_terms
+    //emotion keys-values for tags and memes should already be in: collection_meme_search_obj
 
-function Collection_Add_Memes_Search_Action(){
+    search_memetags_lowercase = collection_meme_search_obj["searchMemeTags"].map(function(x){return x.toLowerCase();})
+    search_tags_lowercase = collection_meme_search_obj["searchTags"].map(function(x){return x.toLowerCase();})
+    //empty array to store the scores of the images against the search
+    img_search_scores = Array(all_image_keys.length).fill(0)
+    meme_key_relevance_scores = Array(all_image_keys.length).fill(0)
+    for(img_ind=0; img_ind<all_image_keys.length; img_ind++){
+        image_tmp = all_image_keys[img_ind]
+        image_tagging_annotation_obj_tmp = await TAGGING_IDB_MODULE.Get_Record(image_tmp)
+        record_tmp_tags = image_tagging_annotation_obj_tmp["taggingTags"]
+        record_tmp_emotions = image_tagging_annotation_obj_tmp["taggingEmotions"]
+        record_tmp_memes = image_tagging_annotation_obj_tmp["taggingMemeChoices"]
+        //scores for the tags/emotions/memes
+        //get the score of the overlap of the object with the search terms
+        tags_overlap_score = (record_tmp_tags.filter(tag => (search_tags_lowercase).includes(tag.toLowerCase()))).length
+        //get the score for the emotions overlap scores range [-1,1] for each emotion that is accumulated
+        emotion_overlap_score = 0
+        record_tmp_emotion_keys = Object.keys(record_tmp_emotions)
+        search_emotions_keys = Object.keys(collection_meme_search_obj["emotions"])
+        search_emotions_keys.forEach(search_key_emotion_label => {
+            record_tmp_emotion_keys.forEach(record_emotion_key_label => {
+                if(search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()) {
+                    delta_tmp = (record_tmp_emotions[record_emotion_key_label] - collection_meme_search_obj["emotions"][search_key_emotion_label]) / 50
+                    emotion_overlap_score_tmp = 1 - Math.abs( delta_tmp )
+                    emotion_overlap_score += emotion_overlap_score_tmp //scores range [-1,1]
+                }
+            })
+        })
+        //get the score for the memes
+        meme_tag_overlap_score = 0
+        for (let rtm=0; rtm<record_tmp_memes.length; rtm++){
+            meme_record_tmp = await TAGGING_IDB_MODULE.Get_Record(record_tmp_memes[rtm])
+            meme_tmp_tags = meme_record_tmp["taggingTags"]
+            meme_tag_overlap_score += (meme_tmp_tags.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length
+        }
+        //get the overlap score for this image tmp
+        //debatable whether the emotion overlap score should multiply the scores and be additive
+        total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score
+        img_search_scores[img_ind] = total_image_match_score
 
-    console.log('search memes now!') //XXX
+        //now each meme gets a bonus for being present and then for the tag relevance
+        //if an image is present as a meme for an (image add or multiply or some proportional metric) to its memetic relevance of that image accumulation
+        //choosing multiply since the total aggregate takes in memes which are popular but irrelevant to the image search criteria
+        record_tmp_memes.forEach(meme_tmp => {
+            meme_key_ind = all_image_keys.indexOf(meme_tmp)
+            meme_key_relevance_scores[meme_key_ind] += 1 * total_image_match_score
+        })
+    }
+    //sort the scores and return the indices order from largest to smallest
+    img_indices_sorted = new Array(img_search_scores.length);
+    for (i = 0; i < img_search_scores.length; ++i) img_indices_sorted[i] = i;
+    img_indices_sorted.sort(function (a, b) { return img_search_scores[a] < img_search_scores[b] ? 1 : img_search_scores[a] > img_search_scores[b] ? -1 : 0; });
+    //sort the meme image scores and return the indices order from largest to smallest
+    meme_img_indices_sorted = new Array(meme_key_relevance_scores.length);
+    for (i = 0; i < meme_key_relevance_scores.length; ++i) meme_img_indices_sorted[i] = i;
+    meme_img_indices_sorted.sort(function (a, b) { return meme_key_relevance_scores[a] < meme_key_relevance_scores[b] ? 1 : meme_key_relevance_scores[a] > meme_key_relevance_scores[b] ? -1 : 0; });
+    
+    //display the search order with the image order first and then the memes that are relevant
+    search_display_div = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
+    search_display_div.innerHTML = ""
+    search_display_inner_tmp = ''
+    img_indices_sorted.forEach( index => {
+        image_filename = all_image_keys[index]
+        image_path_tmp = DIR_PICS + '/' + image_filename
+        if(FS.existsSync(image_path_tmp) == true && current_entity_obj.entityMemes.includes(image_filename)==false) {
+            search_display_inner_tmp += `
+                                        <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${image_filename}">
+                                            <label class="add-memes-memeswitch" title="deselect / include">
+                                                <input id="add-meme-image-toggle-id-${image_filename}" type="checkbox">
+                                                <span class="add-memes-slider"></span>
+                                            </label>
+                                            <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-image-img-id-${image_filename}" src="${image_path_tmp}" title="view" alt="memes"/>
+                                        </div>
+                                        `
+        }
+    })
+    search_display_div.innerHTML += search_display_inner_tmp
+    //memes section
+    search_meme_display_div = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
+    search_meme_display_div.innerHTML = ""
+    search_display_inner_tmp = ''
+    meme_img_indices_sorted.forEach( index => {
+        image_filename = all_image_keys[index]
+        image_path_tmp = DIR_PICS + '/' + image_filename
+        if(FS.existsSync(image_path_tmp) == true && current_entity_obj.entityMemes.includes(image_filename)==false) {
+            search_display_inner_tmp += `
+                                        <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${image_filename}">
+                                            <label class="add-memes-memeswitch" title="deselect / include">
+                                                <input id="add-meme-image-meme-toggle-id-${image_filename}" type="checkbox">
+                                                <span class="add-memes-slider"></span>
+                                            </label>
+                                            <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-meme-image-img-id-${image_filename}" src="${image_path_tmp}" title="view" alt="memes"/>
+                                        </div>
+                                        `
+        }
+    })
+    search_meme_display_div.innerHTML += search_display_inner_tmp
+    //listen for the user saying that the images are selected
+    document.getElementById("modal-search-add-memes-images-results-select-images-order-button-id").addEventListener("click", async function() {
+        update = false
+        all_image_keys.forEach( image_filename => {
+            image_path_tmp = DIR_PICS + '/' + image_filename
+            if(FS.existsSync(image_path_tmp) == true && current_entity_obj.entityMemes.includes(image_filename)==false) {
+                if(document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked){
+                    current_entity_obj.entityMemes.push(image_filename)
+                    update = true
+                } else if(document.getElementById(`add-meme-image-meme-toggle-id-${image_filename}`).checked){
+                    current_entity_obj.entityMemes.push(image_filename)
+                    update = true
+                }
+            }
+        })
+        if(update == true) {
+            await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+            await Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index])            
+        }
+        document.getElementById("search-add-memes-modal-click-top-id").style.display = "none";
+    })
+
 
 
 }
