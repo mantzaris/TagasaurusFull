@@ -997,9 +997,13 @@ async function Collection_Add_Image_Search_Action() {
         //now each meme gets a bonus for being present and then for the tag relevance
         //if an image is present as a meme for an (image add or multiply or some proportional metric) to its memetic relevance of that image accumulation
         //choosing multiply since the total aggregate takes in memes which are popular but irrelevant to the image search criteria
-        record_tmp_memes.forEach(meme_tmp => {
+        record_tmp_memes.forEach(async meme_tmp => {
             meme_key_ind = all_image_keys.indexOf(meme_tmp)
             meme_key_relevance_scores[meme_key_ind] += 1 * total_image_match_score
+            //boost the individual memes for their tag overlap
+            record_tmp = await TAGGING_IDB_MODULE.Get_Record(meme_tmp)
+            tags_tmp = record_tmp["taggingTags"]
+            meme_key_relevance_scores[meme_key_ind] += (tags_tmp.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length
         })
     }
     //sort the scores and return the indices order from largest to smallest
@@ -1291,6 +1295,8 @@ async function Collection_Add_Memes_Search_Action(){
 
     search_memetags_lowercase = collection_meme_search_obj["searchMemeTags"].map(function(x){return x.toLowerCase();})
     search_tags_lowercase = collection_meme_search_obj["searchTags"].map(function(x){return x.toLowerCase();})
+    search_meme_emotions_keys = Object.keys(collection_meme_search_obj["meme_emotions"])
+
     //empty array to store the scores of the images against the search
     img_search_scores = Array(all_image_keys.length).fill(0)
     meme_key_relevance_scores = Array(all_image_keys.length).fill(0)
@@ -1316,24 +1322,56 @@ async function Collection_Add_Memes_Search_Action(){
                 }
             })
         })
+        //meme emotion scores
+        emotion_meme_overlap_score = 0
         //get the score for the memes
         meme_tag_overlap_score = 0
         for (let rtm=0; rtm<record_tmp_memes.length; rtm++){
             meme_record_tmp = await TAGGING_IDB_MODULE.Get_Record(record_tmp_memes[rtm])
+            //tags of memes
             meme_tmp_tags = meme_record_tmp["taggingTags"]
             meme_tag_overlap_score += (meme_tmp_tags.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length
+            //emotions of memes
+            meme_record_tmp_emotion_keys = Object.keys(meme_record_tmp["taggingEmotions"])
+            search_meme_emotions_keys.forEach(search_key_emotion_label => {
+                meme_record_tmp_emotion_keys.forEach(record_emotion_key_label => {
+                    if(search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()) {
+                        delta_tmp = (meme_record_tmp[record_emotion_key_label] - collection_meme_search_obj["meme_emotions"][search_key_emotion_label]) / 50
+                        emotion_overlap_score_tmp = 1 - Math.abs( delta_tmp )
+                        emotion_meme_overlap_score += emotion_overlap_score_tmp //scores range [-1,1]
+                    }
+                })
+            })
         }
         //get the overlap score for this image tmp
         //debatable whether the emotion overlap score should multiply the scores and be additive
-        total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score
+        total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score + emotion_meme_overlap_score
         img_search_scores[img_ind] = total_image_match_score
 
         //now each meme gets a bonus for being present and then for the tag relevance
         //if an image is present as a meme for an (image add or multiply or some proportional metric) to its memetic relevance of that image accumulation
         //choosing multiply since the total aggregate takes in memes which are popular but irrelevant to the image search criteria
-        record_tmp_memes.forEach(meme_tmp => {
+        record_tmp_memes.forEach(async meme_tmp => {
             meme_key_ind = all_image_keys.indexOf(meme_tmp)
+            //boost all memes by this image's score for being connected to it
             meme_key_relevance_scores[meme_key_ind] += 1 * total_image_match_score
+            //boost the individual memes for their tag overlap
+            record_tmp = await TAGGING_IDB_MODULE.Get_Record(meme_tmp)
+            tags_tmp = record_tmp["taggingTags"]
+            meme_key_relevance_scores[meme_key_ind] += (tags_tmp.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length
+            //emotions of memes
+            emotion_meme_overlap_score = 0
+            meme_record_tmp_emotion_keys = Object.keys(record_tmp["taggingEmotions"])
+            search_meme_emotions_keys.forEach(search_key_emotion_label => {
+                meme_record_tmp_emotion_keys.forEach(record_emotion_key_label => {
+                        if(search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()) {
+                            delta_tmp = (meme_record_tmp["taggingEmotions"][record_emotion_key_label] - collection_meme_search_obj["meme_emotions"][search_key_emotion_label]) / 50
+                            emotion_overlap_score_tmp = 1 - Math.abs( delta_tmp )
+                            emotion_meme_overlap_score += emotion_overlap_score_tmp //scores range [-1,1]
+                        }
+                })
+            })
+            meme_key_relevance_scores[meme_key_ind] += emotion_meme_overlap_score
         })
     }
     //sort the scores and return the indices order from largest to smallest
