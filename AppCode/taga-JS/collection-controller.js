@@ -1,10 +1,10 @@
+// packages which might be required later on
+// const IPC_RENDERER_PICS = require('electron').ipcRenderer
+// const FSE = require('fs-extra');
+// const CRYPTO = require('crypto')
 
-const IPC_RENDERER_PICS = require('electron').ipcRenderer
 const PATH = require('path');
-const FSE = require('fs-extra');
 const FS = require('fs');
-const CRYPTO = require('crypto')
-
 
 const ENTITY_DB_FNS = require('./myJS/entity-db-fns.js');
 const MY_FILE_HELPER = require('./myJS/copy-new-file-helper.js')
@@ -261,18 +261,17 @@ async function Save_Meme_Changes(){
 }
 
 //we use the key to pull the entity object from the DB, or if use_key=0 take the value
-//from the existing entity object global variable. 
-//also handles empty cases
+//from the existing entity object global variable, also handles empty cases
 async function Show_Collection_From_Key_Or_Current_Collection(entity_key_or_obj,use_key=1) {
     //if using the key, the global object for the current entity shown is updated and this is 
     //used, or else the current view from the data is presented.
     if(use_key == 1){
-        current_entity_obj = await ENTITY_DB_FNS.Get_Record(entity_key_or_obj) 
+        current_entity_obj = await ENTITY_DB_FNS.Get_Record(entity_key_or_obj)
     }
     //check for issues
     reload_bool = Check_Gallery_And_Profile_Image_Integrity()
     if(reload_bool == true){
-        current_entity_obj = await ENTITY_DB_FNS.Get_Record(entity_key_or_obj) 
+        current_entity_obj = await ENTITY_DB_FNS.Get_Record(entity_key_or_obj)
     }
     document.getElementById("collection-profile-image-img-id").src = DIR_PICS + '/' + current_entity_obj.entityImage;
     document.getElementById("collection-profile-image-img-id").addEventListener("click", function (event) {
@@ -422,7 +421,8 @@ async function Next_Collection() {
 
 async function Handle_Empty_DB(){
     new_default_obj = {...COLLECTION_DEFAULT_EMPTY_OBJECT}
-    new_default_obj.entityName = 'Taga' + Math.floor(Math.random() * max);
+    rand_int = Math.floor(Math.random() * 1000000);
+    new_default_obj.entityName = 'Taga' + '0'.repeat(10 - rand_int.toString().length) + Math.floor(Math.random() * 1000000);
     new_default_obj.entityImage = 'Taga.png'
     new_default_obj.entityImageSet = ['Taga.png']
     await ENTITY_DB_FNS.Insert_Record(new_default_obj)
@@ -494,7 +494,6 @@ async function Initialize_Collection_Page(){
     }
 
     await Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[0]) //set the first entity to be seen, populate entity object data on view
-    await Collection_Description_Page() //the Text Description annotation is the first page to see alternative is the text description    
 }
 //the key starting point for the page
 Initialize_Collection_Page()
@@ -537,7 +536,7 @@ async function Image_Clicked_Modal(filename){
     if( emotion_keys.length > 0 ){        
         emotion_keys.forEach(function(key_tmp, index){
             emotion_value = img_record_obj["taggingEmotions"][key_tmp]
-            if (index === emotion_keys.length - 1){ 
+            if (index === emotion_keys.length - 1){
                 modal_html_tmp += `(${key_tmp}: ${emotion_value})`
             } else {
                 modal_html_tmp += `(${key_tmp}: ${emotion_value}), `
@@ -1070,10 +1069,6 @@ async function Collection_Add_Image_Search_Action() {
 
 
 
-
-
-
-
 //now when the user wants to add more images to the meme set of the collection
 collection_meme_search_obj = {
     emotions:{},
@@ -1434,9 +1429,6 @@ async function Collection_Add_Memes_Search_Action(){
         }
         document.getElementById("search-add-memes-modal-click-top-id").style.display = "none";
     })
-
-
-
 }
 
 
