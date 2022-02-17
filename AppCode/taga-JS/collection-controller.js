@@ -37,13 +37,36 @@ var annotation_view_ind = 1 //which view should be shown to the user when they f
 reg_exp_delims = /[#:,;| ]+/
 
 
-//this function deletes the entity object currently in focus from var 'current_key_index', and calls for the refresh of the next entity to be in view
-async function Delete_Collection() {
-    await COLLECTION_DB_MODULE.Delete_Record(current_entity_obj.entityName)
+// **MODEL ACCESS FUNCTIONS START**
+//pass the entity name which is the key to remove the collection from the DB
+async function Create_Collection_DB_Instance() {
+    await COLLECTION_DB_MODULE.Create_Db()
+}
+async function Insert_Collection_Record_Into_DB(obj) {
+    COLLECTION_DB_MODULE.Insert_Record(obj)
+}
+async function Get_Record_In_DB(entity_key) {
+    return await COLLECTION_DB_MODULE.Get_Record(entity_key)
+}
+async function Update_Collection_In_DB(current_entity_obj) {
+    await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
+}
+async function Refresh_Collection_Keys_From_DB() {
     await COLLECTION_DB_MODULE.Get_All_Keys_From_DB() //refresh the current key list
     all_collection_keys = COLLECTION_DB_MODULE.Read_All_Keys_From_DB() //retrieve that key list and set to the local global variable
+}
+async function Delete_Collection_From_DB(entityName) {
+    await COLLECTION_DB_MODULE.Delete_Record(entityName)
+}
+// **MODEL ACCESS FUNCTIONS END**
+
+
+//this function deletes the entity object currently in focus from var 'current_key_index', and calls for the refresh of the next entity to be in view
+async function Delete_Collection() {
+    await Delete_Collection_From_DB(current_entity_obj.entityName)
+    await Refresh_Collection_Keys_From_DB()
     if(all_collection_keys.length == 0){
-        Handle_Empty_DB()
+        await Handle_Empty_DB()
     }
     if(current_key_index >= all_collection_keys.length) { current_key_index = 0 }
     Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index]) //current index for keys will be 1 ahead from before delete
@@ -83,7 +106,7 @@ function Save_Collection_Description() {
     current_entity_obj.entityDescription = document.getElementById("collection-image-annotation-description-textarea-id").value
     //now process  description text in order to have the tags
     current_entity_obj.taggingTags = DESCRIPTION_PROCESS_MODULE.process_description(current_entity_obj.entityDescription)
-    COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
+    Update_Collection_In_DB(current_entity_obj)
     Collection_Description_Page()
 }
 
@@ -138,7 +161,7 @@ async function Delete_Emotion(emotion_key){
     element_emotion_label = document.getElementById('emotion-id-label-view-name-'+emotion_key);
     element_emotion_label.remove();
     delete current_entity_obj["entityEmotions"][emotion_key];
-    await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
+    await Update_Collection_In_DB(current_entity_obj)
     Collection_Emotion_Page()
 }
 //will take the current emotion values, and store it into an object to replace the current entity object's emotions
@@ -147,7 +170,7 @@ function Save_Collection_Emotions() {
     for( var key of Object.keys(current_entity_obj["entityEmotions"]) ){
         current_entity_obj["entityEmotions"][key] = document.getElementById('emotion-range-id-'+key).value
     }
-    COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
+    Update_Collection_In_DB(current_entity_obj)
     Collection_Emotion_Page()
 }
 //add a new emotion to the emotion set
@@ -159,7 +182,7 @@ async function Add_New_Emotion(){
         if(boolean_included == false){            
             new_emotion_value = document.getElementById("collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id").value
             current_entity_obj["entityEmotions"][new_emotion_text] = new_emotion_value
-            await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
+            await Update_Collection_In_DB(current_entity_obj)
             //do not save upon addition of a new emotion, the save button is necessary
             document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value = ""
             document.getElementById("collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id").value = "0"
@@ -251,7 +274,7 @@ async function Save_Meme_Changes(){
         }
     }
     current_entity_obj.entityMemes = meme_switch_booleans
-    await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
+    await Update_Collection_In_DB(current_entity_obj)
     Collection_Memes_Page()
 }
 
@@ -261,12 +284,12 @@ async function Show_Collection_From_Key_Or_Current_Collection(entity_key_or_obj,
     //if using the key, the global object for the current entity shown is updated and this is 
     //used, or else the current view from the data is presented.
     if(use_key == 1){
-        current_entity_obj = await COLLECTION_DB_MODULE.Get_Record(entity_key_or_obj)
+        current_entity_obj = await Get_Record_In_DB(entity_key_or_obj)
     }
     //check for issues
     reload_bool = Check_Gallery_And_Profile_Image_Integrity()
     if(reload_bool == true){
-        current_entity_obj = await COLLECTION_DB_MODULE.Get_Record(entity_key_or_obj)
+        current_entity_obj = await Get_Record_In_DB(entity_key_or_obj)
     }
     document.getElementById("collection-profile-image-img-id").src = TAGA_IMAGE_DIRECTORY + '/' + current_entity_obj.entityImage;
     document.getElementById("collection-profile-image-img-id").addEventListener("click", function (event) {
@@ -349,7 +372,7 @@ async function Save_Gallery_Changes(){
     length_new = gallery_switch_booleans.length
     if(length_new < length_original){
         current_entity_obj.entityImageSet = gallery_switch_booleans
-        await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
+        await Update_Collection_In_DB(current_entity_obj)
         await Check_Gallery_And_Profile_Image_Integrity()
         Display_Gallery_Images()
     }
@@ -390,7 +413,7 @@ async function Check_Gallery_And_Profile_Image_Integrity(){
     }
 
     if(changes_made == true){
-        await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
+        await Update_Collection_In_DB(current_entity_obj)
     }
     return(changes_made)
 }
@@ -416,11 +439,11 @@ async function Next_Collection() {
 
 async function Handle_Empty_DB(){
     new_default_obj = {...COLLECTION_DEFAULT_EMPTY_OBJECT}
-    rand_int = Math.floor(Math.random() * 1000000);
+    rand_int = Math.floor(Math.random() * 10000000); //OK way to handle filling up with default???
     new_default_obj.entityName = 'Taga' + '0'.repeat(10 - rand_int.toString().length) + Math.floor(Math.random() * 1000000);
     new_default_obj.entityImage = 'Taga.png'
     new_default_obj.entityImageSet = ['Taga.png']
-    await COLLECTION_DB_MODULE.Insert_Record(new_default_obj)
+    await Insert_Collection_Record_Into_DB(new_default_obj)
     all_collection_keys = [new_default_obj.entityName]
 }
 //The missing image filtering is not done in the initial stage here like in the Tagging where all missing
@@ -478,12 +501,11 @@ async function Initialize_Collection_Page(){
     document.getElementById("collection-image-annotation-memes-new-memes-add-button-id").addEventListener("click", function (event) {
         Add_Meme_Images()
     })
-        
+    
     await TAGGING_DB_MODULE.Create_Db()
-    await COLLECTION_DB_MODULE.Create_Db() //sets a global variable in the module to hold the DB for access
-    await COLLECTION_DB_MODULE.Get_All_Keys_From_DB() //gets all entity keys, sets them as a variable available for access later on
-    all_collection_keys = await COLLECTION_DB_MODULE.Read_All_Keys_From_DB() //retrieve the key set stored as a global within the module
-
+    await Create_Collection_DB_Instance() //sets a global variable in the module to hold the DB for access
+    await Refresh_Collection_Keys_From_DB()
+    
     if(all_collection_keys.length == 0){
         await Handle_Empty_DB()
     }
@@ -640,7 +662,7 @@ async function Change_Profile_Image() {
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).addEventListener("click",async function() {
                 current_entity_obj.entityImage = image_filename
-                await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
+                await Update_Collection_In_DB(current_entity_obj)
                 document.getElementById("collection-profile-image-img-id").src = TAGA_IMAGE_DIRECTORY + '/' + image_filename
                 modal_profile_img_change.style.display = "none";
             })
@@ -757,7 +779,7 @@ async function Collection_Profile_Image_Search_Action() {
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).addEventListener("click",async function() {
                 current_entity_obj.entityImage = image_filename
-                await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
+                await Update_Collection_In_DB(current_entity_obj)
                 document.getElementById("collection-profile-image-img-id").src = TAGA_IMAGE_DIRECTORY + '/' + image_filename
                 document.getElementById("search-profileimage-modal-click-top-id").style.display = "none";
             })
@@ -886,7 +908,7 @@ async function Add_Gallery_Images() {
             }
         })
         if(update == true) {
-            await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
+            await Update_Collection_In_DB(current_entity_obj)
             await Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index])            
         }
         modal_gallery_img_add.style.display = "none";
@@ -1055,7 +1077,7 @@ async function Collection_Add_Image_Search_Action() {
             }
         })
         if(update == true) {
-            await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
+            await Update_Collection_In_DB(current_entity_obj)
             await Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index])            
         }
         document.getElementById("search-modal-click-top-id").style.display = "none";
@@ -1217,7 +1239,7 @@ async function Add_Meme_Images() {
             }
         })
         if(update == true) {
-            await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
+            await Update_Collection_In_DB(current_entity_obj)
             await Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index])            
         }
         modal_meme_img_add.style.display = "none";
@@ -1419,7 +1441,7 @@ async function Collection_Add_Memes_Search_Action(){
             }
         })
         if(update == true) {
-            await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
+            await Update_Collection_In_DB(current_entity_obj)
             await Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index])            
         }
         document.getElementById("search-add-memes-modal-click-top-id").style.display = "none";
