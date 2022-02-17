@@ -2,15 +2,13 @@
 // const IPC_RENDERER_PICS = require('electron').ipcRenderer
 // const FSE = require('fs-extra');
 // const CRYPTO = require('crypto')
+// const MY_FILE_HELPER = require('./myJS/copy-new-file-helper.js')
 
 const PATH = require('path');
 const FS = require('fs');
 
-const ENTITY_DB_FNS = require('./myJS/entity-db-fns.js');
-const MY_FILE_HELPER = require('./myJS/copy-new-file-helper.js')
-
-//TAGGING_IDB_MODULE_COPY = require('./myJS/tagging-db-fns.js'); //for the hash refs of the individual images
-const TAGGING_IDB_MODULE = require('./myJS/tagging-db-fns.js'); 
+const COLLECTION_DB_MODULE = require('./myJS/entity-db-fns.js');
+const TAGGING_DB_MODULE = require('./myJS/tagging-db-fns.js'); 
 
 //<script src="./masonry.pkgd.min.js"></script>
 const MASONRY = require('masonry-layout') // require('./masonry.pkgd.min.js')
@@ -44,9 +42,9 @@ reg_exp_delims = /[#:,;| ]+/
 
 //this function deletes the entity object currently in focus from var 'current_key_index', and calls for the refresh of the next entity to be in view
 async function Delete_Collection() {
-    await ENTITY_DB_FNS.Delete_Record(current_entity_obj.entityName)
-    await ENTITY_DB_FNS.Get_All_Keys_From_DB() //refresh the current key list
-    all_collection_keys = ENTITY_DB_FNS.Read_All_Keys_From_DB() //retrieve that key list and set to the local global variable
+    await COLLECTION_DB_MODULE.Delete_Record(current_entity_obj.entityName)
+    await COLLECTION_DB_MODULE.Get_All_Keys_From_DB() //refresh the current key list
+    all_collection_keys = COLLECTION_DB_MODULE.Read_All_Keys_From_DB() //retrieve that key list and set to the local global variable
     if(all_collection_keys.length == 0){
         Handle_Empty_DB()
     }
@@ -88,7 +86,7 @@ function Save_Collection_Description() {
     current_entity_obj.entityDescription = document.getElementById("collection-image-annotation-description-textarea-id").value
     //now process  description text in order to have the tags
     current_entity_obj.taggingTags = DESCRIPTION_PROCESS_MODULE.process_description(current_entity_obj.entityDescription)
-    ENTITY_DB_FNS.Update_Record(current_entity_obj)
+    COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
     Collection_Description_Page()
 }
 
@@ -143,7 +141,7 @@ async function Delete_Emotion(emotion_key){
     element_emotion_label = document.getElementById('emotion-id-label-view-name-'+emotion_key);
     element_emotion_label.remove();
     delete current_entity_obj["entityEmotions"][emotion_key];
-    await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+    await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
     Collection_Emotion_Page()
 }
 //will take the current emotion values, and store it into an object to replace the current entity object's emotions
@@ -152,7 +150,7 @@ function Save_Collection_Emotions() {
     for( var key of Object.keys(current_entity_obj["entityEmotions"]) ){
         current_entity_obj["entityEmotions"][key] = document.getElementById('emotion-range-id-'+key).value
     }
-    ENTITY_DB_FNS.Update_Record(current_entity_obj)
+    COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
     Collection_Emotion_Page()
 }
 //add a new emotion to the emotion set
@@ -164,7 +162,7 @@ async function Add_New_Emotion(){
         if(boolean_included == false){            
             new_emotion_value = document.getElementById("collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id").value
             current_entity_obj["entityEmotions"][new_emotion_text] = new_emotion_value
-            await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+            await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
             //do not save upon addition of a new emotion, the save button is necessary
             document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value = ""
             document.getElementById("collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id").value = "0"
@@ -256,7 +254,7 @@ async function Save_Meme_Changes(){
         }
     }
     current_entity_obj.entityMemes = meme_switch_booleans
-    await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+    await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
     Collection_Memes_Page()
 }
 
@@ -266,12 +264,12 @@ async function Show_Collection_From_Key_Or_Current_Collection(entity_key_or_obj,
     //if using the key, the global object for the current entity shown is updated and this is 
     //used, or else the current view from the data is presented.
     if(use_key == 1){
-        current_entity_obj = await ENTITY_DB_FNS.Get_Record(entity_key_or_obj)
+        current_entity_obj = await COLLECTION_DB_MODULE.Get_Record(entity_key_or_obj)
     }
     //check for issues
     reload_bool = Check_Gallery_And_Profile_Image_Integrity()
     if(reload_bool == true){
-        current_entity_obj = await ENTITY_DB_FNS.Get_Record(entity_key_or_obj)
+        current_entity_obj = await COLLECTION_DB_MODULE.Get_Record(entity_key_or_obj)
     }
     document.getElementById("collection-profile-image-img-id").src = DIR_PICS + '/' + current_entity_obj.entityImage;
     document.getElementById("collection-profile-image-img-id").addEventListener("click", function (event) {
@@ -354,7 +352,7 @@ async function Save_Gallery_Changes(){
     length_new = gallery_switch_booleans.length
     if(length_new < length_original){
         current_entity_obj.entityImageSet = gallery_switch_booleans
-        await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+        await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
         await Check_Gallery_And_Profile_Image_Integrity()
         Display_Gallery_Images()
     }
@@ -395,7 +393,7 @@ async function Check_Gallery_And_Profile_Image_Integrity(){
     }
 
     if(changes_made == true){
-        await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+        await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
     }
     return(changes_made)
 }
@@ -425,7 +423,7 @@ async function Handle_Empty_DB(){
     new_default_obj.entityName = 'Taga' + '0'.repeat(10 - rand_int.toString().length) + Math.floor(Math.random() * 1000000);
     new_default_obj.entityImage = 'Taga.png'
     new_default_obj.entityImageSet = ['Taga.png']
-    await ENTITY_DB_FNS.Insert_Record(new_default_obj)
+    await COLLECTION_DB_MODULE.Insert_Record(new_default_obj)
     all_collection_keys = [new_default_obj.entityName]
 }
 //The missing image filtering is not done in the initial stage here like in the Tagging where all missing
@@ -484,10 +482,10 @@ async function Initialize_Collection_Page(){
         Add_Meme_Images()
     })
         
-    await TAGGING_IDB_MODULE.Create_Db()
-    await ENTITY_DB_FNS.Create_Db() //sets a global variable in the module to hold the DB for access
-    await ENTITY_DB_FNS.Get_All_Keys_From_DB() //gets all entity keys, sets them as a variable available for access later on
-    all_collection_keys = await ENTITY_DB_FNS.Read_All_Keys_From_DB() //retrieve the key set stored as a global within the module
+    await TAGGING_DB_MODULE.Create_Db()
+    await COLLECTION_DB_MODULE.Create_Db() //sets a global variable in the module to hold the DB for access
+    await COLLECTION_DB_MODULE.Get_All_Keys_From_DB() //gets all entity keys, sets them as a variable available for access later on
+    all_collection_keys = await COLLECTION_DB_MODULE.Read_All_Keys_From_DB() //retrieve the key set stored as a global within the module
 
     if(all_collection_keys.length == 0){
         await Handle_Empty_DB()
@@ -522,7 +520,7 @@ async function Image_Clicked_Modal(filename){
         }
     }  
 
-    img_record_obj = await TAGGING_IDB_MODULE.Get_Record(filename)
+    img_record_obj = await TAGGING_DB_MODULE.Get_Record(filename)
     tag_array = img_record_obj["taggingTags"]
     modal_html_tmp = `Tags: `
     if( tag_array.length != 0 && !(tag_array.length == 1 && tag_array[0] == "") ){
@@ -645,7 +643,7 @@ async function Change_Profile_Image() {
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).addEventListener("click",async function() {
                 current_entity_obj.entityImage = image_filename
-                await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+                await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
                 document.getElementById("collection-profile-image-img-id").src = DIR_PICS + '/' + image_filename
                 modal_profile_img_change.style.display = "none";
             })
@@ -692,7 +690,7 @@ async function Collection_Profile_Image_Search_Action() {
     img_search_scores = Array(current_entity_obj.entityImageSet.length).fill(0)
     for(img_ind=0; img_ind<current_entity_obj.entityImageSet.length; img_ind++){
         gallery_image_tmp = current_entity_obj.entityImageSet[img_ind]
-        gallery_image_tagging_annotation_obj_tmp = await TAGGING_IDB_MODULE.Get_Record(gallery_image_tmp)
+        gallery_image_tagging_annotation_obj_tmp = await TAGGING_DB_MODULE.Get_Record(gallery_image_tmp)
         record_tmp_tags = gallery_image_tagging_annotation_obj_tmp["taggingTags"]
         record_tmp_emotions = gallery_image_tagging_annotation_obj_tmp["taggingEmotions"]
         record_tmp_memes = gallery_image_tagging_annotation_obj_tmp["taggingMemeChoices"]
@@ -715,7 +713,7 @@ async function Collection_Profile_Image_Search_Action() {
         //get the score for the memes
         meme_tag_overlap_score = 0
         for (let rtm=0; rtm<record_tmp_memes.length; rtm++){
-            meme_record_tmp = await TAGGING_IDB_MODULE.Get_Record(record_tmp_memes[rtm])
+            meme_record_tmp = await TAGGING_DB_MODULE.Get_Record(record_tmp_memes[rtm])
             meme_tmp_tags = meme_record_tmp["taggingTags"]
             meme_tag_overlap_score += (meme_tmp_tags.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length
         }
@@ -762,7 +760,7 @@ async function Collection_Profile_Image_Search_Action() {
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).addEventListener("click",async function() {
                 current_entity_obj.entityImage = image_filename
-                await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+                await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
                 document.getElementById("collection-profile-image-img-id").src = DIR_PICS + '/' + image_filename
                 document.getElementById("search-profileimage-modal-click-top-id").style.display = "none";
             })
@@ -836,8 +834,8 @@ async function Add_Gallery_Images() {
         }
     })    
     //display default ordering first
-    await TAGGING_IDB_MODULE.Get_All_Keys_From_DB()
-    all_image_keys = TAGGING_IDB_MODULE.Read_All_Keys_From_DB()
+    await TAGGING_DB_MODULE.Get_All_Keys_From_DB()
+    all_image_keys = TAGGING_DB_MODULE.Read_All_Keys_From_DB()
     search_display_div = document.getElementById("modal-search-images-results-grid-div-area-id")
     search_display_div.innerHTML = ""
     search_display_inner_tmp = ''
@@ -891,7 +889,7 @@ async function Add_Gallery_Images() {
             }
         })
         if(update == true) {
-            await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+            await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
             await Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index])            
         }
         modal_gallery_img_add.style.display = "none";
@@ -928,8 +926,8 @@ async function Add_Gallery_Images() {
 }
 //the search for the add images modal of the gallery of the collections
 async function Collection_Add_Image_Search_Action() {
-    await TAGGING_IDB_MODULE.Get_All_Keys_From_DB()
-    all_image_keys = TAGGING_IDB_MODULE.Read_All_Keys_From_DB()
+    await TAGGING_DB_MODULE.Get_All_Keys_From_DB()
+    all_image_keys = TAGGING_DB_MODULE.Read_All_Keys_From_DB()
     //get the tags input and get rid of nuissance chars
     search_tags_input = document.getElementById("modal-search-tag-textarea-entry-id").value
     split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
@@ -951,7 +949,7 @@ async function Collection_Add_Image_Search_Action() {
     meme_key_relevance_scores = Array(all_image_keys.length).fill(0)
     for(img_ind=0; img_ind<all_image_keys.length; img_ind++){
         image_tmp = all_image_keys[img_ind]
-        image_tagging_annotation_obj_tmp = await TAGGING_IDB_MODULE.Get_Record(image_tmp)
+        image_tagging_annotation_obj_tmp = await TAGGING_DB_MODULE.Get_Record(image_tmp)
         record_tmp_tags = image_tagging_annotation_obj_tmp["taggingTags"]
         record_tmp_emotions = image_tagging_annotation_obj_tmp["taggingEmotions"]
         record_tmp_memes = image_tagging_annotation_obj_tmp["taggingMemeChoices"]
@@ -974,7 +972,7 @@ async function Collection_Add_Image_Search_Action() {
         //get the score for the memes
         meme_tag_overlap_score = 0
         for (let rtm=0; rtm<record_tmp_memes.length; rtm++){
-            meme_record_tmp = await TAGGING_IDB_MODULE.Get_Record(record_tmp_memes[rtm])
+            meme_record_tmp = await TAGGING_DB_MODULE.Get_Record(record_tmp_memes[rtm])
             meme_tmp_tags = meme_record_tmp["taggingTags"]
             meme_tag_overlap_score += (meme_tmp_tags.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length
         }
@@ -990,7 +988,7 @@ async function Collection_Add_Image_Search_Action() {
             meme_key_ind = all_image_keys.indexOf(meme_tmp)
             meme_key_relevance_scores[meme_key_ind] += 1 * total_image_match_score
             //boost the individual memes for their tag overlap
-            record_tmp = await TAGGING_IDB_MODULE.Get_Record(meme_tmp)
+            record_tmp = await TAGGING_DB_MODULE.Get_Record(meme_tmp)
             tags_tmp = record_tmp["taggingTags"]
             meme_key_relevance_scores[meme_key_ind] += (tags_tmp.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length
         })
@@ -1060,7 +1058,7 @@ async function Collection_Add_Image_Search_Action() {
             }
         })
         if(update == true) {
-            await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+            await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
             await Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index])            
         }
         document.getElementById("search-modal-click-top-id").style.display = "none";
@@ -1167,8 +1165,8 @@ async function Add_Meme_Images() {
         }
     })
     //display default ordering first
-    await TAGGING_IDB_MODULE.Get_All_Keys_From_DB()
-    all_image_keys = TAGGING_IDB_MODULE.Read_All_Keys_From_DB()
+    await TAGGING_DB_MODULE.Get_All_Keys_From_DB()
+    all_image_keys = TAGGING_DB_MODULE.Read_All_Keys_From_DB()
     search_display_div = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
     search_display_div.innerHTML = ""
     search_display_inner_tmp = ''
@@ -1222,7 +1220,7 @@ async function Add_Meme_Images() {
             }
         })
         if(update == true) {
-            await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+            await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
             await Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index])            
         }
         modal_meme_img_add.style.display = "none";
@@ -1262,8 +1260,8 @@ async function Add_Meme_Images() {
     }
 }
 async function Collection_Add_Memes_Search_Action(){
-    await TAGGING_IDB_MODULE.Get_All_Keys_From_DB()
-    all_image_keys = TAGGING_IDB_MODULE.Read_All_Keys_From_DB()
+    await TAGGING_DB_MODULE.Get_All_Keys_From_DB()
+    all_image_keys = TAGGING_DB_MODULE.Read_All_Keys_From_DB()
     //get the tags input and get rid of nuissance chars
     search_tags_input = document.getElementById("modal-search-add-memes-tag-textarea-entry-id").value
     split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
@@ -1287,7 +1285,7 @@ async function Collection_Add_Memes_Search_Action(){
     meme_key_relevance_scores = Array(all_image_keys.length).fill(0)
     for(img_ind=0; img_ind<all_image_keys.length; img_ind++){
         image_tmp = all_image_keys[img_ind]
-        image_tagging_annotation_obj_tmp = await TAGGING_IDB_MODULE.Get_Record(image_tmp)
+        image_tagging_annotation_obj_tmp = await TAGGING_DB_MODULE.Get_Record(image_tmp)
         record_tmp_tags = image_tagging_annotation_obj_tmp["taggingTags"]
         record_tmp_emotions = image_tagging_annotation_obj_tmp["taggingEmotions"]
         record_tmp_memes = image_tagging_annotation_obj_tmp["taggingMemeChoices"]
@@ -1312,7 +1310,7 @@ async function Collection_Add_Memes_Search_Action(){
         //get the score for the memes
         meme_tag_overlap_score = 0
         for (let rtm=0; rtm<record_tmp_memes.length; rtm++){
-            meme_record_tmp = await TAGGING_IDB_MODULE.Get_Record(record_tmp_memes[rtm])
+            meme_record_tmp = await TAGGING_DB_MODULE.Get_Record(record_tmp_memes[rtm])
             //tags of memes
             meme_tmp_tags = meme_record_tmp["taggingTags"]
             meme_tag_overlap_score += (meme_tmp_tags.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length
@@ -1341,7 +1339,7 @@ async function Collection_Add_Memes_Search_Action(){
             //boost all memes by this image's score for being connected to it
             meme_key_relevance_scores[meme_key_ind] += 1 * total_image_match_score
             //boost the individual memes for their tag overlap
-            record_tmp = await TAGGING_IDB_MODULE.Get_Record(meme_tmp)
+            record_tmp = await TAGGING_DB_MODULE.Get_Record(meme_tmp)
             tags_tmp = record_tmp["taggingTags"]
             meme_key_relevance_scores[meme_key_ind] += (tags_tmp.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length
             //emotions of memes
@@ -1424,7 +1422,7 @@ async function Collection_Add_Memes_Search_Action(){
             }
         })
         if(update == true) {
-            await ENTITY_DB_FNS.Update_Record(current_entity_obj)
+            await COLLECTION_DB_MODULE.Update_Record(current_entity_obj)
             await Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index])            
         }
         document.getElementById("search-add-memes-modal-click-top-id").style.display = "none";
