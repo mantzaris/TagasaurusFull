@@ -1,6 +1,5 @@
 
-The quote from Kalashnikov (the famous gun designer) should be taken
-seriously: "Things that are complex are not useful, Things that are
+Kalashnikov: "Things that are complex are not useful, Things that are
 useful are simple."*
 
 - What do we want to do? Solve problems.
@@ -16,7 +15,7 @@ useful are simple."*
 
 - How will that work? Meta-data is applied to content by users which
   is then shared, users receiving new content and the associated
-  meta-data sample the compatibility applying a confirmation or
+  meta-data sample the compatibility of the datasets applying a confirmation or
   disapproval of the meta-data which is then used to decide whether
   the source user's data is compatible for a merge or not.
 
@@ -28,19 +27,11 @@ useful are simple."*
 - Is there a way to lure power users to participate? It is known that
   the effort amongst users in a group follows a power law and there
   has to be incentive for those capable of putting in the time to do
-  so; some direct feedback for their efforts. Keeping things simple
-  that return of value is 'popularity' (a simple timeless
-  currency). Tags which are supported, or useful, promote the creator.
+  so; some direct feedback for their efforts.
 
 - Can a new approach filter out unwanted content? This is probably the
-  most essential as filtration is a basic principle. Yes it can by
-  allowing negative sentiment to be directly accounted for both
-  positive and negative edges to be produced.
-
-- What about dashboards and overviews? There are many tools and
-  features that can be introduced and maybe not a single approach is
-  taken but they can still interact meaningfully if they follow the
-  basic resource and meta-data paradigm.
+  most essential as filtration is a basic principle and the user will
+  have to take responsibility on this matter in the merge.
 
 How the promotion scheme works can become intricate and complicated
 very easily. It can be kept simple by relying on the premise that any
@@ -54,28 +45,38 @@ is very intresting but even in the abstract he says "integrating Resource Descri
 and does not deviate from that premise. There is the effort to do this
 'automatically' in <Rodriguez, M. A., Bollen, J., & Sompel, H. V. D. (2009). Automatic metadata generation using associative networks. ACM Transactions on Information Systems (TOIS), 27(2), 1-20.>
 but all those automatic approaches always find barriers in the inability to appreciate rich media content. You may even bring up his work of
-<Rodriguez, M. A. (2007, January). Social decision making with multi-relational networks and grammar-based particle swarms. In 2007 40th Annual Hawaii International Conference on System Sciences (HICSS'07) (pp. 39-39). IEEE.> where the relations propagate through the network; but it never actually involves the user in that propagation! The propagation without a user filtration for context means that errors can grow from the constant relevant signal of ontological information. There is also an approach by Mantzaris <Mantzaris, A. V., Walker, T. G., Taylor, C. E., & Ehling, D. (2019). Adaptive network diagram constructions for representing big data event streams on monitoring dashboards. Journal of Big Data, 6(1), 1-19.> which allows meta-data variables to associate through frequency of co-occurances, but even though that does allow for overlaps of ontological tags, and a natural growth of edge types for separations permitting even disjoint networks; its method of analysis is aimed at people being able to visualize the network topologies rather than incentive them to tag or to organize their accumulated resource set.
+<Rodriguez, M. A. (2007, January). Social decision making with multi-relational networks and grammar-based particle swarms. In 2007 40th Annual Hawaii International Conference on System Sciences (HICSS'07) (pp. 39-39). IEEE.> 
+where the relations propagate through the network; but it never actually involves the user in that propagation! 
+The propagation without a user filtration for context means that errors can grow from the constant relevant signal of ontological information. 
+There is also an approach by Mantzaris <Mantzaris, A. V., Walker, T. G., Taylor, C. E., & Ehling, D. (2019). Adaptive network diagram constructions 
+for representing big data event streams on monitoring dashboards. Journal of Big Data, 6(1), 1-19.> 
+which allows meta-data variables to associate through frequency of co-occurances, but even though that does allow for overlaps of ontological tags, 
+and a natural growth of edge types for separations permitting even disjoint networks; 
+its method of analysis is aimed at people being able to visualize the network topologies rather than incentive them to tag or to organize 
+their accumulated resource set.
 
 Once completed would this not fulfill the aspriration of Marvin Minsky to build a database of
 common sense? Yes and no. He wanted a database for all common sense of people as a single map
 which would mean that there would be so many exceptions for each rule/association that it would
-not generalize well. People evolve and so does their view of common sense. The idea of relying upon
-their incentive to perform the actions in an ad-hoc localized manner seems more plausible. 
+not generalize well. People evolve and so does their view of common sense. What is even more daunting
+is the realization that as 'common sense' evolves, changes, there are pockets of localized deviations
+which are highly specific to a group which may or may not propagate through the network. 
+The idea of relying upon localized incentive to perform the actions in an ad-hoc localized manner seems more plausible. 
 
-
-*There are 2 other versions of this quote by Kalashnikov: "When a
-young man, I read somewhere the following: God the Almighty said, 'All
-that is too complex is unnecessary, and it is simple that is needed'"
-and another version: “When a young man, I read somewhere the
-following: God the Almighty said, 'All that is too complex is
-unnecessary, and it is simple that is needed' ... So this has been my
-lifetime motto – I have been creating weapons to defend the borders of
+*There is another version of this quote by Kalashnikov: "When a
+young man, I read somewhere the following: God the Almighty said, 
+'All that is too complex is unnecessary, and it is simple that is needed'
+So this has been my lifetime motto – I have been creating weapons to defend the borders of
 my fatherland, to be simple and reliable.”
 
-From the book, "The Unfinished Revolution: How to Make Technology Work for Us--Instead of the Other Way Around", by the late Michael Dertouzos we can understand that his vision assumed individuals with local storage that would then choose to integrate their searches and data with others based upon the chosen demand. 
+From the book, "The Unfinished Revolution: How to Make Technology Work for Us--Instead of the Other Way Around", by the late Michael Dertouzos 
+we can understand that his vision assumed individuals with local storage that would then choose to integrate their 
+searches and data with others based upon the chosen demand. 
 
 Linus Torvalds: "Talk is cheap, show me the code"
 -why is it cheap?
 Martti Malmi: "Code speaks louder than words"
--and then you may wonder why?
+-and again, why?
 Marshall McLuhan: "the medium is the message"
+
+Chaos. Good news.

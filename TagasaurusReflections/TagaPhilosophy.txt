@@ -9,14 +9,15 @@ Tim Berners-Lee describes his motivation and thinking for the URL in
 his biographies which emphasize the emergence of the WWW. Those
 concepts have taken not only root but rest like the Turtle which
 supposedly held up the universe. Do URLs and URIs with their
-insistance or effort to make things unique not supporting our world?
+insistance, or effort, to make things unique, not end up 
+supporting our world on this hard but brittle 'shell'?
 Our world has redundancy and the organic nature of life promotes
-that. Resources have duplicates and it is a natural occurance which is
-not truly embraced.
+redundancy. Resources in nature have duplicates and it is a natural occurance which is
+not truly embraced with the 'U' in URLs.
 
 This document, https://www.ietf.org/rfc/rfc3986.txt, describes in more
 detail the motivational mindset that continues on this path when
-defining the URI in 2005. From the Abstract, <...resolving URI
+defining the URI in 2005. From the Abstract: <...resolving URI
 references that might be in relative form, along with guidelines and
 security considerations for the use of URIs on the Internet.The URI
 syntax defines a grammar that is a superset of all valid URIs...>, and
@@ -25,12 +26,12 @@ emerge once you place that letter 'U' for universal/unique/uniform
 etc. It is a basic axiom from which other assumptions emerge
 directly. What is wrong with them? You have to 'resolve' issues from
 the stochastic nature of life to keep a common understanding, you have
-to keep it secure as to have the uniform nature needs a central
-authority producing a vulnerability to the whole network and the word
+to keep it secure as to have the uniform it will need a central
+authority. This introduces, a vulnerability to the whole network and the word
 valid means there has to be a gatekeeper regardless of how that
 deciding entity is given access.
 
-Even from early on in the document: 1.1.  Overview of URIs
+Even from early on in the document: 1.1. Overview of URIs
 
    URIs are characterized as follows:
 
@@ -49,8 +50,8 @@ Even from early on in the document: 1.1.  Overview of URIs
 
 <Uniformity provides some benefits...> Ok, but does it take any other
 benefits away?.. < It allows different types of resource identifiers
-to be used in the same context> Yes, that is write but can you then
-use those types in different context easily?
+to be used in the same context> Yes, that is correct but can you then
+use those types in different context without making mix ups?
 
 And Tim Berners-Lee finds it surprising that the web and data is under
 control and is trying to fix it with Inrupt and Solid using the same
@@ -71,7 +72,8 @@ document outlining a bureaucracy of how to deal with all of the issues
 of the locations and identifications of resources. Yes, it brings a
 benefit set listed, but the question is; if I let go of those
 requirements can I get something in return for the loss? Hopefully
-something equally as good.
+something equally as good. At the moment it looks like a realestate 
+competition.
 
 The Good Stuff ---- After having pointed out all the things that can
 be reassessed, there are some brilliant concepts that should be
@@ -89,7 +91,7 @@ node entity references and ... subsequently create a network!
 (remember that networks are powerful)
 
 Each subject can be seen as an Actor to make an Actor-network. It then
-can tell a story which can be a play which might remind some of the
+can tell a story which can be a play that might remind some of the
 Shakespeare quote that we are all actors in a play, but did you know
 that the Roman philosopher Epectitus said something similar many years
 before that?! What is more interesting is that the romantic languages
@@ -124,11 +126,11 @@ there are ideal constructions all of us use in references of language
 while Aristotle believed in the individual perspective being what an
 individual uses to make decisions.
 
-The implications for this basic initial fork in the philosophy is
-grand.  Just take a look at
+There are implications for this basic initial fork in the philosophy.
+Just take a look at
 https://www.w3.org/DesignIssues/HTTP-URI.html where Tim Berners Lee
 makes a long spiral chain of arguments to pin down what a URI means
-when it is engineered. The attempt to 'philosophically engineer' even
+when it is engineered. The attempt to "philosophically engineer" even
 emails is confronted with a range of theoretical solutions which
 appear to lead no where after rounds of debate and consideration;
 https://www.w3.org/DesignIssues/PhilosophicalEngineering.html. The
