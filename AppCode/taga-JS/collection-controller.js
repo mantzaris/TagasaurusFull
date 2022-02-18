@@ -28,6 +28,8 @@ COLLECTION_DEFAULT_EMPTY_OBJECT = {
                                     "entityMemes": []
                                     }
 
+const SEARCH_MODULE = require('./taga-JS/utilities/search-fns.js') // the module holding all the search algorithms
+
 var all_image_keys; // each image key in the tagging db
 
 var current_entity_obj; //it holds the object of the entity being in current context
@@ -525,9 +527,9 @@ async function Initialize_Collection_Page(){
 
     await Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[0]) //set the first entity to be seen, populate entity object data on view
 }
-//the key starting point for the page
+//the key starting point for the page>>>>>>>>>>>>
 Initialize_Collection_Page()
-
+//<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
 //whenever an image is clicked to pop up a modal to give a big display of the image
@@ -1390,6 +1392,9 @@ async function Collection_Add_Memes_Search_Action(){
     for (i = 0; i < meme_key_relevance_scores.length; ++i) meme_img_indices_sorted[i] = i;
     meme_img_indices_sorted.sort(function (a, b) { return meme_key_relevance_scores[a] < meme_key_relevance_scores[b] ? 1 : meme_key_relevance_scores[a] > meme_key_relevance_scores[b] ? -1 : 0; });
     
+    // !!!
+    SEARCH_MODULE.Meme_Addition_Search_Fn(all_image_keys,Get_Tagging_Record_In_DB)
+
     //display the search order with the image order first and then the memes that are relevant
     search_display_div = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
     search_display_div.innerHTML = ""
