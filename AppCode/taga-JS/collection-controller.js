@@ -28,6 +28,8 @@ COLLECTION_DEFAULT_EMPTY_OBJECT = {
                                     "entityMemes": []
                                     }
 
+var all_image_keys; // each image key in the tagging db
+
 var current_entity_obj; //it holds the object of the entity being in current context
 var all_collection_keys; //holds all the keys to the entities in the DB
 var current_key_index = 0; //which key index is currently in view for the current entity
@@ -45,7 +47,7 @@ async function Create_Collection_DB_Instance() {
 async function Insert_Collection_Record_Into_DB(obj) {
     COLLECTION_DB_MODULE.Insert_Record(obj)
 }
-async function Get_Record_In_DB(entity_key) {
+async function Get_Collection_Record_In_DB(entity_key) {
     return await COLLECTION_DB_MODULE.Get_Record(entity_key)
 }
 async function Update_Collection_In_DB(current_entity_obj) {
@@ -57,6 +59,16 @@ async function Refresh_Collection_Keys_From_DB() {
 }
 async function Delete_Collection_From_DB(entityName) {
     await COLLECTION_DB_MODULE.Delete_Record(entityName)
+}
+async function Create_Tagging_DB_Instance() {
+    TAGGING_DB_MODULE.Create_Db()
+}
+async function Get_Tagging_Record_In_DB(filename) {
+    return await TAGGING_DB_MODULE.Get_Record(filename)
+}
+async function Set_All_Image_Keys_In_Tagging_DB() {
+    await TAGGING_DB_MODULE.Get_All_Keys_From_DB()
+    all_image_keys = TAGGING_DB_MODULE.Read_All_Keys_From_DB()
 }
 // **MODEL ACCESS FUNCTIONS END**
 
@@ -284,12 +296,12 @@ async function Show_Collection_From_Key_Or_Current_Collection(entity_key_or_obj,
     //if using the key, the global object for the current entity shown is updated and this is 
     //used, or else the current view from the data is presented.
     if(use_key == 1){
-        current_entity_obj = await Get_Record_In_DB(entity_key_or_obj)
+        current_entity_obj = await Get_Collection_Record_In_DB(entity_key_or_obj)
     }
     //check for issues
     reload_bool = Check_Gallery_And_Profile_Image_Integrity()
     if(reload_bool == true){
-        current_entity_obj = await Get_Record_In_DB(entity_key_or_obj)
+        current_entity_obj = await Get_Collection_Record_In_DB(entity_key_or_obj)
     }
     document.getElementById("collection-profile-image-img-id").src = TAGA_IMAGE_DIRECTORY + '/' + current_entity_obj.entityImage;
     document.getElementById("collection-profile-image-img-id").addEventListener("click", function (event) {
@@ -502,9 +514,10 @@ async function Initialize_Collection_Page(){
         Add_Meme_Images()
     })
     
-    await TAGGING_DB_MODULE.Create_Db()
+    await Create_Tagging_DB_Instance()
     await Create_Collection_DB_Instance() //sets a global variable in the module to hold the DB for access
     await Refresh_Collection_Keys_From_DB()
+    await Set_All_Image_Keys_In_Tagging_DB()
     
     if(all_collection_keys.length == 0){
         await Handle_Empty_DB()
@@ -539,7 +552,7 @@ async function Image_Clicked_Modal(filename){
         }
     }  
 
-    img_record_obj = await TAGGING_DB_MODULE.Get_Record(filename)
+    img_record_obj = await Get_Tagging_Record_In_DB(filename)
     tag_array = img_record_obj["taggingTags"]
     modal_html_tmp = `Tags: `
     if( tag_array.length != 0 && !(tag_array.length == 1 && tag_array[0] == "") ){
@@ -709,7 +722,7 @@ async function Collection_Profile_Image_Search_Action() {
     img_search_scores = Array(current_entity_obj.entityImageSet.length).fill(0)
     for(img_ind=0; img_ind<current_entity_obj.entityImageSet.length; img_ind++){
         gallery_image_tmp = current_entity_obj.entityImageSet[img_ind]
-        gallery_image_tagging_annotation_obj_tmp = await TAGGING_DB_MODULE.Get_Record(gallery_image_tmp)
+        gallery_image_tagging_annotation_obj_tmp = await Get_Tagging_Record_In_DB(gallery_image_tmp)
         record_tmp_tags = gallery_image_tagging_annotation_obj_tmp["taggingTags"]
         record_tmp_emotions = gallery_image_tagging_annotation_obj_tmp["taggingEmotions"]
         record_tmp_memes = gallery_image_tagging_annotation_obj_tmp["taggingMemeChoices"]
@@ -732,7 +745,7 @@ async function Collection_Profile_Image_Search_Action() {
         //get the score for the memes
         meme_tag_overlap_score = 0
         for (let rtm=0; rtm<record_tmp_memes.length; rtm++){
-            meme_record_tmp = await TAGGING_DB_MODULE.Get_Record(record_tmp_memes[rtm])
+            meme_record_tmp = await Get_Tagging_Record_In_DB(record_tmp_memes[rtm])
             meme_tmp_tags = meme_record_tmp["taggingTags"]
             meme_tag_overlap_score += (meme_tmp_tags.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length
         }
@@ -853,8 +866,6 @@ async function Add_Gallery_Images() {
         }
     })    
     //display default ordering first
-    await TAGGING_DB_MODULE.Get_All_Keys_From_DB()
-    all_image_keys = TAGGING_DB_MODULE.Read_All_Keys_From_DB()
     search_display_div = document.getElementById("modal-search-images-results-grid-div-area-id")
     search_display_div.innerHTML = ""
     search_display_inner_tmp = ''
@@ -869,7 +880,7 @@ async function Add_Gallery_Images() {
                                             </label>
                                             <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-${image_filename}" src="${image_path_tmp}" title="view" alt="memes"/>
                                         </div>
-                                                `
+                                        `
         }
     })
     search_display_div.innerHTML += search_display_inner_tmp
@@ -945,8 +956,6 @@ async function Add_Gallery_Images() {
 }
 //the search for the add images modal of the gallery of the collections
 async function Collection_Add_Image_Search_Action() {
-    await TAGGING_DB_MODULE.Get_All_Keys_From_DB()
-    all_image_keys = TAGGING_DB_MODULE.Read_All_Keys_From_DB()
     //get the tags input and get rid of nuissance chars
     search_tags_input = document.getElementById("modal-search-tag-textarea-entry-id").value
     split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
@@ -968,7 +977,7 @@ async function Collection_Add_Image_Search_Action() {
     meme_key_relevance_scores = Array(all_image_keys.length).fill(0)
     for(img_ind=0; img_ind<all_image_keys.length; img_ind++){
         image_tmp = all_image_keys[img_ind]
-        image_tagging_annotation_obj_tmp = await TAGGING_DB_MODULE.Get_Record(image_tmp)
+        image_tagging_annotation_obj_tmp = await Get_Tagging_Record_In_DB(image_tmp)
         record_tmp_tags = image_tagging_annotation_obj_tmp["taggingTags"]
         record_tmp_emotions = image_tagging_annotation_obj_tmp["taggingEmotions"]
         record_tmp_memes = image_tagging_annotation_obj_tmp["taggingMemeChoices"]
@@ -991,7 +1000,7 @@ async function Collection_Add_Image_Search_Action() {
         //get the score for the memes
         meme_tag_overlap_score = 0
         for (let rtm=0; rtm<record_tmp_memes.length; rtm++){
-            meme_record_tmp = await TAGGING_DB_MODULE.Get_Record(record_tmp_memes[rtm])
+            meme_record_tmp = await Get_Tagging_Record_In_DB(record_tmp_memes[rtm])
             meme_tmp_tags = meme_record_tmp["taggingTags"]
             meme_tag_overlap_score += (meme_tmp_tags.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length
         }
@@ -1007,7 +1016,7 @@ async function Collection_Add_Image_Search_Action() {
             meme_key_ind = all_image_keys.indexOf(meme_tmp)
             meme_key_relevance_scores[meme_key_ind] += 1 * total_image_match_score
             //boost the individual memes for their tag overlap
-            record_tmp = await TAGGING_DB_MODULE.Get_Record(meme_tmp)
+            record_tmp = await Get_Tagging_Record_In_DB(meme_tmp)
             tags_tmp = record_tmp["taggingTags"]
             meme_key_relevance_scores[meme_key_ind] += (tags_tmp.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length
         })
@@ -1184,8 +1193,6 @@ async function Add_Meme_Images() {
         }
     })
     //display default ordering first
-    await TAGGING_DB_MODULE.Get_All_Keys_From_DB()
-    all_image_keys = TAGGING_DB_MODULE.Read_All_Keys_From_DB()
     search_display_div = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
     search_display_div.innerHTML = ""
     search_display_inner_tmp = ''
@@ -1279,8 +1286,6 @@ async function Add_Meme_Images() {
     }
 }
 async function Collection_Add_Memes_Search_Action(){
-    await TAGGING_DB_MODULE.Get_All_Keys_From_DB()
-    all_image_keys = TAGGING_DB_MODULE.Read_All_Keys_From_DB()
     //get the tags input and get rid of nuissance chars
     search_tags_input = document.getElementById("modal-search-add-memes-tag-textarea-entry-id").value
     split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
@@ -1304,7 +1309,7 @@ async function Collection_Add_Memes_Search_Action(){
     meme_key_relevance_scores = Array(all_image_keys.length).fill(0)
     for(img_ind=0; img_ind<all_image_keys.length; img_ind++){
         image_tmp = all_image_keys[img_ind]
-        image_tagging_annotation_obj_tmp = await TAGGING_DB_MODULE.Get_Record(image_tmp)
+        image_tagging_annotation_obj_tmp = await Get_Tagging_Record_In_DB(image_tmp)
         record_tmp_tags = image_tagging_annotation_obj_tmp["taggingTags"]
         record_tmp_emotions = image_tagging_annotation_obj_tmp["taggingEmotions"]
         record_tmp_memes = image_tagging_annotation_obj_tmp["taggingMemeChoices"]
@@ -1329,7 +1334,7 @@ async function Collection_Add_Memes_Search_Action(){
         //get the score for the memes
         meme_tag_overlap_score = 0
         for (let rtm=0; rtm<record_tmp_memes.length; rtm++){
-            meme_record_tmp = await TAGGING_DB_MODULE.Get_Record(record_tmp_memes[rtm])
+            meme_record_tmp = await Get_Tagging_Record_In_DB(record_tmp_memes[rtm])
             //tags of memes
             meme_tmp_tags = meme_record_tmp["taggingTags"]
             meme_tag_overlap_score += (meme_tmp_tags.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length
@@ -1358,7 +1363,7 @@ async function Collection_Add_Memes_Search_Action(){
             //boost all memes by this image's score for being connected to it
             meme_key_relevance_scores[meme_key_ind] += 1 * total_image_match_score
             //boost the individual memes for their tag overlap
-            record_tmp = await TAGGING_DB_MODULE.Get_Record(meme_tmp)
+            record_tmp = await Get_Tagging_Record_In_DB(meme_tmp)
             tags_tmp = record_tmp["taggingTags"]
             meme_key_relevance_scores[meme_key_ind] += (tags_tmp.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length
             //emotions of memes
