@@ -19,7 +19,7 @@ body {
     "bottom-area1    bottom-area2   botton-area3   bottom-area4";
 }
 
-#navbar-id {
+#navbar-div-id {
   grid-column-start: navbar-area1;
   grid-column-end: navbar-area4;
   min-width: 0;
@@ -29,7 +29,6 @@ body {
 
   background-color: #808a80;
 }
-
 #navbar-button1-id {
   grid-area: navbar-button1-id;
   font-size: 3.5vmin;
@@ -54,4 +53,34 @@ body {
   grid-area: navbar-button5-id;
   font-size: 3.5vmin;
   pointer-events: none;
+}
+
+#center-div-id {
+  grid-column-start: center-area1;
+  grid-column-end: center-area4;
+  min-width: 0;
+  display: grid;
+
+  background-color: #941894;
+}
+
+#bottom-div-id {
+  grid-column-start: bottom-area1;
+  grid-column-end: bottom-area4;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 1fr 2fr 2fr 10fr;
+  grid-template-areas: " . prev-button next-button . ";
+
+  background-color: #808a80;
+}
+#prev-button-id {
+  grid-area: prev-button;
+  font-size: 3vmin;
+  margin: 3px;
+}
+#next-button-id {
+  grid-area: next-button;
+  font-size: 3vmin;
+  margin: 3px;
 }
