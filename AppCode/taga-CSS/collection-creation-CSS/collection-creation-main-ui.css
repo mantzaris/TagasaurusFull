@@ -66,15 +66,49 @@ body {
 }
 #creation-step1-div-id {
   grid-area: center;
+  min-width: 0;
+  display: grid;
   grid-template-columns: 2fr 3fr;
   grid-template-areas: "left right";
   background-color: #2149a0;
 }
 #collection-name-div-id {
   grid-area: left;
+  display: grid;
+  grid-template-rows: 5fr 1fr 1fr 5fr;
+  grid-template-areas:
+    ". "
+    "nameLabel"
+    "nameTextArea"
+    ".";
+}
+#collection-name-label-id {
+  grid-area: nameLabel;
+  display: flex;
+  align-items: flex-end;
+  justify-content: start;
+  width: 100%;
+  font-size: 3.5vmin;
+  font-weight: bold;
+}
+#collection-name-textarea-div-id {
+  grid-area: nameTextArea;
+  width: 90%;
+}
+#collection-name-textarea-id {
+  display: block;
+  width: 90%;
+  font-size: 4.5vmin;
+  border-radius: 2px;
+  resize: none;
+  border-color: black;
+  white-space: nowrap;
+  overflow: hidden;
 }
 #collection-profile-image-div-id {
   grid-area: right;
+
+  background-color: #941894;
 }
 
 #bottom-div-id {

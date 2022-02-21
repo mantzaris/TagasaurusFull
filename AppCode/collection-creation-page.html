@@ -36,7 +36,12 @@
         <!-- Creation Page 1 -->
         <div id="creation-step1-div-id">
             <div id="collection-name-div-id">
-                collection name
+                <div id="collection-name-label-id">                    
+                    (unqiue) collection name:
+                </div>
+                <div id="collection-name-textarea-div-id">
+                    <textarea id="collection-name-textarea-id" rows="1" placeholder="new name..." oninput="this.value = this.value.replace(/[ \n]/g,'')"></textarea>
+                </div>
             </div>
             <div id="collection-profile-image-div-id">
                 profile image
