@@ -1,0 +1,57 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Verdana, sans-serif;
+  box-sizing: border-box;
+}
+
+#collection-creation-screen-id {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 12fr 1fr;
+  height: 100vh;
+  width: 100vw;
+  box-sizing: border-box;
+  grid-template-areas:
+    "navbar-area1    navbar-area2   navbar-area3   navbar-area4"
+    "center-area1    center-area2   center-area3   center-area4"
+    "bottom-area1    bottom-area2   botton-area3   bottom-area4";
+}
+
+#navbar-id {
+  grid-column-start: navbar-area1;
+  grid-column-end: navbar-area4;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-areas: " . . navbar-button1-id navbar-button2-id navbar-button3-id navbar-button4-id navbar-button5-id . . ";
+
+  background-color: #808a80;
+}
+
+#navbar-button1-id {
+  grid-area: navbar-button1-id;
+  font-size: 3.5vmin;
+  pointer-events: none;
+}
+#navbar-button2-id {
+  grid-area: navbar-button2-id;
+  font-size: 3.5vmin;
+  pointer-events: none;
+}
+#navbar-button3-id {
+  grid-area: navbar-button3-id;
+  font-size: 3.5vmin;
+  pointer-events: none;
+}
+#navbar-button4-id {
+  grid-area: navbar-button4-id;
+  font-size: 3.5vmin;
+  pointer-events: none;
+}
+#navbar-button5-id {
+  grid-area: navbar-button5-id;
+  font-size: 3.5vmin;
+  pointer-events: none;
+}

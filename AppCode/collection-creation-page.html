@@ -1,200 +1,58 @@
-
+<!-- 1-(name,profile-image)->2-(gallery)->3-(description)->4-(emotions)->5-(memes) -->
 
 <!DOCTYPE html>
 <html>
 
 <head>
-    <meta charset="UTF-8">
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-
-    <!-- bootstrap css -->
-    <link rel="stylesheet" href="./bootstrap-css/bootstrap.css">
-    <link rel="stylesheet" href="./bootstrap-css/bootstrap-grid.css">
-
-    <!-- custom css -->
-    <link rel="stylesheet" href="./my-css/entity-welcome-screen.css">
-
-    <!-- model css for the entity profile image selection -->
-    <link rel="stylesheet" href="./my-css-entity-collections/entity-profile-image-selection-modal.css">
-
-    <!-- modal css for the entity gallery image collection addition reusing previous CSS -->
-    <link rel="stylesheet" href="./tagging-extra-HTML-CSS/tagging-search-modal.css">
-
-    <!-- search memes modal -->
-    <link rel="stylesheet" href="./tagging-extra-HTML-CSS/tagging-meme-search-modal.css">
-
-    <style>
     
-    </style>
     <title>Tagasaurus</title>
+
+    <!-- The main collections UI style sheet -->
+	<link rel="stylesheet" href="./taga-CSS/collection-creation-CSS/collection-creation-main-ui.css">
+
+    <!-- general styles for buttons etc -->
+	<link rel="stylesheet" href="./taga-CSS/general-styles.css">
+
+	<!-- general style for the modal pop ups -->
+	<link rel="stylesheet" href="./taga-CSS/modal-general-style.css">
+
+    <!-- something to do with security -->
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+
 </head>
 
-<body>
-
-    <div class="center-div1" id="entityCreateBodyDiv">
+<body id="collection-creation-screen-id">
 
 
-        <nav aria-label="Page navigation of new entity creation">
-            <ul class="pagination pagination-lg justify-content-center">
-
-                <li class="page-item" id="previous_creation_page">
-                    <a class="page-link" onclick="Entity_CreationPage_Previous()">
-                        Previous
-                    </a>
-                </li>
-
-                <li id="step1" class="page-item ">
-                    <a class="page-link" href="#">
-                        step 1
-                    </a>
-                </li>
-
-                <li id="step2" class="page-item ">
-                    <span class="page-link">
-                        step 2
-                    </span>
-                </li>
-
-                <li id="step3" class="page-item ">
-                    <a class="page-link" href="#">
-                        part 3                       
-                    </a>
-                </li>
-
-                <li class="page-item" id="next_creation_page">
-                    <a class="page-link" onclick="Page_Next()">
-                        Next
-                    </a>
-                </li>
-                
-            </ul>
-        </nav>
-
-        <div id="partBody">
-            
-
-        </div>
-
-    </div>
-
-
-    <!-- the new entity profile image choice popup modal -->
-    <div id="top-profile-image-choice-modal-id" class="top-profile-image-choice-modal-class">
-        <!-- Modal content -->
-        <div class="search-modal-entityprofile-content-class">
-            <div class="search-modal-entityprofile-header">
-                <span id="search-entityprofile-close-modal-id" class="search-close-modal-entityprofile-class">&times; Close &times;</span>
-                <h2 id="search-modal-entityprofile-header">Choose new collection entity profile image</h2>
-            </div>
-            
-            <button class="btn btn-primary btn-lg btn-block" id="search-entity-profileimage-searchorder-btn" type="button" onclick="">Gallery images sort order criteria</button>
-            <input type="text" class="form-control" id="search-tags-entity-profileimage-entry-form" aria-describedby="search" placeholder="enter search string (tags)">
-            <br>
-            <div id="modal-entity-profileimage-search-emotion-input-div-id">
-            </div>            
-            <div id="modal-search-entity-profileimage-tags-input-div-id">
-            </div>
-            <hr>
-            <!-- search results -->
-            <div class="search-modal-body-entityprofile-class" id="modal-search-entityprofile-click-body-id">
-                    <div id="search-modal-entityprofile-results-buttons">
-                    <label id="search-image-results-box-label" class="form-label">Click on image to become new collection entity profile image</label>
-                </div>
-                <div id="search-modal-entityprofile-image-results">
-                </div>
-            </div>
-            <div class="search-modal-footer-class" id="search-modal-footer-id">
-                <!-- <h3>Modal Footer</h3> -->
-            </div>
-        </div>        
-    </div>
-
-    <!-- ADD IMAGES TO THE ENTITY GALLERY -->
-    <div id="top-tagging-search-modal-id" class="top-tagging-search-modal-class">
-        <!-- Modal content -->
-        <div class="search-modal-content-class">
-            <div class="search-modal-header">
-                <span id="search-close-modal-id" class="search-close-modal-class">&times; Close &times;</span>
-                <h2 id="search-modal-header">Search images</h2>
-            </div>
-            <button class="btn btn-primary btn-lg btn-block" id="search-entry-btn" type="button" onclick="Search_For_Entity_Gallery_Images()">Search!</button>
-            <input type="text" class="form-control" id="search-tags-entry-form" aria-describedby="search" placeholder="enter search string (tags)">
-            <br>
-            <div id="modal-search-emotion-input-div-id">
-            </div>
-            
-            <div id="modal-search-meme-tags-input-div-id">
-            </div>
-            <hr>
-            <!-- search results -->
-            <div class="search-modal-body-class" id="modal-search-click-body-id">                
-                <div id="search-modal-results-buttons">
-                    <button class="btn btn-primary btn-sm btn-block" id="search-modal-load-image-order" type="button">load these selected images</button>
-                </div>
-                <div id="search-modal-image-results">
-                    <label id="search-image-results-box-label" class="form-label">image matches</label>
-                </div>
-                <div id="search-modal-image-memes">
-                    <label id="search-modal-image-memes-label" class="form-label">meme relevance</label>
-                </div>
-            </div>
-            <div class="search-modal-footer-class" id="search-modal-footer-id">
-                <!-- <h3>Modal Footer</h3> -->
-            </div>
-        </div>        
-    </div>
-
-
-    <!-- the entity MEME choice popup modal -->
-    <div id="top-tagging-meme-search-modal-id" class="top-tagging-meme-search-modal-class">
-        <!-- Modal content -->
-        <div class="search-meme-modal-content-class">
-            <div class="search-meme-modal-header">
-                <span id="search-meme-close-modal-id" class="search-meme-close-modal-class">&times; Close &times;</span>
-                <h2 id="search-meme-modal-header">Search memes</h2>
-            </div>
-            
-            <button class="btn btn-primary btn-lg btn-block" id="search-meme-entry-btn" type="button" onclick="Modal_Meme_Search_Btn()">Search!</button>
-            <input type="text" class="form-control" id="search-meme-tags-entry-form" aria-describedby="search" placeholder="enter keywords of memes (tags)">
-            <br>
-            <div id="modal-meme-search-emotion-input-div-id">
-            </div>
-            <div id="modal-meme-search-image-tags-input-div-id">
-            </div>
-            <hr style="height:6px;border:none;color:#222;background-color:#222;">
-            <input type="text" class="form-control" id="search-meme-image-tags-entry-form" aria-describedby="search" placeholder="enter keywords of images associated with meme (tags)">
-            <br>
-            <div id="modal-meme-search-image-emotion-input-div-id">
-            </div>
-
-            <hr>
-
-            <!-- meme search results -->
-            <div class="search-meme-modal-body-class" id="modal-meme-search-click-body-id">                    
-                <div id="search-meme-modal-results-buttons">
-                    <button class="btn btn-primary btn-sm btn-block" id="search-meme-modal-load-image-order" type="button">load these selected memes and images</button>
-                </div>
-
-                <div id="search-meme-modal-image-results">
-                    <label id="search-meme-image-results-box-label" class="form-label">dominant memes</label>
-                </div>
-
-                <div id="search-meme-modal-image-memes">
-                    <label id="search-meme-modal-image-memes-label" class="form-label">associated images</label>
-                </div>
-            </div>
-
-            <div class="search-meme-modal-footer-class" id="search-meme-modal-footer-id">
-                <!-- <h3>Modal Footer</h3> -->
-            </div>
-        </div>        
+    <div id="navbar-id">
+        <button class="fun-button-blue" id="navbar-button1-id">1</button>
+        <button class="fun-button-blue" id="navbar-button2-id">2</button>
+        <button class="fun-button-blue" id="navbar-button3-id">3</button>
+        <button class="fun-button-blue" id="navbar-button4-id">4</button>
+        <button class="fun-button-blue" id="navbar-button5-id">5</button>
     </div>
 
 
 
-    <script src="./myJS/entity-creation.js"></script>
+
 
 </body>
+
+<script>
+
+
+    nav_btn1 = document.getElementById("navbar-button1-id")
+    nav_btn1.classList.add('nav-bar-on')
+    nav_btn2 = document.getElementById("navbar-button2-id")
+    nav_btn2.classList.add('nav-bar-off')
+    nav_btn3 = document.getElementById("navbar-button3-id")
+    nav_btn3.classList.add('nav-bar-off')
+    nav_btn4 = document.getElementById("navbar-button4-id")
+    nav_btn4.classList.add('nav-bar-off')
+    nav_btn5 = document.getElementById("navbar-button5-id")
+    nav_btn5.classList.add('nav-bar-off')
+
+
+</script>
 
 </html>
