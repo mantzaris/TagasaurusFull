@@ -68,26 +68,23 @@ body {
   grid-area: center;
   min-width: 0;
   display: grid;
-  grid-template-columns: 2fr 3fr;
-  grid-template-areas: "left right";
+  grid-template-rows: 1fr 5fr;
+  grid-template-areas:
+    "top"
+    "bottom";
   background-color: #2149a0;
 }
 #collection-name-div-id {
-  grid-area: left;
+  grid-area: top;
   display: grid;
-  grid-template-rows: 5fr 1fr 1fr 5fr;
+  min-width: 0;
+  grid-template-rows: 2fr 6fr;
   grid-template-areas:
-    ". "
     "nameLabel"
-    "nameTextArea"
-    ".";
+    "nameTextArea";
 }
 #collection-name-label-id {
   grid-area: nameLabel;
-  display: flex;
-  align-items: flex-end;
-  justify-content: start;
-  width: 100%;
   font-size: 3.5vmin;
   font-weight: bold;
 }
@@ -106,16 +103,13 @@ body {
   overflow: hidden;
 }
 #collection-profile-image-div-id {
-  grid-area: right;
-  min-width: 0;
+  grid-area: bottom;
   min-height: 0;
   display: grid;
-  grid-template-rows: 4fr 1fr 14fr 3fr;
+  grid-template-rows: 1fr 14fr;
   grid-template-areas:
-    ". "
     "button"
-    "profileImage"
-    ".";
+    "profileImage";
   background-color: #941894;
 }
 #profile-image-select-button-div-id {
