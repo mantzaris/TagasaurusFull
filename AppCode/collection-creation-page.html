@@ -37,14 +37,19 @@
         <div id="creation-step1-div-id">
             <div id="collection-name-div-id">
                 <div id="collection-name-label-id">                    
-                    (unqiue) collection name:
+                    (REQUIRED & MUST BE UNIQUE) COLLECTION NAME:
                 </div>
                 <div id="collection-name-textarea-div-id">
                     <textarea id="collection-name-textarea-id" rows="1" placeholder="new name..." oninput="this.value = this.value.replace(/[ \n]/g,'')"></textarea>
                 </div>
             </div>
-            <div id="collection-profile-image-div-id">
-                profile image
+            <div id="collection-profile-image-div-id">                
+                <div id="profile-image-select-button-div-id">
+                    <button type="button" class="fun-button-blue" id="profile-image-select-button-id">(REQUIRED) CHOOSE PROFILE IMAGE</button>
+                </div>
+                <div id="profile-image-display-div-id">
+                    <img id="profile-image-display-id" src="../images/dino.jpeg" title="candidate profile image" alt="collection-profile-image"/>
+                </div>
             </div>
             
         </div>

@@ -107,8 +107,33 @@ body {
 }
 #collection-profile-image-div-id {
   grid-area: right;
-
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 4fr 1fr 14fr 3fr;
+  grid-template-areas:
+    ". "
+    "button"
+    "profileImage"
+    ".";
   background-color: #941894;
+}
+#profile-image-select-button-div-id {
+  grid-area: button;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#profile-image-select-button-id {
+  height: 100%;
+  font-size: 150%;
+}
+#profile-image-display-div-id {
+  grid-area: profileImage;
+}
+#profile-image-display-id {
+  width: 100%;
 }
 
 #bottom-div-id {
