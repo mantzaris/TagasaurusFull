@@ -59,6 +59,7 @@ body {
   grid-column-start: center-area1;
   grid-column-end: center-area4;
   min-width: 0;
+  min-height: 0;
   display: grid;
   grid-template-columns: 1fr;
   grid-template-areas: "center";
@@ -67,17 +68,21 @@ body {
 #creation-step1-div-id {
   grid-area: center;
   min-width: 0;
+  min-height: 0;
   display: grid;
   grid-template-rows: 1fr 5fr;
   grid-template-areas:
     "top"
     "bottom";
-  background-color: #2149a0;
+  background-color: #808a80;
 }
 #collection-name-div-id {
   grid-area: top;
   display: grid;
   min-width: 0;
+  min-height: 0;
+  padding-left: 8px;
+  padding-top: 8px;
   grid-template-rows: 2fr 6fr;
   grid-template-areas:
     "nameLabel"
@@ -104,13 +109,14 @@ body {
 }
 #collection-profile-image-div-id {
   grid-area: bottom;
+  min-width: 0;
   min-height: 0;
   display: grid;
   grid-template-rows: 1fr 14fr;
   grid-template-areas:
     "button"
     "profileImage";
-  background-color: #941894;
+  background-color: #808a80;
 }
 #profile-image-select-button-div-id {
   grid-area: button;
@@ -120,20 +126,32 @@ body {
   justify-content: center;
 }
 #profile-image-select-button-id {
+  margin-top: 5px;
   height: 100%;
-  font-size: 150%;
+  font-size: 3vmin;
 }
 #profile-image-display-div-id {
   grid-area: profileImage;
+  min-height: 0;
+  min-width: 0;
 }
 #profile-image-display-id {
-  width: 100%;
+  height: 99999px;
+  object-fit: contain;
+  max-height: 100%;
+  max-width: 100%;
+  display: block;
+  /* margin: auto auto; */
+  margin-left: auto;
+  margin-right: auto;
+  object-position: top;
 }
 
 #bottom-div-id {
   grid-column-start: bottom-area1;
   grid-column-end: bottom-area4;
   min-width: 0;
+  min-height: 0;
   display: grid;
   grid-template-columns: 1fr 2fr 2fr 10fr;
   grid-template-areas: " . prev-button next-button . ";
