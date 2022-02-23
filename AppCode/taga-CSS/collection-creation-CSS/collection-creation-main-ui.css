@@ -169,7 +169,7 @@ body {
   min-width: 0;
   min-height: 0;
   display: grid;
-  grid-template-rows: 1fr 1fr 11fr 1fr;
+  grid-template-rows: 2fr 2fr 22fr 0.5fr;
   grid-template-areas:
     " . "
     " chooseButtons "
@@ -180,7 +180,6 @@ body {
 #step2-gallerychoose-buttons-div-id {
   grid-area: chooseButtons;
   margin: 5px;
-  background-color: #941894;
   display: flex;
   align-items: flex-end;
   justify-content: space-evenly;
@@ -188,20 +187,141 @@ body {
 #gallery-images-search-button-id {
   font-weight: bold;
   font-size: 3vmin;
+  padding: 4px;
 }
 #gallery-save-changes-button-id {
   font-weight: bold;
   font-size: 3vmin;
+  padding: 4px;
 }
 #gallery-label-id {
   font-weight: bold;
   font-size: 3.5vmin;
 }
-#step2-gallerychoose-div-id {
+#step2-gallerygrid-div-id {
   grid-area: galleryDisplay;
 
-  background-color: aqua;
+  min-width: 0;
+  min-height: 0; /*  essential for the auto height be disabled and stop it expanding */
+  height: 100%;
+  padding: 4px;
+
+  overflow: hidden;
+  position: relative;
 }
+#collections-images-gallery-grid-images-div-id {
+  grid-area: collections-images-gallery-grid-images-div-id;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+.collection-images-gallery-grid-wrapper-class {
+  overflow: hidden;
+  overflow-y: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 95%; /*calc(100% - 5.5vh); /* xxx XXX  */
+}
+.collection-images-gallery-grid-class {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 5px;
+}
+.collection-images-gallery-grid-item-class {
+  /*
+    --- (5px * 3) - The indent to the right of one block is 5 pixels, since there are 4 elements in a row, there are only three indents
+    --- + 10px - The parent's padding on the right and left is 5 pixels, in total they give 10
+    For example, if we want 3 elements in one row:
+    --- max-width: calc((100% - ((5px * 2) + 10px)) / 3);
+    For example, if we want 5 elements in one row:
+    --- max-width: calc((100% - ((5px * 4) + 10px)) / 5);
+  */
+  width: 100%;
+  max-width: calc((100% - ((5px * 3) + 10px)) / 4);
+  margin-bottom: 5px;
+}
+@media screen and (max-width: 1500px) {
+  .collection-images-gallery-grid-item-class {
+    max-width: calc((100% - ((5px * 2) + 10px)) / 3);
+  }
+}
+@media screen and (max-width: 1200px) {
+  .collection-images-gallery-grid-item-class {
+    max-width: calc((100% - ((5px) + 10px)) / 2);
+  }
+}
+@media screen and (max-width: 900px) {
+  .collection-images-gallery-grid-item-class {
+    max-width: calc((100% - ((5px) * 0 + 10px)) / 1);
+  }
+}
+/* TOGGLE (START) SWITCH FOR THE MEMES IN TAGGING */
+.memeswitch {
+  /* position: relative; */
+  display: inline-block;
+  width: 60px;
+  height: 5%;
+  min-height: 20px;
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  /* height: 22px; */
+}
+.memeswitch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ad2021;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 75%;
+  width: 26px;
+  left: 4px;
+  bottom: 0.2em;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+input:checked + .slider {
+  background-color: #1884ff;
+}
+input:focus + .slider {
+  box-shadow: 0 0 1px #1884ff;
+}
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+/* TOGGLE (END) SWITCH FOR THE MEMES IN TAGGING */
+.collection-images-gallery-grid-img-class {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  cursor: pointer;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
 #step2-name-profileimage-div-id {
   grid-area: right;
   min-width: 0;

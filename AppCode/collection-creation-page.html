@@ -57,11 +57,48 @@
         <div id="creation-step2-div-id">
             <div id="step2-gallery-choose-div-id">
                 <div id="step2-gallerychoose-buttons-div-id">
-                    <button type="button" class="fun-button-blue" id="gallery-images-search-button-id">SEARCH IMAGES</button>
+                    <button type="button" class="fun-button-blue" id="gallery-images-search-button-id">ADD IMAGES</button>
                     <button type="button" class="fun-button-blue" id="gallery-save-changes-button-id">SAVE CHANGES</button>
                     <label id="gallery-label-id">(OPTIONAL)</label>
                 </div>
-                <div id="step2-gallerychoose-div-id">
+                <div id="step2-gallerygrid-div-id">
+
+                    <!-- taken from the collection page gallery display -->
+                    <div class="collection-images-gallery-grid-wrapper-class">
+                        <div class="collection-images-gallery-grid-class" id="collections-images-gallery-grid-images-div-id">
+                            <div class="collection-images-gallery-masonry-grid-sizer"></div>
+                                    
+                            <div class="collection-images-gallery-grid-item-class">
+                                <label class="memeswitch" title="deselect / keep">
+                                    <input id="galleryimage-toggle-id-paris.jpg" type="checkbox" checked="true">
+                                    <span class="slider"></span>
+                                </label>
+                                <img src="../images/man-kzin.jpg" id="collection-image-annotation-memes-grid-img-id-paris.jpg" class="collection-images-gallery-grid-img-class"/>
+                            </div>
+                            <div class="collection-images-gallery-grid-item-class">
+                                <label class="memeswitch" title="deselect / keep">
+                                    <input id="galleryimage-toggle-id-paris.jpg" type="checkbox" checked="true">
+                                    <span class="slider"></span>
+                                </label>
+                                <img src="../images/denver2.jpg" id="collection-image-annotation-memes-grid-img-id-paris.jpg" class="collection-images-gallery-grid-img-class"/>
+                            </div>
+                            <div class="collection-images-gallery-grid-item-class">
+                                <label class="memeswitch" title="deselect / keep">
+                                    <input id="galleryimage-toggle-id-paris.jpg" type="checkbox" checked="true">
+                                    <span class="slider"></span>
+                                </label>
+                                <img src="../images/parrot.jpg" id="collection-image-annotation-memes-grid-img-id-paris.jpg" class="collection-images-gallery-grid-img-class"/>
+                            </div>
+                            <div class="collection-images-gallery-grid-item-class">
+                                <label class="memeswitch" title="deselect / keep">
+                                    <input id="galleryimage-toggle-id-paris.jpg" type="checkbox" checked="true">
+                                    <span class="slider"></span>
+                                </label>
+                                <img src="../images/snoopy.jpg" id="collection-image-annotation-memes-grid-img-id-paris.jpg" class="collection-images-gallery-grid-img-class"/>
+                            </div>
+                                
+                        </div>
+                    </div>
 
                 </div>
             </div>
@@ -126,6 +163,24 @@
 
     nav_btn2.classList.remove('nav-bar-off')
     nav_btn2.classList.add('nav-bar-on')
+
+
+
+    // for the image layout in panels and their arrangements
+    const MASONRY = require('masonry-layout') // installed via npm
+    Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+        var grid_gallery = document.querySelector(".collection-images-gallery-grid-class");
+        var msnry = new MASONRY(grid_gallery, {
+            columnWidth: '.collection-images-gallery-masonry-grid-sizer',
+            itemSelector: '.collection-images-gallery-grid-item-class',
+            percentPosition: true,
+            gutter: 5,
+            transitionDuration: 0
+        });
+    });
+
+
+
 
 </script>
 
