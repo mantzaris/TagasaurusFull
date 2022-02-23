@@ -48,14 +48,24 @@
                     <button type="button" class="fun-button-blue" id="profile-image-select-button-id">(REQUIRED) CHOOSE PROFILE IMAGE</button>
                 </div>
                 <div id="profile-image-display-div-id">
-                    <img id="profile-image-display-id" src="../images/dino.jpeg" title="candidate profile image" alt="collection-profile-image"/>
+                    <img id="profile-image-display-id" src="../images/denver2.jpg" title="candidate profile image" alt="collection-profile-image"/>
                 </div>
             </div>
             
         </div>
         <!-- Creation Page 2 -->
         <div id="creation-step2-div-id">
-            gallery image set
+            <div id="step2-gallery-choose-div-id">
+                gallery image set
+            </div>
+            <div id="step2-name-profileimage-div-id">
+                <div id="step2-name-div-id">
+                    1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20
+                </div>
+                <div id="step2-profileimage-div-id">
+                    <img id="step2-profile-image-display-id" src="../images/denver2.jpg" title="candidate profile image" alt="collection-profile-image"/>
+                </div>
+            </div>            
         </div>
         <!-- Creation Page 3 -->
         <div id="creation-step3-div-id">
@@ -93,11 +103,11 @@
     step5_id = document.getElementById("creation-step5-div-id")
     step5_id.style.display = "none"
 
-    step1_id.style.display = "grid"
+    step2_id.style.display = "grid"
 
 
     nav_btn1 = document.getElementById("navbar-button1-id")
-    nav_btn1.classList.add('nav-bar-on')
+    nav_btn1.classList.add('nav-bar-off')
     nav_btn2 = document.getElementById("navbar-button2-id")
     nav_btn2.classList.add('nav-bar-off')
     nav_btn3 = document.getElementById("navbar-button3-id")
@@ -107,6 +117,8 @@
     nav_btn5 = document.getElementById("navbar-button5-id")
     nav_btn5.classList.add('nav-bar-off')
 
+    nav_btn2.classList.remove('nav-bar-off')
+    nav_btn2.classList.add('nav-bar-on')
 
 </script>
 

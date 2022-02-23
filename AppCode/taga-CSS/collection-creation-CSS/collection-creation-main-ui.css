@@ -19,6 +19,7 @@ body {
     "bottom-area1    bottom-area2   botton-area3   bottom-area4";
 }
 
+/* NAVBAR START */
 #navbar-div-id {
   grid-column-start: navbar-area1;
   grid-column-end: navbar-area4;
@@ -54,6 +55,7 @@ body {
   font-size: 3.5vmin;
   pointer-events: none;
 }
+/* NAVBAR END */
 
 #center-div-id {
   grid-column-start: center-area1;
@@ -65,6 +67,8 @@ body {
   grid-template-areas: "center";
   background-color: #941894;
 }
+
+/* STEP1 START */
 #creation-step1-div-id {
   grid-area: center;
   min-width: 0;
@@ -146,7 +150,67 @@ body {
   margin-right: auto;
   object-position: top;
 }
+/* STEP1 END */
 
+/* STEP2 START */
+#creation-step2-div-id {
+  grid-area: center;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 11fr 7fr;
+  grid-template-areas: "left  right";
+  background-color: #808a80;
+}
+#step2-gallery-choose-div-id {
+  grid-area: left;
+  min-width: 0;
+  min-height: 0;
+}
+#step2-name-profileimage-div-id {
+  grid-area: right;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 1fr 2fr 12fr 1fr;
+  grid-template-areas:
+    " . "
+    " name "
+    " profileimage "
+    " . ";
+  margin: 5px;
+}
+#step2-name-div-id {
+  grid-area: name;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  /* justify-content: center; */
+  overflow-x: auto;
+  text-indent: 1vmin;
+  white-space: nowrap;
+  font-weight: bold;
+  font-size: 4vmin;
+}
+#step2-profileimage-div-id {
+  grid-area: profileimage;
+  min-height: 0;
+  min-width: 0;
+}
+#step2-profile-image-display-id {
+  height: 99999px;
+  object-fit: contain;
+  max-height: 100%;
+  max-width: 100%;
+  display: block;
+  margin: auto auto;
+  object-position: top;
+}
+/* STEP2 END */
+
+/* BOTTOM START */
 #bottom-div-id {
   grid-column-start: bottom-area1;
   grid-column-end: bottom-area4;
@@ -168,3 +232,4 @@ body {
   font-size: 3vmin;
   margin: 3px;
 }
+/* BOTTOM END */
