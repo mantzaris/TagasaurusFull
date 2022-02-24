@@ -120,10 +120,29 @@
                 </div>
             </div>            
         </div>
-        <!-- Creation Page 3 -->
+        
+
+		<!-- Creation Page 3 -->
         <div id="creation-step3-div-id">
-            description
+            <div id="step3-description-div-id">
+				<div id="step3-description-label-div-id">
+					DESCRIPTION (OPTIONAL)
+				</div>
+				<div id="step3-description-textarea-div-id">
+					<textarea id="step3-description-textarea-id" placeholder="enter description..."></textarea>
+				</div>
+			</div>
+			<div id="step3-name-profileimage-div-id">
+                <div id="step3-name-div-id">
+                    1-2-3-4-45-53465-645-345346-364-452624-66-363-26-7-3-72-62
+                </div>
+                <div id="step3-profileimage-div-id">
+                    <img id="step3-profile-image-display-id" src="../images/man-kzin.jpg" title="candidate profile image" alt="collection-profile-image"/>
+                </div>
+            </div>
         </div>
+
+
         <!-- Creation Page 4 -->
         <div id="creation-step4-div-id">
             emotion selection
@@ -398,7 +417,7 @@
     step5_id = document.getElementById("creation-step5-div-id")
     step5_id.style.display = "none"
 
-    step2_id.style.display = "grid"
+    step3_id.style.display = "grid"
 
 
     nav_btn1 = document.getElementById("navbar-button1-id")
@@ -412,8 +431,8 @@
     nav_btn5 = document.getElementById("navbar-button5-id")
     nav_btn5.classList.add('nav-bar-off')
 
-    nav_btn2.classList.remove('nav-bar-off')
-    nav_btn2.classList.add('nav-bar-on')
+    nav_btn3.classList.remove('nav-bar-off')
+    nav_btn3.classList.add('nav-bar-on')
 
 
     // for the image layout in panels and their arrangements
