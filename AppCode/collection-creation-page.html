@@ -19,6 +19,9 @@
     <!-- (STEP1): The style sheet for style sheet for having clicked on individual images -->
 	<link rel="stylesheet" href="./taga-CSS/collections-CSS/collections-search-profile-image-modal.css">
 
+    <!-- The style sheet for style sheet for having clicked on individual images -->
+	<link rel="stylesheet" href="./taga-CSS/collections-CSS/collections-search-modal.css">
+
 
     <!-- something to do with security -->
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
@@ -249,7 +252,132 @@
 	</div>
 </div>
 <!-- MODAL COLLECTION PROFILE IMAGE END -->
-<!-- STEP1 END -->
+<!-- STEP1 MODAL END -->
+
+
+<!-- STEP2 MODAL START -->
+<!-- MODAL COLLECTION SEARCH IMAGES START -->
+<div id="search-modal-click-top-id" class="modal-top-class">
+	<!-- MEME MODAL CLOSE -->
+	<img
+			class="modal-close-button-class" id="modal-search-close-exit-view-button-id" onmouseover="this.src='taga-ui-icons/CloseRed.png';" onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close"
+	/>
+	<!-- Modal content container -->
+	<div class="modal-content-container">
+		<div id="modal-search-top-grid-div-id">
+			
+			<!-- search button -->
+			<div id="modal-search-main-button-container-div-id">
+				<button type="button" class="fun-button-blue" id="modal-search-main-button-id">SEARCH BUTTON</button>
+				<button type="button" class="fun-button-red" id="modal-search-main-reset-button-id">RESET FIELDS</button>
+			</div>
+			
+			<!-- image tag entry -->
+			<div id="modal-search-tag-entry-container-div-id">
+				<span id="modal-search-tag-label-id">
+					Tag list:
+				</span>
+				<div id="modal-search-tag-textarea-entry-div-id">
+					<textarea
+							id="modal-search-tag-textarea-entry-id" placeholder="enter image #tags to search for" name="search-modal-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')"
+					></textarea>
+				</div>
+			</div>
+			
+			<!-- search meme tag entry start -->
+			<div id="modal-search-meme-tag-entry-top-div-id">
+				<span id="modal-search-meme-tag-label-id">
+					Meme Tag list:
+				</span>
+				<div id="modal-search-meme-tag-textarea-entry-div-id">
+					<textarea
+							id="modal-search-meme-tag-textarea-entry-id" placeholder="enter meme #tags connected to image search" name="search-modal-meme-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')"
+					></textarea>
+				</div>
+			</div>
+			<!-- search meme tag entry start -->
+			
+			<!-- add emotion/value entry -->
+			<div id="modal-search-emotion-entry-top-div-id">
+				
+				<!-- <div id="grid-emotion-area-1-id"></div> -->
+				<button type="button" class="fun-button-blue" id="modal-search-emotion-entry-button-id">INCLUDE EMOTION</button>
+				<!-- </div> -->
+				
+				<!-- <div id="grid-emotion-area-2-id"> -->
+				<div id="modal-search-emotion-label-and-value-entry-container-div-id">
+					<textarea
+							list="emotion-recommend" id="modal-search-emotion-label-value-textarea-entry-id" placeholder="emotion label" name="search-modal-emotion-tag-textarea" oninput="this.value = this.value.replace(/[ \n]/g,'')"
+					></textarea>
+					<input id="modal-search-emotion-value-range-entry-id" type="range" min="0" max="100" value="0">
+				</div>
+				<!-- </div> -->
+				
+				<!-- <div id="grid-emotion-area-3-id"> -->
+				<div id="modal-search-emotion-label-value-display-container-div-id">
+					
+					<!-- <span id="modal-search-emotion-label-value-span-id-EMOTIONKEY" style="white-space:nowrap">
+						<img class="modal-search-emotion-remove-button-class" id="modal-search-emotion-remove-button-id-EMOTIONKEY" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+							onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+						(emotion1,10)
+					</span>  -->
+				
+				</div>
+				<!-- </div> -->
+			</div>
+			
+			<!-- IMAGE SEARCH RESULTS START -->
+			<div id="modal-search-images-results-display-id">
+				<div id="modal-search-images-results-button-div-id">
+					<button type="button" class="fun-button-blue" id="modal-search-images-results-select-images-order-button-id">Select Toggled Images</button>
+				</div>
+				<!-- for the image annotation matches -->
+				<div id="modal-search-images-results-grid-div-area-id">
+					
+					<!-- <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-Taga.png">
+						<label class="add-memes-memeswitch" title="deselect / include">
+							<input id="add-memes-meme-toggle-id-Taga.png" type="checkbox">
+							<span class="add-memes-slider"></span>
+						</label>
+						<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-Taga.png" src="images/water.jpg" title="view" alt="memes"/>
+					</div>
+					<div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-Taga.png">
+						<label class="add-memes-memeswitch" title="deselect / include">
+							<input id="add-memes-meme-toggle-id-Taga.png" type="checkbox">
+							<span class="add-memes-slider"></span>
+						</label>
+						<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-Taga.png" src="images/paris.jpg" title="view" alt="memes"/>
+					</div> -->
+
+				</div>
+				<!-- for the meme images matches -->
+				<div id="modal-search-meme-images-results-grid-div-area-id">
+					
+					<!-- <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-Taga.png">
+						<label class="add-memes-memeswitch" title="deselect / include">
+							<input id="add-memes-meme-toggle-id-Taga.png" type="checkbox">
+							<span class="add-memes-slider"></span>
+						</label>
+						<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-Taga.png" src="images/water.jpg" title="view" alt="memes"/>
+					</div>
+					<div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-Taga.png">
+						<label class="add-memes-memeswitch" title="deselect / include">
+							<input id="add-memes-meme-toggle-id-Taga.png" type="checkbox">
+							<span class="add-memes-slider"></span>
+						</label>
+						<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-Taga.png" src="images/planet.jpg" title="view" alt="memes"/>
+					</div>	-->
+
+				</div>
+			</div>
+			<!-- IMAGE SEARCH RESULTS END -->
+		
+		</div>
+	</div>
+</div>
+<!-- MODAL COLLECTION SEARCH IMAGES END -->
+<!-- STEP2 MODAL END -->
+
 
 
 <!-- MODALS END -->
@@ -270,7 +398,7 @@
     step5_id = document.getElementById("creation-step5-div-id")
     step5_id.style.display = "none"
 
-    step1_id.style.display = "grid"
+    step2_id.style.display = "grid"
 
 
     nav_btn1 = document.getElementById("navbar-button1-id")
@@ -286,7 +414,6 @@
 
     nav_btn2.classList.remove('nav-bar-off')
     nav_btn2.classList.add('nav-bar-on')
-
 
 
     // for the image layout in panels and their arrangements
@@ -320,6 +447,22 @@
         }
     })
 
+    document.getElementById("gallery-images-search-button-id").addEventListener('click', function(){
+        var modal_gallery_img_add = document.getElementById("search-modal-click-top-id");
+        modal_gallery_img_add.style.display = "block";
+        // Get the button that opens the modal
+        var modal_gallery_img_add_close_btn = document.getElementById("modal-search-close-exit-view-button-id");
+        // When the user clicks on the button, close the modal
+        modal_gallery_img_add_close_btn.onclick = function () {
+            modal_gallery_img_add.style.display = "none";
+        }
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modal_gallery_img_add) {
+                modal_gallery_img_add.style.display = "none";
+            }
+        }
+    })
 
 </script>
 
