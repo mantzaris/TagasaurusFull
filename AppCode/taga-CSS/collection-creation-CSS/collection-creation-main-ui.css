@@ -169,13 +169,20 @@ body {
   min-width: 0;
   min-height: 0;
   display: grid;
-  grid-template-rows: 2fr 2fr 22fr 0.5fr;
+  grid-template-rows: 2fr 2fr 22fr;
   grid-template-areas:
-    " . "
+    " galleryLabel "
     " chooseButtons "
-    " galleryDisplay "
-    " . ";
+    " galleryDisplay ";
   margin: 5px;
+}
+#step2-gallerychoose-label-div-id {
+  grid-area: galleryLabel;
+  font-weight: bold;
+  font-size: 3.5vmin;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 }
 #step2-gallerychoose-buttons-div-id {
   grid-area: chooseButtons;
@@ -193,10 +200,6 @@ body {
   font-weight: bold;
   font-size: 3vmin;
   padding: 4px;
-}
-#gallery-label-id {
-  font-weight: bold;
-  font-size: 3.5vmin;
 }
 #step2-gallerygrid-div-id {
   grid-area: galleryDisplay;
