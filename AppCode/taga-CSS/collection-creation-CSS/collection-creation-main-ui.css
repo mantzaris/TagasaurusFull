@@ -645,6 +645,80 @@ input:checked + .slider:before {
 }
 /* STEP4 END */
 
+/* STEP5 START */
+#creation-step5-div-id {
+  grid-area: center;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 11fr 7fr;
+  grid-template-areas: "left  right";
+  background-color: #808a80;
+}
+#step5-meme-div-id {
+  grid-area: left;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 2fr 22fr 1fr;
+  grid-template-areas:
+    " memeStepLabel "
+    " memeStepGallery "
+    " . ";
+  margin: 10px;
+}
+#step5-meme-label-div-id {
+  grid-area: memeStepLabel;
+  font-weight: bold;
+  font-size: 3.5vmin;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+#step5-name-profileimage-div-id {
+  grid-area: right;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 1fr 2fr 12fr 1fr;
+  grid-template-areas:
+    " . "
+    " name "
+    " profileimage "
+    " . ";
+  margin: 5px;
+}
+#step5-name-div-id {
+  grid-area: name;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  /* justify-content: center; */
+  overflow-x: auto;
+  text-indent: 1vmin;
+  white-space: nowrap;
+  font-weight: bold;
+  font-size: 4vmin;
+}
+#step5-profileimage-div-id {
+  grid-area: profileimage;
+  min-height: 0;
+  min-width: 0;
+}
+#step5-profile-image-display-id {
+  height: 99999px;
+  object-fit: contain;
+  max-height: 100%;
+  max-width: 100%;
+  display: block;
+  margin: auto auto;
+  object-position: top;
+}
+/* STEP5 END */
+
 /* BOTTOM START */
 #bottom-div-id {
   grid-column-start: bottom-area1;
