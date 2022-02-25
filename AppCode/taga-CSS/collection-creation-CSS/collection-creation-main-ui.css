@@ -463,9 +463,10 @@ input:checked + .slider:before {
   min-width: 0;
   min-height: 0;
   display: grid;
-  grid-template-rows: 2fr 22fr;
+  grid-template-rows: 2fr 22fr 1fr;
   grid-template-areas:
     " emotionLabel "
+    " emotionEntry "
     " . ";
   margin: 10px;
 }
@@ -475,6 +476,131 @@ input:checked + .slider:before {
   font-size: 3.5vmin;
   display: flex;
   align-items: flex-end;
+  justify-content: center;
+}
+#collection-image-annotation-emotions-div-id {
+  grid-area: emotionEntry;
+  min-height: 0; /*  essential for the auto height be disabled and stop it expanding */
+  min-width: 0;
+  height: 100%;
+  padding: 4px;
+  display: grid;
+  grid-template-rows: 11fr 2fr;
+  box-sizing: border-box;
+  grid-template-areas:
+    "collection-image-annotation-emotions-labels-show-div-id"
+    "collection-image-annotation-emotions-new-entry-div-id";
+}
+#collection-image-annotation-emotions-labels-show-div-id {
+  grid-area: collection-image-annotation-emotions-labels-show-div-id;
+  overflow-y: auto;
+  /* min-height: 0;  essential for the auto height be disabled and stop it expanding */
+  /* height: 100%; */
+}
+.emotion-list-class {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 10px;
+}
+.emotion-list-class div {
+  display: flex;
+  align-items: center;
+}
+.emotion-delete-icon-class {
+  width: 1.5em;
+  height: 1.5em;
+  float: left;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+  cursor: pointer;
+}
+.emotion-label-view-class {
+  /* font-size: 2.75vmin; */
+  word-break: break-all;
+  font-size: 1.8rem;
+}
+.emotion-range-slider-class {
+  max-width: 40%;
+}
+
+#collection-image-annotation-emotions-new-entry-div-id {
+  grid-area: collection-image-annotation-emotions-new-entry-div-id;
+  /* border-top: 3px solid rgb(68, 68, 68); */
+  height: 100%;
+  display: grid;
+  grid-template-rows: 6fr 4fr;
+  grid-template-columns: 1fr 1fr;
+  box-sizing: border-box;
+  grid-template-areas:
+    "collection-image-annotation-emotions-new-entry-emotion-textlabel-div-id   collection-image-annotation-emotions-new-entry-emotion-value-range-div-id"
+    "collection-image-annotation-emotions-new-entry-emotion-button-div-id      collection-image-annotation-emotions-save-button-div-id";
+}
+#collection-image-annotation-emotions-new-entry-emotion-textlabel-div-id {
+  grid-area: collection-image-annotation-emotions-new-entry-emotion-textlabel-div-id;
+  width: 100%;
+  margin-top: 5px;
+}
+#collection-image-annotation-emotions-new-entry-emotion-textarea-id {
+  height: 3vmin;
+  overflow: hidden;
+  margin-top: 0.3rem;
+  font-size: 3vmin;
+  border-radius: 2px;
+  white-space: nowrap;
+  display: inline-block;
+  resize: none;
+  width: 100%;
+  border-width: 3px;
+  border-color: black;
+}
+#collection-image-annotation-emotions-new-entry-emotion-button-div-id {
+  grid-area: collection-image-annotation-emotions-new-entry-emotion-button-div-id;
+  white-space: nowrap;
+  height: 100%;
+  text-align: center;
+}
+#collection-image-annotation-emotions-new-entry-add-emotion-button-id {
+  font-size: 2.4vmin;
+  height: 80%;
+  width: 90%;
+}
+#collection-image-annotation-emotions-save-button-div-id {
+  grid-area: collection-image-annotation-emotions-save-button-div-id;
+  white-space: nowrap;
+  height: 100%;
+  text-align: center;
+}
+#collection-image-annotation-emotions-save-emotion-button-id {
+  font-size: 2.4vmin;
+  height: 80%;
+  width: 90%;
+}
+#collection-image-annotation-emotions-new-entry-emotion-value-range-div-id {
+  grid-area: collection-image-annotation-emotions-new-entry-emotion-value-range-div-id;
+  width: 100%;
+  margin-left: 5%;
+  margin-top: 1vmin;
+}
+#collection-image-annotation-emotions-new-entry-emotion-value-label-min-id {
+  box-sizing: border-box;
+  padding-left: 1%;
+  margin-left: 5px;
+  float: left;
+  font-weight: bold;
+  font-size: 3.5vmin;
+}
+#collection-image-annotation-emotions-new-entry-emotion-value-label-max-id {
+  box-sizing: border-box;
+  padding-right: 10%;
+  float: right;
+  font-weight: bold;
+  font-size: 3.5vmin;
+}
+#collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id {
+  display: inline-block;
+  width: 90%;
+  display: flex;
+  align-items: center;
   justify-content: center;
 }
 
