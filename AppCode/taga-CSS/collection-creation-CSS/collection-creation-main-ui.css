@@ -662,11 +662,11 @@ input:checked + .slider:before {
   min-width: 0;
   min-height: 0;
   display: grid;
-  grid-template-rows: 2fr 22fr 1fr;
+  grid-template-rows: 2fr 2fr 22fr;
   grid-template-areas:
     " memeStepLabel "
-    " memeStepGallery "
-    " . ";
+    " memeStepGalleryButtons "
+    " memeStepGallery ";
   margin: 10px;
 }
 #step5-meme-label-div-id {
@@ -676,6 +676,78 @@ input:checked + .slider:before {
   display: flex;
   align-items: flex-end;
   justify-content: center;
+}
+#step5-meme-buttons-div-id {
+  grid-area: memeStepGalleryButtons;
+  margin: 5px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-evenly;
+}
+#step5-memes-add-button-id {
+  font-weight: bold;
+  font-size: 3vmin;
+  padding: 4px;
+}
+#step5-memes-save-changes-button-id {
+  font-weight: bold;
+  font-size: 3vmin;
+  padding: 4px;
+}
+#step5-memegrid-div-id {
+  grid-area: memeStepGallery;
+
+  min-width: 0;
+  min-height: 0; /*  essential for the auto height be disabled and stop it expanding */
+  height: 100%;
+  padding: 4px;
+
+  overflow: hidden;
+  position: relative;
+}
+.collection-image-annotation-meme-grid-img-class {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
+  cursor: pointer;
+}
+.collection-image-annotation-memes-grid-wrapper-class {
+  overflow: hidden;
+  overflow-y: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 90%; /*calc(100% - 5.5vh);*/
+}
+.collection-image-annotation-memes-images-grid-class {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 5px;
+}
+.collection-image-annotation-memes-grid-item-class {
+  /*
+    --- (5px * 3) - The indent to the right of one block is 5 pixels, since there are 4 elements in a row, there are only three indents
+    --- + 10px - The parent's padding on the right and left is 5 pixels, in total they give 10
+    For example, if we want 3 elements in one row:
+    --- max-width: calc((100% - ((5px * 2) + 10px)) / 3);
+    For example, if we want 5 elements in one row:
+    --- max-width: calc((100% - ((5px * 4) + 10px)) / 5);
+  */
+  width: 100%;
+  max-width: calc((100% - ((5px * 3) + 10px)) / 4);
+  margin-bottom: 5px;
+}
+@media screen and (max-width: 1200px) {
+  .collection-image-annotation-memes-grid-item-class {
+    max-width: calc((100% - ((5px * 2) + 10px)) / 3);
+  }
+}
+@media screen and (max-width: 800px) {
+  .collection-image-annotation-memes-grid-item-class {
+    max-width: calc((100% - ((5px) + 10px)) / 2);
+  }
 }
 
 #step5-name-profileimage-div-id {

@@ -22,6 +22,10 @@
     <!-- The style sheet for style sheet for having clicked on individual images -->
 	<link rel="stylesheet" href="./taga-CSS/collections-CSS/collections-search-modal.css">
 
+	<!-- The style sheet for style sheet for adding memes modal -->
+	<link rel="stylesheet" href="./taga-CSS/collections-CSS/collections-add-memes-search-modal.css">
+	
+
 
     <!-- something to do with security -->
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
@@ -205,6 +209,45 @@
 				<div id="step5-meme-label-div-id">
 					MEMES (OPTIONAL)
 				</div>
+				<div id="step5-meme-buttons-div-id">
+					<button type="button" class="fun-button-blue" id="step5-memes-add-button-id">ADD MEMES</button>
+					<button type="button" class="fun-button-blue" id="step5-memes-save-changes-button-id">SAVE CHANGES</button>
+				</div>
+			
+				<div id="step5-memegrid-div-id">
+					<div class="collection-image-annotation-memes-grid-wrapper-class">
+						<div class="collection-image-annotation-memes-images-grid-class" id="collection-image-annotation-memes-images-show-div-id">
+							<!-- gets the column size for masonry -->
+							<div class="collection-image-annotation-memes-masonry-grid-sizer"></div>
+							
+							<div class="collection-image-annotation-memes-grid-item-class">
+								<label class="memeswitch" title="deselect / keep">
+									<input id="meme-toggle-id-planet.jpg" type="checkbox" checked="true">
+									<span class="slider"></span>
+								</label>
+								<img src="../images/parrot.jpg" id="collection-image-annotation-memes-grid-img-id-planet.jpg" class="collection-image-annotation-meme-grid-img-class"/>
+							</div>
+							<div class="collection-image-annotation-memes-grid-item-class">
+								<label class="memeswitch" title="deselect / keep">
+									<input id="meme-toggle-id-planet.jpg" type="checkbox" checked="true">
+									<span class="slider"></span>
+								</label>
+								<img src="../images/man-kzin.jpg" id="collection-image-annotation-memes-grid-img-id-planet.jpg" class="collection-image-annotation-meme-grid-img-class"/>
+							</div>
+							<div class="collection-image-annotation-memes-grid-item-class">
+								<label class="memeswitch" title="deselect / keep">
+									<input id="meme-toggle-id-planet.jpg" type="checkbox" checked="true">
+									<span class="slider"></span>
+								</label>
+								<img src="../images/parrot.jpg" id="collection-image-annotation-memes-grid-img-id-planet.jpg" class="collection-image-annotation-meme-grid-img-class"/>
+							</div>
+							
+							
+						</div>
+					</div>
+				</div>
+
+
 			</div>
 
 			<div id="step5-name-profileimage-div-id">
@@ -216,6 +259,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 	<!-- END OF ANNOTATION STEPS -->
 
@@ -548,6 +592,25 @@
             }
         }
     })
+
+
+	    //masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
+    //solution from: https://stackoverflow.com/a/60949881/410975
+    Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+        var grid_gallery = document.querySelector(".collection-image-annotation-memes-images-grid-class");
+        var msnry = new MASONRY(grid_gallery, {
+            columnWidth: '.collection-image-annotation-memes-masonry-grid-sizer',
+            itemSelector: '.collection-image-annotation-memes-grid-item-class',
+            percentPosition: true,
+            gutter: 5,
+            transitionDuration: 0
+        });
+    });
+
+
+
+
+
 
 </script>
 
