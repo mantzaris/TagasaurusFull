@@ -59,7 +59,7 @@
                     <button type="button" class="fun-button-blue" id="profile-image-select-button-id">(REQUIRED) CHOOSE PROFILE IMAGE</button>
                 </div>
                 <div id="profile-image-display-div-id">
-                    <img id="profile-image-display-id" src="../images/denver2.jpg" title="candidate profile image" alt="collection-profile-image"/>
+                    <img id="profile-image-display-id" src="" title="candidate profile image" alt="collection-profile-image"/>
                 </div>
             </div>
             
@@ -674,85 +674,85 @@
 
 
     // for the image layout in panels and their arrangements
-    const MASONRY = require('masonry-layout') // installed via npm
-    Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
-        var grid_gallery = document.querySelector(".collection-images-gallery-grid-class");
-        var msnry = new MASONRY(grid_gallery, {
-            columnWidth: '.collection-images-gallery-masonry-grid-sizer',
-            itemSelector: '.collection-images-gallery-grid-item-class',
-            percentPosition: true,
-            gutter: 5,
-            transitionDuration: 0
-        });
-    });
+    //const MASONRY = require('masonry-layout') // installed via npm
+    // Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+    //     var grid_gallery = document.querySelector(".collection-images-gallery-grid-class");
+    //     var msnry = new MASONRY(grid_gallery, {
+    //         columnWidth: '.collection-images-gallery-masonry-grid-sizer',
+    //         itemSelector: '.collection-images-gallery-grid-item-class',
+    //         percentPosition: true,
+    //         gutter: 5,
+    //         transitionDuration: 0
+    //     });
+    // });
 
-    document.getElementById("profile-image-select-button-id").addEventListener("click",function(){
-        console.log('clicked button gallery profile search image')
-        var modal_profile_img_change = document.getElementById("search-profileimage-modal-click-top-id");
-        modal_profile_img_change.style.display = "block";
-        // Get the button that opens the modal
-        var meme_modal_close_btn = document.getElementById("modal-search-profileimage-close-exit-view-button-id");
-        // When the user clicks on the button, close the modal
-        meme_modal_close_btn.onclick = function () {
-            modal_profile_img_change.style.display = "none";
-        }
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function (event) {
-            if (event.target == modal_profile_img_change) {
-                modal_profile_img_change.style.display = "none";
-            }
-        }
-    })
+    // document.getElementById("profile-image-select-button-id").addEventListener("click",function(){
+    //     console.log('clicked button gallery profile search image')
+    //     var modal_profile_img_change = document.getElementById("search-profileimage-modal-click-top-id");
+    //     modal_profile_img_change.style.display = "block";
+    //     // Get the button that opens the modal
+    //     var meme_modal_close_btn = document.getElementById("modal-search-profileimage-close-exit-view-button-id");
+    //     // When the user clicks on the button, close the modal
+    //     meme_modal_close_btn.onclick = function () {
+    //         modal_profile_img_change.style.display = "none";
+    //     }
+    //     // When the user clicks anywhere outside of the modal, close it
+    //     window.onclick = function (event) {
+    //         if (event.target == modal_profile_img_change) {
+    //             modal_profile_img_change.style.display = "none";
+    //         }
+    //     }
+    // })
 
-    document.getElementById("gallery-images-search-button-id").addEventListener('click', function(){
-        var modal_gallery_img_add = document.getElementById("search-modal-click-top-id");
-        modal_gallery_img_add.style.display = "block";
-        // Get the button that opens the modal
-        var modal_gallery_img_add_close_btn = document.getElementById("modal-search-close-exit-view-button-id");
-        // When the user clicks on the button, close the modal
-        modal_gallery_img_add_close_btn.onclick = function () {
-            modal_gallery_img_add.style.display = "none";
-        }
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function (event) {
-            if (event.target == modal_gallery_img_add) {
-                modal_gallery_img_add.style.display = "none";
-            }
-        }
-    })
+    // document.getElementById("gallery-images-search-button-id").addEventListener('click', function(){
+    //     var modal_gallery_img_add = document.getElementById("search-modal-click-top-id");
+    //     modal_gallery_img_add.style.display = "block";
+    //     // Get the button that opens the modal
+    //     var modal_gallery_img_add_close_btn = document.getElementById("modal-search-close-exit-view-button-id");
+    //     // When the user clicks on the button, close the modal
+    //     modal_gallery_img_add_close_btn.onclick = function () {
+    //         modal_gallery_img_add.style.display = "none";
+    //     }
+    //     // When the user clicks anywhere outside of the modal, close it
+    //     window.onclick = function (event) {
+    //         if (event.target == modal_gallery_img_add) {
+    //             modal_gallery_img_add.style.display = "none";
+    //         }
+    //     }
+    // })
 
 
-	//masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
-    //solution from: https://stackoverflow.com/a/60949881/410975
-    Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
-        var grid_gallery = document.querySelector(".collection-image-annotation-memes-images-grid-class");
-        var msnry = new MASONRY(grid_gallery, {
-            columnWidth: '.collection-image-annotation-memes-masonry-grid-sizer',
-            itemSelector: '.collection-image-annotation-memes-grid-item-class',
-            percentPosition: true,
-            gutter: 5,
-            transitionDuration: 0
-        });
-    });
+	// //masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
+    // //solution from: https://stackoverflow.com/a/60949881/410975
+    // Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+    //     var grid_gallery = document.querySelector(".collection-image-annotation-memes-images-grid-class");
+    //     var msnry = new MASONRY(grid_gallery, {
+    //         columnWidth: '.collection-image-annotation-memes-masonry-grid-sizer',
+    //         itemSelector: '.collection-image-annotation-memes-grid-item-class',
+    //         percentPosition: true,
+    //         gutter: 5,
+    //         transitionDuration: 0
+    //     });
+    // });
 
-	document.getElementById("step5-memes-add-button-id").addEventListener('click', function(){
-		console.log('add memes!')
-        var modal_meme_img_add = document.getElementById("search-add-memes-modal-click-top-id");
-		modal_meme_img_add.style.display = "block";
-		// Get the button that opens the modal
-		var modal_meme_img_add_close_btn = document.getElementById("modal-search-add-memes-close-exit-view-button-id");
-		// When the user clicks on the button, close the modal
-		modal_meme_img_add_close_btn.onclick = function () {
-			modal_meme_img_add.style.display = "none";
-		}
-		// When the user clicks anywhere outside of the modal, close it
-		window.onclick = function (event) {
-			if (event.target == modal_meme_img_add) {
-				modal_meme_img_add.style.display = "none";
-			}
-		}
+	// document.getElementById("step5-memes-add-button-id").addEventListener('click', function(){
+	// 	console.log('add memes!')
+    //     var modal_meme_img_add = document.getElementById("search-add-memes-modal-click-top-id");
+	// 	modal_meme_img_add.style.display = "block";
+	// 	// Get the button that opens the modal
+	// 	var modal_meme_img_add_close_btn = document.getElementById("modal-search-add-memes-close-exit-view-button-id");
+	// 	// When the user clicks on the button, close the modal
+	// 	modal_meme_img_add_close_btn.onclick = function () {
+	// 		modal_meme_img_add.style.display = "none";
+	// 	}
+	// 	// When the user clicks anywhere outside of the modal, close it
+	// 	window.onclick = function (event) {
+	// 		if (event.target == modal_meme_img_add) {
+	// 			modal_meme_img_add.style.display = "none";
+	// 		}
+	// 	}
 
-    })
+    // })
 
 </script>
 

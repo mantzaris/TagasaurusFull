@@ -165,13 +165,13 @@ exports.Meme_Addition_Search_Fn = Meme_Addition_Search_Fn
 
 
 //search function for the meme additions
-async function Collection_Profile_Image_Search_Fn(collection_profile_search_obj,current_entity_obj,get_record_fn){
+async function Collection_Profile_Image_Search_Fn(collection_profile_search_obj,profile_candidates,get_record_fn){
     search_memetags_lowercase = collection_profile_search_obj["searchMemeTags"].map(function(x){return x.toLowerCase();})
     search_tags_lowercase = collection_profile_search_obj["searchTags"].map(function(x){return x.toLowerCase();})
     //empty array to store the scores of the images against the search
-    img_search_scores = Array(current_entity_obj.entityImageSet.length).fill(0)
-    for(img_ind=0; img_ind<current_entity_obj.entityImageSet.length; img_ind++){
-        gallery_image_tmp = current_entity_obj.entityImageSet[img_ind]
+    img_search_scores = Array(profile_candidates.length).fill(0)
+    for(img_ind=0; img_ind<profile_candidates.length; img_ind++){
+        gallery_image_tmp = profile_candidates[img_ind]
         gallery_image_tagging_annotation_obj_tmp = await get_record_fn(gallery_image_tmp)
         record_tmp_tags = gallery_image_tagging_annotation_obj_tmp["taggingTags"]
         record_tmp_emotions = gallery_image_tagging_annotation_obj_tmp["taggingEmotions"]

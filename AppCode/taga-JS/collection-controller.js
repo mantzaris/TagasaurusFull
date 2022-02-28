@@ -720,7 +720,7 @@ async function Collection_Profile_Image_Search_Action() {
 
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
-    img_indices_sorted = await SEARCH_MODULE.Collection_Profile_Image_Search_Fn(collection_profile_search_obj,current_entity_obj,Get_Tagging_Record_In_DB)
+    img_indices_sorted = await SEARCH_MODULE.Collection_Profile_Image_Search_Fn(collection_profile_search_obj,current_entity_obj.entityImageSet,Get_Tagging_Record_In_DB)
     
     //present new sorted ordering now!
     profile_search_display_div = document.getElementById("collections-profileimages-gallery-grid-images-div-id")
