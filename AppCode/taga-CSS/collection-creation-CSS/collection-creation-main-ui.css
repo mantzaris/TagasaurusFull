@@ -803,12 +803,12 @@ input:checked + .slider:before {
 
   background-color: #808a80;
 }
-#prev-button-id {
+#creation-back-button-id {
   grid-area: prev-button;
   font-size: 3vmin;
   margin: 3px;
 }
-#next-button-id {
+#creation-next-button-id {
   grid-area: next-button;
   font-size: 3vmin;
   margin: 3px;

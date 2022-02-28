@@ -8,22 +8,22 @@
     <title>Tagasaurus</title>
 
     <!-- The main collections UI style sheet -->
-	<link rel="stylesheet" href="./taga-CSS/collection-creation-CSS/collection-creation-main-ui.css">
+	<link rel="stylesheet" href="../AppCode/taga-CSS/collection-creation-CSS/collection-creation-main-ui.css">
 
     <!-- general styles for buttons etc -->
-	<link rel="stylesheet" href="./taga-CSS/general-styles.css">
+	<link rel="stylesheet" href="../AppCode/taga-CSS/general-styles.css">
 
 	<!-- general style for the modal pop ups -->
-	<link rel="stylesheet" href="./taga-CSS/modal-general-style.css">
+	<link rel="stylesheet" href="../AppCode/taga-CSS/modal-general-style.css">
 
     <!-- (STEP1): The style sheet for style sheet for having clicked on individual images -->
-	<link rel="stylesheet" href="./taga-CSS/collections-CSS/collections-search-profile-image-modal.css">
+	<link rel="stylesheet" href="../AppCode/taga-CSS/collections-CSS/collections-search-profile-image-modal.css">
 
     <!-- The style sheet for style sheet for having clicked on individual images -->
-	<link rel="stylesheet" href="./taga-CSS/collections-CSS/collections-search-modal.css">
+	<link rel="stylesheet" href="../AppCode/taga-CSS/collections-CSS/collections-search-modal.css">
 
 	<!-- The style sheet for style sheet for adding memes modal -->
-	<link rel="stylesheet" href="./taga-CSS/collections-CSS/collections-add-memes-search-modal.css">
+	<link rel="stylesheet" href="../AppCode/taga-CSS/collections-CSS/collections-add-memes-search-modal.css">
 	
 
 
@@ -276,8 +276,8 @@
 
 
     <div id="bottom-div-id">
-        <button class="fun-button-blue" id="prev-button-id">Back</button>
-        <button class="fun-button-blue" id="next-button-id">Next</button>
+        <button class="fun-button-blue" id="creation-back-button-id">BACK</button>
+        <button class="fun-button-blue" id="creation-next-button-id">NEXT</button>
     </div>
 
 
@@ -680,7 +680,7 @@
     step5_id = document.getElementById("creation-step5-div-id")
     step5_id.style.display = "none"
 
-    step5_id.style.display = "grid"
+    step1_id.style.display = "grid"
 
 
     nav_btn1 = document.getElementById("navbar-button1-id")
@@ -694,8 +694,8 @@
     nav_btn5 = document.getElementById("navbar-button5-id")
     nav_btn5.classList.add('nav-bar-off')
 
-    nav_btn5.classList.remove('nav-bar-off')
-    nav_btn5.classList.add('nav-bar-on')
+    nav_btn1.classList.remove('nav-bar-off')
+    nav_btn1.classList.add('nav-bar-on')
 
 
     // for the image layout in panels and their arrangements
@@ -779,10 +779,10 @@
 
     })
 
-
-
-
-
 </script>
+
+
+<script src="../AppCode/taga-JS/collection-creation/collection-creation-controller.js"></script>
+
 
 </html>
