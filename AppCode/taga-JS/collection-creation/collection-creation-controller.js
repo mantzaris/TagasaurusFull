@@ -31,7 +31,7 @@ var creation_step_num = 1 //of all the creation steps which one is the current o
 var all_image_keys; // each image key in the tagging db
 
 
-
+//MODEL DB code START
 async function Create_Collection_DB_Instance() {
     await COLLECTION_DB_MODULE.Create_Db()
 }
@@ -45,7 +45,7 @@ async function Set_All_Image_Keys_In_Tagging_DB() {
     await TAGGING_DB_MODULE.Get_All_Keys_From_DB()
     all_image_keys = await TAGGING_DB_MODULE.Read_All_Keys_From_DB()
 }
-
+//MODEL DB code END
 
 
 function Navbar_ViewHandle() {
@@ -116,7 +116,6 @@ async function Creation_Next_Btn() {
         if(COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage == ''){
             return
         }
-
     }
     //update the counter
     if(creation_step_num < 5) {
@@ -140,8 +139,6 @@ async function Creation_Next_Btn() {
 async function Initialize_Collection_Creation_Page() {
     //set up the nav bar and bottom buttons
     Navbar_ViewHandle()
-    
-
     document.getElementById("creation-back-button-id").addEventListener("click", function (event) {
         Creation_Back_Btn()
     })
@@ -155,8 +152,7 @@ async function Initialize_Collection_Creation_Page() {
     await Create_Collection_DB_Instance()
     await Create_Tagging_DB_Instance()
     await Set_All_Image_Keys_In_Tagging_DB()
-
-
+    document.getElementById("creation-back-button-id").style.display = "none"
 }
 //the key starting point for the page>>>>>>>>>>>>
 Initialize_Collection_Creation_Page()
@@ -285,7 +281,6 @@ async function Change_Profile_Image() {
     document.getElementById("modal-search-profileimage-main-button-id").onclick = function() {        
                                                                                                 Collection_Profile_Image_Search_Action()
                                                                                             }
-
     //add the event listener for the RESET BUTTON on the modal
     document.getElementById("modal-search-profileimage-main-reset-button-id").addEventListener("click", function() {
         document.getElementById("modal-search-profileimage-tag-textarea-entry-id").value = ""
