@@ -126,8 +126,7 @@ async function Creation_Next_Btn() {
     }
     //the invisible back button make visible cause now it is possible to go back from step 2
     if(creation_step_num == 2){
-        button_back = document.getElementById("creation-back-button-id")
-        button_back.style.display = "block"
+        Step2()
     }
     //at the end and notify the user that they can now complete the creation steps
     if(creation_step_num == 5){
@@ -136,7 +135,12 @@ async function Creation_Next_Btn() {
     }
     Navbar_ViewHandle()
 }
-
+function Step2() {
+    button_back = document.getElementById("creation-back-button-id")
+    button_back.style.display = "block"
+    document.getElementById("step2-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.entityName
+    document.getElementById("step2-profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage
+}
 
 
 async function Initialize_Collection_Creation_Page() {
@@ -275,7 +279,7 @@ async function Change_Profile_Image() {
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).addEventListener("click",async function() {
                 COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage = image_filename
-                document.getElementById("profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + '/' + image_filename
+                document.getElementById("profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
                 modal_profile_img_change.style.display = "none";
             })
         }
@@ -324,7 +328,7 @@ async function Collection_Profile_Image_Search_Action() {
     profile_search_display_inner_tmp = ''
     img_indices_sorted.forEach( index => {
         image_filename = all_image_keys[index]
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + '/' + image_filename
+        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             profile_search_display_inner_tmp += `
                                                 <div class="modal-image-search-profileimageresult-single-image-div-class" id="modal-image-search-profileimageresult-single-image-div-id-${image_filename}">
@@ -348,11 +352,11 @@ async function Collection_Profile_Image_Search_Action() {
     });
     //add image event listener so that a click on it makes it a choice
     all_image_keys.forEach( image_filename => {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + '/' + image_filename
+        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).addEventListener("click",async function() {
                 COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage = image_filename
-                document.getElementById("profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + '/' + image_filename
+                document.getElementById("profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
                 document.getElementById("search-profileimage-modal-click-top-id").style.display = "none";
             })
         }
