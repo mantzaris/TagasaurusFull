@@ -6,10 +6,10 @@ const FS = require('fs');
 //the folder to store the taga images (with a commented set of alternative solutions that all appear to work)
 const TAGA_IMAGE_DIRECTORY = PATH.resolve(PATH.resolve(),'images') //PATH.resolve(__dirname, '..', 'images') //PATH.join(__dirname,'..','images')  //PATH.normalize(__dirname+PATH.sep+'..') + PATH.sep + 'images'     //__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
 
-const COLLECTION_DB_MODULE = require('./myJS/entity-db-fns.js');
-const TAGGING_DB_MODULE = require('./myJS/tagging-db-fns.js');
+const COLLECTION_DB_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'entity-db-fns.js');
+const TAGGING_DB_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'tagging-db-fns.js');
 
-const SEARCH_MODULE = require('./taga-JS/utilities/search-fns.js') // the module holding all the search algorithms
+const SEARCH_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'search-fns.js') // the module holding all the search algorithms
 
 // for the image layout in panels and their arrangements
 const MASONRY = require('masonry-layout') // installed via npm
@@ -251,7 +251,7 @@ async function Change_Profile_Image() {
     document.querySelectorAll(".modal-image-search-profileimageresult-single-image-div-class").forEach(el => el.remove());
     profile_search_display_inner_tmp = ''
     all_image_keys.forEach( image_filename => {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + '/' + image_filename
+        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             profile_search_display_inner_tmp += `
                                                 <div class="modal-image-search-profileimageresult-single-image-div-class" id="modal-image-search-profileimageresult-single-image-div-id-${image_filename}">
@@ -275,7 +275,7 @@ async function Change_Profile_Image() {
     });
     //add image event listener so that a click on it makes it a choice
     all_image_keys.forEach( image_filename => {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + '/' + image_filename
+        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).addEventListener("click",async function() {
                 COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage = image_filename
