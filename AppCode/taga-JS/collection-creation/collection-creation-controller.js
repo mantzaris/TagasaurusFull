@@ -45,6 +45,9 @@ async function Set_All_Image_Keys_In_Tagging_DB() {
     await TAGGING_DB_MODULE.Get_All_Keys_From_DB()
     all_image_keys = await TAGGING_DB_MODULE.Read_All_Keys_From_DB()
 }
+async function Get_Tagging_Record_In_DB(filename) {
+    return await TAGGING_DB_MODULE.Get_Record(filename)
+}
 //MODEL DB code END
 
 
@@ -349,7 +352,7 @@ async function Collection_Profile_Image_Search_Action() {
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).addEventListener("click",async function() {
                 COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage = image_filename
-                document.getElementById("collection-profile-image-img-id").src = TAGA_IMAGE_DIRECTORY + '/' + image_filename
+                document.getElementById("profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + '/' + image_filename
                 document.getElementById("search-profileimage-modal-click-top-id").style.display = "none";
             })
         }
