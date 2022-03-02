@@ -140,6 +140,19 @@ function Step2() {
     button_back.style.display = "block"
     document.getElementById("step2-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.entityName
     document.getElementById("step2-profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage
+    //for the gallery view of the present images
+    Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+        var grid_gallery = document.querySelector(".collection-images-gallery-grid-class");
+        var msnry = new MASONRY(grid_gallery, {
+            columnWidth: '.collection-images-gallery-masonry-grid-sizer',
+            itemSelector: '.collection-images-gallery-grid-item-class',
+            percentPosition: true,
+            gutter: 5,
+            transitionDuration: 0
+        });
+    });
+    //adding images to the new gallery
+
 }
 
 
@@ -155,6 +168,10 @@ async function Initialize_Collection_Creation_Page() {
     document.getElementById("profile-image-select-button-id").addEventListener("click",function(){
         Change_Profile_Image()
     })
+    document.getElementById("gallery-images-search-button-id").addEventListener("click", function(){
+        Add_Images_To_New_Collection()
+    })
+
     //init the collection DB
     await Create_Collection_DB_Instance()
     await Create_Tagging_DB_Instance()
@@ -362,7 +379,10 @@ async function Collection_Profile_Image_Search_Action() {
         }
     })
 }
-
+//the event function for the addition of images to the gallery
+async function Add_Images_To_New_Collection() {
+    console.log("add images")
+}
 
 
 
