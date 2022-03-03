@@ -129,16 +129,24 @@ async function Creation_Next_Btn() {
     }
     //the invisible back button make visible cause now it is possible to go back from step 2
     if(creation_step_num == 2) {
-        Step2()
+        button_back = document.getElementById("creation-back-button-id")
+        button_back.style.display = "block"
+        document.getElementById("step2-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.entityName
+        document.getElementById("step2-profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage
     }
     if(creation_step_num == 3) {
         document.getElementById("step3-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.entityName
         document.getElementById("step3-profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage
     }
     if(creation_step_num == 4) {
+        //at step4 compute the previous tags results from step3
         COLLECTION_DEFAULT_EMPTY_OBJECT.entityDescription = document.getElementById("step3-description-textarea-id").value
         //now process  description text in order to have the tags
         COLLECTION_DEFAULT_EMPTY_OBJECT.taggingTags = DESCRIPTION_PROCESS_MODULE.process_description(COLLECTION_DEFAULT_EMPTY_OBJECT.entityDescription)
+        //now set the profile image and collection name before handling emotions
+        document.getElementById("step4-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.entityName
+        document.getElementById("step4-profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage
+        New_Collection_Emotions_Handle()
     }
     //at the end and notify the user that they can now complete the creation steps
     if(creation_step_num == 5){
@@ -147,12 +155,7 @@ async function Creation_Next_Btn() {
     }
     Navbar_ViewHandle()
 }
-function Step2() {
-    button_back = document.getElementById("creation-back-button-id")
-    button_back.style.display = "block"
-    document.getElementById("step2-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.entityName
-    document.getElementById("step2-profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage
-}
+
 
 
 
@@ -174,6 +177,12 @@ async function Initialize_Collection_Creation_Page() {
     document.getElementById("gallery-save-changes-button-id").addEventListener("click", function (event) {
         Save_Gallery_Changes()
     })
+    document.getElementById("collection-image-annotation-emotions-new-entry-add-emotion-button-id").addEventListener("click", function () {
+        Add_New_Emotion()
+    })
+    document.getElementById("collection-image-annotation-emotions-save-emotion-button-id").addEventListener("click", function () {
+        Save_Collection_Emotions()
+    })
 
     //init the collection DB
     await Create_Collection_DB_Instance()
@@ -184,6 +193,66 @@ async function Initialize_Collection_Creation_Page() {
 //the key starting point for the page>>>>>>>>>>>>
 Initialize_Collection_Creation_Page()
 //<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+//handle the activity for the step4 of the emotion entry and display
+function New_Collection_Emotions_Handle() {
+    emotions_collection = COLLECTION_DEFAULT_EMPTY_OBJECT["entityEmotions"]
+    emotion_HTML = ''
+    for( let key in emotions_collection ){        
+        emotion_HTML += `
+                        <div class="emotion-list-class" id="emotion-entry-div-id-${key}">
+                        <div>
+                            <img onclick="" class="emotion-delete-icon-class" id="emotion-delete-button-id-${key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';" onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" alt="emotion-${key}" title="remove"/>
+                            <span class="emotion-label-view-class" id="emotion-id-label-view-name-${key}">${key}</span>
+                        </div>
+                        <input class="emotion-range-slider-class" id="emotion-range-id-${key}" type="range" min="0" max="100" value="0">
+                        </div>
+                        `
+    }
+    emotions_show_div = document.getElementById("collection-image-annotation-emotions-labels-show-div-id")
+    emotions_show_div.innerHTML = emotion_HTML
+    //set up the delete operation per emotion AND set values of slider
+    Object.keys(emotions_collection).forEach(key_tmp => {
+        document.getElementById(`emotion-delete-button-id-${key_tmp}`).onclick = function() {
+            Delete_Emotion(`${key_tmp}`);
+        }
+        document.getElementById(`emotion-range-id-${key_tmp}`).value = COLLECTION_DEFAULT_EMPTY_OBJECT["entityEmotions"][key_tmp]
+    })
+}
+//delete an emotion from the emotion set
+async function Delete_Emotion(emotion_key){
+    element_emotion_entry_div = document.getElementById('emotion-entry-div-id-'+emotion_key);
+    element_emotion_entry_div.remove();
+    delete COLLECTION_DEFAULT_EMPTY_OBJECT["entityEmotions"][emotion_key];
+}
+//will take the current emotion values, and store it into an object to replace the current entity object's emotions
+//then update the record in the Database
+function Save_Collection_Emotions() {    
+    for( var key of Object.keys(COLLECTION_DEFAULT_EMPTY_OBJECT["entityEmotions"]) ){
+        COLLECTION_DEFAULT_EMPTY_OBJECT["entityEmotions"][key] = document.getElementById('emotion-range-id-'+key).value
+    }
+}
+//add a new emotion to the emotion set
+async function Add_New_Emotion() {
+    new_emotion_text = document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value
+    if(new_emotion_text){
+        keys_tmp = Object.keys(COLLECTION_DEFAULT_EMPTY_OBJECT["entityEmotions"])
+        boolean_included = keys_tmp.includes(new_emotion_text)
+        if(boolean_included == false){            
+            new_emotion_value = document.getElementById("collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id").value
+            COLLECTION_DEFAULT_EMPTY_OBJECT["entityEmotions"][new_emotion_text] = new_emotion_value
+            //do not save upon addition of a new emotion, the save button is necessary
+            document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value = ""
+            document.getElementById("collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id").value = "0"
+            New_Collection_Emotions_Handle()
+        } else {
+            document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value = ""
+        }
+    }
+}
+
 
 
 //to save the edits to the gallery images which is the deletions
