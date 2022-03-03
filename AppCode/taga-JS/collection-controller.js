@@ -32,7 +32,7 @@ const SEARCH_MODULE = require('./taga-JS/utilities/search-fns.js') // the module
 
 var all_image_keys; // each image key in the tagging db
 
-var current_entity_obj; //it holds the object of the entity being in current context
+var current_entity_obj; //!!! CHANGE TO COLLECTION //it holds the object of the entity being in current context
 var all_collection_keys; //holds all the keys to the entities in the DB
 var current_key_index = 0; //which key index is currently in view for the current entity
 var annotation_view_ind = 1 //which view should be shown to the user when they flip through entities
