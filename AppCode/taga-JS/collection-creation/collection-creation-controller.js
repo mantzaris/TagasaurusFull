@@ -11,6 +11,9 @@ const TAGGING_DB_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'my
 
 const SEARCH_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'search-fns.js') // the module holding all the search algorithms
 
+//to produce tags from the textual description
+const DESCRIPTION_PROCESS_MODULE = require('./myJS/description-processing.js');
+
 // for the image layout in panels and their arrangements
 const MASONRY = require('masonry-layout') // installed via npm
 
@@ -125,8 +128,17 @@ async function Creation_Next_Btn() {
         creation_step_num += 1
     }
     //the invisible back button make visible cause now it is possible to go back from step 2
-    if(creation_step_num == 2){
+    if(creation_step_num == 2) {
         Step2()
+    }
+    if(creation_step_num == 3) {
+        document.getElementById("step3-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.entityName
+        document.getElementById("step3-profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage
+    }
+    if(creation_step_num == 4) {
+        COLLECTION_DEFAULT_EMPTY_OBJECT.entityDescription = document.getElementById("step3-description-textarea-id").value
+        //now process  description text in order to have the tags
+        COLLECTION_DEFAULT_EMPTY_OBJECT.taggingTags = DESCRIPTION_PROCESS_MODULE.process_description(COLLECTION_DEFAULT_EMPTY_OBJECT.entityDescription)
     }
     //at the end and notify the user that they can now complete the creation steps
     if(creation_step_num == 5){
@@ -140,20 +152,8 @@ function Step2() {
     button_back.style.display = "block"
     document.getElementById("step2-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.entityName
     document.getElementById("step2-profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage
-    //for the gallery view of the present images
-    // Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
-    //     var grid_gallery = document.querySelector(".collection-images-gallery-grid-class");
-    //     var msnry = new MASONRY(grid_gallery, {
-    //         columnWidth: '.collection-images-gallery-masonry-grid-sizer',
-    //         itemSelector: '.collection-images-gallery-grid-item-class',
-    //         percentPosition: true,
-    //         gutter: 5,
-    //         transitionDuration: 0
-    //     });
-    // });
-    //adding images to the new gallery
-
 }
+
 
 
 async function Initialize_Collection_Creation_Page() {
