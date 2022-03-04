@@ -203,7 +203,7 @@
 						<div class="collection-image-annotation-memes-images-grid-class" id="collection-image-annotation-memes-images-show-div-id">
 							<!-- gets the column size for masonry -->
 							<div class="collection-image-annotation-memes-masonry-grid-sizer"></div>
-
+							<!-- 
 							<div class="collection-image-annotation-memes-grid-item-class">
 								<label class="memeswitch" title="deselect / keep">
 									<input id="meme-toggle-id-planet.jpg" type="checkbox" checked="true">
@@ -216,29 +216,8 @@
 									<input id="meme-toggle-id-planet.jpg" type="checkbox" checked="true">
 									<span class="slider"></span>
 								</label>
-								<img src="../images/man-kzin.jpg" id="collection-image-annotation-memes-grid-img-id-planet.jpg" class="collection-image-annotation-meme-grid-img-class"/>
-							</div>
-							<div class="collection-image-annotation-memes-grid-item-class">
-								<label class="memeswitch" title="deselect / keep">
-									<input id="meme-toggle-id-planet.jpg" type="checkbox" checked="true">
-									<span class="slider"></span>
-								</label>
 								<img src="../images/parrot.jpg" id="collection-image-annotation-memes-grid-img-id-planet.jpg" class="collection-image-annotation-meme-grid-img-class"/>
-							</div>		
-							<div class="collection-image-annotation-memes-grid-item-class">
-								<label class="memeswitch" title="deselect / keep">
-									<input id="meme-toggle-id-planet.jpg" type="checkbox" checked="true">
-									<span class="slider"></span>
-								</label>
-								<img src="../images/man-kzin.jpg" id="collection-image-annotation-memes-grid-img-id-planet.jpg" class="collection-image-annotation-meme-grid-img-class"/>
-							</div>
-							<div class="collection-image-annotation-memes-grid-item-class">
-								<label class="memeswitch" title="deselect / keep">
-									<input id="meme-toggle-id-planet.jpg" type="checkbox" checked="true">
-									<span class="slider"></span>
-								</label>
-								<img src="../images/parrot.jpg" id="collection-image-annotation-memes-grid-img-id-planet.jpg" class="collection-image-annotation-meme-grid-img-class"/>
-							</div>							
+							</div> -->
 							
 						</div>
 					</div>
@@ -248,10 +227,10 @@
 
 			<div id="step5-name-profileimage-div-id">
                 <div id="step5-name-div-id">
-                    1-2-3-4-45-53465-645-345346-364-452624-66-363-26-7-3-72-62
+
                 </div>
                 <div id="step5-profileimage-div-id">
-                    <img id="step5-profile-image-display-id" src="../images/man-kzin.jpg" title="candidate profile image" alt="collection-profile-image"/>
+                    <img id="step5-profile-image-display-id" src="" title="candidate profile image" alt="collection-profile-image"/>
                 </div>
             </div>
         </div>
@@ -656,56 +635,6 @@
 <script src="../AppCode/taga-JS/collection-creation/collection-creation-controller.js"></script>
 
 <script>
-
-
-    // for the image layout in panels and their arrangements
-    //const MASONRY = require('masonry-layout') // installed via npm
-    // Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
-    //     var grid_gallery = document.querySelector(".collection-images-gallery-grid-class");
-    //     var msnry = new MASONRY(grid_gallery, {
-    //         columnWidth: '.collection-images-gallery-masonry-grid-sizer',
-    //         itemSelector: '.collection-images-gallery-grid-item-class',
-    //         percentPosition: true,
-    //         gutter: 5,
-    //         transitionDuration: 0
-    //     });
-    // });
-
-    // document.getElementById("profile-image-select-button-id").addEventListener("click",function(){
-    //     console.log('clicked button gallery profile search image')
-    //     var modal_profile_img_change = document.getElementById("search-profileimage-modal-click-top-id");
-    //     modal_profile_img_change.style.display = "block";
-    //     // Get the button that opens the modal
-    //     var meme_modal_close_btn = document.getElementById("modal-search-profileimage-close-exit-view-button-id");
-    //     // When the user clicks on the button, close the modal
-    //     meme_modal_close_btn.onclick = function () {
-    //         modal_profile_img_change.style.display = "none";
-    //     }
-    //     // When the user clicks anywhere outside of the modal, close it
-    //     window.onclick = function (event) {
-    //         if (event.target == modal_profile_img_change) {
-    //             modal_profile_img_change.style.display = "none";
-    //         }
-    //     }
-    // })
-
-    // document.getElementById("gallery-images-search-button-id").addEventListener('click', function(){
-    //     var modal_gallery_img_add = document.getElementById("search-modal-click-top-id");
-    //     modal_gallery_img_add.style.display = "block";
-    //     // Get the button that opens the modal
-    //     var modal_gallery_img_add_close_btn = document.getElementById("modal-search-close-exit-view-button-id");
-    //     // When the user clicks on the button, close the modal
-    //     modal_gallery_img_add_close_btn.onclick = function () {
-    //         modal_gallery_img_add.style.display = "none";
-    //     }
-    //     // When the user clicks anywhere outside of the modal, close it
-    //     window.onclick = function (event) {
-    //         if (event.target == modal_gallery_img_add) {
-    //             modal_gallery_img_add.style.display = "none";
-    //         }
-    //     }
-    // })
-
 
 	// //masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
     // //solution from: https://stackoverflow.com/a/60949881/410975

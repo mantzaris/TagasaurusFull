@@ -1257,7 +1257,7 @@ async function Collection_Add_Memes_Search_Action(){
     })
     search_meme_display_div.innerHTML += search_display_inner_tmp
     //listen for the user saying that the images are selected
-    document.getElementById("modal-search-add-memes-images-results-select-images-order-button-id").addEventListener("click", async function() {
+    document.getElementById("modal-search-add-memes-images-results-select-images-order-button-id").addEventListener("click", async function() { //!!!duplicate of line 1144?
         update = false
         all_image_keys.forEach( image_filename => {
             image_path_tmp = TAGA_IMAGE_DIRECTORY + '/' + image_filename

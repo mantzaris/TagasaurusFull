@@ -152,6 +152,9 @@ async function Creation_Next_Btn() {
     if(creation_step_num == 5){
         button_back = document.getElementById("creation-next-button-id")
         button_back.innerHTML = "COMPLETE"
+        document.getElementById("step5-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.entityName
+        document.getElementById("step5-profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage
+
     }
     Navbar_ViewHandle()
 }
@@ -182,6 +185,9 @@ async function Initialize_Collection_Creation_Page() {
     })
     document.getElementById("collection-image-annotation-emotions-save-emotion-button-id").addEventListener("click", function () {
         Save_Collection_Emotions()
+    })
+    document.getElementById("step5-memes-add-button-id").addEventListener("click", function() {
+        Add_Meme_Images()
     })
 
     //init the collection DB
@@ -760,6 +766,298 @@ async function Collection_Add_Image_Search_Action() {
     search_meme_display_div.innerHTML += search_display_inner_tmp
 
 }
+
+
+//step5 add new memes
+//now when the user wants to add more images to the meme set of the collection
+collection_meme_search_obj = {
+    emotions:{},
+    meme_emotions:{},
+    searchTags:[],
+    searchMemeTags:[]
+}
+async function Add_Meme_Images() {
+    // Show the modal
+    var modal_meme_img_add = document.getElementById("search-add-memes-modal-click-top-id");
+    modal_meme_img_add.style.display = "block";
+    // Get the button that opens the modal
+    var modal_meme_img_add_close_btn = document.getElementById("modal-search-add-memes-close-exit-view-button-id");
+    // When the user clicks on the button, close the modal
+    modal_meme_img_add_close_btn.onclick = function () {
+        modal_meme_img_add.style.display = "none";
+    }
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+        if (event.target == modal_meme_img_add) {
+            modal_meme_img_add.style.display = "none";
+        }
+    }
+    //clear the search obj to make it fresh and reset the fields
+    document.getElementById("modal-search-add-memes-tag-textarea-entry-id").value = ""
+    document.getElementById("modal-search-add-memes-tag-textarea-memes-entry-id").value = ""
+    document.getElementById("modal-search-add-memes-emotion-label-value-textarea-entry-id").value = ""
+    document.getElementById("modal-search-add-memes-emotion-value-range-entry-id").value = "0"
+    document.getElementById("modal-search-add-memes-emotion-meme-label-value-textarea-entry-id").value = ""
+    document.getElementById("modal-search-add-memes-emotion-meme-value-range-entry-id").value = "0"
+    document.getElementById("modal-search-add-memes-emotion-label-value-display-container-div-id").innerHTML = ""
+    document.getElementById("modal-search-add-memes-emotion-meme-label-value-display-container-div-id").innerHTML = ""
+    collection_meme_search_obj = {
+        emotions:{},
+        meme_emotions:{},
+        searchTags:[],
+        searchMemeTags:[]
+    }
+
+    //handler for the image tag emotion labels and value entry additions and then the deletion handling, all emotions are added by default and handled 
+    document.getElementById("modal-search-add-memes-emotion-entry-button-id").onclick = function (event) {        
+        emotion_key_tmp = document.getElementById("modal-search-add-memes-emotion-label-value-textarea-entry-id").value
+        if(emotion_key_tmp != "") { 
+            emotion_value_tmp = document.getElementById("modal-search-add-memes-emotion-value-range-entry-id").value
+            collection_meme_search_obj["emotions"][emotion_key_tmp] = emotion_value_tmp //update the global profile image search object with the new key value
+            emotion_div_id = document.getElementById("modal-search-add-memes-emotion-label-value-display-container-div-id")
+            emotions_html_tmp = ""
+            Object.keys(collection_meme_search_obj["emotions"]).forEach(emotion_key => {
+                        emotions_html_tmp += `
+                                            <span id="modal-search-add-memes-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
+                                                <img class="modal-search-emotion-remove-button-class" id="modal-search-add-memes-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+                                                    onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+                                                (${emotion_key},${collection_meme_search_obj["emotions"][emotion_key]})
+                                            </span>
+                                            `
+            })
+            emotion_div_id.innerHTML = emotions_html_tmp   
+            document.getElementById("modal-search-add-memes-emotion-label-value-textarea-entry-id").value = ""
+            document.getElementById("modal-search-add-memes-emotion-value-range-entry-id").value = "0"
+            //handler for the emotion deletion from search term and view on modal
+            Object.keys(collection_meme_search_obj["emotions"]).forEach(emotion_key => {
+                document.getElementById(`modal-search-add-memes-emotion-remove-button-id-${emotion_key}`).onclick = function() {
+                    document.getElementById(`modal-search-add-memes-emotion-label-value-span-id-${emotion_key}`).remove();
+                    delete collection_meme_search_obj["emotions"][emotion_key]
+                }
+            })
+        }
+    }
+    //handler for the 'meme' tag emotion labels and value entry additions and then the deletion handling, all meme_emotions are added by default and handled 
+    document.getElementById("modal-search-add-memes-emotion-meme-entry-button-id").onclick = function (event) {        
+        emotion_key_tmp = document.getElementById("modal-search-add-memes-emotion-meme-label-value-textarea-entry-id").value
+        if(emotion_key_tmp != "") { 
+            emotion_value_tmp = document.getElementById("modal-search-add-memes-emotion-meme-value-range-entry-id").value
+            collection_meme_search_obj["meme_emotions"][emotion_key_tmp] = emotion_value_tmp //update the global profile image search object with the new key value
+            emotion_div_id = document.getElementById("modal-search-add-memes-emotion-meme-label-value-display-container-div-id")
+            emotions_html_tmp = ""
+            Object.keys(collection_meme_search_obj["meme_emotions"]).forEach(emotion_key => {
+                        emotions_html_tmp += `
+                                            <span id="modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}" style="white-space:nowrap">
+                                                <img class="modal-search-emotion-remove-button-class" id="modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+                                                    onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+                                                (${emotion_key},${collection_meme_search_obj["meme_emotions"][emotion_key]})
+                                            </span>
+                                            `
+            })
+            emotion_div_id.innerHTML = emotions_html_tmp   
+            document.getElementById("modal-search-add-memes-emotion-meme-label-value-textarea-entry-id").value = ""
+            document.getElementById("modal-search-add-memes-emotion-meme-value-range-entry-id").value = "0"
+            //handler for the emotion deletion from search term and view on modal
+            Object.keys(collection_meme_search_obj["meme_emotions"]).forEach(emotion_key => {
+                document.getElementById(`modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}`).onclick = function() {
+                    document.getElementById(`modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}`).remove();
+                    delete collection_meme_search_obj["meme_emotions"][emotion_key]
+                }
+            })
+        }
+    }
+    //display default ordering first
+    search_display_div = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
+    search_display_div.innerHTML = ""
+    search_display_inner_tmp = ''
+    all_image_keys.forEach( image_filename => {
+        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes.includes(image_filename)==false) {
+            search_display_inner_tmp += `
+                                        <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${image_filename}">
+                                            <label class="add-memes-memeswitch" title="deselect / include">
+                                                <input id="add-meme-image-toggle-id-${image_filename}" type="checkbox">
+                                                <span class="add-memes-slider"></span>
+                                            </label>
+                                            <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-image-img-id-${image_filename}" src="${image_path_tmp}" title="view" alt="memes"/>
+                                        </div>
+                                        `
+        }
+    })
+    search_display_div.innerHTML += search_display_inner_tmp
+    //memes section
+    search_meme_display_div = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
+    search_meme_display_div.innerHTML = ""
+    search_display_inner_tmp = ''
+    all_image_keys.forEach( image_filename => {
+        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes.includes(image_filename)==false) {
+            search_display_inner_tmp += `
+                                        <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${image_filename}">
+                                            <label class="add-memes-memeswitch" title="deselect / include">
+                                                <input id="add-meme-image-meme-toggle-id-${image_filename}" type="checkbox">
+                                                <span class="add-memes-slider"></span>
+                                            </label>
+                                            <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-meme-image-img-id-${image_filename}" src="${image_path_tmp}" title="view" alt="memes"/>
+                                        </div>
+                                        `
+        }
+    })
+    search_meme_display_div.innerHTML += search_display_inner_tmp
+    //add an event listener to the images to select them to be added to the gallery and the current obj and the collection DB updated
+    document.getElementById("modal-search-add-memes-images-results-select-images-order-button-id").onclick = async function() {
+        update = false
+        all_image_keys.forEach( image_filename => {
+            image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+            if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes.includes(image_filename)==false) {
+                if(document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked){
+                    COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes.push(image_filename)
+                    update = true
+                } else if(document.getElementById(`add-meme-image-meme-toggle-id-${image_filename}`).checked){
+                    COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes.push(image_filename)
+                    update = true
+                }
+            }
+        })
+        if(update == true) {
+            //clear gallery of gallery image objects
+            document.querySelectorAll(".collection-image-annotation-memes-grid-item-class").forEach(el => el.remove());
+            //place the gallery images in the html and ignore the missing images (leave the lingering links)
+            gallery_div = document.getElementById("collection-image-annotation-memes-images-show-div-id")
+            gallery_html_tmp = ''
+            image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes
+            image_set.forEach(function(image_filename) {
+                image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+                if(FS.existsSync(image_path_tmp) == true){ 
+                    gallery_html_tmp += `
+                                        <div class="collection-image-annotation-memes-grid-item-class">
+                                        <label class="memeswitch" title="deselect / keep">
+                                            <input id="meme-toggle-id-${image_filename}" type="checkbox" checked="true">
+                                            <span class="slider"></span>
+                                        </label>
+                                        <img src="${image_path_tmp}" id="collection-image-annotation-memes-grid-img-id-${image_filename}" class="collection-image-annotation-meme-grid-img-class"/>
+                                        </div>
+                                        `
+                }
+            })
+            gallery_div.innerHTML += gallery_html_tmp //gallery_div.innerHTML = gallery_html_tmp
+            //masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
+            //solution from: https://stackoverflow.com/a/60949881/410975
+            Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+                var grid_gallery = document.querySelector(".collection-image-annotation-memes-images-grid-class");
+                var msnry = new MASONRY(grid_gallery, {
+                    columnWidth: '.collection-image-annotation-memes-masonry-grid-sizer',
+                    itemSelector: '.collection-image-annotation-memes-grid-item-class',
+                    percentPosition: true,
+                    gutter: 5,
+                    transitionDuration: 0
+                });
+            });
+        }
+        modal_meme_img_add.style.display = "none";
+    }
+    //add the event listener for the RESET BUTTON on the modal
+    document.getElementById("modal-search-add-memes-reset-button-id").onclick = function() {
+        document.getElementById("modal-search-add-memes-tag-textarea-entry-id").value = ""
+        document.getElementById("modal-search-add-memes-tag-textarea-memes-entry-id").value = ""
+        document.getElementById("modal-search-add-memes-emotion-label-value-textarea-entry-id").value = ""
+        document.getElementById("modal-search-add-memes-emotion-meme-label-value-textarea-entry-id").value = ""
+        document.getElementById("modal-search-add-memes-emotion-value-range-entry-id").value = "0"
+        document.getElementById("modal-search-add-memes-emotion-meme-value-range-entry-id").value = "0"
+        document.getElementById("modal-search-add-memes-emotion-label-value-display-container-div-id").innerHTML = ""
+        document.getElementById("modal-search-add-memes-emotion-meme-label-value-display-container-div-id").innerHTML = ""
+        collection_meme_search_obj = {
+            emotions:{},
+            meme_emotions:{},
+            searchTags:[],
+            searchMemeTags:[]
+        }
+        //reset toggles to default false
+        all_image_keys.forEach( image_filename => {
+            image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+            if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes.includes(image_filename)==false) {
+                if(document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked){
+                    document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked = false
+                } 
+                if(document.getElementById(`add-meme-image-meme-toggle-id-${image_filename}`).checked){
+                    document.getElementById(`add-meme-image-meme-toggle-id-${image_filename}`).checked = false
+                }
+            }
+        })
+    }
+    //add the event listener for the SEARCH BUTTON on the modal
+    document.getElementById("modal-search-add-memes-main-button-id").onclick = function() {        
+        Collection_Add_Memes_Search_Action()
+    }
+}
+async function Collection_Add_Memes_Search_Action(){
+    //get the tags input and get rid of nuissance chars
+    search_tags_input = document.getElementById("modal-search-add-memes-tag-textarea-entry-id").value
+    split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
+    search_unique_search_terms = [...new Set(split_search_string)]
+    search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
+    collection_meme_search_obj["searchTags"] = search_unique_search_terms
+    //meme tags now    
+    search_meme_tags_input = document.getElementById("modal-search-add-memes-tag-textarea-memes-entry-id").value
+    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
+    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+    search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
+    collection_meme_search_obj["searchMemeTags"] = search_unique_meme_search_terms
+    //emotion keys-values for tags and memes should already be in: collection_meme_search_obj
+
+    //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
+    //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
+    meme_search_result_obj = await SEARCH_MODULE.Meme_Addition_Search_Fn(collection_meme_search_obj,all_image_keys,Get_Tagging_Record_In_DB)
+    img_indices_sorted = meme_search_result_obj.imgInds  
+    meme_img_indices_sorted = meme_search_result_obj.memeInds
+
+    //display the search order with the image order first and then the memes that are relevant
+    search_display_div = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
+    search_display_div.innerHTML = ""
+    search_display_inner_tmp = ''
+    img_indices_sorted.forEach( index => {
+        image_filename = all_image_keys[index]
+        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes.includes(image_filename)==false) {
+            search_display_inner_tmp += `
+                                        <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${image_filename}">
+                                            <label class="add-memes-memeswitch" title="deselect / include">
+                                                <input id="add-meme-image-toggle-id-${image_filename}" type="checkbox">
+                                                <span class="add-memes-slider"></span>
+                                            </label>
+                                            <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-image-img-id-${image_filename}" src="${image_path_tmp}" title="view" alt="memes"/>
+                                        </div>
+                                        `
+        }
+    })
+    search_display_div.innerHTML += search_display_inner_tmp
+    //memes section
+    search_meme_display_div = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
+    search_meme_display_div.innerHTML = ""
+    search_display_inner_tmp = ''
+    meme_img_indices_sorted.forEach( index => {
+        image_filename = all_image_keys[index]
+        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes.includes(image_filename)==false) {
+            search_display_inner_tmp += `
+                                        <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${image_filename}">
+                                            <label class="add-memes-memeswitch" title="deselect / include">
+                                                <input id="add-meme-image-meme-toggle-id-${image_filename}" type="checkbox">
+                                                <span class="add-memes-slider"></span>
+                                            </label>
+                                            <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-meme-image-img-id-${image_filename}" src="${image_path_tmp}" title="view" alt="memes"/>
+                                        </div>
+                                        `
+        }
+    })
+    search_meme_display_div.innerHTML += search_display_inner_tmp
+}
+
+
+
+
+
+
 
 
 
