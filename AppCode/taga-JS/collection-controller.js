@@ -233,7 +233,7 @@ function Collection_Memes_Page() {
     gallery_html = ''
     if(memes_array != "" && memes_array.length > 0){
         memes_array.forEach(meme_key => {
-            image_path_tmp = TAGA_IMAGE_DIRECTORY + '/' + meme_key
+            image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + meme_key
             if(FS.existsSync(image_path_tmp) == true){
                         gallery_html += `
                                     <div class="collection-image-annotation-memes-grid-item-class">
@@ -251,7 +251,7 @@ function Collection_Memes_Page() {
     //event listener to modal focus image upon click
     if(memes_array != "" && memes_array.length > 0){
         memes_array.forEach(function(meme_key) {
-            image_path_tmp = TAGA_IMAGE_DIRECTORY + '/' + meme_key
+            image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + meme_key
             if(FS.existsSync(image_path_tmp) == true){
                 document.getElementById(`collection-image-annotation-memes-grid-img-id-${meme_key}`).addEventListener("click", function (event) {
                     Image_Clicked_Modal(meme_key)    
@@ -277,7 +277,7 @@ async function Save_Meme_Changes(){
     current_memes = current_entity_obj.entityMemes //get the memes of the current object
     meme_switch_booleans = []
     for (var ii = 0; ii < current_memes.length; ii++) {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + '/' + current_memes[ii]
+        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + current_memes[ii]
         if(FS.existsSync(image_path_tmp) == true){
             meme_boolean_tmp = document.getElementById(`meme-toggle-id-${current_memes[ii]}`).checked
             if(meme_boolean_tmp == true){
@@ -305,7 +305,7 @@ async function Show_Collection_From_Key_Or_Current_Collection(entity_key_or_obj,
     if(reload_bool == true){
         current_entity_obj = await Get_Collection_Record_In_DB(entity_key_or_obj)
     }
-    document.getElementById("collection-profile-image-img-id").src = TAGA_IMAGE_DIRECTORY + '/' + current_entity_obj.entityImage;
+    document.getElementById("collection-profile-image-img-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + current_entity_obj.entityImage;
     document.getElementById("collection-profile-image-img-id").addEventListener("click", function (event) {
         Image_Clicked_Modal(current_entity_obj.entityImage)    
     })
@@ -331,7 +331,7 @@ function Display_Gallery_Images() {
     gallery_html_tmp = ''
     image_set = current_entity_obj.entityImageSet
     image_set.forEach(function(image_filename) {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + '/' + image_filename
+        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             gallery_html_tmp += `
                                 <div class="collection-images-gallery-grid-item-class">
@@ -359,7 +359,7 @@ function Display_Gallery_Images() {
     });
     //event listener to modal focus image upon click
     image_set.forEach(function(image_filename) {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + '/' + image_filename
+        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`collection-image-annotation-memes-grid-img-id-${image_filename}`).addEventListener("click", function (event) {
                 Image_Clicked_Modal(image_filename)    
@@ -373,7 +373,7 @@ async function Save_Gallery_Changes(){
     length_original = current_images.length
     gallery_switch_booleans = []
     for (var ii = 0; ii < current_images.length; ii++) {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + '/' + current_images[ii]
+        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + current_images[ii]
         if(FS.existsSync(image_path_tmp) == true){
             image_boolean_tmp = document.getElementById(`galleryimage-toggle-id-${current_images[ii]}`).checked
             if(image_boolean_tmp == true){
@@ -396,7 +396,7 @@ async function Check_Gallery_And_Profile_Image_Integrity(){
     //the Gallery image set for the entity
     image_set = current_entity_obj.entityImageSet
     image_set_present = image_set.map( (image_filename) => {
-                                                path_tmp = TAGA_IMAGE_DIRECTORY + '/' + image_filename
+                                                path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
                                                 if(FS.existsSync(path_tmp) == true){
                                                     return image_filename
                                                 } else {
@@ -404,7 +404,7 @@ async function Check_Gallery_And_Profile_Image_Integrity(){
                                                 }
                                                 }).filter( (e) => e != false)
     entity_profile_pic = current_entity_obj.entityImage
-    image_path_profile_pic = TAGA_IMAGE_DIRECTORY + '/' + entity_profile_pic
+    image_path_profile_pic = TAGA_IMAGE_DIRECTORY + PATH.sep + entity_profile_pic
     profile_pic_present_bool = FS.existsSync(image_path_profile_pic)
     //1-profile image is missing, and image set is empty (or none present to show)
     if(profile_pic_present_bool == false && image_set_present.length == 0) {
@@ -543,7 +543,7 @@ Initialize_Collection_Page()
 //and list the tags and emotions
 async function Image_Clicked_Modal(filename){
 
-    document.getElementById("modal-image-clicked-displayimg-id").src = TAGA_IMAGE_DIRECTORY+'/'+filename
+    document.getElementById("modal-image-clicked-displayimg-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + filename
     
     // Show the modal
     var modal_meme_click = document.getElementById("modal-image-clicked-top-id");
@@ -656,7 +656,7 @@ async function Change_Profile_Image() {
     document.querySelectorAll(".modal-image-search-profileimageresult-single-image-div-class").forEach(el => el.remove());
     profile_search_display_inner_tmp = ''
     current_entity_obj.entityImageSet.forEach( image_filename => {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + '/' + image_filename
+        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             profile_search_display_inner_tmp += `
                                                 <div class="modal-image-search-profileimageresult-single-image-div-class" id="modal-image-search-profileimageresult-single-image-div-id-${image_filename}">
@@ -680,12 +680,12 @@ async function Change_Profile_Image() {
     });
     //add image event listener so that a click on it makes it a choice
     current_entity_obj.entityImageSet.forEach( image_filename => {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + '/' + image_filename
+        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).addEventListener("click",async function() {
                 current_entity_obj.entityImage = image_filename
                 await Update_Collection_In_DB(current_entity_obj)
-                document.getElementById("collection-profile-image-img-id").src = TAGA_IMAGE_DIRECTORY + '/' + image_filename
+                document.getElementById("collection-profile-image-img-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
                 modal_profile_img_change.style.display = "none";
             })
         }
@@ -735,7 +735,7 @@ async function Collection_Profile_Image_Search_Action() {
     profile_search_display_inner_tmp = ''
     img_indices_sorted.forEach( index => {
         image_filename = current_entity_obj.entityImageSet[index]
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + '/' + image_filename
+        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             profile_search_display_inner_tmp += `
                                                 <div class="modal-image-search-profileimageresult-single-image-div-class" id="modal-image-search-profileimageresult-single-image-div-id-${image_filename}">
@@ -759,12 +759,12 @@ async function Collection_Profile_Image_Search_Action() {
     });
     //add image event listener so that a click on it makes it a choice
     current_entity_obj.entityImageSet.forEach( image_filename => {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + '/' + image_filename
+        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).addEventListener("click",async function() {
                 current_entity_obj.entityImage = image_filename
                 await Update_Collection_In_DB(current_entity_obj)
-                document.getElementById("collection-profile-image-img-id").src = TAGA_IMAGE_DIRECTORY + '/' + image_filename
+                document.getElementById("collection-profile-image-img-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
                 document.getElementById("search-profileimage-modal-click-top-id").style.display = "none";
             })
         }
@@ -841,7 +841,7 @@ async function Add_Gallery_Images() {
     search_display_div.innerHTML = ""
     search_display_inner_tmp = ''
     all_image_keys.forEach( image_filename => {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + '/' + image_filename
+        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_entity_obj.entityImageSet.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${image_filename}">
@@ -860,7 +860,7 @@ async function Add_Gallery_Images() {
     search_meme_display_div.innerHTML = ""
     search_display_inner_tmp = ''
     all_image_keys.forEach( image_filename => {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + '/' + image_filename
+        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_entity_obj.entityImageSet.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${image_filename}">

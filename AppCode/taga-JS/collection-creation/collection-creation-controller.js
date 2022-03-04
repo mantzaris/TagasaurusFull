@@ -12,10 +12,13 @@ const TAGGING_DB_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'my
 const SEARCH_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'search-fns.js') // the module holding all the search algorithms
 
 //to produce tags from the textual description
-const DESCRIPTION_PROCESS_MODULE = require('./myJS/description-processing.js');
+const DESCRIPTION_PROCESS_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'description-processing.js');
 
 // for the image layout in panels and their arrangements
 const MASONRY = require('masonry-layout') // installed via npm
+
+const CLOSE_ICON_RED = PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-ui-icons'+PATH.sep+'CloseRed.png'
+const CLOSE_ICON_BLACK = PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-ui-icons'+PATH.sep+'CloseBlack.png'
 
 //for filtering out chars in the search modals
 reg_exp_delims = /[#:,;| ]+/
@@ -221,7 +224,7 @@ function New_Collection_Emotions_Handle() {
         emotion_HTML += `
                         <div class="emotion-list-class" id="emotion-entry-div-id-${key}">
                         <div>
-                            <img onclick="" class="emotion-delete-icon-class" id="emotion-delete-button-id-${key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';" onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" alt="emotion-${key}" title="remove"/>
+                            <img onclick="" class="emotion-delete-icon-class" id="emotion-delete-button-id-${key}" onmouseover="this.src='${CLOSE_ICON_RED}'" onmouseout="this.src='${CLOSE_ICON_BLACK}'" src="${CLOSE_ICON_BLACK}" alt="emotion-${key}" title="remove"/>
                             <span class="emotion-label-view-class" id="emotion-id-label-view-name-${key}">${key}</span>
                         </div>
                         <input class="emotion-range-slider-class" id="emotion-range-id-${key}" type="range" min="0" max="100" value="0">
@@ -448,8 +451,8 @@ async function Change_Profile_Image() {
             Object.keys(collection_profile_search_obj["emotions"]).forEach(emotion_key => {
                         emotions_html_tmp += `
                                             <span id="modal-search-profileimage-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
-                                                <img class="modal-search-profileimage-emotion-remove-button-class" id="modal-search-profileimage-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
-                                                    onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+                                                <img class="modal-search-profileimage-emotion-remove-button-class" id="modal-search-profileimage-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='${CLOSE_ICON_RED}'"
+                                                onmouseout="this.src='${CLOSE_ICON_BLACK}'" src="${CLOSE_ICON_BLACK}" title="close" />
                                                 (${emotion_key},${collection_profile_search_obj["emotions"][emotion_key]})
                                             </span>
                                             `
@@ -631,8 +634,8 @@ async function Add_Images_To_New_Collection() {
             Object.keys(collection_gallery_search_obj["emotions"]).forEach(emotion_key => {
                         emotions_html_tmp += `
                                             <span id="modal-search-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
-                                                <img class="modal-search-emotion-remove-button-class" id="modal-search-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
-                                                    onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+                                                <img class="modal-search-emotion-remove-button-class" id="modal-search-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='${CLOSE_ICON_RED}'"
+                                                onmouseout="this.src='${CLOSE_ICON_BLACK}'" src="${CLOSE_ICON_BLACK}" title="close" />
                                                 (${emotion_key},${collection_gallery_search_obj["emotions"][emotion_key]})
                                             </span>
                                             `
@@ -887,8 +890,8 @@ async function Add_Meme_Images() {
             Object.keys(collection_meme_search_obj["emotions"]).forEach(emotion_key => {
                         emotions_html_tmp += `
                                             <span id="modal-search-add-memes-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
-                                                <img class="modal-search-emotion-remove-button-class" id="modal-search-add-memes-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
-                                                    onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+                                                <img class="modal-search-emotion-remove-button-class" id="modal-search-add-memes-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='${CLOSE_ICON_RED}'"
+                                                onmouseout="this.src='${CLOSE_ICON_BLACK}'" src="${CLOSE_ICON_BLACK}" title="close" />
                                                 (${emotion_key},${collection_meme_search_obj["emotions"][emotion_key]})
                                             </span>
                                             `
@@ -916,8 +919,8 @@ async function Add_Meme_Images() {
             Object.keys(collection_meme_search_obj["meme_emotions"]).forEach(emotion_key => {
                         emotions_html_tmp += `
                                             <span id="modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}" style="white-space:nowrap">
-                                                <img class="modal-search-emotion-remove-button-class" id="modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
-                                                    onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+                                                <img class="modal-search-emotion-remove-button-class" id="modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}" onmouseover="this.src='${CLOSE_ICON_RED}'"
+                                                onmouseout="this.src='${CLOSE_ICON_BLACK}'" src="${CLOSE_ICON_BLACK}" title="close" />
                                                 (${emotion_key},${collection_meme_search_obj["meme_emotions"][emotion_key]})
                                             </span>
                                             `
