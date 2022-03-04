@@ -463,6 +463,7 @@ async function Handle_Empty_DB(){
 //The missing image filtering is not done in the initial stage here like in the Tagging where all missing
 //images are removed and the annotation objects removed
 async function Initialize_Collection_Page(){
+
     desription_btn = document.getElementById("collection-image-annotation-navbar-description-button-id")
 	emotion_btn = document.getElementById("collection-image-annotation-navbar-emotion-button-id")
 	meme_btn = document.getElementById("collection-image-annotation-navbar-meme-button-id")
@@ -525,7 +526,13 @@ async function Initialize_Collection_Page(){
         await Handle_Empty_DB()
     }
 
-    await Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[0]) //set the first entity to be seen, populate entity object data on view
+    if (window.location.href.indexOf("collectionName") > -1) {
+        collection_name_param = window.location.search.split("=")[1]
+        current_key_index = all_collection_keys.indexOf(collection_name_param)
+        await Show_Collection_From_Key_Or_Current_Collection(collection_name_param)
+    } else {
+        await Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[0]) //set the first entity to be seen, populate entity object data on view
+    }
 }
 //the key starting point for the page>>>>>>>>>>>>
 Initialize_Collection_Page()

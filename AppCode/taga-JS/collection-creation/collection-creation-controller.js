@@ -123,6 +123,14 @@ async function Creation_Next_Btn() {
             return
         }
     }
+    //the next button was pressed while at the final step so we now are completed and return after storing in DB new collection
+    if(creation_step_num == 5) {
+        console.log("complete now!")
+        console.log("COLLECTION_DEFAULT_EMPTY_OBJECT="+JSON.stringify(COLLECTION_DEFAULT_EMPTY_OBJECT))
+        await COLLECTION_DB_MODULE.Insert_Record(COLLECTION_DEFAULT_EMPTY_OBJECT)
+        //window redirect
+        window.location = "collections.html" + '?' + `collectionName=${COLLECTION_DEFAULT_EMPTY_OBJECT.entityName}`
+    }
     //update the counter
     if(creation_step_num < 5) {
         creation_step_num += 1
