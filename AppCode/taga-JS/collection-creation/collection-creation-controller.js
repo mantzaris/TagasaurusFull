@@ -189,6 +189,9 @@ async function Initialize_Collection_Creation_Page() {
     document.getElementById("step5-memes-add-button-id").addEventListener("click", function() {
         Add_Meme_Images()
     })
+    document.getElementById("step5-memes-save-changes-button-id").addEventListener("click", function (event) {
+        Save_Meme_Changes()
+    })
 
     //init the collection DB
     await Create_Collection_DB_Instance()
@@ -260,6 +263,63 @@ async function Add_New_Emotion() {
 }
 
 
+//to save the edits to the memes which is the deletions
+async function Save_Meme_Changes(){
+    current_memes = COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes //get the memes of the current object
+    length_original = current_memes.length
+    gallery_switch_booleans = []
+    for (var ii = 0; ii < current_memes.length; ii++) {
+        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + current_memes[ii]
+        if(FS.existsSync(image_path_tmp) == true){
+            image_boolean_tmp = document.getElementById(`meme-toggle-id-${current_memes[ii]}`).checked
+            if(image_boolean_tmp == true){
+                gallery_switch_booleans.push(current_memes[ii])
+            }
+        } else {
+            gallery_switch_booleans.push(current_memes[ii])
+        }
+    }
+    length_new = gallery_switch_booleans.length
+    if(length_new < length_original){
+        COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes = gallery_switch_booleans        
+       //clear gallery of gallery image objects
+        document.querySelectorAll(".collection-image-annotation-memes-grid-item-class").forEach(el => el.remove());
+        //place the gallery images in the html and ignore the missing images (leave the lingering links)
+        gallery_div = document.getElementById("collections-images-gallery-grid-images-div-id")
+            //place the gallery images in the html and ignore the missing images (leave the lingering links)
+        gallery_div = document.getElementById("collection-image-annotation-memes-images-show-div-id")
+        gallery_html_tmp = ''
+        image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes
+        image_set.forEach(function(image_filename) {
+            image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+            if(FS.existsSync(image_path_tmp) == true){
+                gallery_html_tmp += `
+                                    <div class="collection-image-annotation-memes-grid-item-class">
+                                    <label class="memeswitch" title="deselect / keep">
+                                        <input id="meme-toggle-id-${image_filename}" type="checkbox" checked="true">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <img src="${image_path_tmp}" id="collection-image-annotation-memes-grid-img-id-${image_filename}" class="collection-image-annotation-meme-grid-img-class"/>
+                                    </div>
+                                    `
+            }
+        })
+        gallery_div.innerHTML += gallery_html_tmp //gallery_div.innerHTML = gallery_html_tmp
+        //masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
+        //solution from: https://stackoverflow.com/a/60949881/410975
+        Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+            var grid_gallery = document.querySelector(".collection-image-annotation-memes-images-grid-class");
+            var msnry = new MASONRY(grid_gallery, {
+                columnWidth: '.collection-image-annotation-memes-masonry-grid-sizer',
+                itemSelector: '.collection-image-annotation-memes-grid-item-class',
+                percentPosition: true,
+                gutter: 5,
+                transitionDuration: 0
+            });
+        });
+    }
+    
+}
 
 //to save the edits to the gallery images which is the deletions
 async function Save_Gallery_Changes(){ //!!
