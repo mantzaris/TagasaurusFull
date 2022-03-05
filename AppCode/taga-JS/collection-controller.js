@@ -152,11 +152,11 @@ function Collection_Emotion_Page() {
     for( let key in emotions_collection ){        
         emotion_HTML += `
                         <div class="emotion-list-class" id="emotion-entry-div-id-${key}">
-                        <div>
-                            <img onclick="" class="emotion-delete-icon-class" id="emotion-delete-button-id-${key}" onmouseover="this.src='${CLOSE_ICON_RED}'" onmouseout="this.src='${CLOSE_ICON_BLACK}'" src="${CLOSE_ICON_BLACK}" alt="emotion-${key}" title="remove"/>
-                            <span class="emotion-label-view-class" id="emotion-id-label-view-name-${key}">${key}</span>
-                        </div>
-                        <input class="emotion-range-slider-class" id="emotion-range-id-${key}" type="range" min="0" max="100" value="0">
+                            <div>
+                                <img onclick="" class="emotion-delete-icon-class" id="emotion-delete-button-id-${key}" onmouseover="this.src='${CLOSE_ICON_RED}'" onmouseout="this.src='${CLOSE_ICON_BLACK}'" src="${CLOSE_ICON_BLACK}" alt="emotion-${key}" title="remove"/>
+                                <span class="emotion-label-view-class" id="emotion-id-label-view-name-${key}">${key}</span>
+                            </div>
+                            <input class="emotion-range-slider-class" id="emotion-range-id-${key}" type="range" min="0" max="100" value="0">
                         </div>
                         `
     }
@@ -172,12 +172,8 @@ function Collection_Emotion_Page() {
 }
 //delete an emotion from the emotion set
 async function Delete_Emotion(emotion_key){
-    element_slider_delete_btn = document.getElementById('emotion-delete-button-id-'+emotion_key);
-    element_slider_delete_btn.remove();
-    element_slider_range = document.getElementById('emotion-range-id-'+emotion_key);
-    element_slider_range.remove();
-    element_emotion_label = document.getElementById('emotion-id-label-view-name-'+emotion_key);
-    element_emotion_label.remove();
+    element_emotion_entry_div = document.getElementById('emotion-entry-div-id-'+emotion_key);
+    element_emotion_entry_div.remove();    
     delete current_entity_obj["entityEmotions"][emotion_key];
     await Update_Collection_In_DB(current_entity_obj)
     Collection_Emotion_Page()
@@ -992,26 +988,6 @@ async function Collection_Add_Image_Search_Action() {
     })
     search_meme_display_div.innerHTML += search_display_inner_tmp
     //listen for the user saying that the images are selected
-    document.getElementById("modal-search-images-results-select-images-order-button-id").onclick = async function() {
-        update = false
-        all_image_keys.forEach( image_filename => {
-            image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
-            if(FS.existsSync(image_path_tmp) == true && current_entity_obj.entityImageSet.includes(image_filename)==false) {
-                if(document.getElementById(`add-image-toggle-id-${image_filename}`).checked){
-                    current_entity_obj.entityImageSet.push(image_filename)
-                    update = true
-                } else if(document.getElementById(`add-memes-meme-toggle-id-${image_filename}`).checked){
-                    current_entity_obj.entityImageSet.push(image_filename)
-                    update = true
-                }
-            }
-        })
-        if(update == true) {
-            await Update_Collection_In_DB(current_entity_obj)
-            await Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index])            
-        }
-        document.getElementById("search-modal-click-top-id").style.display = "none";
-    }
 }
 
 
@@ -1267,27 +1243,6 @@ async function Collection_Add_Memes_Search_Action(){
         }
     })
     search_meme_display_div.innerHTML += search_display_inner_tmp
-    //listen for the user saying that the images are selected
-    document.getElementById("modal-search-add-memes-images-results-select-images-order-button-id").onclick = async function() { //!!!duplicate of line 1144?
-        update = false
-        all_image_keys.forEach( image_filename => {
-            image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
-            if(FS.existsSync(image_path_tmp) == true && current_entity_obj.entityMemes.includes(image_filename)==false) {
-                if(document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked){
-                    current_entity_obj.entityMemes.push(image_filename)
-                    update = true
-                } else if(document.getElementById(`add-meme-image-meme-toggle-id-${image_filename}`).checked){
-                    current_entity_obj.entityMemes.push(image_filename)
-                    update = true
-                }
-            }
-        })
-        if(update == true) {
-            await Update_Collection_In_DB(current_entity_obj)
-            await Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index])            
-        }
-        document.getElementById("search-add-memes-modal-click-top-id").style.display = "none";
-    }
 }
 
 
