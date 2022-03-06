@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Tagasaurus</title>
+
+	<!-- The general cross app style sheet for things like button design -->
+	<link rel="stylesheet" href="../AppCode/taga-CSS/welcome-screen-CSS/welcome-screen-main-ui.css">
+    
+    <!-- The general cross app style sheet for things like button design -->
+	<link rel="stylesheet" href="../AppCode/taga-CSS/general-styles.css">
+
+    <!-- bootstrap css -->
+    <link rel="stylesheet" href="./bootstrap-css/bootstrap.css">
+    <link rel="stylesheet" href="./bootstrap-css/bootstrap-grid.css">
+
+    <!-- custom css -->
+    <link rel="stylesheet" href="./my-css/welcome-screen.css">
+
+    <meta charset="UTF-8" http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+
+</head>
+
+<body>
+
+    <div class="container_title">
+        <h1 class="neon">Tagasaurus... tag the planet!</h1>
+    </div>
+
+    <br><br>
+
+    <div class="skill_title">Percentage of Images Tagged (#)</div>
+    <div class="container">
+        <div id="tagged_percentage" class="progress tags"></div>
+    </div>
+
+    <br>
+
+    <div class="skill_title">Percentage of Images Emotions Stamped (*)</div>
+    <div class="container">
+        <div id="emotion_stamped_percentage" class="progress emotions"></div>
+    </div>
+
+    <br>
+
+    <div class="skill_title">Percentage of Images Meme connected (->)</div>
+    <div class="container">
+        <div id="meme_connected_images" class="progress memes"></div>
+    </div>
+
+    <br>
+
+    <div class="skill_title">Awesomeness Score</div>
+    <div class="container">
+        <div id="awesomeness_score" class="progress score"></div>
+    </div>
+    <br>
+
+    <div class="btn_div">
+        <a href="./tagging.html" type="button" class="btn_start_tagging">Content Tagging!</a>
+    </div>
+    <br>
+    <div class="btn_div">
+        <a href="./collections.html" type="button" class="btn_create_entities">Content Collections!</a>
+    </div>
+    <br>
+    <div class="btn_div">
+        <a onclick="Export_User_Annotation_Data()" type="button" class="btn_create_entities">Export All Taga Data!</a> 
+    </div>
+    <br>
+    
+
+
+    <script src="./myJS/db-analytics.js"></script>
+    <script src="./myJS/taga-export.js"></script>
+
+</body>
+
+</html>

@@ -2,80 +2,85 @@
 <html>
 
 <head>
-    <meta charset="UTF-8">
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
 
-    <!-- bootstrap css -->
-    <link rel="stylesheet" href="./bootstrap-css/bootstrap.css">
-    <link rel="stylesheet" href="./bootstrap-css/bootstrap-grid.css">
-
-    <!-- custom css -->
-    <link rel="stylesheet" href="./my-css/welcome-screen.css">
-
-    <style>
-
-    </style>
     <title>Tagasaurus</title>
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+
+	<!-- The general cross app style sheet for things like button design -->
+	<link rel="stylesheet" href="../AppCode/taga-CSS/welcome-screen-CSS/welcome-screen-main-ui.css">
+    
+    <!-- The general cross app style sheet for things like button design -->
+	<link rel="stylesheet" href="../AppCode/taga-CSS/general-styles.css">
+
+    <meta charset="UTF-8" http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+
 </head>
 
 <body>
 
-    <div class="container_title">
-        <h1 class="neon">Tagasaurus... tag the planet!</h1>
-    </div>
-
-    <br><br>
-
-    <div class="skill_title">Percentage of Images Tagged (#)</div>
-    <div class="container">
-        <div id="tagged_percentage" class="progress tags"></div>
-    </div>
-
-    <br>
-
-    <div class="skill_title">Percentage of Images Emotions Stamped (*)</div>
-    <div class="container">
-        <div id="emotion_stamped_percentage" class="progress emotions"></div>
-    </div>
-
-    <br>
-
-    <div class="skill_title">Percentage of Images Meme connected (->)</div>
-    <div class="container">
-        <div id="meme_connected_images" class="progress memes"></div>
-    </div>
-
-    <br>
-
-    <div class="skill_title">Awesomeness Score</div>
-    <div class="container">
-        <div id="awesomeness_score" class="progress score"></div>
-    </div>
-    <br>
-
-    <div class="btn_div">
-        <a href="./tagging.html" type="button" class="btn_start_tagging">Content Tagging!</a>
-    </div>
-    <br>
-    <div class="btn_div">
-        <a href="./collections.html" type="button" class="btn_create_entities">Content Collections!</a>
-    </div>
-    <br>
-    <div class="btn_div">
-        <a onclick="Export_User_Annotation_Data()" type="button" class="btn_create_entities">Export All Taga Data!</a> 
-    </div>
-    <br>
-    
-    <!--
-        <div class="btn_div">
-            <a onclick="console.log('import feature coming soon!')" type="button" class="btn_create_entities">Import A Taga Export!</a> 
+    <div id="welcome-screen-body-div-id">
+        
+        <div id="title-div-id">
+            Tagasaurus
         </div>
-    -->
 
-    <script src="./myJS/db-analytics.js"></script>
-    <script src="./myJS/taga-export.js"></script>
+
+
+        <!-- https://www.geeksforgeeks.org/how-to-create-a-progress-bar-using-html-and-css/ -->
+        
+        <div id="skill-bars-div-id">
+
+            <div class="score-grid-div-class" id="tagging-score-div-id">
+                TAGGED #
+                <div class="skill-bar-div-class">
+                    <div class="skill html">80%</div>
+                </div>
+            </div>
+            <div class="score-grid-div-class" id="emotion-score-div-id">
+                WITH EMOTIONS *
+                <div class="skill-bar-div-class">
+                    <div class="skill html">50%</div>
+                </div>
+            </div>
+            <div class="score-grid-div-class" id="meme-score-div-id">
+                MEME CONNECTED ->
+                <div class="skill-bar-div-class">
+                    <div class="skill html">0%</div>
+                </div>
+            </div>
+            <div class="score-grid-div-class" id="awesome-score-div-id">
+                AWESOMENESS SCORE
+                <div class="skill-bar-div-class">
+                    <div class="skill html">100%</div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+        <div id="tagging-button-div-id">
+            <button type="button" class="fun-button-blue main-screen-button-styles" id="tagging-button-id">TAGGING</button>
+        </div>
+        <br>
+        <div id="collection-button-div-id">
+            <button type="button" class="fun-button-blue main-screen-button-styles" id="collections-button-id">COLLECTIONS</button>
+        </div>
+        <br>
+        <div id="export-button-div-id">
+            <button type="button" class="fun-button-blue main-screen-button-styles" id="export-button-id">EXPORT DATA</button>
+        </div>
+        <div id="support-button-div-id">
+            <button type="button" class="fun-button-blue main-screen-button-styles" id="support-button-id">SUPPORT</button>
+        </div>
+    
+    </div>
+    
+
+
+    <!-- <script src="./myJS/db-analytics.js"></script> -->
+    <!-- <script src="./myJS/taga-export.js"></script> -->
 
 </body>
 
 </html>
+

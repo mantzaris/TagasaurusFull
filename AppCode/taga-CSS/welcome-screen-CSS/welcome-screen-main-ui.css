@@ -1,0 +1,127 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Verdana, sans-serif;
+  box-sizing: border-box;
+}
+
+#welcome-screen-body-div-id {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 6fr 1fr 1fr 1fr 1fr;
+  min-width: 0;
+  min-height: 0;
+  height: 100vh;
+  width: 100vw;
+  box-sizing: border-box;
+  grid-template-areas:
+    "title"
+    "skill-bars"
+    "tagging-button"
+    "collection-button"
+    "export-button"
+    "support-button";
+  background-color: #808a80;
+}
+#title-div-id {
+  grid-area: title;
+  width: 100%;
+  height: 100%;
+  font-weight: bold;
+  font-size: 6vmin;
+
+  color: #005000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#skill-bars-div-id {
+  grid-area: skill-bars;
+  display: grid;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+
+  box-sizing: border-box;
+  grid-template-areas:
+    "tagging-score"
+    "emotions-score"
+    "meme-score"
+    "awesomeness-score";
+}
+#tagging-score-div-id {
+  grid-area: tagging-score;
+}
+#emotion-score-div-id {
+  grid-area: emotions-score;
+}
+#meme-score-div-id {
+  grid-area: meme-score;
+}
+#awesome-score-div-id {
+  grid-area: awesomeness-score;
+}
+
+.score-grid-div-class {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: bold;
+  font-size: 3.5vmin;
+}
+/* SKILL BAR START */
+.skill-bar-div-class {
+  background-color: #005000;
+  width: 80%;
+  border-radius: 15px;
+}
+.skill {
+  background-color: #00c600;
+  color: black;
+  padding: 1%;
+  text-align: right;
+  font-size: 20px;
+  border-radius: 15px;
+}
+.html {
+  width: 50%;
+}
+/* SKILL BAR END */
+
+#tagging-button-div-id {
+  grid-area: tagging-button;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+#collection-button-div-id {
+  grid-area: collection-button;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+#export-button-div-id {
+  grid-area: export-button;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+#support-button-div-id {
+  grid-area: support-button;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.main-screen-button-styles {
+  width: 80%;
+  height: 80%;
+  font-weight: bold;
+  font-size: 3.5vmin;
+}
