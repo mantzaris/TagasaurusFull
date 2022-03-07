@@ -6,21 +6,20 @@
 const IPC_Renderer = require('electron').ipcRenderer
 
 const FS = require('fs');
-//console.log(__dirname)
-const dir = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
-var image_files_in_dir = FS.readdirSync(dir)
-const path = require('path');
+PATH = require('path');
 const FSE = require('fs-extra');
 
-const ENTITY_DB_FNS = require('./myJS/entity-db-fns.js');
-ENTITY_DB_FNS.Create_Db() 
+const TAGA_IMAGE_DIRECTORY = PATH.resolve(PATH.resolve(),'images') //PATH.resolve(__dirname, '..', 'images') //PATH.join(__dirname,'..','images')  //PATH.normalize(__dirname+PATH.sep+'..') + PATH.sep + 'images'     //__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
+const COLLECTION_DB_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'entity-db-fns.js');
+fns_DB_IDB = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'tagging-db-fns.js');
+
 
 //functionality for the export of all the information
 async function Export_User_Annotation_Data(){
 
-    await ENTITY_DB_FNS.Create_Db() //sets a global variable in the module to hold the DB for access
-    db_entities = ENTITY_DB_FNS.Get_DB()
-    idb_labels = ENTITY_DB_FNS.Get_Entity_DB_labels()
+    await COLLECTION_DB_MODULE.Create_Db() //sets a global variable in the module to hold the DB for access
+    db_entities = COLLECTION_DB_MODULE.Get_DB()
+    idb_labels = COLLECTION_DB_MODULE.Get_Entity_DB_labels()
     ENTITY_OBJSTORE_NAME = idb_labels.ENTITY_OBJSTORE_NAME
 
     all_entity_Objects = [];
@@ -45,20 +44,14 @@ async function Export_User_Annotation_Data(){
             if (!FS.existsSync(path_chosen.filePath)){
                 FS.mkdirSync(path_chosen.filePath);
                 fns_DB_IDB.Get_All_From_DB().then(function (results) {
-                    console.log('!!!!!!!!!!!!--------------------------------------!!!!!!!!!!!')
                     //console.log(results.rows)
-                    console.log('!!!!!!!!!!!!--------------------------------------!!!!!!!!!!!')
                     tagged_and_entity_JSON = {'imageAnnotations':results,'allEntityObjects':all_entity_Objects}
                     tagged_and_entity_JSON_str = JSON.stringify(tagged_and_entity_JSON)
                     
                     console.log( tagged_and_entity_JSON ) //.allEntityObjects )
                     Write_Export_Data(path_chosen.filePath,tagged_and_entity_JSON)
                 })
-            } else {
-                vanilla_notify.vNotify.error({visibleDuration: 1200,fadeOutDuration: 250,fadeInDuration: 250, text: 'File or Folder already exists', title:'Canceled'});
-            }
-        } else{
-                vanilla_notify.vNotify.notify({visibleDuration: 1200,fadeOutDuration: 250,fadeInDuration: 250, text: 'No destination and folder name given', title:'Canceled'});
+            } 
         }
     })
     
@@ -67,11 +60,11 @@ async function Export_User_Annotation_Data(){
 //put the annotation data to disk for the user's chosen folder
 function Write_Export_Data(file_path,db_rows){
     //write the json data out to the folder
-    file_name_data = '/TagasaurusAnnotations.json'    
+    file_name_data = PATH.sep + 'TagasaurusAnnotations.json'    
     FS.writeFileSync( file_path+file_name_data, JSON.stringify(db_rows) );    
     //now copy the files as well to a new 'images' directory
-    FS.mkdirSync( file_path+'/images');
-    FSE.copy( dir, file_path+'/images', err => {
+    FS.mkdirSync( file_path + PATH.sep + 'images');
+    FSE.copy( TAGA_IMAGE_DIRECTORY, file_path + PATH.sep + 'images', err => {
         if (err){ return console.error(err) }
         else { console.log('folder copy success!') }
     })

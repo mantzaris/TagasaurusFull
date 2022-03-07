@@ -1,6 +1,6 @@
-const PATH = require('path');
+PATH = require('path');
 
-const fns_DB_IDB = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'tagging-db-fns.js');
+fns_DB_IDB = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'tagging-db-fns.js');
 
 // algorithm DFLOW by EPA ( https://stats.stackexchange.com/a/430254/1098 )
 //$\mu_H = \left(\frac{\sum^{n_T - n_0}_{i=1} 1/x_i} {n_T - n_0}\right)^{-1} \times \frac{n_T - n_0} {n_T} ,$
