@@ -1,4 +1,3 @@
-const fs = require('fs');
 const PATH = require('path');
 
 const fns_DB_IDB = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'tagging-db-fns.js');
@@ -57,17 +56,17 @@ async function Display_Skill_Levels() {
     emotion_stamped_images_percentage = 100 * (emotion_stamped_images / total_images_in_db)
     scores_harmonic_mean = 100 * Harmonic_Mean(images_scores_array)
 
-    document.getElementById('tagged_percentage').innerHTML = `${Math.round(tagged_percentage)}%`
-    document.getElementById('tagged_percentage').style.width = `${Math.round(tagged_percentage)}%`;
+    document.getElementById("tagging-score-id").innerHTML = `${Math.round(tagged_percentage)}%`
+    document.getElementById("tagging-score-id").style.width = `${Math.round(tagged_percentage)}%`;
 
-    document.getElementById('emotion_stamped_percentage').innerHTML = `${Math.round(emotion_stamped_images_percentage)}%`
-    document.getElementById('emotion_stamped_percentage').style.width = `${Math.round(emotion_stamped_images_percentage)}%`
+    document.getElementById("emotion-score-id").innerHTML = `${Math.round(emotion_stamped_images_percentage)}%`
+    document.getElementById("emotion-score-id").style.width = `${Math.round(emotion_stamped_images_percentage)}%`
 
-    document.getElementById('meme_connected_images').innerHTML = `${Math.round(meme_connected_percentage)}%`
-    document.getElementById('meme_connected_images').style.width = `${Math.round(meme_connected_percentage)}%`
+    document.getElementById("meme-score-id").innerHTML = `${Math.round(meme_connected_percentage)}%`
+    document.getElementById("meme-score-id").style.width = `${Math.round(meme_connected_percentage)}%`
 
-    document.getElementById('awesomeness_score').innerHTML = `${Math.round(scores_harmonic_mean)}%`
-    document.getElementById('awesomeness_score').style.width = `${Math.round(scores_harmonic_mean)}%`
+    document.getElementById("awesome-score-id").innerHTML = `${Math.round(scores_harmonic_mean)}%`
+    document.getElementById("awesome-score-id").style.width = `${Math.round(scores_harmonic_mean)}%`
 
 }
 
