@@ -141,34 +141,36 @@
 
     </div>
 
+
+    <script>    
+
+        function Copy_Support_Link(support_type) { 
+        /* Get the text field */
+            if(support_type == 'GITHUB') {
+                navigator.clipboard.writeText( 'https://github.com/mantzaris/Tagasaurus' );
+            } else if(support_type == 'VASEXANDROS') {
+                navigator.clipboard.writeText( 'https://www.amazon.com/Vasexandros/e/B010RI6W0G' );
+            } else if(support_type == 'TWITTER') {
+                navigator.clipboard.writeText( 'https://twitter.com/Tagasaurus_app' );
+            } else if(support_type == 'TE-episode01') {
+                navigator.clipboard.writeText( 'https://www.amazon.com/dp/1981965165/' );
+            } else if(support_type == 'GOOGLE-SCHOLAR') {
+                navigator.clipboard.writeText( 'https://scholar.google.com/citations?user=8zP4vSQAAAAJ&hl=en' );
+            } else if(support_type == 'FACEBOOK') {
+                navigator.clipboard.writeText( 'https://www.facebook.com/TagasaurusApp' );
+            } else if(support_type == 'HERCULES') {
+                navigator.clipboard.writeText( 'https://www.amazon.com/gp/product/B0977P9NV2' );
+            }
+        
+        }
+    
+    </script>
+    
+
 </body>
 
 
 
-
-<script>    
-
-function Copy_Support_Link(support_type) {
-  /* Get the text field */
-    if(support_type == 'GITHUB') {
-        navigator.clipboard.writeText( 'https://github.com/mantzaris/Tagasaurus' );
-    } else if(support_type == 'VASEXANDROS') {
-        navigator.clipboard.writeText( 'https://www.amazon.com/Vasexandros/e/B010RI6W0G' );
-    } else if(support_type == 'TWITTER') {
-        navigator.clipboard.writeText( 'https://twitter.com/Tagasaurus_app' );
-    } else if(support_type == 'TE-episode01') {
-        navigator.clipboard.writeText( 'https://www.amazon.com/dp/1981965165/' );
-    } else if(support_type == 'GOOGLE-SCHOLAR') {
-        navigator.clipboard.writeText( 'https://scholar.google.com/citations?user=8zP4vSQAAAAJ&hl=en' );
-    } else if(support_type == 'FACEBOOK') {
-        navigator.clipboard.writeText( 'https://www.facebook.com/TagasaurusApp' );
-    } else if(support_type == 'HERCULES') {
-        navigator.clipboard.writeText( 'https://www.amazon.com/gp/product/B0977P9NV2' );
-    }
-
-}
-
-</script>
 
 
 </html>

@@ -841,8 +841,8 @@ input:checked + .slider:before {
   min-width: 0;
   min-height: 0;
   display: grid;
-  grid-template-columns: 1fr 2fr 2fr 10fr;
-  grid-template-areas: " . prev-button next-button . ";
+  grid-template-columns: 1fr 2fr 2fr 8fr 2fr 1fr;
+  grid-template-areas: " . prev-button next-button . cancel-button . ";
 
   background-color: #808a80;
 }
@@ -853,6 +853,11 @@ input:checked + .slider:before {
 }
 #creation-next-button-id {
   grid-area: next-button;
+  font-size: 3vmin;
+  margin: 3px;
+}
+#creation-cancel-button-id {
+  grid-area: cancel-button;
   font-size: 3vmin;
   margin: 3px;
 }
