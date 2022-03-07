@@ -19,7 +19,13 @@
 <body>
 
     <div id="support-items-div-id">
-    
+
+        <div id="return-to-main-btn-div-id">
+            <button onclick="window.location.href='./welcome-screen.html'" id="return-to-main-btn-id" class="fun-button-blue">
+                RETURN TO MAIN
+            </button>
+        </div>
+
         <div class="support-div-class">
             <div class="icon-div-class">
                 <img class="icon-thumbnail" src="./extra-icons/GitHub-logo.png" alt="">
@@ -28,7 +34,7 @@
                 Github
             </div>
             <div class="link-div-class">
-                https://github.com/mantzaris/Tagasaurus
+                <button onclick="Copy_Support_Link('GITHUB')" class="fun-button-blue copy-button">COPY</button> https://github.com/mantzaris/Tagasaurus
             </div>
             <div class="text-div-class">
                 Follow the main repo for the updates to the code or come on in and joint the development process!
@@ -45,7 +51,7 @@
                 VASEXANDROS
             </div>
             <div class="link-div-class">
-                https://www.amazon.com/Vasexandros/e/B010RI6W0G
+                <button onclick="Copy_Support_Link('VASEXANDROS')" class="fun-button-blue copy-button">COPY</button> https://www.amazon.com/Vasexandros/e/B010RI6W0G
             </div>
             <div class="text-div-class">
                 Read some books by Vasexandros! Available on Amazon.com, Amazon.co.uk, Amazon.de etc. Sci-fi, comics and 
@@ -61,7 +67,7 @@
                 Tagasaurus on Twitter
             </div>
             <div class="link-div-class">
-                https://twitter.com/Tagasaurus_app
+                <button onclick="Copy_Support_Link('TWITTER')" class="fun-button-blue copy-button">COPY</button> https://twitter.com/Tagasaurus_app
             </div>
             <div class="text-div-class">
                 Tagasaurus (aka Taga) in that network
@@ -76,7 +82,7 @@
                 Totem Eclipse (Episode 1)
             </div>
             <div class="link-div-class">
-                https://www.amazon.com/dp/1981965165/
+                <button onclick="Copy_Support_Link('TE-episode01')" class="fun-button-blue copy-button">COPY</button> https://www.amazon.com/dp/1981965165/
             </div>
             <div class="text-div-class">
                 A journey where Archimedes, the ancient, tells us about his adventure to find truth in the 
@@ -92,7 +98,7 @@
                 Google Scholar
             </div>
             <div class="link-div-class">
-                https://scholar.google.com/citations?user=8zP4vSQAAAAJ&hl=en
+                <button onclick="Copy_Support_Link('GOOGLE-SCHOLAR')" class="fun-button-blue copy-button">COPY</button> https://scholar.google.com/citations?user=8zP4vSQAAAAJ&hl=en
             </div>
             <div class="text-div-class">
                 Cool papers, specifically related to Tagaasuarus:
@@ -111,7 +117,7 @@
                 Facebook
             </div>
             <div class="link-div-class">
-                https://www.facebook.com/TagasaurusApp
+                <button onclick="Copy_Support_Link('FACEBOOK')" class="fun-button-blue copy-button">COPY</button> https://www.facebook.com/TagasaurusApp
             </div>
             <div class="text-div-class">
                 Facebook too, why not?..
@@ -126,19 +132,43 @@
                 The labors of Hercules
             </div>
             <div class="link-div-class">
-                https://www.amazon.com/gp/product/B0977P9NV2
+                <button onclick="Copy_Support_Link('HERCULES')" class="fun-button-blue copy-button">COPY</button> https://www.amazon.com/gp/product/B0977P9NV2
             </div>
             <div class="text-div-class">
                 Learn all about the great Hero of Ancient Greece
             </div>
         </div>
 
-
     </div>
-
 
 </body>
 
+
+
+
+<script>    
+
+function Copy_Support_Link(support_type) {
+  /* Get the text field */
+    if(support_type == 'GITHUB') {
+        navigator.clipboard.writeText( 'https://github.com/mantzaris/Tagasaurus' );
+    } else if(support_type == 'VASEXANDROS') {
+        navigator.clipboard.writeText( 'https://www.amazon.com/Vasexandros/e/B010RI6W0G' );
+    } else if(support_type == 'TWITTER') {
+        navigator.clipboard.writeText( 'https://twitter.com/Tagasaurus_app' );
+    } else if(support_type == 'TE-episode01') {
+        navigator.clipboard.writeText( 'https://www.amazon.com/dp/1981965165/' );
+    } else if(support_type == 'GOOGLE-SCHOLAR') {
+        navigator.clipboard.writeText( 'https://scholar.google.com/citations?user=8zP4vSQAAAAJ&hl=en' );
+    } else if(support_type == 'FACEBOOK') {
+        navigator.clipboard.writeText( 'https://www.facebook.com/TagasaurusApp' );
+    } else if(support_type == 'HERCULES') {
+        navigator.clipboard.writeText( 'https://www.amazon.com/gp/product/B0977P9NV2' );
+    }
+
+}
+
+</script>
 
 
 </html>

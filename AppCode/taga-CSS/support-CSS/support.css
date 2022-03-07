@@ -13,6 +13,19 @@ body {
   overflow-y: auto;
 }
 
+#return-to-main-btn-div-id {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+#return-to-main-btn-id {
+  height: 7vh;
+  width: 80%;
+  font-size: 3.5vmin;
+  font-weight: bold;
+}
+
 .support-div-class {
   min-height: 0;
   min-width: 0;
@@ -68,4 +81,10 @@ body {
   grid-area: content;
   padding: 5px;
   overflow-y: auto;
+}
+
+.copy-button {
+  margin-right: 5px;
+  font-weight: bold;
+  font-size: 1.75vmin;
 }
