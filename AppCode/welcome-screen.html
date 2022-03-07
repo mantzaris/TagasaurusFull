@@ -59,15 +59,15 @@
 
 
         <div id="tagging-button-div-id">
-            <button type="button" class="fun-button-blue main-screen-button-styles" id="tagging-button-id">TAGGING</button>
+            <button onclick="window.location.href='./tagging.html'" type="button" class="fun-button-blue main-screen-button-styles" id="tagging-button-id">TAGGING</button>
         </div>
         <br>
         <div id="collection-button-div-id">
-            <button type="button" class="fun-button-blue main-screen-button-styles" id="collections-button-id">COLLECTIONS</button>
+            <button onclick="window.location.href='./collections.html'" type="button" class="fun-button-blue main-screen-button-styles" id="collections-button-id">COLLECTIONS</button>
         </div>
         <br>
         <div id="export-button-div-id">
-            <button type="button" class="fun-button-blue main-screen-button-styles" id="export-button-id">EXPORT DATA</button>
+            <button onclick="Export_User_Annotation_Data()" type="button" class="fun-button-blue main-screen-button-styles" id="export-button-id">EXPORT DATA</button>
         </div>
         <div id="support-button-div-id">
             <button type="button" class="fun-button-blue main-screen-button-styles" id="support-button-id">SUPPORT</button>
@@ -78,8 +78,7 @@
 
 
     <script src="./taga-JS/utilities/db-analytics.js"></script>
-    <!-- const fs = require('fs'); -->
-    <!-- <script src="./myJS/taga-export.js"></script> -->
+    <script src="./taga-JS/utilities/taga-export.js"></script>
 
 </body>
 

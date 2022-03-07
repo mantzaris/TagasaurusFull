@@ -35,7 +35,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+
+  text-shadow: 7px 12px 12px rgba(0, 158, 0, 0.75),
+    -3px 10px 12px rgba(0, 198, 0, 0.5);
 }
+
 #skill-bars-div-id {
   grid-area: skill-bars;
   display: grid;

@@ -8,7 +8,7 @@ const IPC_Renderer = require('electron').ipcRenderer
 const FS = require('fs');
 //console.log(__dirname)
 const dir = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
-var image_files_in_dir = fs.readdirSync(dir)
+var image_files_in_dir = FS.readdirSync(dir)
 const path = require('path');
 const FSE = require('fs-extra');
 
