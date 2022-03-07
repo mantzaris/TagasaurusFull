@@ -19,6 +19,9 @@ body {
   height: 20vh;
   width: 100%;
 
+  font-size: 2.5vmin;
+  font-weight: bold;
+
   display: grid;
   grid-template-columns: 1fr 4fr;
   grid-template-rows: 1fr 1fr 3fr;
@@ -31,25 +34,38 @@ body {
 
   border-style: solid;
   border-width: 4px;
-  border-color: #00c600;
+  border-color: #009e00;
 }
 .icon-div-class {
   grid-area: icon;
   padding: 5px;
-  background-color: blueviolet;
+}
+.icon-thumbnail {
+  height: 99999px;
+  object-fit: contain;
+  max-height: 100%;
+  max-width: 100%;
+  display: block;
+  margin: auto auto;
+  object-position: center;
 }
 .type-div-class {
   grid-area: type;
   padding: 5px;
-  background-color: cornflowerblue;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .link-div-class {
   grid-area: link;
   padding: 5px;
-  background-color: rgb(19, 143, 143);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #00c600;
 }
 .text-div-class {
   grid-area: content;
   padding: 5px;
-  background-color: rgb(154, 168, 22);
+  overflow-y: auto;
 }
