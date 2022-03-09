@@ -9,20 +9,25 @@ const CRYPTO = require('crypto')
 const IPC_RENDERER = require('electron').ipcRenderer 
 
 //module for the main annotation view alterations-directly affects the DOM
-const TAGGING_VIEW_ANNOTATE_MODULE = require('./taga-JS/tagging-view-annotate.js');
+//const TAGGING_VIEW_ANNOTATE_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'tagging'+PATH.sep+'tagging-view-annotate.js'); //require('./taga-JS/tagging-view-annotate.js');
 //module for HELPING the PROCESS of deleting an image and the references to it
-const TAGGING_DELETE_HELPER_MODULE = require('./myJS/tagging-delete-helper.js')
+const TAGGING_DELETE_HELPER_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'tagging-delete-helper.js'); //require('./myJS/tagging-delete-helper.js')
 //module for the processing of the description
-const DESCRIPTION_PROCESS_MODULE = require('./myJS/description-processing.js');
+const DESCRIPTION_PROCESS_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'description-processing.js'); //require('./myJS/description-processing.js');
 //module functions for DB connectivity
-const TAGGING_IDB_MODULE = require('./myJS/tagging-db-fns.js'); 
+const TAGGING_IDB_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'tagging-db-fns.js'); //require('./myJS/tagging-db-fns.js'); 
 //copies files and adds salt for conflicting same file names
-const MY_FILE_HELPER = require('./myJS/copy-new-file-helper.js')
+const MY_FILE_HELPER = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'copy-new-file-helper.js') //require('./myJS/copy-new-file-helper.js')
 //functionality to insert an element into a sorted array with binary search
-const MY_ARRAY_INSERT_HELPER = require('./myJS/utility-insert-into-sorted-array.js')
+const MY_ARRAY_INSERT_HELPER = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'utility-insert-into-sorted-array.js') //require('./myJS/utility-insert-into-sorted-array.js')
 //the folder to store the taga images (with a commented set of alternative solutions that all appear to work)
 const TAGA_IMAGE_DIRECTORY = PATH.resolve(PATH.resolve(),'images') //PATH.resolve(__dirname, '..', 'images') //PATH.join(__dirname,'..','images')  //PATH.normalize(__dirname+PATH.sep+'..') + PATH.sep + 'images'     //__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
 //holds the last directory the user imported images from
+
+const CLOSE_ICON_RED = PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-ui-icons'+PATH.sep+'CloseRed.png'
+const CLOSE_ICON_BLACK = PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-ui-icons'+PATH.sep+'CloseBlack.png'
+
+const HASHTAG_ICON = PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-ui-icons'+PATH.sep+'HashtagGreen.png'
 
 
 var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
@@ -30,10 +35,11 @@ var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
                                     "imageFileHash": '',
                                     "taggingRawDescription": "",
                                     "taggingTags": [],
-                                    "taggingEmotions": {good:0,bad:0},//{ happy: 0, sad: 0, confused: 0 },
+                                    "taggingEmotions": {good:0,bad:0},
                                     "taggingMemeChoices": []
                                     }
 
+//files to cycle through
 var image_files_in_dir = ''
 var last_user_image_directory_chosen = ''
 var processed_tag_word_list
@@ -48,45 +54,213 @@ var search_meme_results_selected = ''
 var search_meme_results = ''
 
 
-//init method to run upon loading
-First_Display_Init(image_index); 
 
 
-//update the file variable storing the array of all the files in the folder
-function Refresh_File_List() {
-    image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY)
+//DISPLAY THE MAIN IMAGE START>>>
+function Display_Image(image_annotation) {
+    document.getElementById('center-gallery-image-id').src = `${TAGA_IMAGE_DIRECTORY}${PATH.sep}${image_annotation["imageFileName"]}`;
 }
+//DISPLAY THE MAIN IMAGE END<<<
 
-//fill the IDB for 'tagging' when loading so new files are taken into account 'eventually', feed it the DB list of files
-//load files in the directory but not DB, into the DB with defaults
-//DB entries not in the directory are lingering entries to be deleted
-async function Check_And_Handle_New_Images_IDB(current_DB_file_list) {
-    //default annotation New_Image_Display(n) bj values to use when new file found
-    for( ii = 0; ii < image_files_in_dir.length; ii++){
-        bool_new_file_name = current_DB_file_list.some( name_tmp => name_tmp === `${image_files_in_dir[ii]}` )
-        if( bool_new_file_name == false ) {
-            image_name_tmp = `${image_files_in_dir[ii]}`
-            tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
-            tagging_entry.imageFileName = image_name_tmp
-            tagging_entry.imageFileHash = Return_File_Hash(`${TAGA_IMAGE_DIRECTORY}/${image_name_tmp}`)
-            await TAGGING_IDB_MODULE.Insert_Record(tagging_entry)
+//DESCRIPTION AND HASHTAGS POPULATE START>>>
+function Description_Hashtags_Display_Fill(image_annotation) {
+    document.getElementById('description-textarea-id').value = image_annotation["taggingRawDescription"];
+    tag_array = image_annotation["taggingTags"];
+    //Create the tag unordered list
+    list = document.createElement('ul');
+    list.setAttribute("id", "hashtag-list-id");
+    for(let i=0; i<tag_array.length; i++) {
+        item = document.createElement('li');
+        image_el = document.createElement("img");
+        image_el.setAttribute("id", "hashtags-icon-id");
+        image_el.setAttribute("src", `${HASHTAG_ICON}`);
+        item.appendChild(image_el);
+        item.appendChild(document.createTextNode(tag_array[i]));
+        list.appendChild(item);
+    }
+    document.getElementById('hashtags-innerbox-displayhashtags-id').appendChild(list)
+}
+//DESCRIPTION AND HASHTAGS POPULATE END<<<
+
+//EMOTION STUFF START>>>
+//populate the emotion value view with emotional values
+async function Emotion_Display_Fill(image_annotation) {
+    emotion_div = document.getElementById("emotion-collectionlist-div-id")
+    emotion_html_tmp = ''
+    for( var key of Object.keys(image_annotation["taggingEmotions"]) ) {
+        emotion_html_tmp += `<div class="emotion-list-class" id="emotion-entry-div-id-${key}">
+                                <img class="emotion-delete-icon-class" id="emotion-delete-button-id-${key}" onmouseover="this.src='${CLOSE_ICON_RED}';"
+                                    onmouseout="this.src='${CLOSE_ICON_BLACK}';" src="${CLOSE_ICON_BLACK}" alt="emotions" title="remove"  />
+                                <span class="emotion-label-view-class" id="emotion-id-label-view-name-${key}">${key}</span>
+                                <input id="emotion-range-id-${key}" type="range" min="0" max="100" value="0">
+                            </div>
+                            `
+    }
+    emotion_div.innerHTML = emotion_html_tmp
+    emotion_keys = Object.keys(image_annotation["taggingEmotions"])
+    emotion_keys.forEach(function(key_tmp){
+        document.getElementById(`emotion-delete-button-id-${key_tmp}`).onclick = function() {
+            Delete_Emotion(`${key_tmp}`);
+        };
+    })
+    for( var key of Object.keys(image_annotation["taggingEmotions"]) ) { //display emotion range values
+        document.getElementById('emotion-range-id-'+key).value = image_annotation["taggingEmotions"][key]
+    }
+}
+//delete an emotion from the emotion set
+async function Delete_Emotion(emotion_key){
+    image_annotation = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
+    delete image_annotation["taggingEmotions"][emotion_key];
+    await TAGGING_IDB_MODULE.Update_Record(image_annotation)
+    //refresh emotion container fill
+    Emotion_Display_Fill(image_annotation)
+}
+//add a new emotion to the emotion set
+async function Add_New_Emotion(){
+    new_emotion_text = document.getElementById("emotions-new-emotion-textarea-id").value
+    new_emotion_value = document.getElementById("new-emotion-range-id").value
+    if(new_emotion_text){
+        image_annotation = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
+        keys_tmp = Object.keys(image_annotation["taggingEmotions"])
+        boolean_included = keys_tmp.includes(new_emotion_text)
+        if(boolean_included == false){
+            image_annotation["taggingEmotions"][new_emotion_text] = new_emotion_value
+            await TAGGING_IDB_MODULE.Update_Record(image_annotation)
+        }
+        document.getElementById("emotions-new-emotion-textarea-id").value = ""
+        document.getElementById("new-emotion-range-id").value = `0`
+         //refresh emotion container fill
+        Emotion_Display_Fill(image_annotation)
+    }
+}
+//EMOTION STUFF END<<<
+
+//MEME STUFF START>>>
+//populate the meme switch view with images
+function Meme_View_Fill(image_annotation) {
+    meme_box = document.getElementById("memes-innerbox-displaymemes-id")
+    meme_choices = image_annotation["taggingMemeChoices"]
+    meme_choices.forEach(file =>{
+        meme_box.insertAdjacentHTML('beforeend',`
+                                                <label class="memeswitch" title="deselect / keep" >   <input id="meme-toggle-id-${file}" type="checkbox"> <span class="slider"></span>   </label>
+                                                <div class="memes-img-div-class" id="memes-image-div-id-${file}">
+                                                    <img class="memes-img-class" id="memes-image-img-id-${file}" src="${TAGA_IMAGE_DIRECTORY}${PATH.sep}${file}" title="view" alt="meme" />
+                                                </div>
+                                                `);
+    })
+    //set default meme choice toggle button direction
+    for(ii=0;ii<meme_choices.length;ii++){
+        document.getElementById(`meme-toggle-id-${meme_choices[ii]}`).checked = true
+    }
+    //add an event listener for when a meme image is clicked to open the modal, and send the file name of the meme
+    meme_choices.forEach(file => {
+        document.getElementById(`memes-image-img-id-${file}`).onclick = function() {
+            Meme_Image_Clicked(file);
+        };
+    })
+}
+//open the modal to view the meme
+async function Meme_Image_Clicked(meme_file_name) {
+    modal_meme_click_top_id_element = document.getElementById("modal-meme-clicked-top-id");
+    modal_meme_click_top_id_element.style.display = "block";
+    // Get the button that opens the modal
+    var meme_modal_close_btn = document.getElementById("modal-meme-clicked-close-button-id");
+    // When the user clicks on the button, close the modal
+    meme_modal_close_btn.onclick = function() {
+        modal_meme_click_top_id_element.style.display = "none";
+    }
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal_meme_click_top_id_element) {
+            modal_meme_click_top_id_element.style.display = "none";
         }
     }
-    //file no longer present so it's entry is to be deleted
-    for( ii = 0; ii < current_DB_file_list.length; ii++){
-        bool_missing_file_name = image_files_in_dir.some( name_tmp => name_tmp === `${current_DB_file_list[ii]}` )
-        if( bool_missing_file_name == false ) {
-            //the picture file name in context
-            image_name_tmp = `${current_DB_file_list[ii]}`
-            await TAGGING_IDB_MODULE.Delete_Record(image_name_tmp)
-        }
+    document.getElementById("modal-meme-clicked-image-gridbox-id").innerHTML = "";
+    meme_click_modal_div = document.getElementById("modal-meme-clicked-image-gridbox-id");
+    meme_click_modal_body_html_tmp = '';
+    meme_click_modal_body_html_tmp += `<img id="modal-meme-clicked-displayimg-id" src="${TAGA_IMAGE_DIRECTORY}${PATH.sep}${meme_file_name}" title="meme" alt="meme" />`;
+    meme_click_modal_div.insertAdjacentHTML('beforeend', meme_click_modal_body_html_tmp);
+    meme_image_annotations = await TAGGING_IDB_MODULE.Get_Record( meme_file_name );
+    //add emotion tuples to view
+    modal_emotions_html_tmp = `Emotions: `
+    emotion_keys = Object.keys(meme_image_annotations["taggingEmotions"])
+    //console.log(`the emotion values length = ${emotion_keys.length}`)
+    if( emotion_keys.length > 0 ){
+        emotion_keys.forEach(function(key_tmp, index){
+            emotion_value = meme_image_annotations["taggingEmotions"][key_tmp]
+            if( index < emotion_keys.length-1 ) {
+                modal_emotions_html_tmp += `(${key_tmp}:${emotion_value}), `
+            } else {
+                modal_emotions_html_tmp += `(${key_tmp}:${emotion_value})`
+            }
+        })
+    } else {
+        modal_emotions_html_tmp += `no emotions added`
     }
-    await TAGGING_IDB_MODULE.Delete_Void_MemeChoices() //!!!needs to be optimized
+    document.getElementById("modal-meme-clicked-emotion-list-div-container-id").innerHTML = modal_emotions_html_tmp
+    tag_array = meme_image_annotations["taggingTags"]
+    modal_tags_html_tmp = `Tags: `
+    if( tag_array.length > 0 ){
+        tag_array.forEach(function(tag){
+            modal_tags_html_tmp += `#${tag} `        
+        })
+    } else {
+        modal_tags_html_tmp += `no tags added`
+    }
+    document.getElementById("modal-meme-clicked-tag-list-div-container-id").innerHTML = modal_tags_html_tmp
 }
+//MEME STUFF END<<<
 
+//RESET TYPE FUNCTIONS START>>>
+//makes the tagging view 'blank' for the annotations to be placed
+function Make_Blank_Tagging_View() {
+    document.getElementById("emotions-new-emotion-textarea-id").value = "" //emtpy new name for emotions
+    document.getElementById("new-emotion-range-id").value = "0" //reset to zero the range of the emotions
+    document.getElementById("emotion-collectionlist-div-id").innerHTML = "" //empty the emotions display div
+    document.getElementById("memes-innerbox-displaymemes-id").innerHTML = "" //empty the meme display container
+    document.getElementById("description-textarea-id").value = "" //clear the description entry textarea
+    document.getElementById('hashtags-innerbox-displayhashtags-id').innerHTML = '' //clear the display for the hashtags
+}
+//bring the image annotation view to the default state (not saving it until confirmed)
+async function Reset_Image_Annotations(){
+    image_annotation = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
+    //reset emotion slider values
+    for( var key of Object.keys(image_annotation["taggingEmotions"]) ){
+        document.getElementById(`emotion-range-id-${key}`).value = 0
+    }
+    document.getElementById(`new-emotion-range-id`).value = 0
+    document.getElementById('description-textarea-id').value = ''
+    document.getElementById('hashtags-innerbox-displayhashtags-id').innerHTML = ''
+    //reset the meme toggles to be the checked true which is the default here
+    meme_choices = image_annotation["taggingMemeChoices"]
+    for(ii=0;ii<meme_choices.length;ii++){
+        document.getElementById(`meme-toggle-id-${meme_choices[ii]}`).checked = false
+    }
+}
+//RESET TYPE FUNCTIONS END<<<
+
+//main function to arrange the display of the image annotations and the image
+async function Load_State_Of_Image_IDB() {
+    image_annotation = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
+    Make_Blank_Tagging_View() //empty all parts to be ready to add the annotation information
+    Emotion_Display_Fill(image_annotation)//display the emotion set annotations
+    Meme_View_Fill(image_annotation)
+    Description_Hashtags_Display_Fill(image_annotation)
+    Display_Image(image_annotation)
+}
+//called from the gallery widget, where 'n' is the number of images forward or backwards to move
+function New_Image_Display(n) {
+    image_index += n;
+    if (image_index > image_files_in_dir.length) {
+        image_index = 1
+    }
+    if (image_index < 1) {
+        image_index = image_files_in_dir.length
+    };
+    Load_State_Of_Image_IDB()
+}
 //called upon app loading
 async function First_Display_Init() {
-
     //add UI button event listeners
     document.getElementById(`left-gallery-image-button-id`).addEventListener("click", function() {
         New_Image_Display(-1);
@@ -119,37 +293,54 @@ async function First_Display_Init() {
         Search_Images();
     }, false);
 
-
-
     await TAGGING_IDB_MODULE.Create_Db()
     await TAGGING_IDB_MODULE.Get_All_Keys_From_DB()
-    current_file_list_IDB = TAGGING_IDB_MODULE.Read_All_Keys_From_DB()
     Refresh_File_List() //var image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY)
-    await Check_And_Handle_New_Images_IDB(current_file_list_IDB)
-
-    await Load_State_Of_Image_IDB() 
+    await Check_And_Handle_New_Images_IDB(); //deals with the extra or missing files in the image directory
+    await Load_State_Of_Image_IDB() //display the image in view currently and the annotations it has
 }
-//called from the gallery widget, where 'n' is the number of images forward or backwards to move
-function New_Image_Display(n) {
-    image_index += n;
-    if (image_index > image_files_in_dir.length) {
-        image_index = 1
+//init method to run upon loading
+First_Display_Init(); 
+
+
+
+//HANLDE FOLDER IMAGE AND DB MATCH START>>>
+//update the file variable storing the array of all the files in the folder
+function Refresh_File_List() {
+    image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY)
+}
+//fill the IDB for 'tagging' when loading so new files are taken into account 'eventually', feed it the DB list of files
+//load files in the directory but not DB, into the DB with defaults
+//DB entries not in the directory are lingering entries to be deleted
+async function Check_And_Handle_New_Images_IDB() {
+    current_DB_file_list = TAGGING_IDB_MODULE.Read_All_Keys_From_DB()
+    //default annotation New_Image_Display(n) bj values to use when new file found
+    for( ii = 0; ii < image_files_in_dir.length; ii++){
+        bool_new_file_name = current_DB_file_list.some( name_tmp => name_tmp === `${image_files_in_dir[ii]}` )
+        if( bool_new_file_name == false ) {
+            image_name_tmp = `${image_files_in_dir[ii]}`
+            tagging_entry = TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION; //JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
+            tagging_entry.imageFileName = image_name_tmp
+            tagging_entry.imageFileHash = Return_File_Hash(`${TAGA_IMAGE_DIRECTORY}/${image_name_tmp}`)
+            await TAGGING_IDB_MODULE.Insert_Record(tagging_entry)
+        }
     }
-    if (image_index < 1) {
-        image_index = image_files_in_dir.length
-    };
-    Load_State_Of_Image_IDB()
+    //file no longer present so it's entry is to be deleted
+    for( ii = 0; ii < current_DB_file_list.length; ii++){
+        bool_missing_file_name = image_files_in_dir.some( name_tmp => name_tmp === `${current_DB_file_list[ii]}` )
+        if( bool_missing_file_name == false ) {
+            //the picture file name in context
+            image_name_tmp = `${current_DB_file_list[ii]}`
+            await TAGGING_IDB_MODULE.Delete_Record(image_name_tmp)
+        }
+    }
+    await TAGGING_IDB_MODULE.Delete_Void_MemeChoices() //!!!needs to be optimized
 }
+//HANLDE FOLDER IMAGE AND DB MATCH END>>>
 
-//set the emotional sliders values to the emotional vector values stored
-async function Load_State_Of_Image_IDB() {
-    console.log(`in LOAD STATE OF IMAGES image_index = ${image_index}, image_files_in_dir[image_index - 1] = ${image_files_in_dir[image_index - 1]} `)
-    image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
-    console.log(JSON.stringify(image_annotations))
-    
-    TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_annotations)
-}
 
+
+//!!! needs fixing
 //load the default image, typically called to avoid having nothing in the DB but can be
 //deleted by the user later when they have more images stored.
 async function Load_Default_Taga_Image(){
@@ -205,11 +396,7 @@ async function Load_New_Image() {
 }
 
 
-//bring the image annotation view to the default state (not saving it until confirmed)
-async function Reset_Image_Annotations(){
-    image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
-    TAGGING_VIEW_ANNOTATE_MODULE.Reset_Image_View(image_annotations)
-}
+
 
 
 //process image for saving including the text to tags (Called from the html Save button)
@@ -261,63 +448,6 @@ async function Delete_Image() {
         New_Image_Display( 0 )
     }
     Refresh_File_List()
-}
-
-
-//add a new emotion to the emotion set
-async function Add_New_Emotion(){
-    new_emotion_text = document.getElementById("emotions-new-emotion-textarea-id").value
-    new_emotion_value = document.getElementById("new-emotion-range-id").value
-
-    if(new_emotion_text){
-        image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
-        keys_tmp = Object.keys(image_annotations["taggingEmotions"])
-        boolean_included = keys_tmp.includes(new_emotion_text)
-        if(boolean_included == false){
-            image_annotations["taggingEmotions"][new_emotion_text] = new_emotion_value
-            emotion_div = document.getElementById("emotion-collectionlist-div-id")
-
-            emotion_inner_html = `<div class="emotion-list-class" id="emotion-entry-div-id-${new_emotion_text}">
-                                    <img class="emotion-delete-icon-class" id="emotion-delete-button-id-${new_emotion_text}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
-                                        onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" alt="emotions" title="remove"  />
-                                    <span class="emotion-label-view-class" id="emotion-id-label-view-name-${new_emotion_text}">${new_emotion_text}</span>
-                                    <input id="emotion-range-id-${new_emotion_text}" type="range" min="0" max="100" value="0">
-                                </div>
-                                `
-            
-            emotion_div.insertAdjacentHTML('beforeend', emotion_inner_html);   
-            //add the delete emotion handler
-            document.getElementById(`emotion-delete-button-id-${new_emotion_text}`).addEventListener("click", function() {
-                Delete_Emotion(`${new_emotion_text}`);
-            }, false);
-            document.getElementById('emotion-range-id-'+new_emotion_text).value = `${new_emotion_value}`
-            await TAGGING_IDB_MODULE.Update_Record(image_annotations)
-            //do not save upon addition of a new emotion, the save button is necessary
-            document.getElementById("emotions-new-emotion-textarea-id").value = ""
-            document.getElementById("new-emotion-range-id").value = `0`
-        } else {
-            document.getElementById("emotions-new-emotion-textarea-id").value = ""
-        }
-         //refresh emotion container fill
-        TAGGING_VIEW_ANNOTATE_MODULE.Emotion_Display_Fill(image_annotations)
-    }
-
-}
-
-
-//delete an emotion from the emotion set
-async function Delete_Emotion(emotion_key){
-    //emotion_name = emotion_key.split("-")[1]
-
-    element_div = document.getElementById('emotion-entry-div-id-'+emotion_key);
-    element_div.remove();
-
-    image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])
-    delete image_annotations["taggingEmotions"][emotion_key];
-    await TAGGING_IDB_MODULE.Update_Record(image_annotations)
-
-    //refresh emotion container fill
-    TAGGING_VIEW_ANNOTATE_MODULE.Emotion_Display_Fill(image_annotations)
 }
 
 
