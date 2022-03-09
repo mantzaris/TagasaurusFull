@@ -8,18 +8,14 @@ const CRYPTO = require('crypto')
 //the object for the window functionality
 const IPC_RENDERER = require('electron').ipcRenderer 
 
-//module for the main annotation view alterations-directly affects the DOM
-//const TAGGING_VIEW_ANNOTATE_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'tagging'+PATH.sep+'tagging-view-annotate.js'); //require('./taga-JS/tagging-view-annotate.js');
-//module for HELPING the PROCESS of deleting an image and the references to it
-const TAGGING_DELETE_HELPER_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'tagging-delete-helper.js'); //require('./myJS/tagging-delete-helper.js')
 //module for the processing of the description
 const DESCRIPTION_PROCESS_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'description-processing.js'); //require('./myJS/description-processing.js');
 //module functions for DB connectivity
 const TAGGING_IDB_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'tagging-db-fns.js'); //require('./myJS/tagging-db-fns.js'); 
 //copies files and adds salt for conflicting same file names
-const MY_FILE_HELPER = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'copy-new-file-helper.js') //require('./myJS/copy-new-file-helper.js')
+const MY_FILE_HELPER = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'copy-new-file-helper.js') //require('./myJS/copy-new-file-helper.js')
 //functionality to insert an element into a sorted array with binary search
-const MY_ARRAY_INSERT_HELPER = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'utility-insert-into-sorted-array.js') //require('./myJS/utility-insert-into-sorted-array.js')
+const MY_ARRAY_INSERT_HELPER = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'utility-insert-into-sorted-array.js') //require('./myJS/utility-insert-into-sorted-array.js')
 //the folder to store the taga images (with a commented set of alternative solutions that all appear to work)
 const TAGA_IMAGE_DIRECTORY = PATH.resolve(PATH.resolve(),'images') //PATH.resolve(__dirname, '..', 'images') //PATH.join(__dirname,'..','images')  //PATH.normalize(__dirname+PATH.sep+'..') + PATH.sep + 'images'     //__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
 //holds the last directory the user imported images from
@@ -78,14 +74,14 @@ function Description_Hashtags_Display_Fill(image_annotation) {
         item.appendChild(document.createTextNode(tag_array[i]));
         list.appendChild(item);
     }
-    document.getElementById('hashtags-innerbox-displayhashtags-id').appendChild(list)
+    document.getElementById('hashtags-innerbox-displayhashtags-id').appendChild(list);
 }
 //DESCRIPTION AND HASHTAGS POPULATE END<<<
 
 //EMOTION STUFF START>>>
 //populate the emotion value view with emotional values
 async function Emotion_Display_Fill(image_annotation) {
-    emotion_div = document.getElementById("emotion-collectionlist-div-id")
+    emotion_div = document.getElementById("emotion-collectionlist-div-id");
     emotion_html_tmp = ''
     for( var key of Object.keys(image_annotation["taggingEmotions"]) ) {
         emotion_html_tmp += `<div class="emotion-list-class" id="emotion-entry-div-id-${key}">
@@ -307,148 +303,119 @@ First_Display_Init();
 //HANLDE FOLDER IMAGE AND DB MATCH START>>>
 //update the file variable storing the array of all the files in the folder
 function Refresh_File_List() {
-    image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY)
+    image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY);
 }
 //fill the IDB for 'tagging' when loading so new files are taken into account 'eventually', feed it the DB list of files
 //load files in the directory but not DB, into the DB with defaults
 //DB entries not in the directory are lingering entries to be deleted
 async function Check_And_Handle_New_Images_IDB() {
-    current_DB_file_list = TAGGING_IDB_MODULE.Read_All_Keys_From_DB()
+    current_DB_file_list = TAGGING_IDB_MODULE.Read_All_Keys_From_DB();
     //default annotation New_Image_Display(n) bj values to use when new file found
     for( ii = 0; ii < image_files_in_dir.length; ii++){
-        bool_new_file_name = current_DB_file_list.some( name_tmp => name_tmp === `${image_files_in_dir[ii]}` )
+        bool_new_file_name = current_DB_file_list.some( name_tmp => name_tmp === `${image_files_in_dir[ii]}` );
         if( bool_new_file_name == false ) {
             image_name_tmp = `${image_files_in_dir[ii]}`
-            tagging_entry = TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION; //JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
-            tagging_entry.imageFileName = image_name_tmp
-            tagging_entry.imageFileHash = Return_File_Hash(`${TAGA_IMAGE_DIRECTORY}/${image_name_tmp}`)
-            await TAGGING_IDB_MODULE.Insert_Record(tagging_entry)
+            tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
+            tagging_entry.imageFileName = image_name_tmp;
+            tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_IMAGE_DIRECTORY}${PATH.sep}${image_name_tmp}`);
+            await TAGGING_IDB_MODULE.Insert_Record(tagging_entry);
         }
     }
     //file no longer present so it's entry is to be deleted
-    for( ii = 0; ii < current_DB_file_list.length; ii++){
-        bool_missing_file_name = image_files_in_dir.some( name_tmp => name_tmp === `${current_DB_file_list[ii]}` )
+    for( ii = 0; ii < current_DB_file_list.length; ii++) {
+        bool_missing_file_name = image_files_in_dir.some( name_tmp => name_tmp === `${current_DB_file_list[ii]}` );
         if( bool_missing_file_name == false ) {
             //the picture file name in context
             image_name_tmp = `${current_DB_file_list[ii]}`
-            await TAGGING_IDB_MODULE.Delete_Record(image_name_tmp)
+            await TAGGING_IDB_MODULE.Delete_Record(image_name_tmp);
         }
     }
     await TAGGING_IDB_MODULE.Delete_Void_MemeChoices() //!!!needs to be optimized
 }
-//HANLDE FOLDER IMAGE AND DB MATCH END>>>
+//HANLDE FOLDER IMAGE AND DB MATCH END<<<
 
 
-
-//!!! needs fixing
-//load the default image, typically called to avoid having nothing in the DB but can be
-//deleted by the user later when they have more images stored.
+//SAVING, LOADING, DELETING, ETC START>>>
+//process image for saving including the text to tags (Called from the html Save button)
+async function Save_Image_Annotation_Changes() {
+    new_record = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1]); //JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
+    //the picture file name in context
+    image_name = `${image_files_in_dir[image_index - 1]}`;
+    //save meme changes
+    current_memes = new_record.taggingMemeChoices;
+    meme_switch_booleans = [] //meme selection toggle switch check boxes
+    for (var ii = 0; ii < current_memes.length; ii++) {
+        meme_boolean_tmp = document.getElementById(`meme-toggle-id-${current_memes[ii]}`).checked;
+        if(meme_boolean_tmp == true) {
+            meme_switch_booleans.push(current_memes[ii]);
+        }
+    }
+    //handle textual description, process for tag words
+    rawDescription = document.getElementById('description-textarea-id').value;
+    processed_tag_word_list = DESCRIPTION_PROCESS_MODULE.process_description(rawDescription);
+    //change the object fields accordingly
+    new_record.imageFileName = image_name;
+    new_record.taggingMemeChoices = meme_switch_booleans;
+    new_record.taggingRawDescription = rawDescription;
+    new_record.taggingTags = processed_tag_word_list;
+    for( var key of Object.keys(new_record["taggingEmotions"]) ) {
+        new_record["taggingEmotions"][key] = document.getElementById('emotion-range-id-'+key).value;
+    }
+    await TAGGING_IDB_MODULE.Update_Record(new_record);
+    Load_State_Of_Image_IDB(); //TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_annotations)
+}
+//load the default image, typically called to avoid having nothing in the DB but can be deleted later on
 async function Load_Default_Taga_Image(){
-
-    console.log(PATH.resolve(PATH.resolve())+PATH.sep+'Taga.png')
-    taga_source_path = PATH.resolve(PATH.resolve())+PATH.sep+'Taga.png'
-    FS.copyFileSync(taga_source_path, `${TAGA_IMAGE_DIRECTORY}/${'Taga.png'}`, FS.constants.COPYFILE_EXCL)
-    tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
-    tagging_entry.imageFileName = 'Taga.png'
-    tagging_entry.imageFileHash = Return_File_Hash(`${TAGA_IMAGE_DIRECTORY}/${'Taga.png'}`)
-
-    await TAGGING_IDB_MODULE.Insert_Record(tagging_entry)
-    Refresh_File_List()
-
+    taga_source_path = PATH.resolve()+PATH.sep+'Taga.png';
+    FS.copyFileSync(taga_source_path, `${TAGA_IMAGE_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL);
+    tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
+    tagging_entry.imageFileName = 'Taga.png';
+    tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_IMAGE_DIRECTORY}${PATH.sep}${'Taga.png'}`);
+    await TAGGING_IDB_MODULE.Insert_Record(tagging_entry);
+    Refresh_File_List();
 }
-
-function Return_File_Hash(image_file_path){
-    taga_image_fileBuffer = FS.readFileSync(image_file_path);
-    HASH_SUM_SHA256 = CRYPTO.createHash('sha512');
-    HASH_SUM_SHA256.update(taga_image_fileBuffer)
-    hex_hash_sum = HASH_SUM_SHA256.digest('hex')
-    return hex_hash_sum
+//delete image from user choice
+async function Delete_Image() {
+    FS.unlinkSync( `${TAGA_IMAGE_DIRECTORY}${PATH.sep}${image_files_in_dir[image_index-1]}` );
+    image_ind_to_delete = await image_files_in_dir.indexOf(image_files_in_dir[image_index-1]);
+    await TAGGING_IDB_MODULE.Delete_Record(image_files_in_dir[image_index-1]);
+    image_files_in_dir.splice(image_ind_to_delete, 1); //Refresh_File_List();
+    await TAGGING_IDB_MODULE.Delete_Void_MemeChoices(); //!!!needs to be optimized
+    if(image_files_in_dir.length == 0) {
+        Load_Default_Taga_Image();
+    }
+    New_Image_Display( 0 ); //pass zero to display current and not forward or backward
 }
-
 //dialog window explorer to select new images to import, and calls the functions to update the view
 //checks whether the directory of the images is the taga image folder and if so returns
-//returns if cancelled the selection
-async function Load_New_Image() {
-    
-    const result = await IPC_RENDERER.invoke('dialog:tagging-new-file-select',{directory: last_user_image_directory_chosen})
+async function Load_New_Image() {    
+    const result = await IPC_RENDERER.invoke('dialog:tagging-new-file-select',{directory: last_user_image_directory_chosen});
     //ignore selections from the taga image folder store
     if(result.canceled == true || PATH.dirname(result.filePaths[0]) == TAGA_IMAGE_DIRECTORY) {
         return
     }
-
-    last_user_image_directory_chosen = PATH.dirname(result.filePaths[0])
-    filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_IMAGE_DIRECTORY)
+    last_user_image_directory_chosen = PATH.dirname(result.filePaths[0]);
+    filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_IMAGE_DIRECTORY);
     if(filenames.length == 0){
         return
     }
     filenames.forEach(filename => {
         tagging_entry_tmp = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
-        tagging_entry_tmp.imageFileName = filename
-        tagging_entry_tmp.imageFileHash = Return_File_Hash(`${TAGA_IMAGE_DIRECTORY}/${filename}`)
-        TAGGING_IDB_MODULE.Insert_Record(tagging_entry_tmp)
-        MY_ARRAY_INSERT_HELPER.Insert_Into_Sorted_Array(image_files_in_dir,filename)
+        tagging_entry_tmp.imageFileName = filename;
+        tagging_entry_tmp.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_IMAGE_DIRECTORY}/${filename}`);
+        TAGGING_IDB_MODULE.Insert_Record(tagging_entry_tmp);
+        MY_ARRAY_INSERT_HELPER.Insert_Into_Sorted_Array(image_files_in_dir,filename); //maintain the alphabetical order after the insertion in place (pass by ref)
     });
-    filename_index = image_files_in_dir.indexOf(filenames[0]) //set index to first of the new images
-    image_index = filename_index + 1
-    image_annotations = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index-1])
-    TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_annotations)
-    New_Image_Display(0)
+    image_index = image_files_in_dir.indexOf(filenames[0]) + 1; //set index to first of the new images
+    image_annotation = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index-1]);
+    Load_State_Of_Image_IDB();
+    New_Image_Display( 0 );
 }
+//SAVING, LOADING, DELETING, ETC END<<<
 
 
 
 
-
-//process image for saving including the text to tags (Called from the html Save button)
-async function Save_Image_Annotation_Changes() {
-
-    new_record = await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[image_index - 1])//JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
-    
-    //the picture file name in context
-    image_name = `${image_files_in_dir[image_index - 1]}`
-    
-    //save meme changes
-    current_memes = new_record.taggingMemeChoices
-    meme_switch_booleans = [] //meme selection toggle switch check boxes
-    for (var ii = 0; ii < current_memes.length; ii++) {
-        meme_boolean_tmp = document.getElementById(`meme-toggle-id-${current_memes[ii]}`).checked
-        if(meme_boolean_tmp == true){
-            meme_switch_booleans.push(current_memes[ii])
-        }
-    }
-    
-    //handle textual description, process for tag words
-    rawDescription = document.getElementById('description-textarea-id').value
-    rawDescription_processed = DESCRIPTION_PROCESS_MODULE.process_description(rawDescription)
-    processed_tag_word_list = rawDescription_processed //.split(' ')
-
-    //change the object fields accordingly
-    new_record.imageFileName = image_name
-    new_record.taggingMemeChoices = meme_switch_booleans
-    new_record.taggingRawDescription = rawDescription
-    new_record.taggingTags = processed_tag_word_list
-    for( var key of Object.keys(new_record["taggingEmotions"]) ){
-        new_record["taggingEmotions"][key] = document.getElementById('emotion-range-id-'+key).value
-    }
-
-    await TAGGING_IDB_MODULE.Update_Record(new_record)
-    Load_State_Of_Image_IDB() //TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_annotations)
-}
-
-//delete image from user choice
-async function Delete_Image() {
-    success = await TAGGING_DELETE_HELPER_MODULE.Delete_Image_File(image_files_in_dir[image_index-1])
-    if(image_files_in_dir.length == 0){
-        Load_Default_Taga_Image()
-    }
-    //Why this is needed?.. I do not know. when I remove it the memes are not update by the time the 
-    //following display call is needed. it appears there is some kind of 'race condition' i cannot track down!!!
-    await TAGGING_IDB_MODULE.Get_Record(image_files_in_dir[0])
-    if(success == 1){
-        New_Image_Display( 0 )
-    }
-    Refresh_File_List()
-}
 
 
 

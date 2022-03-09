@@ -116,5 +116,6 @@ function Return_File_Hash(image_file_path){
     hex_hash_sum = HASH_SUM_SHA256.digest('hex')
     return hex_hash_sum
 }
+exports.Return_File_Hash = Return_File_Hash
 
 
