@@ -27,8 +27,8 @@ async function Copy_Non_Taga_Files(result,dir_pics){
     file_paths = result.filePaths    
     for (file_path of file_paths ) {
         file_hash_tmp = Return_File_Hash(file_path)
-        await TAGGING_IDB_MODULE.Create_Db()
-        hash_exists = await TAGGING_IDB_MODULE.Check_File_Hash_Exists(file_hash_tmp)
+        await TAGGING_DB_MODULE.Create_Db()
+        hash_exists = await TAGGING_DB_MODULE.Check_File_Hash_Exists(file_hash_tmp)
         hash_in_current_set = current_file_hashes_tmp.some( hash => hash == file_hash_tmp )
         if(hash_exists == false && hash_in_current_set == false){
             file_paths_unique_hash.push(file_path)
@@ -73,8 +73,8 @@ async function Copy_Non_Taga_Files_Entity(result,dir_pics){
     file_paths = result.filePaths    
     for (file_path of file_paths ) {
         file_hash_tmp = Return_File_Hash(file_path)
-        await TAGGING_IDB_MODULE.Create_Db()
-        hash_exists = await TAGGING_IDB_MODULE.Check_File_Hash_Exists(file_hash_tmp)
+        await TAGGING_DB_MODULE.Create_Db()
+        hash_exists = await TAGGING_DB_MODULE.Check_File_Hash_Exists(file_hash_tmp)
         hash_in_current_set = current_file_hashes_tmp.some( hash => hash == file_hash_tmp )
         if(hash_exists == false && hash_in_current_set == false){
             file_paths_unique_hash.push(file_path)

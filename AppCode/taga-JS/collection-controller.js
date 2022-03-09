@@ -67,7 +67,7 @@ async function Delete_Collection_From_DB(entityName) {
     await COLLECTION_DB_MODULE.Delete_Record(entityName)
 }
 async function Create_Tagging_DB_Instance() {
-    TAGGING_DB_MODULE.Create_Db()
+    await TAGGING_DB_MODULE.Create_Db()
 }
 async function Get_Tagging_Record_In_DB(filename) {
     return await TAGGING_DB_MODULE.Get_Record(filename)

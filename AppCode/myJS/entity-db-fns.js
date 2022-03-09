@@ -4,7 +4,7 @@ const FSE = require('fs-extra');
 const FS = require('fs');
 const { profile } = require('console');
 
-const MY_FILE_HELPER = require('./copy-new-file-helper.js')
+//const MY_FILE_HELPER = require('./copy-new-file-helper.js')
 
 
 const DIR_PICS_ENTITY_DB = reqPath = PATH.join(__dirname, '../../images')  // __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
