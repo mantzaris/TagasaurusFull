@@ -50,6 +50,9 @@ var search_meme_results_selected = '';
 var search_meme_results = '';
 
 
+var reg_exp_delims = /[#:,;| ]+/
+
+
 
 //MODEL DB ACCESS FUNCTIONS START>>>
 async function Create_Tagging_DB_Instance() {
@@ -448,12 +451,11 @@ tagging_search_obj = {
                         searchTags:[],
                         searchMemeTags:[]
                     }
-search_images_complete = false
+search_images_complete = false //!!! needed?
 
 
 //functionality for the searching of the images
 function Search_Images(){
-
     // Show the modal
     let modal_search_click = document.getElementById("search-modal-click-top-id");
     modal_search_click.style.display = "block";
@@ -469,15 +471,78 @@ function Search_Images(){
             modal_search_click.style.display = "none";
         }
     }
+    //clear the search obj to make it fresh and reset the fields
+    document.getElementById("modal-search-tag-textarea-entry-id").value = ""
+    document.getElementById("modal-search-meme-tag-textarea-entry-id").value = ""
+    document.getElementById("modal-search-emotion-label-value-textarea-entry-id").value = ""
+    document.getElementById("modal-search-emotion-value-range-entry-id").value = "0"
+    document.getElementById("modal-search-emotion-label-value-display-container-div-id").innerHTML = ""
+    document.getElementById("modal-search-images-results-grid-div-area-id").innerHTML = ""
+    document.getElementById("modal-search-meme-images-results-grid-div-area-id").innerHTML = ""
+    tagging_search_obj = {
+        emotions:{},
+        searchTags:[],
+        searchMemeTags:[]
+    }
+    //user presses 'reset' button so the fields of the modal become the default
+    document.getElementById("modal-search-main-reset-button-id").onclick = function() {
+        document.getElementById("modal-search-tag-textarea-entry-id").value = ""
+        document.getElementById("modal-search-meme-tag-textarea-entry-id").value = ""
+        document.getElementById("modal-search-emotion-label-value-textarea-entry-id").value = ""
+        document.getElementById("modal-search-emotion-value-range-entry-id").value = "0"
+        document.getElementById("modal-search-emotion-label-value-display-container-div-id").innerHTML = ""
+        document.getElementById("modal-search-images-results-grid-div-area-id").innerHTML = ""
+        document.getElementById("modal-search-meme-images-results-grid-div-area-id").innerHTML = ""
+        tagging_search_obj = {
+            emotions:{},
+            searchTags:[],
+            searchMemeTags:[]
+        }
+    }
+    
+    //handler for the emotion label and value entry additions and then the deletion handling, all emotions are added by default and handled 
+    document.getElementById("modal-search-emotion-entry-button-id").onclick = function() {
+        entered_emotion_label = document.getElementById("modal-search-emotion-label-value-textarea-entry-id").value
+        emotion_search_entry_value = document.getElementById("modal-search-emotion-value-range-entry-id").value
+        if( entered_emotion_label != "" ) {
+            tagging_search_obj["emotions"][entered_emotion_label] = emotion_search_entry_value
+        }
+        document.getElementById("modal-search-emotion-label-value-textarea-entry-id").value = ""
+        document.getElementById("modal-search-emotion-value-range-entry-id").value = "0"
+        image_emotions_div_id = document.getElementById("modal-search-emotion-label-value-display-container-div-id")
+        image_emotions_div_id.innerHTML = ""
+        //Populate for the emotions of the images
+        Object.keys(tagging_search_obj["emotions"]).forEach(emotion_key => {
+            image_emotions_div_id.innerHTML += `
+                                    <span id="modal-search-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
+                                    <img class="modal-search-emotion-remove-button-class" id="modal-search-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='${CLOSE_ICON_RED}';"
+                                        onmouseout="this.src='${CLOSE_ICON_BLACK}';" src="${CLOSE_ICON_BLACK}" title="close" />
+                                    (${emotion_key},${tagging_search_obj["emotions"][emotion_key]})
+                                    </span>
+                                    `
+        })
+        //action listener for the removal of emotions populated from user entry
+        Object.keys(tagging_search_obj["emotions"]).forEach(emotion_key => {
+            document.getElementById(`modal-search-emotion-remove-button-id-${emotion_key}`).addEventListener("click", function() {
+                search_emotion_search_span_html_obj = document.getElementById(`modal-search-emotion-label-value-span-id-${emotion_key}`);
+                search_emotion_search_span_html_obj.remove();
+                delete tagging_search_obj["emotions"][emotion_key]
+            })
+        })
+    }
+
+
+
+
+
+
+
+
 
 
     //user presses the main search button for the add memes search modal
     document.getElementById("modal-search-main-button-id").onclick = function() {
         Modal_Search_Entry()
-    }
-    //user presses this to 'reset' the fields of the add memes search modal so that they become the default
-    document.getElementById("modal-search-main-reset-button-id").onclick = function() {
-        Search_Images_RESET_Modal_Fields()
     }
 
     //user presses this to 'choose' the results of the search from the images
@@ -489,80 +554,20 @@ function Search_Images(){
         Chose_Image_Search_Meme_Results()
     }
 
-    //populate the search modal with the fields to insert emotion tags and values
-    Search_Modal_Populate_Emotions()
-    document.getElementById("modal-search-emotion-entry-button-id").onclick = function() {
-        Search_Modal_Emotion_Entry()
-    }
+
 
 
 }
 
 
-//function to handle entry of new emotions and values for the search entry
-function Search_Modal_Emotion_Entry() {
-    entered_emotion_label = document.getElementById("modal-search-emotion-label-value-textarea-entry-id").value
-    emotion_search_entry_value = document.getElementById("modal-search-emotion-value-range-entry-id").value
-    if( entered_emotion_label != "" ) {
-        tagging_search_obj["emotions"][entered_emotion_label] = emotion_search_entry_value
-        Search_Modal_Populate_Emotions()
-    }
-}
-
-//add the emotions from the object of the modal search to the modal view with the delete listener for each one
-function Search_Modal_Populate_Emotions() {
-
-    image_emotions_div_id = document.getElementById("modal-search-emotion-label-value-display-container-div-id")
-    image_emotions_div_id.innerHTML = ""
-
-    //Populate for the emotions of the images
-    Object.keys(tagging_search_obj["emotions"]).forEach(emotion_key => {
-        image_emotions_div_id.innerHTML += `
-                                <span id="modal-search-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
-                                <img class="modal-search-emotion-remove-button-class" id="modal-search-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
-                                    onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
-                                (${emotion_key},${tagging_search_obj["emotions"][emotion_key]})
-                                </span>
-                                `
-    })
-
-    //action listener for the removal of emotions populated from user entry
-    Object.keys(tagging_search_obj["emotions"]).forEach(emotion_key => {
-        document.getElementById(`modal-search-emotion-remove-button-id-${emotion_key}`).addEventListener("click", function() {
-            search_emotion_search_span_html_obj = document.getElementById(`modal-search-emotion-label-value-span-id-${emotion_key}`);
-            search_emotion_search_span_html_obj.remove();
-            delete tagging_search_obj["emotions"][emotion_key]
-            Meme_Addition_Modal_Emotion_Populate_View()
-        })
-    })
-}
 
 
-//called when the user chooses to 'reset' the fields for the search modal
-function Search_Images_RESET_Modal_Fields(){
-    //reset object
-    tagging_search_obj = {
-        emotions:{},
-        searchTags:[],
-        searchMemeTags:[]
-    }
-    //clear the search form from previous entries
-    document.getElementById("modal-search-tag-textarea-entry-id").value = ""
-    document.getElementById("modal-search-meme-tag-textarea-entry-id").value = ""
-    document.getElementById("modal-search-emotion-label-value-textarea-entry-id").value = ""
-    document.getElementById("modal-search-emotion-value-range-entry-id").value = "0"
-    document.getElementById("modal-search-emotion-label-value-display-container-div-id").innerHTML = ""
-    document.getElementById("modal-search-images-results-grid-div-area-id").innerHTML = ""
-    document.getElementById("modal-search-meme-images-results-grid-div-area-id").innerHTML = ""
 
-    search_images_complete = false
-}
 
 
 //when the tagging search modal 'search' button is pressed
 async function Modal_Search_Entry() {
 
-    reg_exp_delims = /[#:,;| ]+/
 
     //annotation tags
     search_tags_input = document.getElementById("modal-search-tag-textarea-entry-id").value
@@ -825,9 +830,6 @@ async function Meme_Choose_Search_Results(){
 //the functionality to use the object to search the DB for relevant memes
 async function Modal_Meme_Search_Btn(){
 
-    //after doing the search
-
-    reg_exp_delims = /[#:,;| ]+/
 
     //image annotation tags
     search_tags_input = document.getElementById("modal-search-add-memes-tag-textarea-entry-id").value
