@@ -878,7 +878,7 @@ async function Add_Gallery_Images() {
     document.getElementById("modal-search-images-results-select-images-order-button-id").onclick = async function() {
         update = false
         all_image_keys.forEach( image_filename => {
-            image_path_tmp = TAGA_IMAGE_DIRECTORY + '/' + image_filename
+            image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
             if(FS.existsSync(image_path_tmp) == true && current_entity_obj.entityImageSet.includes(image_filename)==false) {
                 if(document.getElementById(`add-image-toggle-id-${image_filename}`).checked){
                     current_entity_obj.entityImageSet.push(image_filename)
