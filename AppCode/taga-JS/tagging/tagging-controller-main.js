@@ -451,9 +451,6 @@ tagging_search_obj = {
                         searchTags:[],
                         searchMemeTags:[]
                     }
-search_images_complete = false //!!! needed?
-
-
 //functionality for the searching of the images
 function Search_Images(){
     // Show the modal
@@ -626,9 +623,6 @@ async function Modal_Search_Entry() {
 }
 
 
-
-
-
 /******************************
 MEME SEARCH STUFF!!! SEARCH FOR MEMES TO ADD THEM AS AN ANNOTATION
 ******************************/
@@ -638,13 +632,8 @@ meme_tagging_search_obj = {
     searchTags:[],
     searchMemeTags:[]
 }
-search_complete = false
-
-
-//called from the HTML button onclik
-//add a new meme which is searched for by the user
-function Add_New_Meme(){
-    
+//called from the HTML button onclik, add a new meme which is searched for by the user
+function Add_New_Meme(){    
     // Show the modal
     var modal_add_memes_search_click = document.getElementById("search-add-memes-modal-click-top-id");
     modal_add_memes_search_click.style.display = "block";
@@ -660,110 +649,6 @@ function Add_New_Meme(){
             modal_add_memes_search_click.style.display = "none";
         }
     }
-    //user presses the main search button for the add memes search modal
-    document.getElementById("modal-search-add-memes-main-button-id").onclick = function() {
-        Modal_Meme_Search_Btn()
-    }
-    //user presses it after the fields have been entered to search the images to then add memes
-    var select_search_modal_meme_images = document.getElementById("modal-search-add-memes-images-results-select-images-order-button-id")
-    select_search_modal_meme_images.onclick = function() {
-        Meme_Choose_Search_Results()
-    }
-    //user presses this to 'reset' the fields of the add memes search modal so that they become the default
-    var select_reset_modal_meme_add_images_fields = document.getElementById("modal-search-add-memes-reset-button-id")
-    select_reset_modal_meme_add_images_fields.onclick = function() {
-        Search_Add_Meme_RESET_Modal_Fields()
-    }
-
-    //populate the search meme modal with the fields to insert emotion tags and values and handle new emotion entries
-    Meme_Addition_Modal_Emotion_Populate_View()
-    document.getElementById("modal-search-add-memes-emotion-entry-button-id").onclick = function() {
-        Meme_Addition_Modal_Emotion_Entry('image_emotion')
-    }
-    document.getElementById("modal-search-add-memes-emotion-meme-entry-button-id").onclick = function() {
-        Meme_Addition_Modal_Emotion_Entry('meme_emotion')
-    }
-
-}
-
-//function to handle entry of new emotions and values for the search entry
-function Meme_Addition_Modal_Emotion_Entry(image_or_meme_emotion) {
-    if( image_or_meme_emotion == 'image_emotion') {
-        entered_emotion_label = document.getElementById("modal-search-add-memes-emotion-label-value-textarea-entry-id").value
-        emotion_search_entry_value = document.getElementById("modal-search-add-memes-emotion-value-range-entry-id").value
-        if( entered_emotion_label != "" ) {
-            meme_tagging_search_obj["emotions"][entered_emotion_label] = emotion_search_entry_value
-            Meme_Addition_Modal_Emotion_Populate_View()
-        }
-    } else if( image_or_meme_emotion == 'meme_emotion') {
-        entered_emotion_label = document.getElementById("modal-search-add-memes-emotion-meme-label-value-textarea-entry-id").value
-        emotion_search_entry_value = document.getElementById("modal-search-add-memes-emotion-meme-value-range-entry-id").value
-        if( entered_emotion_label != "" ) {
-            meme_tagging_search_obj["meme_emotions"][entered_emotion_label] = emotion_search_entry_value
-            Meme_Addition_Modal_Emotion_Populate_View()
-        }
-    }
-}
-
-//For the user entered emotion label-value pair to be displayed on the modal and included into the search object
-function Meme_Addition_Modal_Emotion_Populate_View() {
-
-    image_emotions_div_id = document.getElementById("modal-search-add-memes-emotion-label-value-display-container-div-id")
-    image_emotions_div_id.innerHTML = ""
-    image_memes_emotions_div_id = document.getElementById("modal-search-add-memes-emotion-meme-label-value-display-container-div-id")
-    image_memes_emotions_div_id.innerHTML = ""
-
-    //Populate for the emotions of the images
-    Object.keys(meme_tagging_search_obj["emotions"]).forEach(emotion_key => {
-        image_emotions_div_id.innerHTML += `
-                                <span id="modal-search-add-memes-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
-                                <img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
-                                    onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
-                                (${emotion_key},${meme_tagging_search_obj["emotions"][emotion_key]})
-                                </span>
-                                `
-    })
-    //Populate for the emotions of the memes of the images
-    Object.keys(meme_tagging_search_obj["meme_emotions"]).forEach(emotion_key => {
-        image_memes_emotions_div_id.innerHTML += `
-                                <span id="modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}" style="white-space:nowrap">
-                                    <img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
-                                        onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
-                                    (${emotion_key},${meme_tagging_search_obj["meme_emotions"][emotion_key]})
-                                </span>
-                                `
-    })
-
-    //action listener for the removal of emotions populated from user entry
-    Object.keys(meme_tagging_search_obj["emotions"]).forEach(emotion_key => {
-        document.getElementById(`modal-search-add-memes-emotion-remove-button-id-${emotion_key}`).addEventListener("click", function() {
-            search_emotion_search_span_html_obj = document.getElementById(`modal-search-add-memes-emotion-label-value-span-id-${emotion_key}`);
-            search_emotion_search_span_html_obj.remove();
-            delete meme_tagging_search_obj["emotions"][emotion_key]
-            Meme_Addition_Modal_Emotion_Populate_View()
-        })
-    })
-    //action listener for the removal of meme emotions populated from user entry
-    Object.keys(meme_tagging_search_obj["meme_emotions"]).forEach(emotion_key => {
-        document.getElementById(`modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}`).addEventListener("click", function() {
-            search_meme_emotion_search_span_html_obj = document.getElementById(`modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}`);
-            search_meme_emotion_search_span_html_obj.remove();
-            delete meme_tagging_search_obj["meme_emotions"][emotion_key]
-            Meme_Addition_Modal_Emotion_Populate_View()
-        })
-    })
-
-}
-
-//called when the user chooses to 'reset' the fields for the meme search modal
-function Search_Add_Meme_RESET_Modal_Fields(){
-    //reset object
-    meme_tagging_search_obj = {
-        meme_emotions:{},
-        emotions:{},
-        searchTags:[],
-        searchMemeTags:[]
-    }
     //clear the search form from previous entries
     document.getElementById("modal-search-add-memes-tag-textarea-entry-id").value = ""
     document.getElementById("modal-search-add-memes-tag-textarea-memes-entry-id").value = ""
@@ -776,91 +661,157 @@ function Search_Add_Meme_RESET_Modal_Fields(){
     document.getElementById("modal-search-add-memes-emotion-meme-label-value-display-container-div-id").innerHTML = ""
     document.getElementById("modal-search-add-memes-images-results-grid-div-area-id").innerHTML = ""
     document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id").innerHTML = ""
-    search_meme_complete = false
-}
+    meme_tagging_search_obj = {
+        meme_emotions:{},
+        emotions:{},
+        searchTags:[],
+        searchMemeTags:[]
+    }
+    document.getElementById("modal-search-add-memes-reset-button-id").onclick = function() {
+        document.getElementById("modal-search-add-memes-tag-textarea-entry-id").value = ""
+        document.getElementById("modal-search-add-memes-tag-textarea-memes-entry-id").value = ""
+        document.getElementById("modal-search-add-memes-emotion-label-value-textarea-entry-id").value = ""
+        document.getElementById("modal-search-add-memes-emotion-meme-label-value-textarea-entry-id").value = ""
+        document.getElementById("modal-search-add-memes-emotion-value-range-entry-id").value = "0"
+        document.getElementById("modal-search-add-memes-emotion-label-value-display-container-div-id").value = ""
+        document.getElementById("modal-search-add-memes-emotion-meme-value-range-entry-id").value = "0"
+        document.getElementById("modal-search-add-memes-emotion-label-value-display-container-div-id").innerHTML = ""
+        document.getElementById("modal-search-add-memes-emotion-meme-label-value-display-container-div-id").innerHTML = ""
+        document.getElementById("modal-search-add-memes-images-results-grid-div-area-id").innerHTML = ""
+        document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id").innerHTML = ""
+        meme_tagging_search_obj = {
+            meme_emotions:{},
+            emotions:{},
+            searchTags:[],
+            searchMemeTags:[]
+        }
+    }
 
-
-//after the search is done and 
-async function Meme_Choose_Search_Results(){
-    //Now update the current file list with the new order of pics 'search_results' which comes from the 
-    //DB search function
-    if( search_meme_complete == true ){
-        
-        record = await TAGGING_DB_MODULE.Get_Record(image_files_in_dir[image_index - 1])//JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
-        memes_current = record.taggingMemeChoices
-
+    //user adds emotions for the 'images' of the search criteria (not meme images)
+    document.getElementById("modal-search-add-memes-emotion-entry-button-id").onclick = function() {
+        entered_emotion_label = document.getElementById("modal-search-add-memes-emotion-label-value-textarea-entry-id").value
+        emotion_search_entry_value = document.getElementById("modal-search-add-memes-emotion-value-range-entry-id").value
+        if( entered_emotion_label != "" ) {
+            meme_tagging_search_obj["emotions"][entered_emotion_label] = emotion_search_entry_value
+            image_emotions_div_id = document.getElementById("modal-search-add-memes-emotion-label-value-display-container-div-id")
+            image_emotions_div_id.innerHTML = ""
+            //Populate for the emotions of the images
+            Object.keys(meme_tagging_search_obj["emotions"]).forEach(emotion_key => {
+                image_emotions_div_id.innerHTML += `
+                                        <span id="modal-search-add-memes-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
+                                        <img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='${CLOSE_ICON_RED}';"
+                                            onmouseout="this.src='${CLOSE_ICON_BLACK}';" src="${CLOSE_ICON_BLACK}" title="close" />
+                                        (${emotion_key},${meme_tagging_search_obj["emotions"][emotion_key]})
+                                        </span>
+                                        `
+            })
+            //action listener for the removal of emotions populated from user entry
+            Object.keys(meme_tagging_search_obj["emotions"]).forEach(emotion_key => {
+                document.getElementById(`modal-search-add-memes-emotion-remove-button-id-${emotion_key}`).onclick = function() {
+                    search_emotion_search_span_html_obj = document.getElementById(`modal-search-add-memes-emotion-label-value-span-id-${emotion_key}`);
+                    search_emotion_search_span_html_obj.remove();
+                    delete meme_tagging_search_obj["emotions"][emotion_key]                    
+                }
+            })
+        }
+        document.getElementById("modal-search-add-memes-emotion-label-value-textarea-entry-id").value = "";
+        document.getElementById("modal-search-add-memes-emotion-value-range-entry-id").value = '0';
+    }
+    //user adds emotions of the 'memes' of the search criteria
+    document.getElementById("modal-search-add-memes-emotion-meme-entry-button-id").onclick = function() {
+        entered_emotion_label = document.getElementById("modal-search-add-memes-emotion-meme-label-value-textarea-entry-id").value
+        emotion_search_entry_value = document.getElementById("modal-search-add-memes-emotion-meme-value-range-entry-id").value
+        if( entered_emotion_label != "" ) {
+            meme_tagging_search_obj["meme_emotions"][entered_emotion_label] = emotion_search_entry_value
+            image_memes_emotions_div_id = document.getElementById("modal-search-add-memes-emotion-meme-label-value-display-container-div-id")
+            image_memes_emotions_div_id.innerHTML = ""
+            //Populate for the emotions of the memes of the images
+            Object.keys(meme_tagging_search_obj["meme_emotions"]).forEach(emotion_key => {
+                image_memes_emotions_div_id.innerHTML += `
+                                        <span id="modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}" style="white-space:nowrap">
+                                            <img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}" onmouseover="this.src='${CLOSE_ICON_RED}';"
+                                                onmouseout="this.src='${CLOSE_ICON_BLACK}';" src="${CLOSE_ICON_BLACK}" title="close" />
+                                            (${emotion_key},${meme_tagging_search_obj["meme_emotions"][emotion_key]})
+                                        </span>
+                                        `
+            })
+            //action listener for the removal of meme emotions populated from user entry
+            Object.keys(meme_tagging_search_obj["meme_emotions"]).forEach(emotion_key => {
+                document.getElementById(`modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}`).addEventListener("click", function() {
+                    search_meme_emotion_search_span_html_obj = document.getElementById(`modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}`);
+                    search_meme_emotion_search_span_html_obj.remove();
+                    delete meme_tagging_search_obj["meme_emotions"][emotion_key]
+                })
+            })
+        }
+        document.getElementById("modal-search-add-memes-emotion-meme-label-value-textarea-entry-id").value = "";
+        document.getElementById("modal-search-add-memes-emotion-meme-value-range-entry-id").value = '0';
+    }
+    //user presses the main search button for the add memes search
+    document.getElementById("modal-search-add-memes-main-button-id").onclick = function() {
+        Modal_Meme_Search_Btn()
+    }
+    //user presses it after the fields have been entered to search the images to then add memes
+    //after the search is done and user has made the meme selection (or not) and they are to be added to the current annotation object
+    document.getElementById("modal-search-add-memes-images-results-select-images-order-button-id").onclick = async function() {
+        memes_current = current_image_annotation.taggingMemeChoices
         //meme selection switch check boxes
         meme_switch_booleans = []
-        for (var ii = 0; ii < image_files_in_dir.length; ii++) {
-            if(memes_current.includes(image_files_in_dir[ii]) == false && record.imageFileName != image_files_in_dir[ii]){  //exclude memes already present
-                    meme_boolean_tmp1 = document.getElementById(`add-memes-images-toggle-id-${image_files_in_dir[ii]}`).checked
-                    meme_boolean_tmp2 = document.getElementById(`add-memes-meme-toggle-id-${image_files_in_dir[ii]}`).checked
+        for (var ii = 0; ii < all_image_keys.length; ii++) {
+            if(memes_current.includes(all_image_keys[ii]) == false && current_image_annotation.imageFileName != all_image_keys[ii]){  //exclude memes already present
+                    meme_boolean_tmp1 = document.getElementById(`add-memes-images-toggle-id-${all_image_keys[ii]}`).checked
+                    meme_boolean_tmp2 = document.getElementById(`add-memes-meme-toggle-id-${all_image_keys[ii]}`).checked
                     if(meme_boolean_tmp1 == true || meme_boolean_tmp2 == true){
-                        meme_switch_booleans.push(image_files_in_dir[ii])
+                        meme_switch_booleans.push(all_image_keys[ii])
                     }
             }
         }
-        
-        meme_switch_booleans.push(...record.taggingMemeChoices)
-        record.taggingMemeChoices = [...new Set(meme_switch_booleans)]
-        await TAGGING_DB_MODULE.Update_Record(record)
-        
+        meme_switch_booleans.push(...current_image_annotation.taggingMemeChoices)
+        current_image_annotation.taggingMemeChoices = [...new Set(meme_switch_booleans)] //add a 'unique' set of memes as the 'new Set' has unique contents
+        await Update_Tagging_Annotation_In_DB(current_image_annotation)
         Load_State_Of_Image_IDB()
-
         modal_add_memes_search_click = document.getElementById("search-add-memes-modal-click-top-id");
         modal_add_memes_search_click.style.display = "none";
     }
-
+    //perform the default search from the time the modal is opened
+    Modal_Meme_Search_Btn()
 }
-
-
 //the functionality to use the object to search the DB for relevant memes
 async function Modal_Meme_Search_Btn(){
-
-
     //image annotation tags
     search_tags_input = document.getElementById("modal-search-add-memes-tag-textarea-entry-id").value
     split_search_string = search_tags_input.split(reg_exp_delims)
     search_unique_search_terms = [...new Set(split_search_string)]
+    search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
     meme_tagging_search_obj["searchTags"] = search_unique_search_terms
-
     //meme tags now
     search_meme_tags_input = document.getElementById("modal-search-add-memes-tag-textarea-memes-entry-id").value
     split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
     search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+    search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
     meme_tagging_search_obj["searchMemeTags"] = search_unique_meme_search_terms
 
-    console.log(`the meme search term object is = ${JSON.stringify(meme_tagging_search_obj)}`)
-
-    //search the DB according to this set of criteria
-    //look through the keys and find the overlapping set
-    search_meme_results = await TAGGING_DB_MODULE.Search_Meme_Images_Basic_Relevances(meme_tagging_search_obj)
-    search_meme_complete = true
-    
-    search_sorted_meme_image_filename_keys = search_meme_results[0]
-    search_sorted_image_filename_keys = search_meme_results[1]
-    
-    //>>SHOW SEARCH RESULTS<<
-    //search images results annotations
-    search_image_results_output = document.getElementById("search-meme-image-results-box-label")
-
+    //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
+    //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
+    meme_search_result_obj = await SEARCH_MODULE.Meme_Addition_Search_Fn(meme_tagging_search_obj,all_image_keys,Get_Tagging_Record_In_DB)
+    img_indices_sorted = meme_search_result_obj.imgInds  
+    meme_img_indices_sorted = meme_search_result_obj.memeInds
     //get the record to know the memes that are present to not present any redundancy
-    record = await TAGGING_DB_MODULE.Get_Record(image_files_in_dir[image_index - 1])//JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
-    memes_current = record.taggingMemeChoices
+    memes_current = current_image_annotation.taggingMemeChoices
 
     //search results display images
     search_meme_images_results_output = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
     search_meme_images_results_output.innerHTML = ""
-    search_sorted_meme_image_filename_keys.forEach(file_key => {
-        if(memes_current.includes(file_key) == false && record.imageFileName != file_key){  //exclude memes already present
-            //console.log(`add-memes-images-toggle-id-${file_key}`)
+    img_indices_sorted.forEach(index => {
+        file_key = all_image_keys[index]
+        if(memes_current.includes(file_key) == false && current_image_annotation.imageFileName != file_key){ //exclude memes already present            
             search_meme_images_results_output.insertAdjacentHTML('beforeend', `
                 <label class="add-memes-memeswitch" title="deselect / include" >   
                     <input id="add-memes-images-toggle-id-${file_key}" type="checkbox" > 
                     <span class="add-memes-slider"></span>   
                 </label>
                 <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${file_key}" >
-                    <img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-image-img-id-${file_key}" src="${TAGA_IMAGE_DIRECTORY}/${file_key}" title="view" alt="memes" />
+                    <img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-image-img-id-${file_key}" src="${TAGA_IMAGE_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="memes" />
                 </div>
                 `
             )
@@ -869,21 +820,21 @@ async function Modal_Meme_Search_Btn(){
     //search results display image memes
     search_meme_images_memes_results_output = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
     search_meme_images_memes_results_output.innerHTML = ""
-    search_sorted_image_filename_keys.forEach(file_key => {
-        if(memes_current.includes(file_key) == false && record.imageFileName != file_key){  //exclude memes already present
+    meme_img_indices_sorted.forEach(index => {
+        file_key = all_image_keys[index]
+        if(memes_current.includes(file_key) == false && current_image_annotation.imageFileName != file_key){ //exclude memes already present
             search_meme_images_memes_results_output.insertAdjacentHTML('beforeend', `
                 <label class="add-memes-memeswitch" title="deselect / include" >   
                     <input id="add-memes-meme-toggle-id-${file_key}" type="checkbox" > 
                     <span class="add-memes-slider"></span>   
                 </label>
                 <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${file_key}" >
-                    <img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}" src="${TAGA_IMAGE_DIRECTORY}/${file_key}" title="view" alt="memes" />
+                    <img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}" src="${TAGA_IMAGE_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="memes" />
                 </div>
                 `
             )
         }
     })
-
 }
 
 
