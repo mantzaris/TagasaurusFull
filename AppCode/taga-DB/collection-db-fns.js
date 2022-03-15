@@ -1,13 +1,5 @@
 
 const PATH = require('path');
-const FSE = require('fs-extra');
-const FS = require('fs');
-const { profile } = require('console');
-
-//const MY_FILE_HELPER = require('./copy-new-file-helper.js')
-
-
-const DIR_PICS_ENTITY_DB = reqPath = PATH.join(__dirname, '../../images')  // __dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
 
 db_entities = null;
 
@@ -257,116 +249,6 @@ function randomExcluded(min, max, excluded) {
 function randInteger(maxInt){
     return Math.floor(Math.random() * maxInt )
 }
-//examine in sequence all the profile images of entities and make sure the file exists or replace it with a candidate gallery image
-//or give it the default taga image
-// async function Check_Presence_Of_Entity_Profile_and_Gallery_Images_and_Memes(){
-//     get_record_promise = new Promise( (resolve, reject) => {        
-//         entity_keys_tmp = Read_All_Keys_From_DB() //get the local keys variable
-//         if(entity_keys == ''){ //if not set up yet, call the DB to get the key list
-//             Get_All_Keys_From_DB()
-//             entity_keys_tmp = Read_All_Keys_From_DB()
-//         }
-//         entity_keys_tmp.forEach( async key_tmp => { //go through the key list to check the profile image integrity            
-//             entity_obj_tmp = await Get_Record(key_tmp)
-            
-//             //MEMES first
-//             if(Array.isArray(entity_obj_tmp.entityMemes) == false || entity_obj_tmp.entityMemes.length == 0) {
-//                 //entity_obj_tmp.entityMemes = [entity_obj_tmp.entityMemes]
-//             } else {
-//                 //now check the MEMES to see if they are there or remove them from the meme store vector
-//                 image_set_tmp = entity_obj_tmp.entityMemes.slice() //clone the array
-//                 entity_obj_tmp.entityMemes.forEach( async image_tmp => {
-//                     filename_path_to_local = DIR_PICS_ENTITY_DB + '/' + image_tmp
-//                     image_exists = FS.existsSync(filename_path_to_local)
-//                     if( FS.existsSync(filename_path_to_local) == false ) { 
-//                         meme_image_ind = image_set_tmp.findIndex(img => img === image_tmp);
-//                         image_set_tmp.splice(meme_image_ind,1) //you cannot splice the array you are looping upon!!!!!             
-//                     }
-//                 })
-//                 entity_obj_tmp.entityMemes = image_set_tmp
-//             }
-//             //going to do gallery and entities together
-//             //doing gallery first since if the gallery is not fresh the profile image substitution is more complicated
-//             image_set_tmp = entity_obj_tmp.entityImageSet.slice() //clone the array
-//             entity_obj_tmp.entityImageSet.forEach( async image_tmp => {
-//                 filename_path_to_local = DIR_PICS_ENTITY_DB + '/' + image_tmp
-//                 image_exists = FS.existsSync(filename_path_to_local)
-//                 if( FS.existsSync(filename_path_to_local) == false ) { 
-//                     gallery_image_ind = image_set_tmp.findIndex(img => img === image_tmp);
-//                     image_set_tmp.splice(gallery_image_ind,1) //you cannot splice the array you are looping upon!!!!!             
-//                 }
-//             })
-//             entity_obj_tmp.entityImageSet = image_set_tmp
-//             //Update_Record(entity_obj_tmp)
-            
-//             //now deal with the PROFILE IMAGE, non-existant files from the image set should already be removed
-//             filename_path_to_local = DIR_PICS_ENTITY_DB + '/' + entity_obj_tmp.entityImage
-//             image_exists = FS.existsSync(filename_path_to_local)
-//             if( FS.existsSync(filename_path_to_local) == false ) {
-//                 num_of_images_in_set = (entity_obj_tmp.entityImageSet).length
-//                 if(num_of_images_in_set >= 1){ //alternatives to choose from within gallery, sample a random image to replace it and excluse prior
-//                     new_profile_candidate_ind = randInteger(num_of_images_in_set)
-//                     new_profile_candidate_image_name = entity_obj_tmp.entityImageSet[new_profile_candidate_ind]
-//                     entity_obj_tmp.entityImage = new_profile_candidate_image_name                    
-//                     Update_Record(entity_obj_tmp)
-//                 } else { //default to Taga for the image (LOL) since there are no gallery alternatives
-//                     filename_path_to_local_TagaPNG = DIR_PICS_ENTITY_DB + '/' + 'Taga.png'
-//                     if( FS.existsSync(filename_path_to_local_TagaPNG) == true ) {
-//                         entity_obj_tmp.entityImage = 'Taga.png'
-//                         entity_obj_tmp.entityImageSet = [ 'Taga.png' ]
-//                         Update_Record(entity_obj_tmp)
-//                     } else { //If Taga is not in the directory
-//                         taga_source = PATH.join(__dirname, '../../Taga.png')
-//                         FS.copyFileSync(taga_source, `${DIR_PICS}/Taga.png`, FS.constants.COPYFILE_EXCL)
-//                         entity_obj_tmp.entityImage = 'Taga.png'
-//                         entity_obj_tmp.entityImageSet = [ 'Taga.png' ]
-//                         Update_Record(entity_obj_tmp)
-//                     }
-//                 }
-//             } else {
-//                 Update_Record(entity_obj_tmp)
-//             }        
-//         });        
-//         resolve(42)
-//     })
-//     await get_record_promise.then(function(value){
-//        //Check_Presence_Of_Gallery_Profile_Images()
-//         //console.log(`the returned promise value is === ${value}`)
-//     })
-// }
-// exports.Check_Presence_Of_Entity_Profile_and_Gallery_Images_and_Memes = Check_Presence_Of_Entity_Profile_and_Gallery_Images_and_Memes
-
-
-
-
-
-
-
-//MUST RUN THIS FUNCTION FIRST TO GET THE DB OBJECT
-//Create_Db()
-
-//* to implement in the future
-//* IDBIndex.getAll()
-//* IDBIndex.getAllKeys()
-//* IDBIndex.getAllKeys(keyRangeValue)
-//* ObjStore.openCursor(keyRangeValue)
-//* IDBIndex.openCursor(keyRangeValue)
-//https://stackoverflow.com/a/56729678/410975
-
-
-
-//incase we need to get rid of the database (NO USE CASE FOR IT YET BUT WHEN USER ACCOUNTS ARE MADE IT WILL BE NEEDED)
-function Delete_Db(){
-    let request = window.indexedDB.deleteDatabase(ENTITY_DB_NAME)
-    request.onsuccess = function(event){
-        console.log(`entity, the Database for the entities, ${ENTITY_DB_NAME} successfully deleted`)
-        console.log(request.result)
-    }
-    request.onerror = function(event){
-        console.log(`entity, the Database for the entities, ${ENTITY_DB_NAME} NOT successfully deleted`)
-        console.log(event.target.error)
-    }
-}
 
 //return all the records in the object store  (NOT BEING USED YET CAUSE WE CURRENTLY ONLY RETURN THE KEYS FOR ALL OBJECTS)
 function Get_All_From_DB(){
@@ -384,71 +266,15 @@ function Get_All_From_DB(){
 }
 exports.Get_All_From_DB = Get_All_From_DB
 
-//not using a cursor yet (not sure if needed)
-ii=0
-var docs = []
-//there is also 'IDBIndex.openKeyCursor'
-function cursor(){
-
-    if(db_entities){
-        let cursor_transaction = db_entities.transaction(ENTITY_OBJSTORE_NAME, 'readonly')
-        let store = cursor_transaction.objectStore(ENTITY_OBJSTORE_NAME)
-
-        cursor_transaction.onerror = function(event){
-            console.log('entity, problem with cursor transactions.')
-            console.log(event.target.error)
-        }
-        cursor_transaction.oncomplete = function(event){
-            console.log('entity, all cursor transactions complete')
-            console.log(event.target.result)
-        }
-
-        let request = store.openCursor();        
-        request.onerror = function(event){
-            console.log('entity, could not make cursor ')
-            console.log(event.target.error)
-        }
-        request.onsuccess = function(event) {
-            let cursor = event.target.result;
-            if(cursor) {
-                console.log(ii)
-                console.log(cursor.key)
-                console.log(get_record(cursor.key))
-                ii += 1
-                docs.push(cursor.value)
-                console.log(event)
-                
-                cursor.continue();
-            } else {
-                console.log("entity, no more cursor results")// no more results
-            }
-        }    
+//incase we need to get rid of the database (NO USE CASE FOR IT YET BUT WHEN USER ACCOUNTS ARE MADE IT WILL BE NEEDED)
+function Delete_Db(){
+    let request = window.indexedDB.deleteDatabase(ENTITY_DB_NAME)
+    request.onsuccess = function(event){
+        console.log(`entity, the Database for the entities, ${ENTITY_DB_NAME} successfully deleted`)
+        console.log(request.result)
+    }
+    request.onerror = function(event){
+        console.log(`entity, the Database for the entities, ${ENTITY_DB_NAME} NOT successfully deleted`)
+        console.log(event.target.error)
     }
 }
-
-
-/*
-var entities_ex = [
-    {
-        "entityName":"name1",
-        "entityImage":"test1.jpg",
-        "entityEmotions":{happy:10,sad:0,confused:0},
-        "textDescription" : "lots of reactions etc and details",
-        "entityMemes": ["file2.jpg"]
-    },
-    {
-        "entityName":"name2",
-        "entityImage":"test2.jpg",
-        "entityEmotions":{happy:0,sad:20,confused:0},
-        "textDescription" : "what a cool car I really like name2",
-        "entityMemes": ["test1.jpg","test3.jpg"]
-    },
-    {
-        "entityName":"name3",
-        "entityImage":"test3.jpg",
-        "entityEmotions":{happy:90,sad:40,confused:60},
-        "entityDescription" : "this was a great holiday",
-        "entityMemes": ["file2.jpg"]
-    }
-] 
-*/

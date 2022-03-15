@@ -8,9 +8,9 @@ const PATH = require('path');
 const IPC_RENDERER = require('electron').ipcRenderer 
 
 //module for the processing of the description
-const DESCRIPTION_PROCESS_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'description-processing.js'); //require('./myJS/description-processing.js');
+const DESCRIPTION_PROCESS_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'description-processing.js');
 //module functions for DB connectivity
-const TAGGING_DB_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'myJS'+PATH.sep+'tagging-db-fns.js'); //require('./myJS/tagging-db-fns.js'); 
+const TAGGING_DB_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'tagging-db-fns.js'); //require('./myJS/tagging-db-fns.js'); 
 //copies files and adds salt for conflicting same file names
 const MY_FILE_HELPER = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'copy-new-file-helper.js') //require('./myJS/copy-new-file-helper.js')
 //functionality to insert an element into a sorted array with binary search
