@@ -1,7 +1,9 @@
 // Modules to control application life and create native browser window
 //'ipcMain' and 'dialog' are introduced to open the dialog window in slides.js
 const {app, ipcMain, dialog, BrowserWindow} = require('electron')
-const path = require('path')
+const PATH = require('path')
+
+const TAGA_IMAGE_DIRECTORY = PATH.resolve(PATH.resolve(),'images') 
 
 function createWindow () {
   //debugger
@@ -9,17 +11,17 @@ function createWindow () {
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 1000,
-    icon: __dirname + '/icons/TagaIcon1024x1024.png',
+    icon: PATH.join(PATH.resolve(),'taga-icon','TagaIcon1024x1024.png'),
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: PATH.join(__dirname, 'preload.js'),
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true 
+      enableRemoteModule: true
     }
   })
 
   // and load the index.html of the app.
-  mainWindow.loadFile('./AppCode/welcome-screen.html')
+  mainWindow.loadFile(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'welcome-screen.html')
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
@@ -38,13 +40,13 @@ ipcMain.handle('dialog:tagging-new-file-select', async (event, args) => {
 
 //for the ability to load a dialog window in the entity creation for the selection of a profile image
 ipcMain.handle('dialog:openEntity', async (_, args) => {
-  const result = dialog.showOpenDialog({ properties: ['openFile' ], defaultPath: '/home/resort/Documents/repos/Tagasaurus/images/' })
+  const result = dialog.showOpenDialog({ properties: ['openFile' ], defaultPath: TAGA_IMAGE_DIRECTORY })
   return result
 })
 
 //for the ability to load the entity creation for the selection of a profile image set
 ipcMain.handle('dialog:openEntityImageSet', async (_, args) => {
-  const result = dialog.showOpenDialog({ properties: ['openFile', 'multiSelections' ], defaultPath: '/home/resort/Documents/repos/Tagasaurus/images/' })
+  const result = dialog.showOpenDialog({ properties: ['openFile', 'multiSelections' ], defaultPath: TAGA_IMAGE_DIRECTORY })
   return result
 })
 
@@ -81,7 +83,7 @@ app.on('window-all-closed', function () {
 const env = process.env.NODE_ENV || 'development';
 if (env === 'development') {
   require('electron-reload')(__dirname, {
-      electron: path.join(__dirname, 'node_modules', '.bin', 'electron'),
+      electron: PATH.join(__dirname, 'node_modules', '.bin', 'electron'),
       hardResetMethod: 'exit'
   });
 }
