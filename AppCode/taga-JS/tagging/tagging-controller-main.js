@@ -1,30 +1,14 @@
 const FS = require('fs');
 const PATH = require('path');
-
+//the object for the window functionality
+const IPC_RENDERER = require('electron').ipcRenderer 
 //FSE is not being used but should be for the directory batch import
 //const FSE = require('fs-extra');
 
-//the object for the window functionality
-const IPC_RENDERER = require('electron').ipcRenderer 
 
-//module for the processing of the description
-const DESCRIPTION_PROCESS_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'description-processing.js');
-//module functions for DB connectivity
-const TAGGING_DB_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'tagging-db-fns.js'); //require('./myJS/tagging-db-fns.js'); 
-//copies files and adds salt for conflicting same file names
-const MY_FILE_HELPER = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'copy-new-file-helper.js') //require('./myJS/copy-new-file-helper.js')
-//functionality to insert an element into a sorted array with binary search
-const MY_ARRAY_INSERT_HELPER = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'utility-insert-into-sorted-array.js') //require('./myJS/utility-insert-into-sorted-array.js')
-//the folder to store the taga images (with a commented set of alternative solutions that all appear to work)
-const TAGA_IMAGE_DIRECTORY = PATH.resolve(PATH.resolve(),'images') //PATH.resolve(__dirname, '..', 'images') //PATH.join(__dirname,'..','images')  //PATH.normalize(__dirname+PATH.sep+'..') + PATH.sep + 'images'     //__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
-//holds the last directory the user imported images from
+const { TAGA_IMAGE_DIRECTORY, TAGGING_DB_MODULE, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MY_FILE_HELPER, MY_ARRAY_INSERT_HELPER } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
-const SEARCH_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'search-fns.js') // the module holding all the search algorithms
-
-const CLOSE_ICON_RED = PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-ui-icons'+PATH.sep+'CloseRed.png'
-const CLOSE_ICON_BLACK = PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-ui-icons'+PATH.sep+'CloseBlack.png'
-
-const HASHTAG_ICON = PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-ui-icons'+PATH.sep+'HashtagGreen.png'
+const { CLOSE_ICON_RED, CLOSE_ICON_BLACK, HASHTAG_ICON } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 
 
 var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
@@ -42,12 +26,13 @@ var all_image_keys; // each image key in the tagging db
 var current_image_annotation;
 var image_index = 1;
 
+//holds the last directory the user imported images from
 var last_user_image_directory_chosen = '';
 
 //For the search results of image searchees
-var search_results;
+var search_results = '';
 //meme search results
-var search_meme_results;
+var search_meme_results = '';
 
 
 var reg_exp_delims = /[#:,;| ]+/
@@ -528,8 +513,10 @@ function Search_Images(){
         })
     }
     //default search results are the order the user has them now
-    search_results = all_image_keys
-    search_meme_results = all_image_keys
+    if(search_results == '' && search_meme_results == '') {
+        search_results = all_image_keys
+        search_meme_results = all_image_keys
+    }
     //display default ordering first
     search_image_results_output = document.getElementById("modal-search-images-results-grid-div-area-id")
     search_image_results_output.innerHTML = ""
@@ -556,14 +543,14 @@ function Search_Images(){
     search_meme_results_output.innerHTML += search_display_inner_tmp
     //user presses this to 'choose' the results of the search from the images
     document.getElementById("modal-search-images-results-select-images-order-button-id").onclick = function() {
-        all_image_keys = search_results.map(i => all_image_keys[i]);
+        all_image_keys = search_results//search_results.map(i => all_image_keys[i]);
         image_index = 1;
         Load_State_Of_Image_IDB()
         document.getElementById("search-modal-click-top-id").style.display = "none";
     }
     //user presses this to 'choose' the results of the search from the meme images
     document.getElementById("modal-search-images-results-select-meme-images-order-button-id").onclick = function() {
-        all_image_keys = search_meme_results.map(i => all_image_keys[i]);
+        all_image_keys = search_meme_results//search_meme_results.map(i => all_image_keys[i]);
         image_index = 1;
         Load_State_Of_Image_IDB()
         document.getElementById("search-modal-click-top-id").style.display = "none";
@@ -591,15 +578,14 @@ async function Modal_Search_Entry() {
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
     image_search_result_obj = await SEARCH_MODULE.Image_Addition_Search_Fn(tagging_search_obj,all_image_keys,Get_Tagging_Record_In_DB)
-    search_results = image_search_result_obj.imgInds
-    search_meme_results = image_search_result_obj.memeInds
+    search_results = image_search_result_obj.imgInds.map(i => all_image_keys[i]);
+    search_meme_results = image_search_result_obj.memeInds.map(i => all_image_keys[i]);
     //>>SHOW SEARCH RESULTS<<
     //search images results annotations
     search_image_results_output = document.getElementById("modal-search-images-results-grid-div-area-id")
     search_image_results_output.innerHTML = "";
     search_display_inner_tmp = '';
-    search_results.forEach(index => {
-        file_key = all_image_keys[index]
+    search_results.forEach(file_key => {
         search_display_inner_tmp += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${file_key}" >
                                     <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-${file_key}" src="${TAGA_IMAGE_DIRECTORY}/${file_key}" title="view" alt="memes" />
@@ -611,8 +597,7 @@ async function Modal_Search_Entry() {
     search_meme_results_output = document.getElementById("modal-search-meme-images-results-grid-div-area-id")
     search_meme_results_output.innerHTML = "";
     search_display_inner_tmp = '';
-    search_meme_results.forEach(index => {
-        file_key = all_image_keys[index]
+    search_meme_results.forEach(file_key => {
         search_display_inner_tmp += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${file_key}" >
                                     <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-${file_key}" src="${TAGA_IMAGE_DIRECTORY}/${file_key}" title="view" alt="memes" />
