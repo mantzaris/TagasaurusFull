@@ -1,6 +1,7 @@
 PATH = require('path');
 
-fns_DB_IDB = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'tagging-db-fns.js');
+const { TAGGING_DB_MODULE } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+
 
 // algorithm DFLOW by EPA ( https://stats.stackexchange.com/a/430254/1098 )
 //$\mu_H = \left(\frac{\sum^{n_T - n_0}_{i=1} 1/x_i} {n_T - n_0}\right)^{-1} \times \frac{n_T - n_0} {n_T} ,$
@@ -24,10 +25,10 @@ function Harmonic_Mean(arr) {
 }
 
 async function Display_Skill_Levels() {
-    await fns_DB_IDB.Create_Db()
+    await TAGGING_DB_MODULE.Create_Db()
 
     //all_data = await fns_DB.Return_All_DB_Data().then(function (results) { return results })
-    all_data = await fns_DB_IDB.Get_All_From_DB()//.then(function(results) {return results})
+    all_data = await TAGGING_DB_MODULE.Get_All_From_DB()//.then(function(results) {return results})
     total_images_in_db = all_data.length
     total_tagged_images = 0
     meme_connected_images = 0

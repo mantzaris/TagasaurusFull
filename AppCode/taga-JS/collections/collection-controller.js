@@ -7,18 +7,10 @@
 const PATH = require('path');
 const FS = require('fs');
 
+const { TAGA_IMAGE_DIRECTORY, TAGGING_DB_MODULE, COLLECTION_DB_MODULE, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MASONRY } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
-const COLLECTION_DB_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'collection-db-fns.js');
-const TAGGING_DB_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'tagging-db-fns.js');
+const { CLOSE_ICON_RED, CLOSE_ICON_BLACK } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 
-// for the image layout in panels and their arrangements
-const MASONRY = require('masonry-layout') // installed via npm
-
-//the folder to store the taga images (with a commented set of alternative solutions that all appear to work)
-const TAGA_IMAGE_DIRECTORY = PATH.resolve(PATH.resolve(),'images') //PATH.resolve(__dirname, '..', 'images') //PATH.join(__dirname,'..','images')  //PATH.normalize(__dirname+PATH.sep+'..') + PATH.sep + 'images'     //__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
-
-//to produce tags from the textual description
-const DESCRIPTION_PROCESS_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'description-processing.js');
 
 COLLECTION_DEFAULT_EMPTY_OBJECT = {
                                     "entityName": '',
@@ -29,10 +21,6 @@ COLLECTION_DEFAULT_EMPTY_OBJECT = {
                                     "entityMemes": []
                                     }
 
-const SEARCH_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'search-fns.js') // the module holding all the search algorithms
-
-const CLOSE_ICON_RED = PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-ui-icons'+PATH.sep+'CloseRed.png'
-const CLOSE_ICON_BLACK = PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-ui-icons'+PATH.sep+'CloseBlack.png'
 
 var all_image_keys; // each image key in the tagging db
 

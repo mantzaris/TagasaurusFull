@@ -1,6 +1,6 @@
 //module functions for DB connectivity 
 //FNS_DB = require('./myJS/db-access-module.js');
-//fns_DB_IDB = require('./myJS/tagging-db-fns.js');
+//TAGGING_DB_MODULE = require('./myJS/tagging-db-fns.js');
 
 
 const IPC_Renderer = require('electron').ipcRenderer
@@ -9,9 +9,7 @@ const FS = require('fs');
 PATH = require('path');
 const FSE = require('fs-extra');
 
-const TAGA_IMAGE_DIRECTORY = PATH.resolve(PATH.resolve(),'images') //PATH.resolve(__dirname, '..', 'images') //PATH.join(__dirname,'..','images')  //PATH.normalize(__dirname+PATH.sep+'..') + PATH.sep + 'images'     //__dirname.substring(0, __dirname.lastIndexOf('/')) + '/images'; // './AppCode/images'
-const COLLECTION_DB_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'collection-db-fns.js');
-fns_DB_IDB = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'tagging-db-fns.js');
+const { TAGA_IMAGE_DIRECTORY, COLLECTION_DB_MODULE } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 
 //functionality for the export of all the information
@@ -43,7 +41,7 @@ async function Export_User_Annotation_Data(){
         if(path_chosen.canceled == false){
             if (!FS.existsSync(path_chosen.filePath)){
                 FS.mkdirSync(path_chosen.filePath);
-                fns_DB_IDB.Get_All_From_DB().then(function (results) {
+                TAGGING_DB_MODULE.Get_All_From_DB().then(function (results) {
                     //console.log(results.rows)
                     tagged_and_entity_JSON = {'imageAnnotations':results,'allEntityObjects':all_entity_Objects}
                     tagged_and_entity_JSON_str = JSON.stringify(tagged_and_entity_JSON)
