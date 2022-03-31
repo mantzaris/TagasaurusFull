@@ -12,6 +12,9 @@ exports.TAGGING_DB_MODULE = TAGGING_DB_MODULE
 const COLLECTION_DB_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'collection-db-fns.js');
 exports.COLLECTION_DB_MODULE = COLLECTION_DB_MODULE
 
+const DB_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'db-fns.js');
+exports.DB_MODULE = DB_MODULE
+
 
 const SEARCH_MODULE = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'search-fns.js') // the module holding all the search algorithms
 exports.SEARCH_MODULE = SEARCH_MODULE

@@ -1,6 +1,9 @@
 PATH = require('path');
 
-const { TAGGING_DB_MODULE } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const { TAGGING_DB_MODULE, DB_MODULE } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+
+const Database = require('better-sqlite3');
+const db = new Database('test-better2.db', { verbose: console.log });
 
 
 // algorithm DFLOW by EPA ( https://stats.stackexchange.com/a/430254/1098 )

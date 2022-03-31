@@ -1,12 +1,19 @@
 // Modules to control application life and create native browser window
 //'ipcMain' and 'dialog' are introduced to open the dialog window in slides.js
-const {app, ipcMain, dialog, BrowserWindow} = require('electron')
-const PATH = require('path')
+const {app, ipcMain, dialog, BrowserWindow} = require('electron');
+const PATH = require('path');
+const FS = require('fs');
 
 const TAGA_IMAGE_DIRECTORY = PATH.resolve(PATH.resolve(),'images') 
+const TAGA_FILES_DIRECTORY = PATH.join(PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles')
+const TAGA_DATA_DIRECTORY = PATH.resolve(TAGA_FILES_DIRECTORY,'data') 
+
+const DATABASE = require('better-sqlite3');
+var DB;
+DB_FILE_NAME = 'test-better2.db'
+
 
 function createWindow () {
-  //debugger
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1200,
@@ -19,15 +26,33 @@ function createWindow () {
       enableRemoteModule: true
     }
   })
-
-  // and load the index.html of the app.
+  //LOAD THE STARTING .html OF THE APP->
   mainWindow.loadFile(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'welcome-screen.html')
 
-  // Open the DevTools.
   // mainWindow.webContents.openDevTools()
 }
 
-//for the ability to load a dialog window in slides.js
+
+//DB SET UP START>>>
+//is taga data directory and DB set up
+try {
+  if( FS.existsSync(TAGA_FILES_DIRECTORY) == false ) { //directory for files exists?
+    FS.mkdirSync(TAGA_FILES_DIRECTORY);
+  }  
+  DB = new DATABASE(TAGA_FILES_DIRECTORY+PATH.sep+DB_FILE_NAME, { verbose: console.log }); //open db in that directory
+  if( FS.existsSync(TAGA_FILES_DIRECTORY) == true && FS.existsSync(TAGA_DATA_DIRECTORY) == false ) { //directory for data exists?
+    FS.mkdirSync(TAGA_DATA_DIRECTORY);
+  } 
+} catch(e) {
+  console.log("An error occurred trying to make the Tagasaurus Data and Files Directory.");
+}
+ipcMain.handle('returnDBobject', (event, args) => {
+  return DB
+})
+//DB SET UP END<<<
+
+//FILE SELECTION DIALOGUE WINDOWS START>>>
+//for the ability to load a dialog window in selecting images/files
 ipcMain.handle('dialog:tagging-new-file-select', async (event, args) => {
   directory_default = app.getPath('pictures')
   if(args.directory != ''){
@@ -37,31 +62,22 @@ ipcMain.handle('dialog:tagging-new-file-select', async (event, args) => {
               defaultPath: directory_default })
   return result
 })
-
-//for the ability to load a dialog window in the entity creation for the selection of a profile image
-ipcMain.handle('dialog:openEntity', async (_, args) => {
-  const result = dialog.showOpenDialog({ properties: ['openFile' ], defaultPath: TAGA_IMAGE_DIRECTORY })
-  return result
-})
-
 //for the ability to load the entity creation for the selection of a profile image set
 ipcMain.handle('dialog:openEntityImageSet', async (_, args) => {
   const result = dialog.showOpenDialog({ properties: ['openFile', 'multiSelections' ], defaultPath: TAGA_IMAGE_DIRECTORY })
   return result
 })
-
-
 //for the ability to save a data export
 ipcMain.handle('dialog:save', async (_, args) => {
   const result = dialog.showSaveDialog({ title: "Enter Folder Name to Create"})
   return result
 })
+//FILE SELECTION DIALOGUE WINDOWS END<<<
 
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-
 app.whenReady().then(() => {
   createWindow()  
   app.on('activate', function () {
@@ -70,7 +86,6 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
-
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
