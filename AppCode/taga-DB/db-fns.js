@@ -6,3 +6,6 @@ console.log("ok..")
 //const Database = require('better-sqlite3');
 //const dbb = new Database('test-better.db', { verbose: console.log });
 //
+
+
+  //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //

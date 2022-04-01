@@ -10,7 +10,7 @@ const TAGA_DATA_DIRECTORY = PATH.resolve(TAGA_FILES_DIRECTORY,'data')
 
 const DATABASE = require('better-sqlite3');
 var DB;
-DB_FILE_NAME = 'test-better2.db'
+DB_FILE_NAME = 'test-better3.db'
 
 
 function createWindow () {
@@ -34,19 +34,49 @@ function createWindow () {
 
 
 //DB SET UP START>>>
+//create folders for data and db -> check if db tables exist -> create indexes on tables
 //is taga data directory and DB set up
-try {
-  if( FS.existsSync(TAGA_FILES_DIRECTORY) == false ) { //directory for files exists?
-    FS.mkdirSync(TAGA_FILES_DIRECTORY);
-  }  
-  DB = new DATABASE(TAGA_FILES_DIRECTORY+PATH.sep+DB_FILE_NAME, { verbose: console.log }); //open db in that directory
-  if( FS.existsSync(TAGA_FILES_DIRECTORY) == true && FS.existsSync(TAGA_DATA_DIRECTORY) == false ) { //directory for data exists?
-    FS.mkdirSync(TAGA_DATA_DIRECTORY);
-  } 
-} catch(e) {
-  console.log("An error occurred trying to make the Tagasaurus Data and Files Directory.");
+const TAGGING_TABLE_NAME = 'TAGGING'
+const COLLECTIONS_TABLE_NAME = 'COLLECTIONS'
+
+if( FS.existsSync(TAGA_FILES_DIRECTORY) == false ) { //directory for files exists?
+  FS.mkdirSync(TAGA_FILES_DIRECTORY);
+}  
+DB = new DATABASE(TAGA_FILES_DIRECTORY+PATH.sep+DB_FILE_NAME, { verbose: console.log }); //open db in that directory
+if( FS.existsSync(TAGA_FILES_DIRECTORY) == true && FS.existsSync(TAGA_DATA_DIRECTORY) == false ) { //directory for data exists?
+  FS.mkdirSync(TAGA_DATA_DIRECTORY);
 }
-ipcMain.handle('returnDBobject', (event, args) => {
+//check to see if the TAGGING table exists
+tagging_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${TAGGING_TABLE_NAME}'; `);
+tagging_table_exists_res = tagging_table_exists_stmt.get();
+//if tagging table does not exit, so create it
+if( tagging_table_exists_res["count(*)"] == 0 ){
+  STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${TAGGING_TABLE_NAME}
+                    (imageFileName TEXT, imageFileHash TEXT, taggingRawDescription TEXT,
+                            taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT)`);
+  STMT.run();
+  //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
+  STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX imageFileName_index ON ${TAGGING_TABLE_NAME} (imageFileName); `);
+  STMT_index1.run();
+  STMT_index2 = DB.prepare(` CREATE UNIQUE INDEX imageFileHash_index ON ${TAGGING_TABLE_NAME} (imageFileHash); `);
+  STMT_index2.run();
+}
+//check to see if the COLLECTIONS table exists
+collection_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTIONS_TABLE_NAME}'; `);
+collection_table_exists_res = collection_table_exists_stmt.get();
+//if collection table does not exit, so create it
+if( collection_table_exists_res["count(*)"] == 0 ){
+  STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTIONS_TABLE_NAME}
+                    (entityName TEXT, entityImage TEXT, entityDescription TEXT,
+                      entityImageSet TEXT, entityEmotions TEXT, entityMemes TEXT)`);
+  STMT.run();
+  //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
+  STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX entityName_index ON ${COLLECTIONS_TABLE_NAME} (entityName); `);
+  STMT_index1.run();
+}
+
+//function to return the DB object to controllers to access the DB
+ipcMain.handle('returnDBobject', async (event, args) => {
   return DB
 })
 //DB SET UP END<<<
