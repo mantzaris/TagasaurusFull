@@ -18,6 +18,8 @@ const DB = new DATABASE(TAGA_FILES_DIRECTORY+PATH.sep+DB_FILE_NAME, { verbose: c
 const INSERT_TAGGING_STMT = DB.prepare(`INSERT INTO ${TAGGING_TABLE_NAME} (imageFileName, imageFileHash, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices) VALUES (?, ?, ?, ?, ?, ?)`);
 const UPDATE_ROWID_TAGGING_STMT = DB.prepare(`UPDATE ${TAGGING_TABLE_NAME} SET imageFileName=?, imageFileHash=?, taggingRawDescription=?, taggingTags=?, taggingEmotions=?, taggingMemeChoices=? WHERE ROWID=?`);
 const UPDATE_FILENAME_TAGGING_STMT = DB.prepare(`UPDATE ${TAGGING_TABLE_NAME} SET imageFileName=?, imageFileHash=?, taggingRawDescription=?, taggingTags=?, taggingEmotions=?, taggingMemeChoices=? WHERE imageFileName=?`);
+const DELETE_ROWID_TAGGING_STMT = DB.prepare(`DELETE FROM ${TAGGING_TABLE_NAME} WHERE ROWID=?`);
+const DELETE_FILENAME_TAGGING_STMT = DB.prepare(`DELETE FROM ${TAGGING_TABLE_NAME} WHERE imageFileName=?`);
 
 
 //fn to insert into the DB the record of the 
@@ -41,6 +43,15 @@ async function Update_Tagging_Annotation_DB(key_type, row_key, tagging_obj) {
 }
 exports.Update_Tagging_Annotation_DB = Update_Tagging_Annotation_DB
 
-
+async function Delete_Tagging_Annotation_DB(key_type, row_key) {
+  if(key_type == 'ROWID') {
+    info = await DELETE_ROWID_TAGGING_STMT.run(row_key);
+    console.log(`Delete_Tagging_Annotation_DB: update sqlite info.changes = ${info}`);
+  } else if(key_type == 'FILENAME') {
+    info = await DELETE_FILENAME_TAGGING_STMT.run(row_key);
+    console.log(`Delete_Tagging_Annotation_DB: update sqlite info.changes = ${info}`);
+  }
+}
+exports.Delete_Tagging_Annotation_DB = Delete_Tagging_Annotation_DB
 
 
