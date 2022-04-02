@@ -6,7 +6,7 @@ const IPC_RENDERER = require('electron').ipcRenderer
 //const FSE = require('fs-extra');
 
 
-const { TAGA_IMAGE_DIRECTORY, TAGGING_DB_MODULE, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MY_FILE_HELPER, MY_ARRAY_INSERT_HELPER } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const { DB_MODULE, TAGA_DATA_DIRECTORY, TAGA_IMAGE_DIRECTORY, TAGGING_DB_MODULE, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MY_FILE_HELPER, MY_ARRAY_INSERT_HELPER } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 const { CLOSE_ICON_RED, CLOSE_ICON_BLACK, HASHTAG_ICON } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 
@@ -64,6 +64,14 @@ async function Delete_Void_MemeChoices() {
 }
 //MODEL DB ACCESS FUNCTIONS END<<<
 
+//NEW SQLITE MODEL DB ACCESS FUNCTIONS START>>>
+async function Insert_Record_Into_DB(tagging_obj) {
+    await DB_MODULE.Insert_Record_Into_DB(tagging_obj);
+}
+async function Update_Tagging_Annotation_FILENAME_DB(tagging_obj) {
+    await DB_MODULE.Update_Tagging_Annotation_DB('FILENAME',tagging_obj.imageFileName,tagging_obj)
+}
+//NEW SQLITE MODEL DB ACCESS FUNCTIONS END>>>
 
 //DISPLAY THE MAIN IMAGE START>>>
 function Display_Image() {
@@ -377,10 +385,12 @@ async function Save_Image_Annotation_Changes() {
 async function Load_Default_Taga_Image() {
     taga_source_path = PATH.resolve()+PATH.sep+'Taga.png';
     FS.copyFileSync(taga_source_path, `${TAGA_IMAGE_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL);
+    FS.copyFileSync(taga_source_path, `${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL);
     tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
     tagging_entry.imageFileName = 'Taga.png';
     tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_IMAGE_DIRECTORY}${PATH.sep}${'Taga.png'}`);
     await Insert_Record_In_DB(tagging_entry);
+    await Insert_Record_Into_DB(tagging_entry); //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
 }
 //delete image from user choice
 async function Delete_Image() {
@@ -404,14 +414,16 @@ async function Load_New_Image() {
     }
     last_user_image_directory_chosen = PATH.dirname(result.filePaths[0]);
     filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_IMAGE_DIRECTORY);
+    filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
     if(filenames.length == 0){
         return
     }
     filenames.forEach( filename => {
-        tagging_entry_tmp = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
+        tagging_entry_tmp = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //cloning obj
         tagging_entry_tmp.imageFileName = filename;
         tagging_entry_tmp.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_IMAGE_DIRECTORY}${PATH.sep}${filename}`);
         Insert_Record_In_DB(tagging_entry_tmp);
+        Insert_Record_Into_DB(tagging_entry_tmp); //sqlite version
         MY_ARRAY_INSERT_HELPER.Insert_Into_Sorted_Array(all_image_keys,filename); //maintain the alphabetical order after the insertion in place (pass by ref)
     });
     image_index = all_image_keys.indexOf(filenames[0]) + 1; //set index to first of the new images

@@ -28,7 +28,6 @@ function createWindow () {
   })
   //LOAD THE STARTING .html OF THE APP->
   mainWindow.loadFile(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'welcome-screen.html')
-
   // mainWindow.webContents.openDevTools()
 }
 
@@ -36,8 +35,8 @@ function createWindow () {
 //DB SET UP START>>>
 //create folders for data and db -> check if db tables exist -> create indexes on tables
 //is taga data directory and DB set up
-const TAGGING_TABLE_NAME = 'TAGGING'
-const COLLECTIONS_TABLE_NAME = 'COLLECTIONS'
+TAGGING_TABLE_NAME = 'TAGGING'
+COLLECTIONS_TABLE_NAME = 'COLLECTIONS'
 
 if( FS.existsSync(TAGA_FILES_DIRECTORY) == false ) { //directory for files exists?
   FS.mkdirSync(TAGA_FILES_DIRECTORY);
@@ -74,11 +73,6 @@ if( collection_table_exists_res["count(*)"] == 0 ){
   STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX entityName_index ON ${COLLECTIONS_TABLE_NAME} (entityName); `);
   STMT_index1.run();
 }
-
-//function to return the DB object to controllers to access the DB
-ipcMain.handle('returnDBobject', async (event, args) => {
-  return DB
-})
 //DB SET UP END<<<
 
 //FILE SELECTION DIALOGUE WINDOWS START>>>

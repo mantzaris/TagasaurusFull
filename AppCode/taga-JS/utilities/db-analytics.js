@@ -2,9 +2,6 @@ PATH = require('path');
 
 const { TAGGING_DB_MODULE, DB_MODULE } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
-const Database = require('better-sqlite3');
-const db = new Database('test-better2.db', { verbose: console.log });
-
 
 // algorithm DFLOW by EPA ( https://stats.stackexchange.com/a/430254/1098 )
 //$\mu_H = \left(\frac{\sum^{n_T - n_0}_{i=1} 1/x_i} {n_T - n_0}\right)^{-1} \times \frac{n_T - n_0} {n_T} ,$
