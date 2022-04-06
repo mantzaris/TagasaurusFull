@@ -15,12 +15,72 @@ const {  } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-cod
 //set up the DB to use
 const DB = new DATABASE(TAGA_FILES_DIRECTORY+PATH.sep+DB_FILE_NAME, { verbose: console.log }); //open db in that directory
 //insert tagging record
+const GET_ROWID_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE ROWID=?`);
+const GET_FILENAME_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE imageFileName=?`);
 const INSERT_TAGGING_STMT = DB.prepare(`INSERT INTO ${TAGGING_TABLE_NAME} (imageFileName, imageFileHash, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices) VALUES (?, ?, ?, ?, ?, ?)`);
 const UPDATE_ROWID_TAGGING_STMT = DB.prepare(`UPDATE ${TAGGING_TABLE_NAME} SET imageFileName=?, imageFileHash=?, taggingRawDescription=?, taggingTags=?, taggingEmotions=?, taggingMemeChoices=? WHERE ROWID=?`);
 const UPDATE_FILENAME_TAGGING_STMT = DB.prepare(`UPDATE ${TAGGING_TABLE_NAME} SET imageFileName=?, imageFileHash=?, taggingRawDescription=?, taggingTags=?, taggingEmotions=?, taggingMemeChoices=? WHERE imageFileName=?`);
 const DELETE_ROWID_TAGGING_STMT = DB.prepare(`DELETE FROM ${TAGGING_TABLE_NAME} WHERE ROWID=?`);
 const DELETE_FILENAME_TAGGING_STMT = DB.prepare(`DELETE FROM ${TAGGING_TABLE_NAME} WHERE imageFileName=?`);
 
+const GET_NEXT_ROWID_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
+const GET_PREV_ROWID_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE ROWID < ? ORDER BY ROWID DESC LIMIT 1`);
+
+const GET_MAX_ROWID_STMT = DB.prepare(`SELECT MAX(ROWID) AS rowid FROM ${TAGGING_TABLE_NAME}`);
+const GET_MIN_ROWID_STMT = DB.prepare(`SELECT MIN(ROWID) AS rowid FROM ${TAGGING_TABLE_NAME}`);
+
+var rowid_current;
+var rowid_max;
+var rowid_min;
+
+//set the maximum and minimum rowid to provide bounds for the rowid usage when user iterates through images
+async function Set_Max_Min_Rowid() {
+  res = GET_MAX_ROWID_STMT.get();
+  rowid_max = res.rowid;
+  res = GET_MIN_ROWID_STMT.get();
+  rowid_min = res.rowid;
+  rowid_current = rowid_min;
+}
+Set_Max_Min_Rowid()
+
+//the function expects a +1,-1,0 for movement about the current rowid 
+async function Rowid_Step(step) {
+  if(step == 0) {
+    return rowid_current;
+  } else if(step == 1) {
+    rowid_res = GET_NEXT_ROWID_STMT.get(rowid_current);
+    if(rowid_res == undefined) {
+      rowid_current = rowid_min; 
+    } else {
+      rowid_current = rowid_res.rowid;
+      return rowid_current;
+    }
+  } else if(step == -1) {
+    rowid_res = GET_PREV_ROWID_STMT.get(rowid_current);
+    if(rowid_res == undefined) {
+      rowid_current = rowid_min; //rowid_res.rowid;
+    } else {
+      rowid_current = rowid_res.rowid;
+      return rowid_current;
+    }
+  }
+}
+exports.Rowid_Step = Rowid_Step;
+
+//fn to get the annotation record for an image by key_type of rowid or filename
+async function Get_Tagging_Record_FROM_DB(key_type, row_key) {
+  row_obj = undefined;
+  if(key_type == 'ROWID') {
+    row_obj = await GET_ROWID_TAGGING_STMT.get(row_key);
+    console.log(`Get_Tagging_Record_FROM_DB: get rowid sqlite info.changes = ${JSON.stringify(row_obj)}`);
+  } else if(key_type == 'FILENAME') {
+    row_obj = await GET_FILENAME_TAGGING_STMT.get(row_key);
+    console.log(`Get_Tagging_Record_FROM_DB: get filename sqlite info.changes = ${JSON.stringify(row_obj)}`);
+  }
+  console.log(`rowid_current = ${rowid_current}`)
+  return row_obj;
+}
+exports.Get_Tagging_Record_FROM_DB = Get_Tagging_Record_FROM_DB;
 
 //fn to insert into the DB the record of the 
 //column template: (imageFileName TEXT, imageFileHash TEXT, taggingRawDescription TEXT, taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT)

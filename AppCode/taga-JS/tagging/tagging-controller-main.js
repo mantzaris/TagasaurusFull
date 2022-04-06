@@ -24,7 +24,9 @@ var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
 var image_files_in_dir = '';
 var all_image_keys; // each image key in the tagging db
 var current_image_annotation;
+var current_image_annotation_sqlite;
 var image_index = 1;
+var image_index_sqlite;
 
 //holds the last directory the user imported images from
 var last_user_image_directory_chosen = '';
@@ -65,6 +67,15 @@ async function Delete_Void_MemeChoices() {
 //MODEL DB ACCESS FUNCTIONS END<<<
 
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS START>>>
+async function Get_Tagging_ROWID(step) {
+    return await DB_MODULE.Rowid_Step(step);
+}
+async function Get_Tagging_Annotation_FILENAME_DB(image_name) { //delete via file name
+    return await DB_MODULE.Get_Tagging_Record_FROM_DB('FILENAME',image_name);
+}
+async function Get_Tagging_Annotation_ROWID_DB(rowid) { //delete via rowid
+    return await DB_MODULE.Get_Tagging_Record_FROM_DB('ROWID',rowid);
+}
 async function Insert_Record_Into_DB(tagging_obj) {
     await DB_MODULE.Insert_Record_Into_DB(tagging_obj);
 }
@@ -206,7 +217,8 @@ async function Meme_Image_Clicked(meme_file_name) {
     meme_click_modal_body_html_tmp = '';
     meme_click_modal_body_html_tmp += `<img id="modal-meme-clicked-displayimg-id" src="${TAGA_IMAGE_DIRECTORY}${PATH.sep}${meme_file_name}" title="meme" alt="meme" />`;
     meme_click_modal_div.insertAdjacentHTML('beforeend', meme_click_modal_body_html_tmp);
-    meme_image_annotations = await Get_Tagging_Record_In_DB( meme_file_name );
+    meme_image_annotations = await Get_Tagging_Record_In_DB( meme_file_name ); //indexeddb
+    meme_image_annotations_sqlite = await Get_Tagging_Annotation_FILENAME_DB( meme_file_name );
     //add emotion tuples to view
     modal_emotions_html_tmp = `Emotions: `
     emotion_keys = Object.keys(meme_image_annotations["taggingEmotions"])
@@ -266,7 +278,8 @@ async function Reset_Image_Annotations(){
 
 //main function to arrange the display of the image annotations and the image
 async function Load_State_Of_Image_IDB() {
-    current_image_annotation = await Get_Tagging_Record_In_DB(all_image_keys[image_index - 1])
+    current_image_annotation = await Get_Tagging_Record_In_DB(all_image_keys[image_index - 1]); //indexeddb
+    current_image_annotation_sqlite = await Get_Tagging_Annotation_FILENAME_DB(all_image_keys[image_index - 1]);
     Make_Blank_Tagging_View() //empty all parts to be ready to add the annotation information
     Emotion_Display_Fill()//display the emotion set annotations
     Meme_View_Fill()
@@ -275,7 +288,9 @@ async function Load_State_Of_Image_IDB() {
 }
 //called from the gallery widget, where 'n' is the number of images forward or backwards to move
 function New_Image_Display(n) {
-    image_index += n;
+    image_index += n; //indexeddb
+    image_index_sqlite = Get_Tagging_ROWID(n);
+    console.log(`image_index_sqlite = ${image_index_sqlite}`)
     if (image_index > all_image_keys.length) {
         image_index = 1
     }
@@ -319,7 +334,7 @@ async function First_Display_Init() {
     }, false);
 
     await Create_Tagging_DB_Instance()
-    await Set_All_Image_Keys_In_Tagging_DB()
+    await Set_All_Image_Keys_In_Tagging_DB() //indexeddb
     await Check_And_Handle_New_Images_IDB(); //deals with the extra or missing files in the image directory
     await Load_State_Of_Image_IDB() //display the image in view currently and the annotations it has
 }
@@ -367,7 +382,8 @@ async function Check_And_Handle_New_Images_IDB() {
 //SAVING, LOADING, DELETING, ETC START>>>
 //process image for saving including the text to tags (Called from the html Save button)
 async function Save_Image_Annotation_Changes() {
-    new_record = await Get_Tagging_Record_In_DB(all_image_keys[image_index - 1]); //JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
+    new_record = await Get_Tagging_Record_In_DB(all_image_keys[image_index - 1]); //indexeddb JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
+    new_record_sqlite = await Get_Tagging_Annotation_FILENAME_DB(all_image_keys[image_index - 1]); 
     //the picture file name in context
     image_name = `${all_image_keys[image_index - 1]}`;
     //save meme changes
@@ -445,7 +461,8 @@ async function Load_New_Image() {
         MY_ARRAY_INSERT_HELPER.Insert_Into_Sorted_Array(all_image_keys,filename); //maintain the alphabetical order after the insertion in place (pass by ref)
     });
     image_index = all_image_keys.indexOf(filenames[0]) + 1; //set index to first of the new images
-    current_image_annotation = await Get_Tagging_Record_In_DB(all_image_keys[image_index-1]);
+    current_image_annotation = await Get_Tagging_Record_In_DB(all_image_keys[image_index-1]); //indexeddb 
+    current_image_annotation_sqlite = await Get_Tagging_Annotation_FILENAME_DB(all_image_keys[image_index-1]);
     Load_State_Of_Image_IDB();
     New_Image_Display( 0 );
 }
@@ -607,7 +624,8 @@ async function Modal_Search_Entry() {
 
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
-    image_search_result_obj = await SEARCH_MODULE.Image_Addition_Search_Fn(tagging_search_obj,all_image_keys,Get_Tagging_Record_In_DB)
+    image_search_result_obj = await SEARCH_MODULE.Image_Addition_Search_Fn(tagging_search_obj,all_image_keys,Get_Tagging_Record_In_DB); //indexeddb
+    image_search_result_obj_sqlite = await SEARCH_MODULE.Image_Addition_Search_Fn(tagging_search_obj,all_image_keys,Get_Tagging_Annotation_FILENAME_DB); 
     search_results = image_search_result_obj.imgInds.map(i => all_image_keys[i]);
     search_meme_results = image_search_result_obj.memeInds.map(i => all_image_keys[i]);
     //>>SHOW SEARCH RESULTS<<
@@ -809,7 +827,8 @@ async function Modal_Meme_Search_Btn(){
 
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
-    meme_search_result_obj = await SEARCH_MODULE.Meme_Addition_Search_Fn(meme_tagging_search_obj,all_image_keys,Get_Tagging_Record_In_DB)
+    meme_search_result_obj = await SEARCH_MODULE.Meme_Addition_Search_Fn(meme_tagging_search_obj,all_image_keys,Get_Tagging_Record_In_DB); //indexeddb
+    meme_search_result_obj_sqlite = await SEARCH_MODULE.Meme_Addition_Search_Fn(meme_tagging_search_obj,all_image_keys,Get_Tagging_Annotation_FILENAME_DB);
     img_indices_sorted = meme_search_result_obj.imgInds  
     meme_img_indices_sorted = meme_search_result_obj.memeInds
     //get the record to know the memes that are present to not present any redundancy
