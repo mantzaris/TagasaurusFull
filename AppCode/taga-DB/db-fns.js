@@ -23,6 +23,8 @@ const UPDATE_FILENAME_TAGGING_STMT = DB.prepare(`UPDATE ${TAGGING_TABLE_NAME} SE
 const DELETE_ROWID_TAGGING_STMT = DB.prepare(`DELETE FROM ${TAGGING_TABLE_NAME} WHERE ROWID=?`);
 const DELETE_FILENAME_TAGGING_STMT = DB.prepare(`DELETE FROM ${TAGGING_TABLE_NAME} WHERE imageFileName=?`);
 
+const GET_ROWID_FROM_FILENAME_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE imageFileName=?;`)
+
 const GET_NEXT_ROWID_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
 const GET_PREV_ROWID_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE ROWID < ? ORDER BY ROWID DESC LIMIT 1`);
 
@@ -43,6 +45,17 @@ async function Set_Max_Min_Rowid() {
 }
 Set_Max_Min_Rowid()
 
+function Set_ROWID(rowid) {
+  rowid_current = rowid;
+}
+exports.Set_ROWID = Set_ROWID;
+
+async function Get_ROWID_From_Filename(filename) {
+  res = GET_ROWID_FROM_FILENAME_STMT.get(filename);  
+  return res.rowid;
+}
+exports.Get_ROWID_From_Filename = Get_ROWID_From_Filename;
+
 //the function expects a +1,-1,0 for movement about the current rowid 
 async function Rowid_Step(step) {
   if(step == 0) {
@@ -58,7 +71,7 @@ async function Rowid_Step(step) {
   } else if(step == -1) {
     rowid_res = GET_PREV_ROWID_STMT.get(rowid_current);
     if(rowid_res == undefined) {
-      rowid_current = rowid_min; //rowid_res.rowid;
+      rowid_current = rowid_max; //rowid_res.rowid;
     } else {
       rowid_current = rowid_res.rowid;
       return rowid_current;
@@ -71,6 +84,7 @@ exports.Rowid_Step = Rowid_Step;
 async function Get_Tagging_Record_FROM_DB(key_type, row_key) {
   row_obj = undefined;
   if(key_type == 'ROWID') {
+    console.log(`row_key = ${row_key} in get tagging record prior`)
     row_obj = await GET_ROWID_TAGGING_STMT.get(row_key);
     console.log(`Get_Tagging_Record_FROM_DB: get rowid sqlite info.changes = ${JSON.stringify(row_obj)}`);
   } else if(key_type == 'FILENAME') {
@@ -88,6 +102,7 @@ async function Insert_Record_Into_DB(tagging_obj) {
   console.log(`Insert_Record_Into_DB: tagging_obj = ${tagging_obj}`);
   info = await INSERT_TAGGING_STMT.run(tagging_obj.imageFileName,tagging_obj.imageFileHash,tagging_obj.taggingRawDescription,JSON.stringify(tagging_obj.taggingTags),JSON.stringify(tagging_obj.taggingEmotions),JSON.stringify(tagging_obj.taggingMemeChoices));
   console.log(`Insert_Record_Into_DB: insert sqlite info.changes = ${info}`);
+  Set_Max_Min_Rowid()
 }
 exports.Insert_Record_Into_DB = Insert_Record_Into_DB;
 
@@ -111,6 +126,7 @@ async function Delete_Tagging_Annotation_DB(key_type, row_key) {
     info = await DELETE_FILENAME_TAGGING_STMT.run(row_key);
     console.log(`Delete_Tagging_Annotation_DB: update sqlite info.changes = ${info}`);
   }
+  Set_Max_Min_Rowid()
 }
 exports.Delete_Tagging_Annotation_DB = Delete_Tagging_Annotation_DB
 

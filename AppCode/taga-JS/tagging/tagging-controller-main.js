@@ -21,12 +21,12 @@ var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
                                     }
 
 //files to cycle through
-var image_files_in_dir = '';
-var all_image_keys; // each image key in the tagging db
+//var image_files_in_dir = ''; //indexeddb
+//var all_image_keys; // each image key in the tagging db //indexeddb
+//var current_image_annotation; //indexeddb
 var current_image_annotation;
-var current_image_annotation_sqlite;
-var image_index = 1;
-var image_index_sqlite;
+//var image_index = 1; //indexeddb
+var image_index;
 
 //holds the last directory the user imported images from
 var last_user_image_directory_chosen = '';
@@ -42,28 +42,28 @@ var reg_exp_delims = /[#:,;| ]+/
 
 
 //MODEL DB ACCESS FUNCTIONS START>>>
-async function Create_Tagging_DB_Instance() {
-    await TAGGING_DB_MODULE.Create_Db()
-}
-async function Get_Tagging_Record_In_DB(filename) {
-    return await TAGGING_DB_MODULE.Get_Record(filename)
-}
-async function Set_All_Image_Keys_In_Tagging_DB() {
-    await TAGGING_DB_MODULE.Get_All_Keys_From_DB()
-    all_image_keys = TAGGING_DB_MODULE.Read_All_Keys_From_DB()
-}
-async function Update_Tagging_Annotation_In_DB(tagging_obj) {
-    await TAGGING_DB_MODULE.Update_Record(tagging_obj)
-}
-async function Insert_Record_In_DB(tagging_obj) {
-    await TAGGING_DB_MODULE.Insert_Record(tagging_obj);
-}
-async function Delete_Tagging_Annotation_In_DB(image_name) {
-    return await TAGGING_DB_MODULE.Delete_Record(image_name);
-}
-async function Delete_Void_MemeChoices() {
-    await TAGGING_DB_MODULE.Delete_Void_MemeChoices(); //!!!needs to be optimized
-}
+// async function Create_Tagging_DB_Instance() { //indexeddb
+//     await TAGGING_DB_MODULE.Create_Db()
+// }
+// async function Get_Tagging_Record_In_DB(filename) { //indexeddb
+//     return await TAGGING_DB_MODULE.Get_Record(filename)
+// }
+// async function Set_All_Image_Keys_In_Tagging_DB() { //indexeddb
+//     await TAGGING_DB_MODULE.Get_All_Keys_From_DB()
+//     all_image_keys = TAGGING_DB_MODULE.Read_All_Keys_From_DB()
+// }
+// async function Update_Tagging_Annotation_In_DB(tagging_obj) { //indexeddb
+//     await TAGGING_DB_MODULE.Update_Record(tagging_obj)
+// }
+// async function Insert_Record_In_DB(tagging_obj) { //indexeddb
+//     await TAGGING_DB_MODULE.Insert_Record(tagging_obj);
+// }
+// async function Delete_Tagging_Annotation_In_DB(image_name) { //indexeddb
+//     return await TAGGING_DB_MODULE.Delete_Record(image_name);
+// }
+// async function Delete_Void_MemeChoices() { //indexeddb
+//     await TAGGING_DB_MODULE.Delete_Void_MemeChoices(); //!!!needs to be optimized
+// }
 //MODEL DB ACCESS FUNCTIONS END<<<
 
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS START>>>
@@ -91,11 +91,17 @@ async function Delete_Tagging_Annotation_FILENAME_DB(image_name) { //delete via 
 async function Delete_Tagging_Annotation_ROWID_DB(rowid) { //delete via rowid
     return await DB_MODULE.Delete_Tagging_Annotation_DB('ROWID',rowid);
 }
+async function Get_ROWID_From_Filename(filename) {
+    return await DB_MODULE.Get_ROWID_From_Filename(filename);
+}
+function Set_ROWID(rowid) {
+    DB_MODULE.Set_ROWID(rowid);
+}
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END>>>
 
 //DISPLAY THE MAIN IMAGE START>>>
 function Display_Image() {
-    document.getElementById('center-gallery-image-id').src = `${TAGA_IMAGE_DIRECTORY}${PATH.sep}${current_image_annotation["imageFileName"]}`;
+    document.getElementById('center-gallery-image-id').src = `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation["imageFileName"]}`;
 }
 //DISPLAY THE MAIN IMAGE END<<<
 
@@ -161,13 +167,13 @@ async function Add_New_Emotion(){
         boolean_included = keys_tmp.includes(new_emotion_text)
         if(boolean_included == false){
             current_image_annotation["taggingEmotions"][new_emotion_text] = new_emotion_value
-            await Update_Tagging_Annotation_In_DB(current_image_annotation) //indexeeddb
-            await Update_Tagging_Annotation_FILENAME_DB(current_image_annotation)
+            //await Update_Tagging_Annotation_In_DB(current_image_annotation) //indexeeddb
+            await Update_Tagging_Annotation_FILENAME_DB(current_image_annotation);
         }
-        document.getElementById("emotions-new-emotion-textarea-id").value = ""
-        document.getElementById("new-emotion-range-id").value = `0`
+        document.getElementById("emotions-new-emotion-textarea-id").value = "";
+        document.getElementById("new-emotion-range-id").value = `0`;
          //refresh emotion container fill
-        Emotion_Display_Fill()
+        Emotion_Display_Fill();
     }
 }
 //EMOTION STUFF END<<<
@@ -176,18 +182,27 @@ async function Add_New_Emotion(){
 //populate the meme switch view with images
 function Meme_View_Fill() {
     meme_box = document.getElementById("memes-innerbox-displaymemes-id")
-    meme_choices = current_image_annotation["taggingMemeChoices"]
+    meme_choices = JSON.parse(current_image_annotation["taggingMemeChoices"])
+    console.log(`meme_choices = ${meme_choices}`)
+    console.log(`current_image_annotation = ${JSON.stringify(current_image_annotation)}`)
+    if(Array.isArray(meme_choices)==true){
+        console.log(`meme_choices is an array!`)
+    } else {
+        console.log('meme choices is not an array...')
+        console.log(`meme choices type of = ${typeof(meme_choices)}`)
+    }
     meme_choices.forEach(file =>{
+        console.log(`file = ${file}`)
         meme_box.insertAdjacentHTML('beforeend',`
                                                 <label class="memeswitch" title="deselect / keep" >   <input id="meme-toggle-id-${file}" type="checkbox"> <span class="slider"></span>   </label>
                                                 <div class="memes-img-div-class" id="memes-image-div-id-${file}">
-                                                    <img class="memes-img-class" id="memes-image-img-id-${file}" src="${TAGA_IMAGE_DIRECTORY}${PATH.sep}${file}" title="view" alt="meme" />
+                                                    <img class="memes-img-class" id="memes-image-img-id-${file}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file}" title="view" alt="meme" />
                                                 </div>
                                                 `);
     })
     //set default meme choice toggle button direction
     for(ii=0;ii<meme_choices.length;ii++){
-        document.getElementById(`meme-toggle-id-${meme_choices[ii]}`).checked = true
+        document.getElementById(`meme-toggle-id-${meme_choices[ii]}`).checked = true;
     }
     //add an event listener for when a meme image is clicked to open the modal, and send the file name of the meme
     meme_choices.forEach(file => {
@@ -215,7 +230,7 @@ async function Meme_Image_Clicked(meme_file_name) {
     document.getElementById("modal-meme-clicked-image-gridbox-id").innerHTML = "";
     meme_click_modal_div = document.getElementById("modal-meme-clicked-image-gridbox-id");
     meme_click_modal_body_html_tmp = '';
-    meme_click_modal_body_html_tmp += `<img id="modal-meme-clicked-displayimg-id" src="${TAGA_IMAGE_DIRECTORY}${PATH.sep}${meme_file_name}" title="meme" alt="meme" />`;
+    meme_click_modal_body_html_tmp += `<img id="modal-meme-clicked-displayimg-id" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_file_name}" title="meme" alt="meme" />`;
     meme_click_modal_div.insertAdjacentHTML('beforeend', meme_click_modal_body_html_tmp);
     meme_image_annotations = await Get_Tagging_Record_In_DB( meme_file_name ); //indexeddb
     meme_image_annotations_sqlite = await Get_Tagging_Annotation_FILENAME_DB( meme_file_name );
@@ -263,40 +278,44 @@ function Make_Blank_Tagging_View() {
 async function Reset_Image_Annotations(){
     //reset emotion slider values
     for( var key of Object.keys(current_image_annotation["taggingEmotions"]) ){
-        document.getElementById(`emotion-range-id-${key}`).value = 0
+        document.getElementById(`emotion-range-id-${key}`).value = 0;
     }
-    document.getElementById(`new-emotion-range-id`).value = 0
-    document.getElementById('description-textarea-id').value = ''
-    document.getElementById('hashtags-innerbox-displayhashtags-id').innerHTML = ''
+    document.getElementById(`new-emotion-range-id`).value = 0;
+    document.getElementById('description-textarea-id').value = '';
+    document.getElementById('hashtags-innerbox-displayhashtags-id').innerHTML = '';
     //reset the meme toggles to be the checked true which is the default here
-    meme_choices = current_image_annotation["taggingMemeChoices"]
+    meme_choices = current_image_annotation["taggingMemeChoices"];
     for(ii=0;ii<meme_choices.length;ii++){
-        document.getElementById(`meme-toggle-id-${meme_choices[ii]}`).checked = false
+        document.getElementById(`meme-toggle-id-${meme_choices[ii]}`).checked = false;
     }
 }
 //RESET TYPE FUNCTIONS END<<<
 
 //main function to arrange the display of the image annotations and the image
 async function Load_State_Of_Image_IDB() {
-    current_image_annotation = await Get_Tagging_Record_In_DB(all_image_keys[image_index - 1]); //indexeddb
-    current_image_annotation_sqlite = await Get_Tagging_Annotation_FILENAME_DB(all_image_keys[image_index - 1]);
+    //current_image_annotation = await Get_Tagging_Record_In_DB(all_image_keys[image_index - 1]); //indexeddb
+    current_image_annotation = await Get_Tagging_Annotation_ROWID_DB( await Get_Tagging_ROWID(0) );
+    console.log(`in Load_State_Of_Image_IDB`)
+    console.log(`current_image_annotation typeof = ${current_image_annotation}`)
+    console.log(` current_image_annotation = ${current_image_annotation}`)
+    console.log(`current_image_annotation typeof meme choices = ${typeof(current_image_annotation.taggingMemeChoices)}`)
     Make_Blank_Tagging_View() //empty all parts to be ready to add the annotation information
     Emotion_Display_Fill()//display the emotion set annotations
-    Meme_View_Fill()
-    Description_Hashtags_Display_Fill()
-    Display_Image()
+    Meme_View_Fill();
+    Description_Hashtags_Display_Fill();
+    Display_Image();
 }
 //called from the gallery widget, where 'n' is the number of images forward or backwards to move
 function New_Image_Display(n) {
-    image_index += n; //indexeddb
-    image_index_sqlite = Get_Tagging_ROWID(n);
-    console.log(`image_index_sqlite = ${image_index_sqlite}`)
-    if (image_index > all_image_keys.length) {
-        image_index = 1
-    }
-    if (image_index < 1) {
-        image_index = all_image_keys.length
-    };
+    //image_index += n; //indexeddb
+    image_index = Get_Tagging_ROWID(n);
+    console.log(`image_index_sqlite = ${image_index}`)
+    // if (image_index > all_image_keys.length) { //indexeddb
+    //     image_index = 1
+    // }
+    // if (image_index < 1) {
+    //     image_index = all_image_keys.length
+    // };
     Load_State_Of_Image_IDB()
 }
 //called upon app loading
@@ -333,9 +352,9 @@ async function First_Display_Init() {
         Search_Images();
     }, false);
 
-    await Create_Tagging_DB_Instance()
-    await Set_All_Image_Keys_In_Tagging_DB() //indexeddb
-    await Check_And_Handle_New_Images_IDB(); //deals with the extra or missing files in the image directory
+    //await Create_Tagging_DB_Instance() //indexeddb
+    //await Set_All_Image_Keys_In_Tagging_DB() //indexeddb
+    //await Check_And_Handle_New_Images_IDB(); //deals with the extra or missing files in the image directory //indexeddb
     await Load_State_Of_Image_IDB() //display the image in view currently and the annotations it has
 }
 //init method to run upon loading
@@ -345,49 +364,49 @@ First_Display_Init();
 
 //HANLDE FOLDER IMAGE AND DB MATCH START>>>
 //update the file variable storing the array of all the files in the folder
-function Refresh_File_List() {
-    image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY);
-}
+// function Refresh_File_List() {
+//     image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY);
+// }
 //fill the IDB for 'tagging' when loading so new files are taken into account 'eventually', feed it the DB list of files
 //load files in the directory but not DB, into the DB with defaults
 //DB entries not in the directory are lingering entries to be deleted
-async function Check_And_Handle_New_Images_IDB() {
-    Refresh_File_List() //var image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY)
-    //default annotation New_Image_Display(n) bj values to use when new file found
-    for( ii = 0; ii < image_files_in_dir.length; ii++){
-        bool_new_file_name = all_image_keys.some( name_tmp => name_tmp === `${image_files_in_dir[ii]}` );
-        if( bool_new_file_name == false ) {
-            image_name_tmp = `${image_files_in_dir[ii]}`
-            tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
-            tagging_entry.imageFileName = image_name_tmp;
-            tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_IMAGE_DIRECTORY}${PATH.sep}${image_name_tmp}`);
-            await Insert_Record_In_DB(tagging_entry);
-        }
-    }
-    //file no longer present so it's entry is to be deleted
-    for( ii = 0; ii < all_image_keys.length; ii++) {
-        bool_missing_file_name = image_files_in_dir.some( name_tmp => name_tmp === `${all_image_keys[ii]}` );
-        if( bool_missing_file_name == false ) {
-            //the picture file name in context
-            image_name_tmp = `${all_image_keys[ii]}`
-            await Delete_Tagging_Annotation_In_DB(image_name_tmp); //indexeddb
-            await Delete_Tagging_Annotation_FILENAME_DB(image_name_tmp);
-        }
-    }
-    await Delete_Void_MemeChoices() //!!!needs to be optimized
-}
+// async function Check_And_Handle_New_Images_IDB() {
+//     Refresh_File_List() //var image_files_in_dir = FS.readdirSync(TAGA_IMAGE_DIRECTORY)
+//     //default annotation New_Image_Display(n) bj values to use when new file found
+//     for( ii = 0; ii < image_files_in_dir.length; ii++){
+//         bool_new_file_name = all_image_keys.some( name_tmp => name_tmp === `${image_files_in_dir[ii]}` );
+//         if( bool_new_file_name == false ) {
+//             image_name_tmp = `${image_files_in_dir[ii]}`
+//             tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
+//             tagging_entry.imageFileName = image_name_tmp;
+//             tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_IMAGE_DIRECTORY}${PATH.sep}${image_name_tmp}`);
+//             await Insert_Record_In_DB(tagging_entry);
+//         }
+//     }
+//     //file no longer present so it's entry is to be deleted
+//     for( ii = 0; ii < all_image_keys.length; ii++) {
+//         bool_missing_file_name = image_files_in_dir.some( name_tmp => name_tmp === `${all_image_keys[ii]}` );
+//         if( bool_missing_file_name == false ) {
+//             //the picture file name in context
+//             image_name_tmp = `${all_image_keys[ii]}`
+//             await Delete_Tagging_Annotation_In_DB(image_name_tmp); //indexeddb
+//             await Delete_Tagging_Annotation_FILENAME_DB(image_name_tmp);
+//         }
+//     }
+//     await Delete_Void_MemeChoices() //!!!needs to be optimized
+// }
 //HANLDE FOLDER IMAGE AND DB MATCH END<<<
 
 
 //SAVING, LOADING, DELETING, ETC START>>>
 //process image for saving including the text to tags (Called from the html Save button)
 async function Save_Image_Annotation_Changes() {
-    new_record = await Get_Tagging_Record_In_DB(all_image_keys[image_index - 1]); //indexeddb JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
-    new_record_sqlite = await Get_Tagging_Annotation_FILENAME_DB(all_image_keys[image_index - 1]); 
+    //new_record = await Get_Tagging_Record_In_DB(all_image_keys[image_index - 1]); //indexeddb JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION));
+    //new_record = await Get_Tagging_Annotation_ROWID_DB( Get_Tagging_ROWID(0) );
     //the picture file name in context
-    image_name = `${all_image_keys[image_index - 1]}`;
+    //image_name = `${all_image_keys[image_index - 1]}`;
     //save meme changes
-    current_memes = new_record.taggingMemeChoices;
+    current_memes = current_image_annotation.taggingMemeChoices;
     meme_switch_booleans = [] //meme selection toggle switch check boxes
     for (var ii = 0; ii < current_memes.length; ii++) {
         meme_boolean_tmp = document.getElementById(`meme-toggle-id-${current_memes[ii]}`).checked;
@@ -399,72 +418,75 @@ async function Save_Image_Annotation_Changes() {
     rawDescription = document.getElementById('description-textarea-id').value;
     processed_tag_word_list = DESCRIPTION_PROCESS_MODULE.process_description(rawDescription);
     //change the object fields accordingly
-    new_record.imageFileName = image_name;
-    new_record.taggingMemeChoices = meme_switch_booleans;
-    new_record.taggingRawDescription = rawDescription;
-    new_record.taggingTags = processed_tag_word_list;
-    for( var key of Object.keys(new_record["taggingEmotions"]) ) {
-        new_record["taggingEmotions"][key] = document.getElementById('emotion-range-id-'+key).value;
+    //new_record.imageFileName = image_name;
+    current_image_annotation.taggingMemeChoices = meme_switch_booleans;
+    current_image_annotation.taggingRawDescription = rawDescription;
+    current_image_annotation.taggingTags = processed_tag_word_list;
+    for( var key of Object.keys(current_image_annotation["taggingEmotions"]) ) {
+        current_image_annotation["taggingEmotions"][key] = document.getElementById('emotion-range-id-'+key).value;
     }
-    await Update_Tagging_Annotation_In_DB(new_record); //indexeddb
-    await Update_Tagging_Annotation_FILENAME_DB(new_record)
+    //await Update_Tagging_Annotation_In_DB(new_record); //indexeddb
+    await Update_Tagging_Annotation_FILENAME_DB(current_image_annotation);
     Load_State_Of_Image_IDB(); //TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_annotations)
 }
 //load the default image, typically called to avoid having nothing in the DB but can be deleted later on
 async function Load_Default_Taga_Image() {
     taga_source_path = PATH.resolve()+PATH.sep+'Taga.png';
-    FS.copyFileSync(taga_source_path, `${TAGA_IMAGE_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL);
+    //FS.copyFileSync(taga_source_path, `${TAGA_IMAGE_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL); //indexeddb
     FS.copyFileSync(taga_source_path, `${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL);
     tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
     tagging_entry.imageFileName = 'Taga.png';
-    tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_IMAGE_DIRECTORY}${PATH.sep}${'Taga.png'}`);
-    await Insert_Record_In_DB(tagging_entry); //indexeddb
+    tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
+    //await Insert_Record_In_DB(tagging_entry); //indexeddb
     await Insert_Record_Into_DB(tagging_entry); //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
 }
 //delete image from user choice
 async function Delete_Image() {
-    FS.unlinkSync( `${TAGA_IMAGE_DIRECTORY}${PATH.sep}${all_image_keys[image_index-1]}` ); //indexeddb
-    FS.unlinkSync( `${TAGA_DATA_DIRECTORY}${PATH.sep}${all_image_keys[image_index-1]}` );
-    image_ind_to_delete = await all_image_keys.indexOf(all_image_keys[image_index-1]);
-    await Delete_Tagging_Annotation_In_DB(all_image_keys[image_index-1]); //indexeddb
-    await Delete_Tagging_Annotation_FILENAME_DB(all_image_keys[image_index-1]);
-    all_image_keys.splice(image_ind_to_delete, 1);
-    await Delete_Void_MemeChoices(); //!!!needs to be optimized
-    if(all_image_keys.length == 0) {
+    //FS.unlinkSync( `${TAGA_IMAGE_DIRECTORY}${PATH.sep}${all_image_keys[image_index-1]}` ); //indexeddb
+    FS.unlinkSync( `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation.imageFileName}` );
+    //image_ind_to_delete = await all_image_keys.indexOf(all_image_keys[image_index-1]);
+    //await Delete_Tagging_Annotation_In_DB(all_image_keys[image_index-1]); //indexeddb
+    await Delete_Tagging_Annotation_ROWID_DB( Get_Tagging_ROWID(0) );
+    //all_image_keys.splice(image_ind_to_delete, 1);
+    //await Delete_Void_MemeChoices(); //!!!needs to be optimized //indexeddb
+    if(0) { //!!! take into account
         Load_Default_Taga_Image();
     }
-    New_Image_Display( 0 ); //pass zero to display current and not forward or backward
+    New_Image_Display( 1 ); //pass zero to display current and not forward or backward
 }
 //dialog window explorer to select new images to import, and calls the functions to update the view
 //checks whether the directory of the images is the taga image folder and if so returns
 async function Load_New_Image() {    
     const result = await IPC_RENDERER.invoke('dialog:tagging-new-file-select',{directory: last_user_image_directory_chosen});
     //ignore selections from the taga image folder store
-    if(result.canceled == true || PATH.dirname(result.filePaths[0]) == TAGA_IMAGE_DIRECTORY) { //indexeddb
-        return
-    }
+    // if(result.canceled == true || PATH.dirname(result.filePaths[0]) == TAGA_IMAGE_DIRECTORY) { //indexeddb
+    //     return
+    // }
     if(result.canceled == true || PATH.dirname(result.filePaths[0]) == TAGA_DATA_DIRECTORY) { 
         return
     }
     last_user_image_directory_chosen = PATH.dirname(result.filePaths[0]);
-    filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_IMAGE_DIRECTORY); //indexeddb
+    //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_IMAGE_DIRECTORY); //indexeddb
     filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
     if(filenames.length == 0){
         return
     }
-    filenames.forEach( filename => {
+    tagging_entry_tmp = '';
+    filenames.forEach( async filename => {
         tagging_entry_tmp = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //cloning obj
         tagging_entry_tmp.imageFileName = filename;
-        tagging_entry_tmp.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_IMAGE_DIRECTORY}${PATH.sep}${filename}`);
-        Insert_Record_In_DB(tagging_entry_tmp); //indexeddb
-        Insert_Record_Into_DB(tagging_entry_tmp); //sqlite version
-        MY_ARRAY_INSERT_HELPER.Insert_Into_Sorted_Array(all_image_keys,filename); //maintain the alphabetical order after the insertion in place (pass by ref)
+        tagging_entry_tmp.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${filename}`);
+        //Insert_Record_In_DB(tagging_entry_tmp); //indexeddb
+        await Insert_Record_Into_DB(tagging_entry_tmp); //sqlite version
+        //MY_ARRAY_INSERT_HELPER.Insert_Into_Sorted_Array(all_image_keys,filename); //indexeddb //maintain the alphabetical order after the insertion in place (pass by ref)
     });
-    image_index = all_image_keys.indexOf(filenames[0]) + 1; //set index to first of the new images
-    current_image_annotation = await Get_Tagging_Record_In_DB(all_image_keys[image_index-1]); //indexeddb 
-    current_image_annotation_sqlite = await Get_Tagging_Annotation_FILENAME_DB(all_image_keys[image_index-1]);
+    //image_index = all_image_keys.indexOf(filenames[0]) + 1; //indexeddb //set index to first of the new images
+    //current_image_annotation = await Get_Tagging_Record_In_DB(all_image_keys[image_index-1]); //indexeddb 
+    current_image_annotation = tagging_entry_tmp;
+    image_index = await Get_ROWID_From_Filename(current_image_annotation.imageFileName);
+    Set_ROWID(image_index)
     Load_State_Of_Image_IDB();
-    New_Image_Display( 0 );
+    //New_Image_Display( 0 );
 }
 //SAVING, LOADING, DELETING, ETC END<<<
 
