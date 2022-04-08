@@ -42,6 +42,7 @@ async function Number_of_Tagging_Records() {
   record_num_tagging = res.rownum;
   return res.rownum;
 }
+exports.Number_of_Tagging_Records = Number_of_Tagging_Records;
 Number_of_Tagging_Records();
 
 //set the maximum and minimum rowid to provide bounds for the rowid usage when user iterates through images
@@ -126,9 +127,10 @@ exports.Update_Tagging_Annotation_DB = Update_Tagging_Annotation_DB
 async function Delete_Tagging_Annotation_DB(filename) {
   info = await DELETE_FILENAME_TAGGING_STMT.run(filename);
   Set_Max_Min_Rowid();
-  Number_of_Tagging_Records();
   //!!! handle empty DEFAULT TAGA
-  console.log(`after delete rownum = ${record_num_tagging}`)
+  records_remaining = await Number_of_Tagging_Records();
+  console.log(`after delete rownum = ${records_remaining}`)
+  return records_remaining; //0 is the indicator that loading a default is necessary
 }
 exports.Delete_Tagging_Annotation_DB = Delete_Tagging_Annotation_DB
 

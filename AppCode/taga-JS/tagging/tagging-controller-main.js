@@ -50,6 +50,9 @@ async function Update_Tagging_Annotation_DB(tagging_obj) { //update via file nam
 async function Delete_Tagging_Annotation_DB(filename) { //delete via file name
     return await DB_MODULE.Delete_Tagging_Annotation_DB(filename);
 }
+async function Number_of_Tagging_Records() {
+    return await DB_MODULE.Number_of_Tagging_Records();
+}
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END>>>
 
 //DISPLAY THE MAIN IMAGE START>>>
@@ -297,6 +300,10 @@ async function First_Display_Init() {
         Search_Images();
     }, false);
 
+    records_remaining = await Number_of_Tagging_Records();
+    if(records_remaining == 0) {
+        Load_Default_Taga_Image();
+    }
     await New_Image_Display(0)
     await Load_State_Of_Image_IDB() //display the image in view currently and the annotations it has
 }
@@ -342,7 +349,6 @@ async function Load_Default_Taga_Image() {
     tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
     tagging_entry.imageFileName = 'Taga.png';
     tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
-    //await Insert_Record_In_DB(tagging_entry); //indexeddb
     await Insert_Record_Into_DB(tagging_entry); //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
 }
 //delete image from user choice
@@ -350,9 +356,9 @@ async function Delete_Image() {
     if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation.imageFileName}`) == true ) {
         FS.unlinkSync( `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation.imageFileName}` );
     }
-    await Delete_Tagging_Annotation_DB( current_image_annotation.imageFileName );
-    if(0) { //!!! take into account
-        Load_Default_Taga_Image();
+    records_remaining = await Delete_Tagging_Annotation_DB( current_image_annotation.imageFileName );
+    if(records_remaining == 0) {
+        await Load_Default_Taga_Image();
     }
     New_Image_Display( 0 ); //pass zero to display current and not forward or backward
 }
@@ -390,7 +396,7 @@ async function Load_New_Image() {
 
 
 /*
-MODAL SEARCH STUFF!!!
+MODAL SEARCH STUFF
 */
 tagging_search_obj = {
                         emotions:{},
@@ -571,7 +577,7 @@ async function Modal_Search_Entry() {
 
 
 /******************************
-MEME SEARCH STUFF!!! SEARCH FOR MEMES TO ADD THEM AS AN ANNOTATION
+MEME SEARCH STUFF SEARCH FOR MEMES TO ADD THEM AS AN ANNOTATION
 ******************************/
 meme_tagging_search_obj = {
     meme_emotions:{},
