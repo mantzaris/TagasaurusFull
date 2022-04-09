@@ -85,8 +85,8 @@ function Description_Hashtags_Display_Fill() {
 //populate the emotion value view with emotional values
 async function Emotion_Display_Fill() {
     emotion_div = document.getElementById("emotion-collectionlist-div-id");
+    emotion_keys = Object.keys(current_image_annotation["taggingEmotions"]);
     emotion_html_tmp = ''
-    emotion_keys = Object.keys(current_image_annotation["taggingEmotions"])
     for( var key of emotion_keys ) {
         emotion_html_tmp += `<div class="emotion-list-class" id="emotion-entry-div-id-${key}">
                                 <img class="emotion-delete-icon-class" id="emotion-delete-button-id-${key}" onmouseover="this.src='${CLOSE_ICON_RED}';"
@@ -107,7 +107,7 @@ async function Emotion_Display_Fill() {
     }
 }
 //delete an emotion from the emotion set
-async function Delete_Emotion(emotion_key){
+async function Delete_Emotion(emotion_key) {
     delete current_image_annotation["taggingEmotions"][emotion_key];
     await Update_Tagging_Annotation_DB(current_image_annotation);
     //refresh emotion container fill
@@ -138,7 +138,6 @@ function Meme_View_Fill() {
     meme_box = document.getElementById("memes-innerbox-displaymemes-id");
     meme_choices = current_image_annotation["taggingMemeChoices"];
     meme_choices.forEach(file => {
-        console.log(`file = ${file}`)
         if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true ) {
             meme_box.insertAdjacentHTML('beforeend',`
                                                 <label class="memeswitch" title="deselect / keep" >   <input id="meme-toggle-id-${file}" type="checkbox"> <span class="slider"></span>   </label>
@@ -217,12 +216,12 @@ async function Meme_Image_Clicked(meme_file_name) {
 //RESET TYPE FUNCTIONS START>>>
 //makes the tagging view 'blank' for the annotations to be placed
 function Make_Blank_Tagging_View() {
-    document.getElementById("emotions-new-emotion-textarea-id").value = "" //emtpy new name for emotions
-    document.getElementById("new-emotion-range-id").value = "0" //reset to zero the range of the emotions
-    document.getElementById("emotion-collectionlist-div-id").innerHTML = "" //empty the emotions display div
-    document.getElementById("memes-innerbox-displaymemes-id").innerHTML = "" //empty the meme display container
-    document.getElementById("description-textarea-id").value = "" //clear the description entry textarea
-    document.getElementById('hashtags-innerbox-displayhashtags-id').innerHTML = '' //clear the display for the hashtags
+    document.getElementById("emotions-new-emotion-textarea-id").value = ""; //emtpy new name for emotions
+    document.getElementById("new-emotion-range-id").value = "0"; //reset to zero the range of the emotions
+    document.getElementById("emotion-collectionlist-div-id").innerHTML = ""; //empty the emotions display div
+    document.getElementById("memes-innerbox-displaymemes-id").innerHTML = ""; //empty the meme display container
+    document.getElementById("description-textarea-id").value = ""; //clear the description entry textarea
+    document.getElementById('hashtags-innerbox-displayhashtags-id').innerHTML = ''; //clear the display for the hashtags
 }
 //bring the image annotation view to the default state (not saving it until confirmed)
 async function Reset_Image_Annotations(){
@@ -243,12 +242,8 @@ async function Reset_Image_Annotations(){
 
 //main function to arrange the display of the image annotations and the image
 async function Load_State_Of_Image_IDB() {
-    console.log(`in Load_State_Of_Image_IDB`)
-    console.log(`current_image_annotation typeof = ${typeof(current_image_annotation)}`)
-    console.log(` current_image_annotation = ${JSON.stringify(current_image_annotation)}`)
-    console.log(`current_image_annotation typeof meme choices = ${typeof(current_image_annotation.taggingMemeChoices)}`)
-    Make_Blank_Tagging_View() //empty all parts to be ready to add the annotation information
-    Emotion_Display_Fill() //display the emotion set annotations
+    Make_Blank_Tagging_View(); //empty all parts to be ready to add the annotation information
+    Emotion_Display_Fill(); //display the emotion set annotations
     Meme_View_Fill();
     Description_Hashtags_Display_Fill();
     Display_Image();
@@ -259,8 +254,6 @@ async function New_Image_Display(n) {
         current_image_annotation = await Step_Get_Annotation('',0);
     } else if(n == 1) {
         current_image_annotation = await Step_Get_Annotation(current_image_annotation.imageFileName,1);
-        console.log(`current image annotation in new image display +1 = ${current_image_annotation}`)
-        console.log(`current image annotation in new image display +1 = ${JSON.stringify(current_image_annotation)}`)
     } else if(n == -1) {
         current_image_annotation = await Step_Get_Annotation(current_image_annotation.imageFileName,-1);
     }
@@ -337,8 +330,6 @@ async function Save_Image_Annotation_Changes() {
     for( var key of Object.keys(current_image_annotation["taggingEmotions"]) ) {
         current_image_annotation["taggingEmotions"][key] = document.getElementById('emotion-range-id-'+key).value;
     }
-    console.log(`in saving annotation current annotation = ${current_image_annotation}`)
-    console.log(`in saving annotation current annotation = ${JSON.stringify(current_image_annotation)}`)
     await Update_Tagging_Annotation_DB(current_image_annotation);
     Load_State_Of_Image_IDB(); //TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_annotations)
 }
@@ -387,8 +378,6 @@ async function Load_New_Image() {
     //New_Image_Display( 0 );
 }
 //SAVING, LOADING, DELETING, ETC END<<<
-
-
 
 
 

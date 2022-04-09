@@ -64,21 +64,20 @@ exports.Get_ROWID_From_Filename = Get_ROWID_From_Filename;
 
 //the function expects a +1,-1,0 for movement about the current rowid
 async function Step_Get_Annotation(filename,step) {
-  if( step == 0 ) {
+  if( step == 0 && filename == '' ) {
     record = await GET_RECORD_FROM_ROWID_TAGGING_STMT.get(rowid_current);
     return Get_Obj_Fields_From_Record(record);
   }
   rowid_current = await Get_ROWID_From_Filename(filename);
-  console.log(`rowid in dbfns lin 71 = ${rowid_current}`)
   if(step == 1) {
-    rowid_res = GET_NEXT_ROWID_STMT.get(rowid_current);
+    rowid_res = await GET_NEXT_ROWID_STMT.get(rowid_current);
     if(rowid_res == undefined) {
       rowid_current = rowid_min;
     } else {
       rowid_current = rowid_res.rowid;
     }
   } else if(step == -1) {
-    rowid_res = GET_PREV_ROWID_STMT.get(rowid_current);
+    rowid_res = await GET_PREV_ROWID_STMT.get(rowid_current);
     if(rowid_res == undefined) {
       rowid_current = rowid_max; //rowid_res.rowid;
     } else {
@@ -93,7 +92,6 @@ exports.Step_Get_Annotation = Step_Get_Annotation;
 //fn to get the annotation record for an image by key_type of rowid or filename
 async function Get_Tagging_Record_From_DB(filename) {
   row_obj = await GET_FILENAME_TAGGING_STMT.get(filename);
-  console.log(`Get_Tagging_Record_From_DB: get filename sqlite info.changes = ${JSON.stringify(row_obj)}`);
   return Get_Obj_Fields_From_Record(row_obj);
 }
 exports.Get_Tagging_Record_From_DB = Get_Tagging_Record_From_DB;
@@ -103,16 +101,13 @@ function Get_Obj_Fields_From_Record(record) {
   record.taggingTags = JSON.parse(record.taggingTags);
   record.taggingEmotions = JSON.parse(record.taggingEmotions);
   record.taggingMemeChoices = JSON.parse(record.taggingMemeChoices);
-  console.log(`>>in get obj field and memes type is = ${typeof(record.taggingMemeChoices)}`)
   return record;
 }
 
 //fn to insert into the DB the record of the 
 //column template: (imageFileName TEXT, imageFileHash TEXT, taggingRawDescription TEXT, taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT)
 async function Insert_Record_Into_DB(tagging_obj) {
-  console.log(`Insert_Record_Into_DB: tagging_obj = ${tagging_obj}`);
   info = await INSERT_TAGGING_STMT.run(tagging_obj.imageFileName,tagging_obj.imageFileHash,tagging_obj.taggingRawDescription,JSON.stringify(tagging_obj.taggingTags),JSON.stringify(tagging_obj.taggingEmotions),JSON.stringify(tagging_obj.taggingMemeChoices));
-  console.log(`Insert_Record_Into_DB: insert sqlite info.changes = ${info}`);
   Set_Max_Min_Rowid();
 }
 exports.Insert_Record_Into_DB = Insert_Record_Into_DB;
@@ -120,19 +115,36 @@ exports.Insert_Record_Into_DB = Insert_Record_Into_DB;
 //update the tagging annotation object in the DB
 async function Update_Tagging_Annotation_DB(tagging_obj) {
   info = await UPDATE_FILENAME_TAGGING_STMT.run(tagging_obj.imageFileName,tagging_obj.imageFileHash,tagging_obj.taggingRawDescription,JSON.stringify(tagging_obj.taggingTags),JSON.stringify(tagging_obj.taggingEmotions),JSON.stringify(tagging_obj.taggingMemeChoices),tagging_obj.imageFileName);
-  console.log(`Update_Tagging_Annotation_DB: update sqlite info.changes = ${info}`);
 }
 exports.Update_Tagging_Annotation_DB = Update_Tagging_Annotation_DB
 
 async function Delete_Tagging_Annotation_DB(filename) {
   info = await DELETE_FILENAME_TAGGING_STMT.run(filename);
   Set_Max_Min_Rowid();
-  //!!! handle empty DEFAULT TAGA
   records_remaining = await Number_of_Tagging_Records();
-  console.log(`after delete rownum = ${records_remaining}`)
   return records_remaining; //0 is the indicator that loading a default is necessary
 }
 exports.Delete_Tagging_Annotation_DB = Delete_Tagging_Annotation_DB
 
+//SEARCH FUNCTION ITERATOR VIA CLOSURE START>>>
+async function Tagging_Image_DB_Iterator() {
+  iter_current_rowid = await GET_MIN_ROWID_STMT.get().rowid;
+  //inner function for closure
+  async function Tagging_Iterator_Next() {
+    if(iter_current_rowid == undefined) {
+      return undefined;
+    }
+    current_record = Get_Obj_Fields_From_Record(await GET_RECORD_FROM_ROWID_TAGGING_STMT.get(iter_current_rowid));
+    tmp_rowid = await GET_NEXT_ROWID_STMT.get(iter_current_rowid);
+    if( tmp_rowid != undefined ) {
+      iter_current_rowid = tmp_rowid.rowid;
+    } else {
+      iter_current_rowid = undefined;
+    }
+    return current_record;
+  }
+  return Tagging_Iterator_Next;
+}
+exports.Tagging_Image_DB_Iterator = Tagging_Image_DB_Iterator;
+//SEARCH FUNCTION ITERATOR VIA CLOSURE END<<<
 
-//DEFAULT TAGA CONSIDER ON EMPTY
