@@ -6,7 +6,7 @@ const IPC_RENDERER = require('electron').ipcRenderer
 //const FSE = require('fs-extra');
 
 
-const { DB_MODULE, TAGA_DATA_DIRECTORY, TAGA_IMAGE_DIRECTORY, TAGGING_DB_MODULE, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MY_FILE_HELPER, MY_ARRAY_INSERT_HELPER } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const { DB_MODULE, TAGA_DATA_DIRECTORY, TAGA_IMAGE_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MY_FILE_HELPER, MY_ARRAY_INSERT_HELPER } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 const { CLOSE_ICON_RED, CLOSE_ICON_BLACK, HASHTAG_ICON } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 
@@ -52,6 +52,9 @@ async function Delete_Tagging_Annotation_DB(filename) { //delete via file name
 }
 async function Number_of_Tagging_Records() {
     return await DB_MODULE.Number_of_Tagging_Records();
+}
+async function Tagging_Image_DB_Iterator() {
+    return DB_MODULE.Tagging_Image_DB_Iterator();
 }
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END>>>
 
@@ -393,7 +396,7 @@ tagging_search_obj = {
                         searchMemeTags:[]
                     }
 //functionality for the searching of the images
-function Search_Images(){
+async function Search_Images(){
     // Show the modal
     let modal_search_click = document.getElementById("search-modal-click-top-id");
     modal_search_click.style.display = "block";
@@ -470,47 +473,80 @@ function Search_Images(){
     }
     //default search results are the order the user has them now
     if(search_results == '' && search_meme_results == '') {
-        search_results = all_image_keys
-        search_meme_results = all_image_keys
+        // !!! initial search default list in future make random
+        search_results = [];
+        image_DB_iterator = await Tagging_Image_DB_Iterator(); //!!! randomize !!!
+        for(ii=1;ii<=MAX_COUNT_SEARCH_RESULTS;ii++) {
+            img_record_tmp = await image_DB_iterator();
+            if( img_record_tmp == undefined ) {
+                break;
+            } else {
+                search_results.push( img_record_tmp.imageFileName );
+                console.log(`img_record_tmp = ${img_record_tmp.imageFileName}`)
+            }
+        }
+        search_meme_results = search_results;
     }
     //display default ordering first
-    search_image_results_output = document.getElementById("modal-search-images-results-grid-div-area-id")
-    search_image_results_output.innerHTML = ""
-    search_display_inner_tmp = ''
+    search_image_results_output = document.getElementById("modal-search-images-results-grid-div-area-id");
+    search_image_results_output.innerHTML = "";
+    search_display_inner_tmp = '';
     search_results.forEach(file_key => {
         search_display_inner_tmp += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${file_key}" >
-                                    <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-${file_key}" src="${TAGA_IMAGE_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="memes" />
+                                    <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" cursor="pointer" title="select" alt="image" />
                                 </div>
                                 `
     })
-    search_image_results_output.innerHTML += search_display_inner_tmp
+    search_image_results_output.innerHTML += search_display_inner_tmp;
     //search meme results
-    search_meme_results_output = document.getElementById("modal-search-meme-images-results-grid-div-area-id")
-    search_meme_results_output.innerHTML = ""
-    search_display_inner_tmp = ''
+    search_meme_results_output = document.getElementById("modal-search-meme-images-results-grid-div-area-id");
+    search_meme_results_output.innerHTML = "";
+    search_display_inner_tmp = '';
     search_meme_results.forEach(file_key => {
         search_display_inner_tmp += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${file_key}" >
-                                    <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-${file_key}" src="${TAGA_IMAGE_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="memes" />
+                                    <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" cursor="pointer" title="select" alt="memes" />
                                 </div>                                
                             `
     })
-    search_meme_results_output.innerHTML += search_display_inner_tmp
-    //user presses this to 'choose' the results of the search from the images
-    document.getElementById("modal-search-images-results-select-images-order-button-id").onclick = function() {
-        all_image_keys = search_results//search_results.map(i => all_image_keys[i]);
-        image_index = 1;
-        Load_State_Of_Image_IDB()
-        document.getElementById("search-modal-click-top-id").style.display = "none";
-    }
-    //user presses this to 'choose' the results of the search from the meme images
-    document.getElementById("modal-search-images-results-select-meme-images-order-button-id").onclick = function() {
-        all_image_keys = search_meme_results//search_meme_results.map(i => all_image_keys[i]);
-        image_index = 1;
-        Load_State_Of_Image_IDB()
-        document.getElementById("search-modal-click-top-id").style.display = "none";
-    }
+    search_meme_results_output.innerHTML += search_display_inner_tmp;
+
+    //user presses an image to select it from the images section, add onclick event listener
+    search_results.forEach(file => {
+        if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true ) {
+            document.getElementById(`modal-image-search-result-single-image-img-id-${file}`).onclick = async function() {
+                current_image_annotation = await Get_Tagging_Annotation_From_DB(file);
+                Load_State_Of_Image_IDB();
+                document.getElementById("search-modal-click-top-id").style.display = "none";
+            };
+        }
+    });
+    search_meme_results.forEach(file => {
+        if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true ) {
+            document.getElementById(`modal-image-search-result-single-meme-image-img-id-${file}`).onclick = async function() {
+                current_image_annotation = await Get_Tagging_Annotation_From_DB(file);
+                Load_State_Of_Image_IDB();
+                document.getElementById("search-modal-click-top-id").style.display = "none";
+            };
+        }
+    });
+
+    //DEFUNCT BUTTONS USAGE>>>
+    //user presses this to 'choose' the results of the search from the images 
+    // document.getElementById("modal-search-images-results-select-images-order-button-id").onclick = async function() {
+    //     current_image_annotation = await Get_Tagging_Annotation_From_DB(search_results[2]);
+    //     Load_State_Of_Image_IDB();
+    //     document.getElementById("search-modal-click-top-id").style.display = "none";
+    // }
+    // //user presses this to 'choose' the results of the search from the meme images
+    // document.getElementById("modal-search-images-results-select-meme-images-order-button-id").onclick = async function() {
+    //     current_image_annotation = await Get_Tagging_Annotation_From_DB(search_results[1]);
+    //     Load_State_Of_Image_IDB()
+    //     document.getElementById("search-modal-click-top-id").style.display = "none";
+    // }
+    ////DEFUNCT BUTTONS USAGE<<<
+
     //user presses the main search button for the add memes search modal
     document.getElementById("modal-search-main-button-id").onclick = function() {
         Modal_Search_Entry()
@@ -533,8 +569,8 @@ async function Modal_Search_Entry() {
 
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
-    image_search_result_obj = await SEARCH_MODULE.Image_Addition_Search_Fn(tagging_search_obj,all_image_keys,Get_Tagging_Record_In_DB); //indexeddb
-    image_search_result_obj_sqlite = await SEARCH_MODULE.Image_Addition_Search_Fn(tagging_search_obj,all_image_keys,Get_Tagging_Annotation_From_DB); 
+    image_DB_iterator = await Tagging_Image_DB_Iterator(); //Iterate the images to return from the DB
+    image_search_result_obj = await SEARCH_MODULE.Image_Search_DB(tagging_search_obj,image_DB_iterator,MAX_COUNT_SEARCH_RESULTS); 
     search_results = image_search_result_obj.imgInds.map(i => all_image_keys[i]);
     search_meme_results = image_search_result_obj.memeInds.map(i => all_image_keys[i]);
     //>>SHOW SEARCH RESULTS<<

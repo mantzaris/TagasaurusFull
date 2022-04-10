@@ -36,6 +36,9 @@ exports.MY_FILE_HELPER = MY_FILE_HELPER;
 const MY_ARRAY_INSERT_HELPER = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'utility-insert-into-sorted-array.js') //require('./myJS/utility-insert-into-sorted-array.js')
 exports.MY_ARRAY_INSERT_HELPER = MY_ARRAY_INSERT_HELPER;
 
+//constrains the number of search results returned to the user in the search modals
+const MAX_COUNT_SEARCH_RESULTS = 300;
+exports.MAX_COUNT_SEARCH_RESULTS = MAX_COUNT_SEARCH_RESULTS;
 
 // for the image layout in panels and their arrangements
 const MASONRY = require('masonry-layout'); // installed via npm

@@ -127,6 +127,8 @@ async function Delete_Tagging_Annotation_DB(filename) {
 exports.Delete_Tagging_Annotation_DB = Delete_Tagging_Annotation_DB
 
 //SEARCH FUNCTION ITERATOR VIA CLOSURE START>>>
+//use via 'iter = await Tagging_Image_DB_Iterator()' and 'rr = await iter()'
+//after all rows complete 'undefined' is returned
 async function Tagging_Image_DB_Iterator() {
   iter_current_rowid = await GET_MIN_ROWID_STMT.get().rowid;
   //inner function for closure
