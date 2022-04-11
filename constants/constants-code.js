@@ -37,7 +37,7 @@ const MY_ARRAY_INSERT_HELPER = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.se
 exports.MY_ARRAY_INSERT_HELPER = MY_ARRAY_INSERT_HELPER;
 
 //constrains the number of search results returned to the user in the search modals
-const MAX_COUNT_SEARCH_RESULTS = 300;
+const MAX_COUNT_SEARCH_RESULTS = 5;
 exports.MAX_COUNT_SEARCH_RESULTS = MAX_COUNT_SEARCH_RESULTS;
 
 // for the image layout in panels and their arrangements

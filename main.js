@@ -4,7 +4,7 @@ const {app, ipcMain, dialog, BrowserWindow} = require('electron');
 const PATH = require('path');
 const FS = require('fs');
 
-const TAGA_IMAGE_DIRECTORY = PATH.resolve(PATH.resolve(),'images') 
+const TAGA_IMAGE_DIRECTORY = PATH.resolve(PATH.resolve(),'images') //!!! remove old reference
 const TAGA_FILES_DIRECTORY = PATH.join(PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles')
 const TAGA_DATA_DIRECTORY = PATH.resolve(TAGA_FILES_DIRECTORY,'data') 
 
@@ -35,7 +35,8 @@ function createWindow () {
 //DB SET UP START>>>
 //create folders for data and db -> check if db tables exist -> create indexes on tables
 //is taga data directory and DB set up
-TAGGING_TABLE_NAME = 'TAGGING'
+TAGGING_TABLE_NAME = 'TAGGING';
+TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
 COLLECTIONS_TABLE_NAME = 'COLLECTIONS'
 
 if( FS.existsSync(TAGA_FILES_DIRECTORY) == false ) { //directory for files exists?
@@ -60,6 +61,18 @@ if( tagging_table_exists_res["count(*)"] == 0 ){
   STMT_index2 = DB.prepare(` CREATE UNIQUE INDEX imageFileHash_index ON ${TAGGING_TABLE_NAME} (imageFileHash); `);
   STMT_index2.run();
 }
+//check to see if the TAGGING MEME table exists
+tagging_meme_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${TAGGING_MEME_TABLE_NAME}'; `);
+tagging_meme_table_exists_res = tagging_meme_table_exists_stmt.get();
+//if tagging table does not exit, so create it
+if( tagging_meme_table_exists_res["count(*)"] == 0 ){
+  STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${TAGGING_MEME_TABLE_NAME}
+                    (imageMemeFileName TEXT, imageFileNames TEXT)`);
+  STMT.run();
+  //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
+  STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX imageMemeFileNameIndex ON ${TAGGING_MEME_TABLE_NAME} (imageMemeFileName); `);
+  STMT_index1.run();
+}
 //check to see if the COLLECTIONS table exists
 collection_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTIONS_TABLE_NAME}'; `);
 collection_table_exists_res = collection_table_exists_stmt.get();
@@ -70,7 +83,7 @@ if( collection_table_exists_res["count(*)"] == 0 ){
                       entityImageSet TEXT, entityEmotions TEXT, entityMemes TEXT)`);
   STMT.run();
   //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
-  STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX entityName_index ON ${COLLECTIONS_TABLE_NAME} (entityName); `);
+  STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX entityNameIndex ON ${COLLECTIONS_TABLE_NAME} (entityName); `);
   STMT_index1.run();
 }
 //DB SET UP END<<<
@@ -88,7 +101,7 @@ ipcMain.handle('dialog:tagging-new-file-select', async (event, args) => {
 })
 //for the ability to load the entity creation for the selection of a profile image set
 ipcMain.handle('dialog:openEntityImageSet', async (_, args) => {
-  const result = dialog.showOpenDialog({ properties: ['openFile', 'multiSelections' ], defaultPath: TAGA_IMAGE_DIRECTORY })
+  const result = dialog.showOpenDialog({ properties: ['openFile', 'multiSelections' ], defaultPath: TAGA_IMAGE_DIRECTORY }) //!!! remove old reference
   return result
 })
 //for the ability to save a data export

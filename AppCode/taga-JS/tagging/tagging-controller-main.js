@@ -569,8 +569,8 @@ async function Modal_Search_Entry() {
 
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
-    image_DB_iterator = await Tagging_Image_DB_Iterator(); //Iterate the images to return from the DB
-    image_search_result_obj = await SEARCH_MODULE.Image_Search_DB(tagging_search_obj,image_DB_iterator,MAX_COUNT_SEARCH_RESULTS); 
+    tagging_db_iterator = await Tagging_Image_DB_Iterator();
+    image_search_result_obj = await SEARCH_MODULE.Image_Search_DB(tagging_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
     search_results = image_search_result_obj.imgInds.map(i => all_image_keys[i]);
     search_meme_results = image_search_result_obj.memeInds.map(i => all_image_keys[i]);
     //>>SHOW SEARCH RESULTS<<
