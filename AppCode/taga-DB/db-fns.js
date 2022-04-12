@@ -5,7 +5,8 @@ const FS = require('fs');
 const DATABASE = require('better-sqlite3');
 
 const DB_FILE_NAME = 'test-better3.db';
-const TAGGING_TABLE_NAME = 'TAGGING'
+const TAGGING_TABLE_NAME = 'TAGGING';
+const TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
 const COLLECTIONS_TABLE_NAME = 'COLLECTIONS'
 
 const TAGA_FILES_DIRECTORY = PATH.join(PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles')
@@ -14,7 +15,7 @@ const {  } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-cod
 
 //set up the DB to use
 const DB = new DATABASE(TAGA_FILES_DIRECTORY+PATH.sep+DB_FILE_NAME, { verbose: console.log }); //open db in that directory
-//insert tagging record
+//TAGGING START>>>
 const GET_FILENAME_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE imageFileName=?`);
 const GET_RECORD_FROM_ROWID_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE ROWID=?`);
 const INSERT_TAGGING_STMT = DB.prepare(`INSERT INTO ${TAGGING_TABLE_NAME} (imageFileName, imageFileHash, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices) VALUES (?, ?, ?, ?, ?, ?)`);
@@ -30,7 +31,7 @@ const GET_MAX_ROWID_STMT = DB.prepare(`SELECT MAX(ROWID) AS rowid FROM ${TAGGING
 const GET_MIN_ROWID_STMT = DB.prepare(`SELECT MIN(ROWID) AS rowid FROM ${TAGGING_TABLE_NAME}`);
 
 const GET_TAGGING_ROW_COUNT = DB.prepare(`SELECT COUNT(*) AS rownum FROM ${TAGGING_TABLE_NAME}`)
-
+//TAGGING END<<<
 var rowid_current;
 var rowid_max;
 var rowid_min;
@@ -150,3 +151,40 @@ async function Tagging_Image_DB_Iterator() {
 exports.Tagging_Image_DB_Iterator = Tagging_Image_DB_Iterator;
 //SEARCH FUNCTION ITERATOR VIA CLOSURE END<<<
 
+//TAGGING MEME START>>>
+const GET_MIN_MEME_ROWID_STMT = DB.prepare(`SELECT MIN(ROWID) AS rowid FROM ${TAGGING_MEME_TABLE_NAME}`);
+const GET_NEXT_MEME_ROWID_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_MEME_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
+const GET_RECORD_FROM_ROWID_TAGGING_MEME_STMT = DB.prepare(`SELECT * FROM ${TAGGING_MEME_TABLE_NAME} WHERE ROWID=?`);
+const GET_FILENAME_TAGGING_MEME_STMT = DB.prepare(`SELECT * FROM ${TAGGING_MEME_TABLE_NAME} WHERE imageMemeFileName=?`);
+//change the stored obj to pure json obj on all the fields so no parsing at the controller side is needed for MEME
+function Get_Obj_Fields_From_MEME_Record(record) {
+  record.imageFileNames = JSON.parse(record.imageFileNames);
+  return record;
+}
+async function Get_Tagging_MEME_Record_From_DB(filename) {
+  row_obj = await GET_FILENAME_TAGGING_MEME_STMT.get(filename);
+  return Get_Obj_Fields_From_MEME_Record(row_obj);
+}
+exports.Get_Tagging_MEME_Record_From_DB = Get_Tagging_MEME_Record_From_DB;
+//use via 'iter = await Tagging_Image_DB_Iterator()' and 'rr = await iter()'
+//after all rows complete 'undefined' is returned
+async function Tagging_MEME_Image_DB_Iterator() {
+  iter_current_meme_rowid = await GET_MIN_MEME_ROWID_STMT.get().rowid;
+  //inner function for closure
+  async function Tagging_MEME_Iterator_Next() {
+    if(iter_current_meme_rowid == undefined) {
+      return undefined;
+    }
+    current_record = Get_Obj_Fields_From_MEME_Record(await GET_RECORD_FROM_ROWID_TAGGING_MEME_STMT.get(iter_current_meme_rowid));
+    tmp_rowid = await GET_NEXT_MEME_ROWID_STMT.get(iter_current_meme_rowid);
+    if( tmp_rowid != undefined ) {
+      iter_current_meme_rowid = tmp_rowid.rowid;
+    } else {
+      iter_current_meme_rowid = undefined;
+    }
+    return current_record;
+  }
+  return Tagging_MEME_Iterator_Next;
+}
+exports.Tagging_MEME_Image_DB_Iterator = Tagging_MEME_Image_DB_Iterator;
+//TAGGING MEME END<<<

@@ -2,17 +2,15 @@
 //search function for the image additions
 //to iterate through the images: use via 'iter = await Tagging_Image_DB_Iterator()' and 'rr = await iter()' after all rows complete 'undefined' is returned
 //passing in the search criteria object, the iterator function handle, the get record annotation from DB and the max counts allowed.
-async function Image_Search_DB(collection_gallery_search_obj,taggin_DB_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS) {
-        
-    search_memetags_lowercase = collection_gallery_search_obj["searchMemeTags"].map(function(x){return x.toLowerCase();})
-    search_tags_lowercase = collection_gallery_search_obj["searchTags"].map(function(x){return x.toLowerCase();})
-
+async function Image_Search_DB(search_obj,taggin_DB_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS) {        
+    search_tags_lowercase = search_obj["searchTags"].map(function(x){return x.toLowerCase();})
+    search_memetags_lowercase = search_obj["searchMemeTags"].map(function(x){return x.toLowerCase();})
     //empty array to store the scores of the images against the search
     img_search_scores = [];
     img_search_scores_filenames = [];    
     image_tagging_annotation_obj_tmp = await taggin_DB_iterator();
     while( image_tagging_annotation_obj_tmp != undefined ) {
-        total_image_match_score = Image_Scoring(image_tagging_annotation_obj_tmp,Get_Tagging_Annotation_From_DB);
+        total_image_match_score = Image_Scoring(search_obj,image_tagging_annotation_obj_tmp,Get_Tagging_Annotation_From_DB,search_tags_lowercase,search_memetags_lowercase);
         //get the overlap score for this image tmp
         if( img_search_scores.length <= MAX_COUNT_SEARCH_RESULTS ) {
             img_search_scores.push(total_image_match_score);
@@ -31,20 +29,13 @@ async function Image_Search_DB(collection_gallery_search_obj,taggin_DB_iterator,
     img_indices_sorted = new Array(img_search_scores.length);
     for (i = 0; i < img_search_scores.length; ++i) img_indices_sorted[i] = i;
     img_indices_sorted.sort(function (a, b) { return img_search_scores[a] < img_search_scores[b] ? 1 : img_search_scores[a] > img_search_scores[b] ? -1 : 0; });
-
-    //now for the memes to be ranked
-    meme_key_relevance_scores = [];
-    meme_key_relevance_scores_filenames = [];
-    //sort the meme image scores and return the indices order from largest to smallest
-    meme_img_indices_sorted = new Array(meme_key_relevance_scores.length);
-    for (i = 0; i < meme_key_relevance_scores.length; ++i) meme_img_indices_sorted[i] = i;
-    meme_img_indices_sorted.sort(function (a, b) { return meme_key_relevance_scores[a] < meme_key_relevance_scores[b] ? 1 : meme_key_relevance_scores[a] > meme_key_relevance_scores[b] ? -1 : 0; });
-    
-    return {imgInds:img_indices_sorted,memeInds:meme_img_indices_sorted}
+    //ranked filenames now
+    img_search_scores_filenames = img_indices_sorted.map(i => img_search_scores_filenames[i]);    
+    return img_search_scores_filenames;
 }
 exports.Image_Search_DB = Image_Search_DB
 //called in each loop for each image
-async function Image_Scoring(image_tagging_annotation_obj_tmp,Get_Tagging_Annotation_From_DB) {
+async function Image_Scoring(search_obj,image_tagging_annotation_obj_tmp,Get_Tagging_Annotation_From_DB,search_tags_lowercase,search_memetags_lowercase) {
     record_tmp_tags = image_tagging_annotation_obj_tmp["taggingTags"];
     record_tmp_emotions = image_tagging_annotation_obj_tmp["taggingEmotions"];
     record_tmp_memes = image_tagging_annotation_obj_tmp["taggingMemeChoices"];
@@ -54,11 +45,11 @@ async function Image_Scoring(image_tagging_annotation_obj_tmp,Get_Tagging_Annota
     //get the score for the emotions overlap scores range [-1,1] for each emotion that is accumulated
     emotion_overlap_score = 0
     record_tmp_emotion_keys = Object.keys(record_tmp_emotions)
-    search_emotions_keys = Object.keys(collection_gallery_search_obj["emotions"])
+    search_emotions_keys = Object.keys(search_obj["emotions"])
     search_emotions_keys.forEach(search_key_emotion_label => {
         record_tmp_emotion_keys.forEach(record_emotion_key_label => {
             if(search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()) {
-                delta_tmp = (record_tmp_emotions[record_emotion_key_label] - collection_gallery_search_obj["emotions"][search_key_emotion_label]) / 50
+                delta_tmp = (record_tmp_emotions[record_emotion_key_label] - search_obj["emotions"][search_key_emotion_label]) / 50
                 emotion_overlap_score_tmp = 1 - Math.abs( delta_tmp )
                 emotion_overlap_score += emotion_overlap_score_tmp //scores range [-1,1]
             }
@@ -74,9 +65,49 @@ async function Image_Scoring(image_tagging_annotation_obj_tmp,Get_Tagging_Annota
     total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score;
     return total_image_match_score;
 }
-async function Meme_Image_Scoring() {
+async function Image_Meme_Search_DB(search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,Get_Tagging_MEME_Record_From_DB,MAX_COUNT_SEARCH_RESULTS) {        
+    search_tags_lowercase = search_obj["searchTags"].map(function(x){return x.toLowerCase();})
+    search_memetags_lowercase = search_obj["searchMemeTags"].map(function(x){return x.toLowerCase();})
+    
+    //now for the memes to be ranked
+    meme_key_relevance_scores = [];
+    meme_key_relevance_scores_filenames = [];
+    image_tagging_meme_annotation_obj_tmp = await tagging_meme_db_iterator();
+    while( image_tagging_meme_annotation_obj_tmp != undefined ) {
+        total_image_meme_match_score = Meme_Image_Scoring(search_obj,image_tagging_meme_annotation_obj_tmp,Get_Tagging_Annotation_From_DB,Get_Tagging_MEME_Record_From_DB,search_tags_lowercase,search_memetags_lowercase);
+        //get the overlap score for this image tmp
+        if( meme_key_relevance_scores.length <= MAX_COUNT_SEARCH_RESULTS ) {
+            meme_key_relevance_scores.push(total_image_meme_match_score);
+            meme_key_relevance_scores_filenames.push(image_tagging_meme_annotation_obj_tmp.imageFileName);
+        } else {
+            min_imgscore_tmp = Math.min(...meme_key_relevance_scores);
+            if( total_image_meme_match_score > min_imgscore_tmp) { //place image in the set since it is bigger than the current minimum
+                index_min_tmp = meme_key_relevance_scores.indexOf(min_imgscore_tmp);
+                meme_key_relevance_scores[index_min_tmp] = total_image_meme_match_score;
+                meme_key_relevance_scores_filenames[index_min_tmp] = image_tagging_meme_annotation_obj_tmp.imageFileName;
+            }
+        }
+        image_tagging_meme_annotation_obj_tmp = await tagging_meme_db_iterator(); //next record extract and undefined if finished all records in table
+    }
+
+    //sort the meme image scores and return the indices order from largest to smallest
+    meme_img_indices_sorted = new Array(meme_key_relevance_scores.length);
+    for (i = 0; i < meme_key_relevance_scores.length; ++i) meme_img_indices_sorted[i] = i;
+    meme_img_indices_sorted.sort(function (a, b) { return meme_key_relevance_scores[a] < meme_key_relevance_scores[b] ? 1 : meme_key_relevance_scores[a] > meme_key_relevance_scores[b] ? -1 : 0; });
+    
+    meme_key_relevance_scores_filenames = meme_img_indices_sorted.map(i => meme_key_relevance_scores_filenames[i]);    
+    return meme_key_relevance_scores_filenames;
+}
+exports.Image_Meme_Search_DB = Image_Meme_Search_DB;
+async function Meme_Image_Scoring(search_obj,image_tagging_meme_annotation_obj_tmp,Get_Tagging_Annotation_From_DB,Get_Tagging_MEME_Record_From_DB,search_tags_lowercase,search_memetags_lowercase) {
     //debatable whether the emotion overlap score should multiply the scores and be additive
 
+    1 get the meme tag overlap score
+    2 get the number of images it is a meme for
+    3 get the tag overlap for the images it is a meme for
+    4 get the emotion overlap for the images it is a meme for. 
+
+    Get_Tagging_MEME_Record_From_DB
     //now each meme gets a bonus for being present and then for the tag relevance
     //if an image is present as a meme for an (image add or multiply or some proportional metric) to its memetic relevance of that image accumulation
     //choosing multiply since the total aggregate takes in memes which are popular but irrelevant to the image search criteria
@@ -88,7 +119,7 @@ async function Meme_Image_Scoring() {
         tags_tmp = record_tmp["taggingTags"];
         meme_key_relevance_scores[meme_key_ind] += (tags_tmp.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length;
     })
-
+    return total_image_meme_match_score;
 }
 
 

@@ -56,6 +56,12 @@ async function Number_of_Tagging_Records() {
 async function Tagging_Image_DB_Iterator() {
     return DB_MODULE.Tagging_Image_DB_Iterator();
 }
+async function Tagging_MEME_Image_DB_Iterator() {
+    return DB_MODULE.Tagging_MEME_Image_DB_Iterator();
+}
+async function Get_Tagging_MEME_Record_From_DB(image_name) { //
+    return await DB_MODULE.Get_Tagging_MEME_Record_From_DB(image_name);
+}
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END>>>
 
 //DISPLAY THE MAIN IMAGE START>>>
@@ -570,9 +576,9 @@ async function Modal_Search_Entry() {
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
     tagging_db_iterator = await Tagging_Image_DB_Iterator();
-    image_search_result_obj = await SEARCH_MODULE.Image_Search_DB(tagging_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
-    search_results = image_search_result_obj.imgInds.map(i => all_image_keys[i]);
-    search_meme_results = image_search_result_obj.memeInds.map(i => all_image_keys[i]);
+    tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
+    search_results = await SEARCH_MODULE.Image_Search_DB(tagging_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
+    search_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(tagging_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,Get_Tagging_MEME_Record_From_DB,MAX_COUNT_SEARCH_RESULTS);
     //>>SHOW SEARCH RESULTS<<
     //search images results annotations
     search_image_results_output = document.getElementById("modal-search-images-results-grid-div-area-id")
