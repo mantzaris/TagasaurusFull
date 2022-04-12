@@ -578,7 +578,8 @@ async function Modal_Search_Entry() {
     tagging_db_iterator = await Tagging_Image_DB_Iterator();
     tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
     search_results = await SEARCH_MODULE.Image_Search_DB(tagging_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
-    search_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(tagging_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,Get_Tagging_MEME_Record_From_DB,MAX_COUNT_SEARCH_RESULTS);
+    search_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(tagging_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
+    console.log(`search_meme_results = ${search_meme_results}`)
     //>>SHOW SEARCH RESULTS<<
     //search images results annotations
     search_image_results_output = document.getElementById("modal-search-images-results-grid-div-area-id")
@@ -587,7 +588,7 @@ async function Modal_Search_Entry() {
     search_results.forEach(file_key => {
         search_display_inner_tmp += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${file_key}" >
-                                    <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-${file_key}" src="${TAGA_IMAGE_DIRECTORY}/${file_key}" title="view" alt="memes" />
+                                    <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="memes" />
                                 </div>
                                 `
     })
@@ -599,7 +600,7 @@ async function Modal_Search_Entry() {
     search_meme_results.forEach(file_key => {
         search_display_inner_tmp += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${file_key}" >
-                                    <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-${file_key}" src="${TAGA_IMAGE_DIRECTORY}/${file_key}" title="view" alt="memes" />
+                                    <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="memes" />
                                 </div>                                
                             `
     })
@@ -797,7 +798,7 @@ async function Modal_Meme_Search_Btn(){
                     <span class="add-memes-slider"></span>   
                 </label>
                 <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${file_key}" >
-                    <img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-image-img-id-${file_key}" src="${TAGA_IMAGE_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="memes" />
+                    <img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-image-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="memes" />
                 </div>
                 `
             )
@@ -815,7 +816,7 @@ async function Modal_Meme_Search_Btn(){
                     <span class="add-memes-slider"></span>   
                 </label>
                 <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${file_key}" >
-                    <img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}" src="${TAGA_IMAGE_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="memes" />
+                    <img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="memes" />
                 </div>
                 `
             )
