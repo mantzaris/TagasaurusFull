@@ -26,10 +26,12 @@ var current_image_annotation;
 //holds the last directory the user imported images from
 var last_user_image_directory_chosen = '';
 
-//For the search results of image searchees
-var search_results = '';
-//meme search results
-var search_meme_results = '';
+var search_results = ''; //For the search results of image searchees
+var search_meme_results = ''; //meme search results
+
+var meme_search_results = ''; //when adding a meme the images panel (left)
+var meme_search_meme_results = ''; //when adding a meme the meme panel (right)
+
 
 var reg_exp_delims = /[#:,;| ]+/
 
@@ -616,7 +618,7 @@ meme_tagging_search_obj = {
     searchMemeTags:[]
 }
 //called from the HTML button onclik, add a new meme which is searched for by the user
-function Add_New_Meme(){    
+async function Add_New_Meme(){    
     // Show the modal
     var modal_add_memes_search_click = document.getElementById("search-add-memes-modal-click-top-id");
     modal_add_memes_search_click.style.display = "block";
@@ -736,20 +738,28 @@ function Add_New_Meme(){
     document.getElementById("modal-search-add-memes-images-results-select-images-order-button-id").onclick = async function() {
         memes_current = current_image_annotation.taggingMemeChoices
         //meme selection switch check boxes
+        //!!!simplify by getting the checked meme list and then append and get unique array
+        // the list will be from the 
         meme_switch_booleans = []
-        for (var ii = 0; ii < all_image_keys.length; ii++) {
-            if(memes_current.includes(all_image_keys[ii]) == false && current_image_annotation.imageFileName != all_image_keys[ii]){  //exclude memes already present
-                    meme_boolean_tmp1 = document.getElementById(`add-memes-images-toggle-id-${all_image_keys[ii]}`).checked
-                    meme_boolean_tmp2 = document.getElementById(`add-memes-meme-toggle-id-${all_image_keys[ii]}`).checked
-                    if(meme_boolean_tmp1 == true || meme_boolean_tmp2 == true){
-                        meme_switch_booleans.push(all_image_keys[ii])
+        for (var ii = 0; ii < meme_search_results.length; ii++) {
+            if(memes_current.includes(meme_search_results[ii]) == false && current_image_annotation.imageFileName != meme_search_results[ii]){  //exclude memes already present
+                    meme_boolean_tmp1 = document.getElementById(`add-memes-images-toggle-id-${meme_search_results[ii]}`).checked
+                    if(meme_boolean_tmp1 == true){
+                        meme_switch_booleans.push(meme_search_results[ii])
+                    }
+            }
+        }
+        for (var ii = 0; ii < meme_search_meme_results.length; ii++) {
+            if(memes_current.includes(meme_search_meme_results[ii]) == false && current_image_annotation.imageFileName != meme_search_meme_results[ii]){  //exclude memes already present
+                    meme_boolean_tmp2 = document.getElementById(`add-memes-meme-toggle-id-${meme_search_meme_results[ii]}`).checked
+                    if(meme_boolean_tmp2 == true){
+                        meme_switch_booleans.push(meme_search_meme_results[ii])
                     }
             }
         }
         meme_switch_booleans.push(...current_image_annotation.taggingMemeChoices)
         current_image_annotation.taggingMemeChoices = [...new Set(meme_switch_booleans)] //add a 'unique' set of memes as the 'new Set' has unique contents
-        await Update_Tagging_Annotation_In_DB(current_image_annotation); //indexeddb
-        await Update_Tagging_Annotation_FILENAME_DB(current_image_annotation);
+        await Update_Tagging_Annotation_DB(current_image_annotation);
         Load_State_Of_Image_IDB()
         modal_add_memes_search_click = document.getElementById("search-add-memes-modal-click-top-id");
         modal_add_memes_search_click.style.display = "none";
@@ -758,8 +768,58 @@ function Add_New_Meme(){
     document.getElementById("modal-search-add-memes-main-button-id").onclick = function() {
         Modal_Meme_Search_Btn()
     }
-    //perform the default search from the time the modal is opened
-    Modal_Meme_Search_Btn()
+
+    //default search results are the order the user has them now
+    if(meme_search_results == '' && meme_search_meme_results == '') {
+        // !!! initial search default list in future make random
+        meme_search_results = [];
+        image_DB_iterator = await Tagging_Image_DB_Iterator(); //!!! randomize !!! take from the MEME TAGGING TABLE INSTEAD
+        for(ii=1;ii<=MAX_COUNT_SEARCH_RESULTS;ii++) {
+            img_record_tmp = await image_DB_iterator();
+            if( img_record_tmp == undefined ) {
+                break;
+            } else {
+                meme_search_results.push( img_record_tmp.imageFileName );
+            }
+        }
+        meme_search_meme_results = meme_search_results;
+    }
+    //display meme candidates
+    memes_current = current_image_annotation.taggingMemeChoices
+    search_meme_images_results_output = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
+    search_meme_images_results_output.innerHTML = ""
+    meme_search_results.forEach(file_key => {
+        if(memes_current.includes(file_key) == false && current_image_annotation.imageFileName != file_key){ //exclude memes already present            
+            search_meme_images_results_output.insertAdjacentHTML('beforeend', `
+                <label class="add-memes-memeswitch" title="deselect / include" >   
+                    <input id="add-memes-images-toggle-id-${file_key}" type="checkbox" > 
+                    <span class="add-memes-slider"></span>   
+                </label>
+                <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${file_key}" >
+                    <img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-image-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="memes" />
+                </div>
+                `
+            )
+        }
+    })
+    //search results display image memes
+    search_meme_images_memes_results_output = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
+    search_meme_images_memes_results_output.innerHTML = ""
+    meme_search_meme_results.forEach(file_key => {
+        if(memes_current.includes(file_key) == false && current_image_annotation.imageFileName != file_key){ //exclude memes already present
+            search_meme_images_memes_results_output.insertAdjacentHTML('beforeend', `
+                <label class="add-memes-memeswitch" title="deselect / include" >   
+                    <input id="add-memes-meme-toggle-id-${file_key}" type="checkbox" > 
+                    <span class="add-memes-slider"></span>   
+                </label>
+                <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${file_key}" >
+                    <img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="memes" />
+                </div>
+                `
+            )
+        }
+    })
+    
 }
 //the functionality to use the object to search the DB for relevant memes
 async function Modal_Meme_Search_Btn(){
