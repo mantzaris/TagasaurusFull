@@ -488,7 +488,6 @@ async function Search_Images(){
                 break;
             } else {
                 search_results.push( img_record_tmp.imageFileName );
-                console.log(`img_record_tmp = ${img_record_tmp.imageFileName}`)
             }
         }
         search_meme_results = search_results;
@@ -579,7 +578,6 @@ async function Modal_Search_Entry() {
     tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
     search_results = await SEARCH_MODULE.Image_Search_DB(tagging_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
     search_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(tagging_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
-    console.log(`search_meme_results = ${search_meme_results}`)
     //>>SHOW SEARCH RESULTS<<
     //search images results annotations
     search_image_results_output = document.getElementById("modal-search-images-results-grid-div-area-id")
@@ -732,10 +730,7 @@ function Add_New_Meme(){
         document.getElementById("modal-search-add-memes-emotion-meme-label-value-textarea-entry-id").value = "";
         document.getElementById("modal-search-add-memes-emotion-meme-value-range-entry-id").value = '0';
     }
-    //user presses the main search button for the add memes search
-    document.getElementById("modal-search-add-memes-main-button-id").onclick = function() {
-        Modal_Meme_Search_Btn()
-    }
+
     //user presses it after the fields have been entered to search the images to then add memes
     //after the search is done and user has made the meme selection (or not) and they are to be added to the current annotation object
     document.getElementById("modal-search-add-memes-images-results-select-images-order-button-id").onclick = async function() {
@@ -758,6 +753,10 @@ function Add_New_Meme(){
         Load_State_Of_Image_IDB()
         modal_add_memes_search_click = document.getElementById("search-add-memes-modal-click-top-id");
         modal_add_memes_search_click.style.display = "none";
+    }
+    //user presses the main search button for the add memes search
+    document.getElementById("modal-search-add-memes-main-button-id").onclick = function() {
+        Modal_Meme_Search_Btn()
     }
     //perform the default search from the time the modal is opened
     Modal_Meme_Search_Btn()

@@ -10,7 +10,7 @@ async function Image_Search_DB(search_obj,taggin_DB_iterator,Get_Tagging_Annotat
     img_search_scores_filenames = [];    
     image_tagging_annotation_obj_tmp = await taggin_DB_iterator();
     while( image_tagging_annotation_obj_tmp != undefined ) {
-        total_image_match_score = Image_Scoring(search_obj,image_tagging_annotation_obj_tmp,Get_Tagging_Annotation_From_DB,search_tags_lowercase,search_memetags_lowercase);
+        total_image_match_score = await Image_Scoring(search_obj,image_tagging_annotation_obj_tmp,Get_Tagging_Annotation_From_DB,search_tags_lowercase,search_memetags_lowercase);
         //get the overlap score for this image tmp
         if( img_search_scores.length <= MAX_COUNT_SEARCH_RESULTS ) {
             img_search_scores.push(total_image_match_score);
@@ -30,7 +30,7 @@ async function Image_Search_DB(search_obj,taggin_DB_iterator,Get_Tagging_Annotat
     for (i = 0; i < img_search_scores.length; ++i) img_indices_sorted[i] = i;
     img_indices_sorted.sort(function (a, b) { return img_search_scores[a] < img_search_scores[b] ? 1 : img_search_scores[a] > img_search_scores[b] ? -1 : 0; });
     //ranked filenames now
-    img_search_scores_filenames = img_indices_sorted.map(i => img_search_scores_filenames[i]);    
+    img_search_scores_filenames = img_indices_sorted.map(i => img_search_scores_filenames[i]);   
     return img_search_scores_filenames;
 }
 exports.Image_Search_DB = Image_Search_DB
@@ -74,7 +74,7 @@ async function Image_Meme_Search_DB(search_obj,tagging_meme_db_iterator,Get_Tagg
     meme_key_relevance_scores_filenames = [];
     image_tagging_meme_annotation_obj_tmp = await tagging_meme_db_iterator();
     while( image_tagging_meme_annotation_obj_tmp != undefined ) {
-        total_image_meme_match_score = Meme_Image_Scoring(search_obj,image_tagging_meme_annotation_obj_tmp,Get_Tagging_Annotation_From_DB,search_tags_lowercase,search_memetags_lowercase);
+        total_image_meme_match_score = await Meme_Image_Scoring(search_obj,image_tagging_meme_annotation_obj_tmp,Get_Tagging_Annotation_From_DB,search_tags_lowercase,search_memetags_lowercase);
         //get the overlap score for this image tmp
         if( meme_key_relevance_scores.length <= MAX_COUNT_SEARCH_RESULTS ) {
             meme_key_relevance_scores.push(total_image_meme_match_score);
@@ -279,7 +279,7 @@ exports.Collection_Profile_Image_Search_Fn = Collection_Profile_Image_Search_Fn
 
 
 
-//OLD !!!
+//!!! OLD !!!
 //search function for the image additions
 async function Image_Addition_Search_Fn(collection_gallery_search_obj,all_image_keys,get_record_fn){
     search_memetags_lowercase = collection_gallery_search_obj["searchMemeTags"].map(function(x){return x.toLowerCase();})
