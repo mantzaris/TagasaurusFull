@@ -109,7 +109,7 @@ function Get_Obj_Fields_From_Record(record) {
 //column template: (imageFileName TEXT, imageFileHash TEXT, taggingRawDescription TEXT, taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT)
 async function Insert_Record_Into_DB(tagging_obj) {
   info = await INSERT_TAGGING_STMT.run(tagging_obj.imageFileName,tagging_obj.imageFileHash,tagging_obj.taggingRawDescription,JSON.stringify(tagging_obj.taggingTags),JSON.stringify(tagging_obj.taggingEmotions),JSON.stringify(tagging_obj.taggingMemeChoices));
-  Set_Max_Min_Rowid();
+  await Set_Max_Min_Rowid();
 }
 exports.Insert_Record_Into_DB = Insert_Record_Into_DB;
 
@@ -121,7 +121,7 @@ exports.Update_Tagging_Annotation_DB = Update_Tagging_Annotation_DB
 
 async function Delete_Tagging_Annotation_DB(filename) {
   info = await DELETE_FILENAME_TAGGING_STMT.run(filename);
-  Set_Max_Min_Rowid();
+  await Set_Max_Min_Rowid();
   records_remaining = await Number_of_Tagging_Records();
   return records_remaining; //0 is the indicator that loading a default is necessary
 }
@@ -152,20 +152,55 @@ exports.Tagging_Image_DB_Iterator = Tagging_Image_DB_Iterator;
 //SEARCH FUNCTION ITERATOR VIA CLOSURE END<<<
 
 //TAGGING MEME START>>>
+//table schema: (imageMemeFileName TEXT, imageFileNames TEXT)`)
 const GET_MIN_MEME_ROWID_STMT = DB.prepare(`SELECT MIN(ROWID) AS rowid FROM ${TAGGING_MEME_TABLE_NAME}`);
 const GET_NEXT_MEME_ROWID_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_MEME_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
 const GET_RECORD_FROM_ROWID_TAGGING_MEME_STMT = DB.prepare(`SELECT * FROM ${TAGGING_MEME_TABLE_NAME} WHERE ROWID=?`);
 const GET_FILENAME_TAGGING_MEME_STMT = DB.prepare(`SELECT * FROM ${TAGGING_MEME_TABLE_NAME} WHERE imageMemeFileName=?`);
+const UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT = DB.prepare(`UPDATE ${TAGGING_MEME_TABLE_NAME} SET imageFileNames=? WHERE imageMemeFileName=?`);
+const INSERT_MEME_TABLE_TAGGING_STMT = DB.prepare(`INSERT INTO ${TAGGING_MEME_TABLE_NAME} (imageMemeFileName, imageFileNames) VALUES (?, ?)`);
 //change the stored obj to pure json obj on all the fields so no parsing at the controller side is needed for MEME
 function Get_Obj_Fields_From_MEME_Record(record) {
+  console.log(`record = ${record}`)
+  console.log(`record.imageFileNames = ${record.imageFileNames}`)
   record.imageFileNames = JSON.parse(record.imageFileNames);
   return record;
 }
 async function Get_Tagging_MEME_Record_From_DB(filename) {
+  console.log(`filename in Get_Tagging_MEME_Record_From_DB filename = ${filename}`)
   row_obj = await GET_FILENAME_TAGGING_MEME_STMT.get(filename);
+  if(row_obj == undefined) { //record non-existant so make one
+    await INSERT_MEME_TABLE_TAGGING_STMT.run(filename, JSON.stringify([]));
+    row_obj = await GET_FILENAME_TAGGING_MEME_STMT.get(filename);
+    console.log(`row_obj after INSERT and GET = ${row_obj} : ${JSON.stringify(row_obj)}`)
+  }
   return Get_Obj_Fields_From_MEME_Record(row_obj);
 }
 exports.Get_Tagging_MEME_Record_From_DB = Get_Tagging_MEME_Record_From_DB;
+// provide the image being tagged and the before and after meme array and there will be an update to the meme table
+async function Update_Tagging_MEME_Connections(imageFileName,current_image_memes,new_image_memes) {
+  console.log(`imageFileName = ${imageFileName} : current_image_memes = ${current_image_memes} : new_image_memes = ${new_image_memes}  `)
+  // get the memes which no longer include this file (left difference [1,2,3] diff-> [1,3,4] => [2]) and from [2] remove/subtract the image filename from the array: difference = arr1.filter(x => !arr2.includes(x));
+  remove_as_memes_filenames = current_image_memes.filter(x => !new_image_memes.includes(x)); //remove from meme connection
+  console.log(`remove_as_memes_filenames = ${remove_as_memes_filenames}`)
+  remove_as_memes_filenames.forEach(async meme_filename => {
+    meme_table_record = await Get_Tagging_MEME_Record_From_DB(meme_filename);
+    new_array_tmp = meme_table_record.imageFileNames.filter(item => item !== imageFileName)
+    await UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT.run( JSON.stringify(new_array_tmp) , meme_filename )
+  });
+  // get the right difference ([1,2,3] diff -> [1,3,4] => [4]) and from [4] include/add this imagefilename in the array: diff2 = b.filter(x => !a.includes(x));
+  add_as_memes_filenames = new_image_memes.filter(x => !current_image_memes.includes(x)); //new meme connections to record
+  console.log(`add_as_memes_filenames = ${add_as_memes_filenames}`)
+  add_as_memes_filenames.forEach(async meme_filename => {
+    meme_table_record = await Get_Tagging_MEME_Record_From_DB(meme_filename);
+    console.log(`meme_table_record = ${JSON.stringify(meme_table_record)}`)
+    console.log(`imageFileName = ${imageFileName}`)
+    meme_table_record["imageFileNames"].push( imageFileName )
+    console.log(`meme_table_record = ${meme_table_record}`)
+    await UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT.run( meme_table_record["imageFileNames"] , meme_filename )
+  });
+}
+exports.Update_Tagging_MEME_Connections = Update_Tagging_MEME_Connections;
 //use via 'iter = await Tagging_Image_DB_Iterator()' and 'rr = await iter()'
 //after all rows complete 'undefined' is returned
 async function Tagging_MEME_Image_DB_Iterator() {

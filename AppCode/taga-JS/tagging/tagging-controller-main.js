@@ -6,7 +6,7 @@ const IPC_RENDERER = require('electron').ipcRenderer
 //const FSE = require('fs-extra');
 
 
-const { DB_MODULE, TAGA_DATA_DIRECTORY, TAGA_IMAGE_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MY_FILE_HELPER, MY_ARRAY_INSERT_HELPER } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MY_FILE_HELPER, MY_ARRAY_INSERT_HELPER } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 const { CLOSE_ICON_RED, CLOSE_ICON_BLACK, HASHTAG_ICON } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 
@@ -63,6 +63,9 @@ async function Tagging_MEME_Image_DB_Iterator() {
 }
 async function Get_Tagging_MEME_Record_From_DB(image_name) { //
     return await DB_MODULE.Get_Tagging_MEME_Record_From_DB(image_name);
+}
+async function Update_Tagging_MEME_Connections(imageFileName,current_image_memes,new_image_memes) {
+    return await DB_MODULE.Update_Tagging_MEME_Connections(imageFileName,current_image_memes,new_image_memes);
 }
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END>>>
 
@@ -342,6 +345,7 @@ async function Save_Image_Annotation_Changes() {
         current_image_annotation["taggingEmotions"][key] = document.getElementById('emotion-range-id-'+key).value;
     }
     await Update_Tagging_Annotation_DB(current_image_annotation);
+    await Update_Tagging_MEME_Connections(current_image_annotation.imageFileName,current_memes,meme_switch_booleans)
     Load_State_Of_Image_IDB(); //TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_annotations)
 }
 //load the default image, typically called to avoid having nothing in the DB but can be deleted later on
@@ -359,6 +363,7 @@ async function Delete_Image() {
         FS.unlinkSync( `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation.imageFileName}` );
     }
     records_remaining = await Delete_Tagging_Annotation_DB( current_image_annotation.imageFileName );
+    await Update_Tagging_MEME_Connections(current_image_annotation.imageFileName,current_image_annotation.taggingMemeChoices,[])
     if(records_remaining == 0) {
         await Load_Default_Taga_Image();
     }
@@ -757,6 +762,7 @@ async function Add_New_Meme(){
                     }
             }
         }
+        await Update_Tagging_MEME_Connections(current_image_annotation.imageFileName,memes_current,meme_switch_booleans)
         meme_switch_booleans.push(...current_image_annotation.taggingMemeChoices)
         current_image_annotation.taggingMemeChoices = [...new Set(meme_switch_booleans)] //add a 'unique' set of memes as the 'new Set' has unique contents
         await Update_Tagging_Annotation_DB(current_image_annotation);
