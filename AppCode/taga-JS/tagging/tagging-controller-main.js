@@ -67,6 +67,9 @@ async function Get_Tagging_MEME_Record_From_DB(image_name) { //
 async function Update_Tagging_MEME_Connections(imageFileName,current_image_memes,new_image_memes) {
     return await DB_MODULE.Update_Tagging_MEME_Connections(imageFileName,current_image_memes,new_image_memes);
 }
+async function Handle_Delete_Image_MEME_references(imageFileName) {
+    return await DB_MODULE.Handle_Delete_Image_MEME_references(imageFileName);
+}
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END>>>
 
 //DISPLAY THE MAIN IMAGE START>>>
@@ -364,6 +367,7 @@ async function Delete_Image() {
     }
     records_remaining = await Delete_Tagging_Annotation_DB( current_image_annotation.imageFileName );
     await Update_Tagging_MEME_Connections(current_image_annotation.imageFileName,current_image_annotation.taggingMemeChoices,[])
+    await Handle_Delete_Image_MEME_references(current_image_annotation.imageFileName)
     if(records_remaining == 0) {
         await Load_Default_Taga_Image();
     }
@@ -762,7 +766,9 @@ async function Add_New_Meme(){
                     }
             }
         }
-        await Update_Tagging_MEME_Connections(current_image_annotation.imageFileName,memes_current,meme_switch_booleans)
+        console.log(`1 => current_image_annotation.imageFileName=${current_image_annotation.imageFileName} : memes_current=${memes_current} : meme_switch_booleans=${meme_switch_booleans}`)
+        await Update_Tagging_MEME_Connections(current_image_annotation.imageFileName,JSON.parse(JSON.stringify(memes_current)),JSON.parse(JSON.stringify(meme_switch_booleans)))
+        console.log(`EXIT => current_image_annotation.imageFileName=${current_image_annotation.imageFileName} : memes_current=${memes_current} : meme_switch_booleans=${meme_switch_booleans}`)
         meme_switch_booleans.push(...current_image_annotation.taggingMemeChoices)
         current_image_annotation.taggingMemeChoices = [...new Set(meme_switch_booleans)] //add a 'unique' set of memes as the 'new Set' has unique contents
         await Update_Tagging_Annotation_DB(current_image_annotation);

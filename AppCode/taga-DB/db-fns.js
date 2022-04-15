@@ -159,48 +159,85 @@ const GET_RECORD_FROM_ROWID_TAGGING_MEME_STMT = DB.prepare(`SELECT * FROM ${TAGG
 const GET_FILENAME_TAGGING_MEME_STMT = DB.prepare(`SELECT * FROM ${TAGGING_MEME_TABLE_NAME} WHERE imageMemeFileName=?`);
 const UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT = DB.prepare(`UPDATE ${TAGGING_MEME_TABLE_NAME} SET imageFileNames=? WHERE imageMemeFileName=?`);
 const INSERT_MEME_TABLE_TAGGING_STMT = DB.prepare(`INSERT INTO ${TAGGING_MEME_TABLE_NAME} (imageMemeFileName, imageFileNames) VALUES (?, ?)`);
+const DELETE_MEME_TABLE_ENTRY_STMT = DB.prepare(`DELETE FROM ${TAGGING_MEME_TABLE_NAME} WHERE imageMemeFileName=?`)
 //change the stored obj to pure json obj on all the fields so no parsing at the controller side is needed for MEME
 function Get_Obj_Fields_From_MEME_Record(record) {
-  console.log(`record = ${record}`)
-  console.log(`record.imageFileNames = ${record.imageFileNames}`)
+  console.log(`   16 => record = ${record} : record stringify = ${JSON.stringify(record)}`)
   record.imageFileNames = JSON.parse(record.imageFileNames);
+  console.log(`   17 => record = ${record} : record stringify = ${JSON.stringify(record)}`)
   return record;
 }
 async function Get_Tagging_MEME_Record_From_DB(filename) {
-  console.log(`filename in Get_Tagging_MEME_Record_From_DB filename = ${filename}`)
+  console.log(`   11 => filename = ${filename}`)
   row_obj = await GET_FILENAME_TAGGING_MEME_STMT.get(filename);
+  console.log(`   12 => row_obj = ${row_obj} : row_obj stringify = ${JSON.stringify(row_obj)}`)
   if(row_obj == undefined) { //record non-existant so make one
-    await INSERT_MEME_TABLE_TAGGING_STMT.run(filename, JSON.stringify([]));
+    INSERT_MEME_TABLE_TAGGING_STMT.run( filename, JSON.stringify( [] ) );
     row_obj = await GET_FILENAME_TAGGING_MEME_STMT.get(filename);
-    console.log(`row_obj after INSERT and GET = ${row_obj} : ${JSON.stringify(row_obj)}`)
+    console.log(`   13 => row_obj = ${row_obj} : row_obj stringify = ${JSON.stringify(row_obj)}`)
   }
-  return Get_Obj_Fields_From_MEME_Record(row_obj);
+  console.log(`   14 => row_obj = ${row_obj} : row_obj stringify = ${JSON.stringify(row_obj)}`)
+  row_obj = Get_Obj_Fields_From_MEME_Record(row_obj);
+  console.log(`   15 => row_obj = ${row_obj} : row_obj stringify = ${JSON.stringify(row_obj)}`)
+  return row_obj;
 }
 exports.Get_Tagging_MEME_Record_From_DB = Get_Tagging_MEME_Record_From_DB;
 // provide the image being tagged and the before and after meme array and there will be an update to the meme table
 async function Update_Tagging_MEME_Connections(imageFileName,current_image_memes,new_image_memes) {
-  console.log(`imageFileName = ${imageFileName} : current_image_memes = ${current_image_memes} : new_image_memes = ${new_image_memes}  `)
+  console.log(`   2 => imageFileName = ${imageFileName} : current_image_memes = ${current_image_memes} : new_image_memes = ${new_image_memes}  `)
   // get the memes which no longer include this file (left difference [1,2,3] diff-> [1,3,4] => [2]) and from [2] remove/subtract the image filename from the array: difference = arr1.filter(x => !arr2.includes(x));
   remove_as_memes_filenames = current_image_memes.filter(x => !new_image_memes.includes(x)); //remove from meme connection
-  console.log(`remove_as_memes_filenames = ${remove_as_memes_filenames}`)
+  console.log(`   3 => remove_as_memes_filenames = ${remove_as_memes_filenames}`)
   remove_as_memes_filenames.forEach(async meme_filename => {
+    console.log(`   4 => meme_filename = ${meme_filename}`)
     meme_table_record = await Get_Tagging_MEME_Record_From_DB(meme_filename);
+    console.log(`   5 => meme_table_record = ${meme_table_record}`)
     new_array_tmp = meme_table_record.imageFileNames.filter(item => item !== imageFileName)
-    await UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT.run( JSON.stringify(new_array_tmp) , meme_filename )
+    console.log(`   6 => new_array_tmp = ${new_array_tmp}`)
+    if( new_array_tmp.length == 0) {
+      console.log(`the MEME now points to ZERO IMAGES!!! THEREFORE DELETE (REMOVE) FROM MEMETAGGING TABLE`)
+      DELETE_MEME_TABLE_ENTRY_STMT.run( meme_filename )
+      console.log(`now the meme entry was removed as it is no longer relevant`)
+    }
+    UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT.run( JSON.stringify(new_array_tmp) , meme_filename )
   });
   // get the right difference ([1,2,3] diff -> [1,3,4] => [4]) and from [4] include/add this imagefilename in the array: diff2 = b.filter(x => !a.includes(x));
   add_as_memes_filenames = new_image_memes.filter(x => !current_image_memes.includes(x)); //new meme connections to record
-  console.log(`add_as_memes_filenames = ${add_as_memes_filenames}`)
+  console.log(`   7 => add_as_memes_filenames = ${add_as_memes_filenames}`)
   add_as_memes_filenames.forEach(async meme_filename => {
+    console.log(`   8 => meme_filename = ${meme_filename}`)
     meme_table_record = await Get_Tagging_MEME_Record_From_DB(meme_filename);
-    console.log(`meme_table_record = ${JSON.stringify(meme_table_record)}`)
-    console.log(`imageFileName = ${imageFileName}`)
+    console.log(`   9 => meme_table_record = ${meme_table_record} : imageFileName=${imageFileName} : meme_table_record["imageFileNames"] = ${meme_table_record["imageFileNames"]} :  meme_table_record stringigy = ${JSON.stringify(meme_table_record)}`)
     meme_table_record["imageFileNames"].push( imageFileName )
-    console.log(`meme_table_record = ${meme_table_record}`)
-    await UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT.run( meme_table_record["imageFileNames"] , meme_filename )
+    console.log(`   10 => meme_table_record = ${meme_table_record} : meme_table_record stringify = ${JSON.stringify(meme_table_record)} : imageFileName=${imageFileName} : meme_table_record["imageFileNames"] = ${meme_table_record["imageFileNames"]} `)
+    UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT.run( JSON.stringify(meme_table_record["imageFileNames"]) , meme_filename )
   });
 }
 exports.Update_Tagging_MEME_Connections = Update_Tagging_MEME_Connections;
+//when an image is deleted it no longer can be a meme on other images, so we 
+//1 those images cannot reference it any more (got through each image and remove this filename) 2 remove it from teh table of meme to files 
+async function Handle_Delete_Image_MEME_references(imageFileName) {
+  //this image may be a meme, get the meme links and from those images remove the refs to this imageFileName
+  console.log(`++ 1 imageFileName = ${imageFileName}`)
+  meme_row_obj = await GET_FILENAME_TAGGING_MEME_STMT.get(imageFileName);
+  
+  meme_row_obj = Get_Obj_Fields_From_MEME_Record(meme_row_obj);
+  console.log(`++ 2 meme_row_obj = ${meme_row_obj} : meme_row_obj stringigy = ${JSON.stringify(meme_row_obj)}`)
+  meme_row_obj["imageFileNames"].forEach( async filename => {
+    console.log(`++ 3 filename = ${filename} `)
+    record_tmp = await Get_Tagging_Record_From_DB(filename);
+    console.log(`++ 4 record_tmp = ${record_tmp} : record_tmp stringify = ${JSON.stringify(record_tmp)} `)
+    new_meme_choices_tmp = record_tmp.taggingMemeChoices.filter(item => item !== imageFileName)
+    if( new_meme_choices_tmp.length != record_tmp.taggingMemeChoices.length ) {
+      record_tmp.taggingMemeChoices = new_meme_choices_tmp
+      await Update_Tagging_Annotation_DB(record_tmp);
+      console.log(`++ 5 new record_tmp = ${record_tmp} : record_tmp stringify = ${JSON.stringify(record_tmp)} `)
+    }
+  })
+  //remove this image as a meme in the meme table
+  DELETE_MEME_TABLE_ENTRY_STMT.run( imageFileName )
+}
+exports.Handle_Delete_Image_MEME_references = Handle_Delete_Image_MEME_references;
 //use via 'iter = await Tagging_Image_DB_Iterator()' and 'rr = await iter()'
 //after all rows complete 'undefined' is returned
 async function Tagging_MEME_Image_DB_Iterator() {
