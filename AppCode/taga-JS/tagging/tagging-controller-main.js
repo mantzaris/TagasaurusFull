@@ -619,6 +619,26 @@ async function Modal_Search_Entry() {
                             `
     })
     search_meme_results_output.innerHTML = search_display_inner_tmp
+
+    //user presses an image to select it from the images section, add onclick event listener
+    search_results.forEach(file => {
+        if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true ) {
+            document.getElementById(`modal-image-search-result-single-image-img-id-${file}`).onclick = async function() {
+                current_image_annotation = await Get_Tagging_Annotation_From_DB(file);
+                Load_State_Of_Image_IDB();
+                document.getElementById("search-modal-click-top-id").style.display = "none";
+            };
+        }
+    });
+    search_meme_results.forEach(file => {
+        if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true ) {
+            document.getElementById(`modal-image-search-result-single-meme-image-img-id-${file}`).onclick = async function() {
+                current_image_annotation = await Get_Tagging_Annotation_From_DB(file);
+                Load_State_Of_Image_IDB();
+                document.getElementById("search-modal-click-top-id").style.display = "none";
+            };
+        }
+    });
 }
 
 
