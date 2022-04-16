@@ -73,6 +73,12 @@ async function Update_Tagging_MEME_Connections(imageFileName,current_image_memes
 async function Handle_Delete_Image_MEME_references(imageFileName) {
     return await DB_MODULE.Handle_Delete_Image_MEME_references(imageFileName);
 }
+async function Tagging_Random_DB_Images(num_of_records) {
+    return await DB_MODULE.Tagging_Random_DB_Images(num_of_records)
+}
+async function Meme_Tagging_Random_DB_Images(num_of_records) {
+    return await DB_MODULE.Meme_Tagging_Random_DB_Images(num_of_records)
+}
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END>>>
 
 //DISPLAY THE MAIN IMAGE START>>>
@@ -495,18 +501,8 @@ async function Search_Images(){
     }
     //default search results are the order the user has them now
     if(search_results == '' && search_meme_results == '') {
-        // !!! initial search default list in future make random
-        search_results = [];
-        image_DB_iterator = await Tagging_Image_DB_Iterator(); //!!! randomize !!!
-        for(ii=1;ii<=MAX_COUNT_SEARCH_RESULTS;ii++) {
-            img_record_tmp = await image_DB_iterator();
-            if( img_record_tmp == undefined ) {
-                break;
-            } else {
-                search_results.push( img_record_tmp.imageFileName );
-            }
-        }
-        search_meme_results = search_results;
+        search_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
+        search_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
     }
     //display default ordering first
     search_image_results_output = document.getElementById("modal-search-images-results-grid-div-area-id");
@@ -808,18 +804,8 @@ async function Add_New_Meme(){
 
     //default search results are the order the user has them now
     if(meme_search_results == '' && meme_search_meme_results == '') {
-        // !!! initial search default list in future make random
-        meme_search_results = [];
-        image_DB_iterator = await Tagging_Image_DB_Iterator(); //!!! randomize !!! take from the MEME TAGGING TABLE INSTEAD
-        for(ii=1;ii<=MAX_COUNT_SEARCH_RESULTS;ii++) {
-            img_record_tmp = await image_DB_iterator();
-            if( img_record_tmp == undefined ) {
-                break;
-            } else {
-                meme_search_results.push( img_record_tmp.imageFileName );
-            }
-        }
-        meme_search_meme_results = meme_search_results;
+        meme_search_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
+        meme_search_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
     }
     //display meme candidates
     memes_current = current_image_annotation.taggingMemeChoices

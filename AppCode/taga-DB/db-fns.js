@@ -140,6 +140,23 @@ async function Delete_Tagging_Annotation_DB(filename) {
 }
 exports.Delete_Tagging_Annotation_DB = Delete_Tagging_Annotation_DB
 
+
+//get random image filenames from the tagging image records
+//`SELECT * FROM table WHERE rowid > (ABS(RANDOM()) % (SELECT max(rowid) FROM table)) LIMIT 1;` OR select * from quest order by RANDOM() LIMIT 1;
+const GET_N_RAND_TAGGING_FILENAMES_STMT = DB.prepare(`SELECT imageFileName FROM ${TAGGING_TABLE_NAME} WHERE rowid > (ABS(RANDOM()) % (SELECT max(rowid) FROM ${TAGGING_TABLE_NAME})) LIMIT ?;`)
+async function Tagging_Random_DB_Images(num_of_records) {
+  filenames = []
+  for(ii=0;ii<num_of_records;ii++) {
+    filename_tmp = await GET_N_RAND_TAGGING_FILENAMES_STMT.all(1)
+    console.log(`line 151: filename_tmp[0].imageFileName  = ${filename_tmp[0].imageFileName}`)
+    filenames.push(filename_tmp[0].imageFileName)
+  }
+  console.log(`line 153: filenames = ${filenames}`)
+  filenames = [...new Set(filenames)];
+  return filenames;
+}
+exports.Tagging_Random_DB_Images = Tagging_Random_DB_Images
+
 //SEARCH FUNCTION ITERATOR VIA CLOSURE START>>>
 //use via 'iter = await Tagging_Image_DB_Iterator()' and 'rr = await iter()'
 //after all rows complete 'undefined' is returned
@@ -253,6 +270,24 @@ async function Handle_Delete_Image_MEME_references(imageFileName) {
   DELETE_MEME_TABLE_ENTRY_STMT.run( imageFileName )
 }
 exports.Handle_Delete_Image_MEME_references = Handle_Delete_Image_MEME_references;
+
+//get random image filenames from the tagging image records
+//`SELECT * FROM table WHERE rowid > (ABS(RANDOM()) % (SELECT max(rowid) FROM table)) LIMIT 1;` OR select * from quest order by RANDOM() LIMIT 1;
+const GET_N_RAND_MEME_TAGGING_FILENAMES_STMT = DB.prepare(`SELECT imageMemeFileName FROM ${TAGGING_MEME_TABLE_NAME} WHERE rowid > (ABS(RANDOM()) % (SELECT max(rowid) FROM ${TAGGING_MEME_TABLE_NAME})) LIMIT ?;`)
+async function Meme_Tagging_Random_DB_Images(num_of_records) {
+  filenames = []
+  for(ii=0;ii<num_of_records;ii++) {
+    filename_tmp = await GET_N_RAND_MEME_TAGGING_FILENAMES_STMT.all(1)
+    console.log(`line 281: filename_tmp[0].imageFileName  = ${filename_tmp[0].imageMemeFileName}`)
+    filenames.push(filename_tmp[0].imageMemeFileName)
+  }
+  console.log(`line 284: filenames = ${filenames}`)
+  filenames = [...new Set(filenames)];
+  return filenames;
+}
+exports.Meme_Tagging_Random_DB_Images = Meme_Tagging_Random_DB_Images
+
+
 //use via 'iter = await Tagging_Image_DB_Iterator()' and 'rr = await iter()'
 //after all rows complete 'undefined' is returned
 async function Tagging_MEME_Image_DB_Iterator() {
