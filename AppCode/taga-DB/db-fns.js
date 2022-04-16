@@ -16,7 +16,8 @@ const {  } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-cod
 //set up the DB to use
 const DB = new DATABASE(TAGA_FILES_DIRECTORY+PATH.sep+DB_FILE_NAME, { verbose: console.log }); //open db in that directory
 //TAGGING START>>>
-const GET_FILENAME_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE imageFileName=?`);
+const GET_FILENAME_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE imageFileName=?`); //!!! use the index
+const GET_HASH_TAGGING_STMT = DB.prepare(`SELECT imageFileHash FROM ${TAGGING_TABLE_NAME} WHERE imageFileHash=?`); //!!! use the index
 const GET_RECORD_FROM_ROWID_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE ROWID=?`);
 const INSERT_TAGGING_STMT = DB.prepare(`INSERT INTO ${TAGGING_TABLE_NAME} (imageFileName, imageFileHash, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices) VALUES (?, ?, ?, ?, ?, ?)`);
 const UPDATE_FILENAME_TAGGING_STMT = DB.prepare(`UPDATE ${TAGGING_TABLE_NAME} SET imageFileName=?, imageFileHash=?, taggingRawDescription=?, taggingTags=?, taggingEmotions=?, taggingMemeChoices=? WHERE imageFileName=?`);
@@ -96,6 +97,16 @@ async function Get_Tagging_Record_From_DB(filename) {
   return Get_Obj_Fields_From_Record(row_obj);
 }
 exports.Get_Tagging_Record_From_DB = Get_Tagging_Record_From_DB;
+//fn to check the presence of a hash in the DB
+async function Get_Tagging_Hash_From_DB(hash) {
+  hash_res = await GET_HASH_TAGGING_STMT.get(hash)
+  if(hash_res != undefined) {
+    return hash_res.imageFileHash
+  } else {
+    return undefined
+  }
+}
+exports.Get_Tagging_Hash_From_DB = Get_Tagging_Hash_From_DB
 
 //change the stored obj to pure json obj on all the fields so no parsing at the controller side is needed
 function Get_Obj_Fields_From_Record(record) {
@@ -220,7 +231,9 @@ async function Handle_Delete_Image_MEME_references(imageFileName) {
   //this image may be a meme, get the meme links and from those images remove the refs to this imageFileName
   console.log(`++ 1 imageFileName = ${imageFileName}`)
   meme_row_obj = await GET_FILENAME_TAGGING_MEME_STMT.get(imageFileName);
-  
+  if(meme_row_obj == undefined) { //is not listed as a meme for any other image
+    return
+  }
   meme_row_obj = Get_Obj_Fields_From_MEME_Record(meme_row_obj);
   console.log(`++ 2 meme_row_obj = ${meme_row_obj} : meme_row_obj stringigy = ${JSON.stringify(meme_row_obj)}`)
   meme_row_obj["imageFileNames"].forEach( async filename => {
