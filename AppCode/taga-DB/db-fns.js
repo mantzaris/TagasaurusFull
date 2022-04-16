@@ -93,7 +93,9 @@ exports.Step_Get_Annotation = Step_Get_Annotation;
 
 //fn to get the annotation record for an image by key_type of rowid or filename
 async function Get_Tagging_Record_From_DB(filename) {
+  console.log(`line 96: filename = ${filename}`)
   row_obj = await GET_FILENAME_TAGGING_STMT.get(filename);
+  console.log(`line 98 row_obj = ${row_obj}`)
   return Get_Obj_Fields_From_Record(row_obj);
 }
 exports.Get_Tagging_Record_From_DB = Get_Tagging_Record_From_DB;

@@ -591,8 +591,8 @@ async function Modal_Search_Entry() {
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
     tagging_db_iterator = await Tagging_Image_DB_Iterator();
-    tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
     search_results = await SEARCH_MODULE.Image_Search_DB(tagging_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
+    tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
     search_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(tagging_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
     //>>SHOW SEARCH RESULTS<<
     //search images results annotations
@@ -856,8 +856,8 @@ async function Modal_Meme_Search_Btn(){
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
     tagging_db_iterator = await Tagging_Image_DB_Iterator();
-    tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
     meme_search_results = await SEARCH_MODULE.Meme_Addition_Image_Search_DB(meme_tagging_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
+    tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
     meme_search_meme_results = await SEARCH_MODULE.Meme_Addition_Image_Meme_Search_DB(meme_tagging_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
 
     //get the record to know the memes that are present to not present any redundancy
