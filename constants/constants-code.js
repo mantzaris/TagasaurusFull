@@ -40,6 +40,10 @@ exports.MY_ARRAY_INSERT_HELPER = MY_ARRAY_INSERT_HELPER;
 const MAX_COUNT_SEARCH_RESULTS = 5;
 exports.MAX_COUNT_SEARCH_RESULTS = MAX_COUNT_SEARCH_RESULTS;
 
+//for the DB analytics which reports a score to the user on the progress of tagging
+const MAX_SAMPLE_COUNT_RECORDS = 250;
+exports.MAX_SAMPLE_COUNT_RECORDS = MAX_SAMPLE_COUNT_RECORDS;
+
 // for the image layout in panels and their arrangements
 const MASONRY = require('masonry-layout'); // installed via npm
 exports.MASONRY = MASONRY;
