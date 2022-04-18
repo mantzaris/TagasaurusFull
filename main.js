@@ -37,7 +37,8 @@ function createWindow () {
 //is taga data directory and DB set up
 TAGGING_TABLE_NAME = 'TAGGING';
 TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
-COLLECTIONS_TABLE_NAME = 'COLLECTIONS'
+COLLECTIONS_TABLE_NAME = 'COLLECTIONS';
+COLLECTION_MEME_TABLE_NAME = 'COLLECTIONMEMES';
 
 if( FS.existsSync(TAGA_FILES_DIRECTORY) == false ) { //directory for files exists?
   FS.mkdirSync(TAGA_FILES_DIRECTORY);
@@ -79,11 +80,23 @@ collection_table_exists_res = collection_table_exists_stmt.get();
 //if collection table does not exit, so create it
 if( collection_table_exists_res["count(*)"] == 0 ){
   STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTIONS_TABLE_NAME}
-                    (entityName TEXT, entityImage TEXT, entityDescription TEXT,
-                      entityImageSet TEXT, entityEmotions TEXT, entityMemes TEXT)`);
+                    (collectionName TEXT, collectionImage TEXT, collectionDescription TEXT,
+                      collectionImageSet TEXT, collectionEmotions TEXT, collectionMemes TEXT)`);
   STMT.run();
   //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
-  STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX entityNameIndex ON ${COLLECTIONS_TABLE_NAME} (entityName); `);
+  STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX collectionNameIndex ON ${COLLECTIONS_TABLE_NAME} (collectionName); `);
+  STMT_index1.run();
+}
+//The collections also each have a meme set, and this is dependent upon the tagging DB as well, since when an image from the tagging view
+//is deleted it should be deleted from the collection set.
+collection_meme_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTION_MEME_TABLE_NAME}'; `);
+collection_meme_table_exists_res = collection_meme_table_exists_stmt.get();
+//if collection table does not exit, so create it
+if( collection_meme_table_exists_res["count(*)"] == 0 ) {
+  STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTION_MEME_TABLE_NAME}
+                    (collectionMemeFileName TEXT, collectionNames TEXT)`);
+  STMT.run(); //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
+  STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX collectionMemeFileNameIndex ON ${COLLECTION_MEME_TABLE_NAME} (collectionMemeFileName); `);
   STMT_index1.run();
 }
 //DB SET UP END<<<

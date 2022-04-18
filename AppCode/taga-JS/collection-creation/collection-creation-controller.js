@@ -12,12 +12,12 @@ const { CLOSE_ICON_RED, CLOSE_ICON_BLACK } = require(PATH.resolve()+PATH.sep+'co
 reg_exp_delims = /[#:,;| ]+/
 
 COLLECTION_DEFAULT_EMPTY_OBJECT = {
-    "entityName": '',
-    "entityImage": '',
-    "entityDescription": '',
-    "entityImageSet": [],
-    "entityEmotions": {good:0,bad:0}, //{happy:happy_value,sad:sad_value,confused:confused_value},            
-    "entityMemes": []
+    "collectionName": '',
+    "collectionImage": '',
+    "collectionDescription": '',
+    "collectionImageSet": [],
+    "collectionEmotions": {good:0,bad:0}, //{happy:happy_value,sad:sad_value,confused:confused_value},            
+    "collectionMemes": []
 }
 
 
@@ -110,7 +110,7 @@ async function Creation_Next_Btn() {
         if(await Check_Collection_Name() == false) {
             return 
         }
-        if(COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage == ''){
+        if(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage == ''){
             return
         }
     }
@@ -120,7 +120,7 @@ async function Creation_Next_Btn() {
         console.log("COLLECTION_DEFAULT_EMPTY_OBJECT="+JSON.stringify(COLLECTION_DEFAULT_EMPTY_OBJECT))
         await COLLECTION_DB_MODULE.Insert_Record(COLLECTION_DEFAULT_EMPTY_OBJECT)
         //window redirect
-        window.location = "collections.html" + '?' + `collectionName=${COLLECTION_DEFAULT_EMPTY_OBJECT.entityName}`
+        window.location = "collections.html" + '?' + `collectionName=${COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName}`
     }
     //update the counter
     if(creation_step_num < 5) {
@@ -130,29 +130,29 @@ async function Creation_Next_Btn() {
     if(creation_step_num == 2) {
         button_back = document.getElementById("creation-back-button-id")
         button_back.style.display = "block"
-        document.getElementById("step2-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.entityName
-        document.getElementById("step2-profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage
+        document.getElementById("step2-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName
+        document.getElementById("step2-profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage
     }
     if(creation_step_num == 3) {
-        document.getElementById("step3-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.entityName
-        document.getElementById("step3-profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage
+        document.getElementById("step3-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName
+        document.getElementById("step3-profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage
     }
     if(creation_step_num == 4) {
         //at step4 compute the previous tags results from step3
-        COLLECTION_DEFAULT_EMPTY_OBJECT.entityDescription = document.getElementById("step3-description-textarea-id").value
+        COLLECTION_DEFAULT_EMPTY_OBJECT.collectionDescription = document.getElementById("step3-description-textarea-id").value
         //now process  description text in order to have the tags
-        COLLECTION_DEFAULT_EMPTY_OBJECT.taggingTags = DESCRIPTION_PROCESS_MODULE.process_description(COLLECTION_DEFAULT_EMPTY_OBJECT.entityDescription)
+        COLLECTION_DEFAULT_EMPTY_OBJECT.taggingTags = DESCRIPTION_PROCESS_MODULE.process_description(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionDescription)
         //now set the profile image and collection name before handling emotions
-        document.getElementById("step4-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.entityName
-        document.getElementById("step4-profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage
+        document.getElementById("step4-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName
+        document.getElementById("step4-profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage
         New_Collection_Emotions_Handle()
     }
     //at the end and notify the user that they can now complete the creation steps
     if(creation_step_num == 5){
         button_back = document.getElementById("creation-next-button-id")
         button_back.innerHTML = "COMPLETE"
-        document.getElementById("step5-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.entityName
-        document.getElementById("step5-profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage
+        document.getElementById("step5-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName
+        document.getElementById("step5-profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage
 
     }
     Navbar_ViewHandle()
@@ -206,7 +206,7 @@ Initialize_Collection_Creation_Page()
 
 //handle the activity for the step4 of the emotion entry and display
 function New_Collection_Emotions_Handle() {
-    emotions_collection = COLLECTION_DEFAULT_EMPTY_OBJECT["entityEmotions"]
+    emotions_collection = COLLECTION_DEFAULT_EMPTY_OBJECT["collectionEmotions"]
     emotion_HTML = ''
     for( let key in emotions_collection ){        
         emotion_HTML += `
@@ -226,31 +226,31 @@ function New_Collection_Emotions_Handle() {
         document.getElementById(`emotion-delete-button-id-${key_tmp}`).onclick = function() {
             Delete_Emotion(`${key_tmp}`);
         }
-        document.getElementById(`emotion-range-id-${key_tmp}`).value = COLLECTION_DEFAULT_EMPTY_OBJECT["entityEmotions"][key_tmp]
+        document.getElementById(`emotion-range-id-${key_tmp}`).value = COLLECTION_DEFAULT_EMPTY_OBJECT["collectionEmotions"][key_tmp]
     })
 }
 //delete an emotion from the emotion set
 async function Delete_Emotion(emotion_key){
     element_emotion_entry_div = document.getElementById('emotion-entry-div-id-'+emotion_key);
     element_emotion_entry_div.remove();
-    delete COLLECTION_DEFAULT_EMPTY_OBJECT["entityEmotions"][emotion_key];
+    delete COLLECTION_DEFAULT_EMPTY_OBJECT["collectionEmotions"][emotion_key];
 }
 //will take the current emotion values, and store it into an object to replace the current entity object's emotions
 //then update the record in the Database
 function Save_Collection_Emotions() {    
-    for( var key of Object.keys(COLLECTION_DEFAULT_EMPTY_OBJECT["entityEmotions"]) ){
-        COLLECTION_DEFAULT_EMPTY_OBJECT["entityEmotions"][key] = document.getElementById('emotion-range-id-'+key).value
+    for( var key of Object.keys(COLLECTION_DEFAULT_EMPTY_OBJECT["collectionEmotions"]) ){
+        COLLECTION_DEFAULT_EMPTY_OBJECT["collectionEmotions"][key] = document.getElementById('emotion-range-id-'+key).value
     }
 }
 //add a new emotion to the emotion set
 async function Add_New_Emotion() {
     new_emotion_text = document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value
     if(new_emotion_text){
-        keys_tmp = Object.keys(COLLECTION_DEFAULT_EMPTY_OBJECT["entityEmotions"])
+        keys_tmp = Object.keys(COLLECTION_DEFAULT_EMPTY_OBJECT["collectionEmotions"])
         boolean_included = keys_tmp.includes(new_emotion_text)
         if(boolean_included == false){            
             new_emotion_value = document.getElementById("collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id").value
-            COLLECTION_DEFAULT_EMPTY_OBJECT["entityEmotions"][new_emotion_text] = new_emotion_value
+            COLLECTION_DEFAULT_EMPTY_OBJECT["collectionEmotions"][new_emotion_text] = new_emotion_value
             //do not save upon addition of a new emotion, the save button is necessary
             document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value = ""
             document.getElementById("collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id").value = "0"
@@ -264,7 +264,7 @@ async function Add_New_Emotion() {
 
 //to save the edits to the memes which is the deletions
 async function Save_Meme_Changes(){
-    current_memes = COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes //get the memes of the current object
+    current_memes = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes //get the memes of the current object
     length_original = current_memes.length
     gallery_switch_booleans = []
     for (var ii = 0; ii < current_memes.length; ii++) {
@@ -280,7 +280,7 @@ async function Save_Meme_Changes(){
     }
     length_new = gallery_switch_booleans.length
     if(length_new < length_original){
-        COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes = gallery_switch_booleans        
+        COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes = gallery_switch_booleans        
        //clear gallery of gallery image objects
         document.querySelectorAll(".collection-image-annotation-memes-grid-item-class").forEach(el => el.remove());
         //place the gallery images in the html and ignore the missing images (leave the lingering links)
@@ -288,7 +288,7 @@ async function Save_Meme_Changes(){
             //place the gallery images in the html and ignore the missing images (leave the lingering links)
         gallery_div = document.getElementById("collection-image-annotation-memes-images-show-div-id")
         gallery_html_tmp = ''
-        image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes
+        image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes
         image_set.forEach(function(image_filename) {
             image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
             if(FS.existsSync(image_path_tmp) == true){
@@ -322,7 +322,7 @@ async function Save_Meme_Changes(){
 
 //to save the edits to the gallery images which is the deletions
 async function Save_Gallery_Changes(){ //!!
-    current_images = COLLECTION_DEFAULT_EMPTY_OBJECT.entityImageSet //get the memes of the current object
+    current_images = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet //get the memes of the current object
     length_original = current_images.length
     gallery_switch_booleans = []
     for (var ii = 0; ii < current_images.length; ii++) {
@@ -338,14 +338,14 @@ async function Save_Gallery_Changes(){ //!!
     }
     length_new = gallery_switch_booleans.length
     if(length_new < length_original){
-        COLLECTION_DEFAULT_EMPTY_OBJECT.entityImageSet = gallery_switch_booleans
+        COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet = gallery_switch_booleans
         
        //clear gallery of gallery image objects
         document.querySelectorAll(".collection-images-gallery-grid-item-class").forEach(el => el.remove());
         //place the gallery images in the html and ignore the missing images (leave the lingering links)
         gallery_div = document.getElementById("collections-images-gallery-grid-images-div-id")
         gallery_html_tmp = ''
-        image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.entityImageSet
+        image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet
         image_set.forEach(function(image_filename) {
             image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
             if(FS.existsSync(image_path_tmp) == true){
@@ -389,7 +389,7 @@ async function Check_Collection_Name() {
         return false//exit without proceeding until unique name supplied
     }
     //name is ok, set it to the default new obj
-    COLLECTION_DEFAULT_EMPTY_OBJECT.entityName = collection_name_text_area
+    COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName = collection_name_text_area
     return true
 }
 //step1 of the user selecting the profile image
@@ -489,7 +489,7 @@ async function Change_Profile_Image() {
         image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).onclick = async function() {
-                COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage = image_filename
+                COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage = image_filename
                 document.getElementById("profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
                 modal_profile_img_change.style.display = "none";
             }
@@ -567,7 +567,7 @@ async function Collection_Profile_Image_Search_Action() {
         image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).onclick = async function() {
-                COLLECTION_DEFAULT_EMPTY_OBJECT.entityImage = image_filename
+                COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage = image_filename
                 document.getElementById("profile-image-display-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
                 document.getElementById("search-profileimage-modal-click-top-id").style.display = "none";
             }
@@ -646,7 +646,7 @@ async function Add_Images_To_New_Collection() {
     search_display_inner_tmp = ''
     all_image_keys.forEach( image_filename => { 
         image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
-        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.entityImageSet.includes(image_filename)==false) {
+        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
@@ -665,7 +665,7 @@ async function Add_Images_To_New_Collection() {
     search_display_inner_tmp = ''
     all_image_keys.forEach( image_filename => {
         image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
-        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.entityImageSet.includes(image_filename)==false) {
+        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
@@ -683,12 +683,12 @@ async function Add_Images_To_New_Collection() {
         update = false
         all_image_keys.forEach( image_filename => {
             image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
-            if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.entityImageSet.includes(image_filename)==false) {
+            if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
                 if(document.getElementById(`add-image-toggle-id-${image_filename}`).checked){
-                    COLLECTION_DEFAULT_EMPTY_OBJECT.entityImageSet.push(image_filename)
+                    COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.push(image_filename)
                     update = true
                 } else if(document.getElementById(`add-memes-meme-toggle-id-${image_filename}`).checked){
-                    COLLECTION_DEFAULT_EMPTY_OBJECT.entityImageSet.push(image_filename)
+                    COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.push(image_filename)
                     update = true
                 }
             }
@@ -699,7 +699,7 @@ async function Add_Images_To_New_Collection() {
             //place the gallery images in the html and ignore the missing images (leave the lingering links)
             gallery_div = document.getElementById("collections-images-gallery-grid-images-div-id")
             gallery_html_tmp = ''
-            image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.entityImageSet
+            image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet
             image_set.forEach(function(image_filename) {
                 image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
                 if(FS.existsSync(image_path_tmp) == true){ 
@@ -746,7 +746,7 @@ async function Add_Images_To_New_Collection() {
         //reset toggles to default false
         all_image_keys.forEach( image_filename => {
             image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
-            if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.entityImageSet.includes(image_filename)==false) {
+            if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
                 if(document.getElementById(`add-image-toggle-id-${image_filename}`).checked){
                     document.getElementById(`add-image-toggle-id-${image_filename}`).checked = false
                 } 
@@ -790,7 +790,7 @@ async function Collection_Add_Image_Search_Action() {
     img_indices_sorted.forEach( index => {
         image_filename = all_image_keys[index]
         image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
-        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.entityImageSet.includes(image_filename)==false) {
+        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
@@ -810,7 +810,7 @@ async function Collection_Add_Image_Search_Action() {
     meme_img_indices_sorted.forEach( index => {
         image_filename = all_image_keys[index]
         image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
-        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.entityImageSet.includes(image_filename)==false) {
+        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
@@ -931,7 +931,7 @@ async function Add_Meme_Images() {
     search_display_inner_tmp = ''
     all_image_keys.forEach( image_filename => {
         image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
-        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes.includes(image_filename)==false) {
+        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
@@ -950,7 +950,7 @@ async function Add_Meme_Images() {
     search_display_inner_tmp = ''
     all_image_keys.forEach( image_filename => {
         image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
-        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes.includes(image_filename)==false) {
+        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
@@ -968,12 +968,12 @@ async function Add_Meme_Images() {
         update = false
         all_image_keys.forEach( image_filename => {
             image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
-            if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes.includes(image_filename)==false) {
+            if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.includes(image_filename)==false) {
                 if(document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked){
-                    COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes.push(image_filename)
+                    COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.push(image_filename)
                     update = true
                 } else if(document.getElementById(`add-meme-image-meme-toggle-id-${image_filename}`).checked){
-                    COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes.push(image_filename)
+                    COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.push(image_filename)
                     update = true
                 }
             }
@@ -984,7 +984,7 @@ async function Add_Meme_Images() {
             //place the gallery images in the html and ignore the missing images (leave the lingering links)
             gallery_div = document.getElementById("collection-image-annotation-memes-images-show-div-id")
             gallery_html_tmp = ''
-            image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes
+            image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes
             image_set.forEach(function(image_filename) {
                 image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
                 if(FS.existsSync(image_path_tmp) == true){ 
@@ -1034,7 +1034,7 @@ async function Add_Meme_Images() {
         //reset toggles to default false
         all_image_keys.forEach( image_filename => {
             image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
-            if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes.includes(image_filename)==false) {
+            if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.includes(image_filename)==false) {
                 if(document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked){
                     document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked = false
                 } 
@@ -1077,7 +1077,7 @@ async function Collection_Add_Memes_Search_Action(){
     img_indices_sorted.forEach( index => {
         image_filename = all_image_keys[index]
         image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
-        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes.includes(image_filename)==false) {
+        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
@@ -1097,7 +1097,7 @@ async function Collection_Add_Memes_Search_Action(){
     meme_img_indices_sorted.forEach( index => {
         image_filename = all_image_keys[index]
         image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
-        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.entityMemes.includes(image_filename)==false) {
+        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
