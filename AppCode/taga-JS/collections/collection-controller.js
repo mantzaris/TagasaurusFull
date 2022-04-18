@@ -37,6 +37,18 @@ reg_exp_delims = /[#:,;| ]+/
 
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS START>>>
 
+
+
+async function Delete_Collection_DB(collectioname) { //delete via file name
+    return await DB_MODULE.Delete_Collection_DB(collectioname);
+}
+async function Update_Collection_MEME_Connections(collectionName,current_memes,new_collection_memes) {
+    return await DB_MODULE.Update_Collection_MEME_Connections(collectionName,current_memes,new_collection_memes);
+}
+
+
+//NEW SQLITE MODEL DB ACCESS FUNCTIONS END<<<
+
 // **MODEL ACCESS FUNCTIONS START**
 //pass the entity name which is the key to remove the collection from the DB
 async function Create_Collection_DB_Instance() {
@@ -55,9 +67,6 @@ async function Refresh_Collection_Keys_From_DB() {
     await COLLECTION_DB_MODULE.Get_All_Keys_From_DB() //refresh the current key list
     all_collection_keys = COLLECTION_DB_MODULE.Read_All_Keys_From_DB() //retrieve that key list and set to the local global variable
 }
-async function Delete_Collection_From_DB(collectionName) {
-    await COLLECTION_DB_MODULE.Delete_Record(collectionName)
-}
 async function Create_Tagging_DB_Instance() {
     await TAGGING_DB_MODULE.Create_Db()
 }
@@ -71,15 +80,17 @@ async function Set_All_Image_Keys_In_Tagging_DB() {
 // **MODEL ACCESS FUNCTIONS END**
 
 
+
+
 //this function deletes the entity object currently in focus from var 'current_key_index', and calls for the refresh of the next entity to be in view
 async function Delete_Collection() {
-    await Delete_Collection_From_DB(current_collection_obj.collectionName)
-    await Refresh_Collection_Keys_From_DB()
-    if(all_collection_keys.length == 0){
-        await Handle_Empty_DB()
+    collections_remaining = await Delete_Collection_DB(current_collection_obj.collectionName)
+    console.log(`collections_remaining = ${collections_remaining}`)
+    if(collections_remaining == 0) {
+        await Handle_Empty_DB();
     }
-    if(current_key_index >= all_collection_keys.length) { current_key_index = 0 }
-    Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index]) //current index for keys will be 1 ahead from before delete
+    await Update_Collection_MEME_Connections(current_collection_obj.collectionName,current_collection_obj.collectionMemes,[])
+    Show_Collection_From_Key_Or_Current_Collection( 0 )
 }
 
 
@@ -360,7 +371,7 @@ function Display_Gallery_Images() {
     })
 }
 //to save the edits to the gallery images which is the deletions
-async function Save_Gallery_Changes(){
+async function Save_Gallery_Changes() {
     current_images = current_collection_obj.collectionImageSet //get the memes of the current object
     length_original = current_images.length
     gallery_switch_booleans = []
