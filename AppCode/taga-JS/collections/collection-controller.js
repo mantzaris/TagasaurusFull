@@ -16,6 +16,7 @@ COLLECTION_DEFAULT_EMPTY_OBJECT = {
                                     "collectionName": '',
                                     "collectionImage": '',
                                     "collectionDescription": '',
+                                    "collectionDescriptionTags": [],
                                     "collectionImageSet": [],
                                     "collectionEmotions": {good:0,bad:0}, //{happy:happy_value,sad:sad_value,confused:confused_value},            
                                     "collectionMemes": []
@@ -25,11 +26,11 @@ COLLECTION_DEFAULT_EMPTY_OBJECT = {
 var current_collection_obj; //it holds the object of the entity being in current context
 var annotation_view_ind = 1 //which view should be shown to the user when they flip through entities
 
-var search_results = ''; //For the search results of image searchees
-var search_meme_results = ''; //meme search results
+var search_image_results = ''; //For the search results of image searchees
+var search_image_meme_results = ''; //meme search results
 
-var meme_search_results = ''; //when adding a meme the images panel (left)
-var meme_search_meme_results = ''; //when adding a meme the meme panel (right)
+var meme_search_image_results = ''; //when adding a meme the images panel (left)
+var meme_search_image_meme_results = ''; //when adding a meme the meme panel (right)
 
 //for filtering out chars in the search modals
 reg_exp_delims = /[#:,;| ]+/
@@ -37,15 +38,28 @@ reg_exp_delims = /[#:,;| ]+/
 
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS START>>>
 
-
-
-async function Delete_Collection_DB(collectioname) { //delete via file name
+async function Number_of_Collection_Records() { //delete via file name
+    return await DB_MODULE.Number_of_Collection_Records();
+}
+async function Step_Get_Collection_Annotation(collectionName,step) {
+    return await DB_MODULE.Step_Get_Collection_Annotation(collectionName,step)
+}
+async function Get_Collection_Record_From_DB(collectionname) { //delete via file name
+    return await DB_MODULE.Get_Collection_Record_From_DB(collectionname);
+}
+async function Insert_Collection_Record_Into_DB(collect_obj) { //delete via file name
+    return await DB_MODULE.Insert_Collection_Record_Into_DB(collect_obj);
+}
+async function Update_Collection_Record_In_DB(collect_obj) { //delete via file name
+    return await DB_MODULE.Update_Collection_Record_In_DB(collect_obj);
+}
+async function Delete_Collection_Record_In_DB(collectioname) { //delete via file name
     return await DB_MODULE.Delete_Collection_DB(collectioname);
 }
+
 async function Update_Collection_MEME_Connections(collectionName,current_memes,new_collection_memes) {
     return await DB_MODULE.Update_Collection_MEME_Connections(collectionName,current_memes,new_collection_memes);
 }
-
 
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END<<<
 
@@ -84,12 +98,12 @@ async function Set_All_Image_Keys_In_Tagging_DB() {
 
 //this function deletes the entity object currently in focus from var 'current_key_index', and calls for the refresh of the next entity to be in view
 async function Delete_Collection() {
-    collections_remaining = await Delete_Collection_DB(current_collection_obj.collectionName)
+    await Update_Collection_MEME_Connections(current_collection_obj.collectionName,current_collection_obj.collectionMemes,[])
+    collections_remaining = await Delete_Collection_Record_In_DB(current_collection_obj.collectionName)
     console.log(`collections_remaining = ${collections_remaining}`)
     if(collections_remaining == 0) {
         await Handle_Empty_DB();
     }
-    await Update_Collection_MEME_Connections(current_collection_obj.collectionName,current_collection_obj.collectionMemes,[])
     Show_Collection_From_Key_Or_Current_Collection( 0 )
 }
 
@@ -106,7 +120,7 @@ function Collection_Description_Page() {
     emotion_btn.classList.remove('nav-bar-on')
     emotion_btn.classList.add('nav-bar-off')
     meme_btn.classList.remove('nav-bar-on')
-    meme_btn.classList.add('nav-bar-off')    
+    meme_btn.classList.add('nav-bar-off')
 	description_annotations_div = document.getElementById("collection-image-annotation-description-div-id")
     description_annotations_div.style.display = 'grid'
 	emotions_annotations_div = document.getElementById("collection-image-annotation-emotions-div-id")
@@ -116,8 +130,8 @@ function Collection_Description_Page() {
     description_text_area_element = document.getElementById("collection-image-annotation-description-textarea-id")
     description_text_area_element.value = current_collection_obj.collectionDescription
     hashtag_div = document.getElementById("collection-description-annotation-hashtags-div-id")    
-    if(current_collection_obj.taggingTags != undefined){
-        hashtag_div.innerHTML = (current_collection_obj.taggingTags).join(' ,')
+    if(current_collection_obj.collectionDescriptionTags != undefined){
+        hashtag_div.innerHTML = (current_collection_obj.collectionDescriptionTags).join(' ,')
     } else {
         hashtag_div.innerHTML = ""
     }
@@ -126,8 +140,9 @@ function Collection_Description_Page() {
 function Save_Collection_Description() {
     current_collection_obj.collectionDescription = document.getElementById("collection-image-annotation-description-textarea-id").value
     //now process  description text in order to have the tags
-    current_collection_obj.taggingTags = DESCRIPTION_PROCESS_MODULE.process_description(current_collection_obj.collectionDescription)
-    Update_Collection_In_DB(current_collection_obj)
+    current_collection_obj.collectionDescriptionTags = DESCRIPTION_PROCESS_MODULE.process_description(current_collection_obj.collectionDescription)
+    //Update_Collection_In_DB(current_collection_obj) //!!!indexeddb !!!
+    await Update_Collection_Record_In_DB(current_collection_obj)
     Collection_Description_Page()
 }
 
@@ -178,34 +193,37 @@ async function Delete_Emotion(emotion_key){
     element_emotion_entry_div = document.getElementById('emotion-entry-div-id-'+emotion_key);
     element_emotion_entry_div.remove();    
     delete current_collection_obj["collectionEmotions"][emotion_key];
-    await Update_Collection_In_DB(current_collection_obj)
+    //await Update_Collection_In_DB(current_collection_obj) //!!!indexeddb !!!
+    await Update_Collection_Record_In_DB(current_collection_obj)
     Collection_Emotion_Page()
 }
 //will take the current emotion values, and store it into an object to replace the current entity object's emotions
 //then update the record in the Database
-function Save_Collection_Emotions() {    
-    for( var key of Object.keys(current_collection_obj["collectionEmotions"]) ){
+function Save_Collection_Emotions() {
+    for( var key of Object.keys(current_collection_obj["collectionEmotions"]) ) {
         current_collection_obj["collectionEmotions"][key] = document.getElementById('emotion-range-id-'+key).value
     }
-    Update_Collection_In_DB(current_collection_obj)
+    //Update_Collection_In_DB(current_collection_obj) //!!!indexeddb !!!
+    await Update_Collection_Record_In_DB(current_collection_obj)
     Collection_Emotion_Page()
 }
 //add a new emotion to the emotion set
-async function Add_New_Emotion(){
+async function Add_New_Emotion() {
     new_emotion_text = document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value
     if(new_emotion_text){
         keys_tmp = Object.keys(current_collection_obj["collectionEmotions"])
         boolean_included = keys_tmp.includes(new_emotion_text)
         if(boolean_included == false){            
-            new_emotion_value = document.getElementById("collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id").value
-            current_collection_obj["collectionEmotions"][new_emotion_text] = new_emotion_value
-            await Update_Collection_In_DB(current_collection_obj)
+            new_emotion_value = document.getElementById("collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id").value;
+            current_collection_obj["collectionEmotions"][new_emotion_text] = new_emotion_value;
+            //await Update_Collection_In_DB(current_collection_obj) //!!!indexeddb !!!
+            await Update_Collection_Record_In_DB(current_collection_obj)
             //do not save upon addition of a new emotion, the save button is necessary
-            document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value = ""
-            document.getElementById("collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id").value = "0"
+            document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value = "";
+            document.getElementById("collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id").value = "0";
             Collection_Emotion_Page()
         } else {
-            document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value = ""
+            document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value = "";
         }
     }
 }
@@ -234,10 +252,10 @@ function Collection_Memes_Page() {
     memes_array = current_collection_obj.collectionMemes //get the memes of the current object
     document.querySelectorAll(".collection-image-annotation-memes-grid-item-class").forEach(el => el.remove());
     gallery_html = ''
-    if(memes_array != "" && memes_array.length > 0){
+    if(memes_array != "" && memes_array.length > 0) {
         memes_array.forEach(meme_key => {
             image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + meme_key
-            if(FS.existsSync(image_path_tmp) == true){
+            if(FS.existsSync(image_path_tmp) == true) {
                         gallery_html += `
                                     <div class="collection-image-annotation-memes-grid-item-class">
                                     <label class="memeswitch" title="deselect / keep">
@@ -252,12 +270,12 @@ function Collection_Memes_Page() {
     }
     document.getElementById("collection-image-annotation-memes-images-show-div-id").innerHTML += gallery_html
     //event listener to modal focus image upon click
-    if(memes_array != "" && memes_array.length > 0){
+    if(memes_array != "" && memes_array.length > 0) {
         memes_array.forEach(function(meme_key) {
             image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + meme_key
-            if(FS.existsSync(image_path_tmp) == true){
+            if(FS.existsSync(image_path_tmp) == true) {
                 document.getElementById(`collection-image-annotation-memes-grid-img-id-${meme_key}`).onclick = function (event) {
-                    Image_Clicked_Modal(meme_key)    
+                    Image_Clicked_Modal(meme_key)
                 }
             }
         })
@@ -291,7 +309,9 @@ async function Save_Meme_Changes(){
         }
     }
     current_collection_obj.collectionMemes = meme_switch_booleans
-    await Update_Collection_In_DB(current_collection_obj)
+    //await Update_Collection_In_DB(current_collection_obj) //!!! indexeddb !!!
+    await Update_Collection_Record_In_DB(current_collection_obj)
+    await Update_Collection_MEME_Connections(current_collection_obj.collectionName,current_memes,meme_switch_booleans)
     Collection_Memes_Page()
 }
 
@@ -301,12 +321,12 @@ async function Show_Collection_From_Key_Or_Current_Collection(entity_key_or_obj,
     //if using the key, the global object for the current entity shown is updated and this is 
     //used, or else the current view from the data is presented.
     if(use_key == 1){
-        current_collection_obj = await Get_Collection_Record_In_DB(entity_key_or_obj)
+        current_collection_obj = await Get_Collection_Record_From_DB(entity_key_or_obj) //Get_Collection_Record_In_DB(entity_key_or_obj) //!!! indexeddb !!!
     }
     //check for issues
     reload_bool = Check_Gallery_And_Profile_Image_Integrity()
     if(reload_bool == true){
-        current_collection_obj = await Get_Collection_Record_In_DB(entity_key_or_obj)
+        current_collection_obj = await Get_Collection_Record_From_DB(entity_key_or_obj) //Get_Collection_Record_In_DB(entity_key_or_obj) //!!! indexeddb !!!
     }
     document.getElementById("collection-profile-image-img-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + current_collection_obj.collectionImage;
     document.getElementById("collection-profile-image-img-id").onclick = function (event) {
@@ -389,7 +409,8 @@ async function Save_Gallery_Changes() {
     length_new = gallery_switch_booleans.length
     if(length_new < length_original){
         current_collection_obj.collectionImageSet = gallery_switch_booleans
-        await Update_Collection_In_DB(current_collection_obj)
+        //await Update_Collection_In_DB(current_collection_obj) //!!!indexeddb !!!
+        await Update_Collection_Record_In_DB(current_collection_obj)
         await Check_Gallery_And_Profile_Image_Integrity()
         Display_Gallery_Images()
     }
@@ -430,7 +451,8 @@ async function Check_Gallery_And_Profile_Image_Integrity(){
     }
 
     if(changes_made == true){
-        await Update_Collection_In_DB(current_collection_obj)
+        //await Update_Collection_In_DB(current_collection_obj) //!!!indexeddb !!!
+        await Update_Collection_Record_In_DB(current_collection_obj)
     }
     return(changes_made)
 }
@@ -460,6 +482,7 @@ async function Handle_Empty_DB(){
     new_default_obj.collectionName = 'Taga' + '0'.repeat(10 - rand_int.toString().length) + Math.floor(Math.random() * 1000000);
     new_default_obj.collectionImage = 'Taga.png'
     new_default_obj.collectionImageSet = ['Taga.png']
+    //await Insert_Collection_Record_Into_DB(new_default_obj) //!!! indexeddb !!!
     await Insert_Collection_Record_Into_DB(new_default_obj)
     all_collection_keys = [new_default_obj.collectionName]
 }
@@ -520,12 +543,12 @@ async function Initialize_Collection_Page(){
         Add_Meme_Images()
     })
     
-    await Create_Tagging_DB_Instance()
-    await Create_Collection_DB_Instance() //sets a global variable in the module to hold the DB for access
-    await Refresh_Collection_Keys_From_DB()
-    await Set_All_Image_Keys_In_Tagging_DB()
-    
-    if(all_collection_keys.length == 0){
+    //await Create_Tagging_DB_Instance() //!!!indexeddb !!!
+    //await Create_Collection_DB_Instance() //sets a global variable in the module to hold the DB for access //!!!indexeddb !!!
+    //await Refresh_Collection_Keys_From_DB() //!!!indexeddb !!!
+    //await Set_All_Image_Keys_In_Tagging_DB() //!!!indexeddb !!!
+    record_num_tmp = await Number_of_Collection_Records()
+    if( record_num_tmp == 0) {
         await Handle_Empty_DB()
     }
 

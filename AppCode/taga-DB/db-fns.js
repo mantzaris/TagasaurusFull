@@ -190,6 +190,8 @@ const GET_FILENAME_TAGGING_MEME_STMT = DB.prepare(`SELECT * FROM ${TAGGING_MEME_
 const UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT = DB.prepare(`UPDATE ${TAGGING_MEME_TABLE_NAME} SET imageFileNames=? WHERE imageMemeFileName=?`);
 const INSERT_MEME_TABLE_TAGGING_STMT = DB.prepare(`INSERT INTO ${TAGGING_MEME_TABLE_NAME} (imageMemeFileName, imageFileNames) VALUES (?, ?)`);
 const DELETE_MEME_TABLE_ENTRY_STMT = DB.prepare(`DELETE FROM ${TAGGING_MEME_TABLE_NAME} WHERE imageMemeFileName=?`)
+
+
 //change the stored obj to pure json obj on all the fields so no parsing at the controller side is needed for MEME
 function Get_Obj_Fields_From_MEME_Record(record) {
   console.log(`   16 => record = ${record} : record stringify = ${JSON.stringify(record)}`)
@@ -305,13 +307,13 @@ exports.Tagging_MEME_Image_DB_Iterator = Tagging_MEME_Image_DB_Iterator;
 
 
 //COLLECTIONS FUNCTIONS START>>>
-const GET_COLLECTION_TAGGING_STMT = DB.prepare(`SELECT * FROM ${COLLECTIONS_TABLE_NAME} WHERE collectionName=?`); //!!! use the index
+const GET_COLLECTION_FROM_NAME_STMT = DB.prepare(`SELECT * FROM ${COLLECTIONS_TABLE_NAME} WHERE collectionName=?`); //!!! use the index
 const GET_COLLECTION_ROWID_FROM_COLLECTION_NAME_STMT = DB.prepare(`SELECT ROWID FROM ${COLLECTIONS_TABLE_NAME} WHERE collectionName=?;`)
-const INSERT_COLLECTION_STMT = DB.prepare(`INSERT INTO ${COLLECTIONS_TABLE_NAME} (collectionName, collectionImage, collectionDescription, collectionImageSet, collectionEmotions, collectionMemes) VALUES (?, ?, ?, ?, ?, ?)`);
-
-const DELETE_COLLECTION_STMT = DB.prepare(`DELETE FROM ${COLLECTIONS_TABLE_NAME} WHERE collectionName=?`);
-
 const GET_RECORD_FROM_ROWID_COLLECTION_STMT = DB.prepare(`SELECT * FROM ${COLLECTIONS_TABLE_NAME} WHERE ROWID=?`);
+
+const INSERT_COLLECTION_STMT = DB.prepare(`INSERT INTO ${COLLECTIONS_TABLE_NAME} (collectionName, collectionImage, collectionImageSet, collectionDescription, collectionDescriptionTags, collectionEmotions, collectionMemes) VALUES (?, ?, ?, ?, ?, ?, ?)`);
+const UPDATE_FILENAME_TAGGING_STMT = DB.prepare(`UPDATE ${COLLECTIONS_TABLE_NAME} SET collectionName=?, collectionImage=?, collectionImageSet=?, collectionDescription=?, collectionDescriptionTags=?, collectionEmotions=?, collectionMemes=? WHERE collectionName=?`);
+const DELETE_COLLECTION_STMT = DB.prepare(`DELETE FROM ${COLLECTIONS_TABLE_NAME} WHERE collectionName=?`);
 
 const GET_NEXT_COLLECTION_ROWID_STMT = DB.prepare(`SELECT ROWID FROM ${COLLECTIONS_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
 const GET_PREV_COLLECTION_ROWID_STMT = DB.prepare(`SELECT ROWID FROM ${COLLECTIONS_TABLE_NAME} WHERE ROWID < ? ORDER BY ROWID DESC LIMIT 1`);
@@ -380,7 +382,7 @@ exports.Step_Get_Collection_Annotation = Step_Get_Collection_Annotation;
 
 
 async function Get_Collection_Record_From_DB(collectionname) {
-  row_obj = await GET_COLLECTION_TAGGING_STMT.get(collectionname);
+  row_obj = await GET_COLLECTION_FROM_NAME_STMT.get(collectionname);
   return Get_Collection_Obj_Fields_From_Record(row_obj);
 }
 exports.Get_Collection_Record_From_DB = Get_Collection_Record_From_DB;
@@ -388,6 +390,7 @@ exports.Get_Collection_Record_From_DB = Get_Collection_Record_From_DB;
 //change the stored collection obj to pure json obj on all the fields so no parsing at the controller side is needed
 function Get_Collection_Obj_Fields_From_Record(record) {
   record.collectionImageSet = JSON.parse(record.collectionImageSet);
+  record.collectionDescriptionTags = JSON.parse(record.collectionDescriptionTags);
   record.collectionEmotions = JSON.parse(record.collectionEmotions);
   record.collectionMemes = JSON.parse(record.collectionMemes);
   return record;
@@ -396,29 +399,37 @@ function Get_Collection_Obj_Fields_From_Record(record) {
 //fn to insert into the collection DB the collection record of the 
 //column template: (collectionName TEXT, collectionImage TEXT, collectionDescription TEXT, collectionImageSet TEXT, collectionEmotions TEXT, collectionMemes TEXT)
 async function Insert_Collection_Record_Into_DB(collection_obj) {
-  info = await INSERT_COLLECTION_STMT.run(collection_obj.collectionName,collection_obj.collectionImage,collection_obj.collectionDescription,JSON.stringify(collection_obj.collectionImageSet),JSON.stringify(collection_obj.collectionEmotions),JSON.stringify(collection_obj.collectionMemes));
+  info = await INSERT_COLLECTION_STMT.run(collection_obj.collectionName,collection_obj.collectionImage,JSON.stringify(collection_obj.collectionImageSet),collection_obj.collectionDescription,collection_obj.collectionDescriptionTags,JSON.stringify(collection_obj.collectionEmotions),JSON.stringify(collection_obj.collectionMemes));
   await Set_Max_Min_Rowid_Collection();
 }
 exports.Insert_Collection_Record_Into_DB = Insert_Collection_Record_Into_DB;
 
-async function Delete_Collection_DB(collectioname) {
+//update the tagging annotation object in the DB
+async function Update_Collection_Record_In_DB(tagging_obj) {
+  info = await UPDATE_FILENAME_TAGGING_STMT.run(tagging_obj.imageFileName,tagging_obj.imageFileHash,tagging_obj.taggingRawDescription,JSON.stringify(tagging_obj.taggingTags),JSON.stringify(tagging_obj.taggingEmotions),JSON.stringify(tagging_obj.taggingMemeChoices),tagging_obj.imageFileName);
+}
+exports.Update_Collection_Record_In_DB = Update_Collection_Record_In_DB
+
+async function Delete_Collection_Record_In_DB(collectioname) {
   info = await DELETE_COLLECTION_STMT.run(collectioname);
   await Set_Max_Min_Rowid_Collection();
   records_remaining = await Number_of_Collection_Records();
   //now update the collection references, that is: there will be references of memes to collections they are no longer members of once the collection is gone
   return records_remaining; //0 is the indicator that loading a default is necessary
 }
-exports.Delete_Collection_DB = Delete_Collection_DB
+exports.Delete_Collection_Record_In_DB = Delete_Collection_Record_In_DB
 
 
 //function for handling the update of the memes for the collections ++memes & --memes
-const GET_COLLECTION_TAGGING_MEME_STMT = DB.prepare(`SELECT * FROM ${COLLECTION_MEME_TABLE_NAME} WHERE collectionMemeFileName=?`);
+const GET_MEME_COLLECTION_TABLE_STMT = DB.prepare(`SELECT * FROM ${COLLECTION_MEME_TABLE_NAME} WHERE collectionMemeFileName=?`);
 const DELETE_COLLECTION_MEME_TABLE_ENTRY_STMT = DB.prepare(`DELETE FROM ${COLLECTION_MEME_TABLE_NAME} WHERE collectionMemeFileName=?`)
 const UPDATE_FILENAME_MEME_TABLE_COLLECTION_STMT = DB.prepare(`UPDATE ${COLLECTION_MEME_TABLE_NAME} SET collectionNames=? WHERE collectionMemeFileName=?`);
 const INSERT_MEME_TABLE_COLLECTION_STMT = DB.prepare(`INSERT INTO ${COLLECTION_MEME_TABLE_NAME} (collectionMemeFileName, collectionNames) VALUES (?, ?)`);
+
+
 async function Update_Collection_MEME_Connections(collectionName,current_collection_memes,new_collection_memes) {
   // get the memes which no longer include this file (left difference [1,2,3] diff-> [1,3,4] => [2]) and from [2] remove/subtract the image filename from the array: difference = arr1.filter(x => !arr2.includes(x));
-  remove_as_memes_filenames = current_collection_memes.filter(x => !new_image_memes.includes(x)); //remove from meme connection
+  remove_as_memes_filenames = current_collection_memes.filter(x => !new_collection_memes.includes(x)); //remove from meme connection
   remove_as_memes_filenames.forEach(async meme_filename => {
     meme_table_record = await Get_Collection_MEME_Record_From_DB(meme_filename);
     new_array_tmp = meme_table_record.collectionNames.filter(item => item !== collectionName)
@@ -438,10 +449,10 @@ async function Update_Collection_MEME_Connections(collectionName,current_collect
 exports.Update_Collection_MEME_Connections = Update_Collection_MEME_Connections;
 
 async function Get_Collection_MEME_Record_From_DB(collectionName) {
-  row_obj = await GET_COLLECTION_TAGGING_MEME_STMT.get(collectionName);
+  row_obj = await GET_MEME_COLLECTION_TABLE_STMT.get(collectionName);
   if(row_obj == undefined) { //record non-existant so make one
     INSERT_MEME_TABLE_COLLECTION_STMT.run( collectionName, JSON.stringify( [] ) );
-    row_obj = await GET_COLLECTION_TAGGING_MEME_STMT.get(collectionName);
+    row_obj = await GET_MEME_COLLECTION_TABLE_STMT.get(collectionName);
   }
   row_obj = Get_Obj_Fields_From_Collection_MEME_Record(row_obj);
   return row_obj;
@@ -454,7 +465,26 @@ function Get_Obj_Fields_From_Collection_MEME_Record(record) {
 }
 //fn for the update of the collection image table connections
 
-
+//!!! make call to this when image is deleted from tagging to update collection meme table !!!
+// async function Handle_Delete_Image_MEME_references(imageFileName) {
+//   //this image may be a meme, get the meme links and from those images remove the refs to this imageFileName
+//   meme_row_obj = await GET_FILENAME_TAGGING_MEME_STMT.get(imageFileName);
+//   if(meme_row_obj == undefined) { //is not listed as a meme for any other image
+//     return
+//   }
+//   meme_row_obj = Get_Obj_Fields_From_MEME_Record(meme_row_obj);
+//   meme_row_obj["imageFileNames"].forEach( async filename => {
+//     record_tmp = await Get_Tagging_Record_From_DB(filename);
+//     new_meme_choices_tmp = record_tmp.taggingMemeChoices.filter(item => item !== imageFileName)
+//     if( new_meme_choices_tmp.length != record_tmp.taggingMemeChoices.length ) {
+//       record_tmp.taggingMemeChoices = new_meme_choices_tmp
+//       await Update_Tagging_Annotation_DB(record_tmp);
+//     }
+//   })
+//   //remove this image as a meme in the meme table
+//   DELETE_MEME_TABLE_ENTRY_STMT.run( imageFileName )
+// }
+// exports.Handle_Delete_Image_MEME_references = Handle_Delete_Image_MEME_references;
 
 
 //COLLECTIONS FUNCTIONS END<<<

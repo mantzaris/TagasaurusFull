@@ -80,8 +80,9 @@ collection_table_exists_res = collection_table_exists_stmt.get();
 //if collection table does not exit, so create it
 if( collection_table_exists_res["count(*)"] == 0 ){
   STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTIONS_TABLE_NAME}
-                    (collectionName TEXT, collectionImage TEXT, collectionDescription TEXT,
-                      collectionImageSet TEXT, collectionEmotions TEXT, collectionMemes TEXT)`);
+                    (collectionName TEXT, collectionImage TEXT, collectionImageSet TEXT, 
+                      collectionDescription TEXT, collectionDescriptionTags TEXT,
+                      collectionEmotions TEXT, collectionMemes TEXT)`);
   STMT.run();
   //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
   STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX collectionNameIndex ON ${COLLECTIONS_TABLE_NAME} (collectionName); `);
@@ -100,6 +101,8 @@ if( collection_meme_table_exists_res["count(*)"] == 0 ) {
   STMT_index1.run();
 }
 //DB SET UP END<<<
+
+
 
 //FILE SELECTION DIALOGUE WINDOWS START>>>
 //for the ability to load a dialog window in selecting images/files
