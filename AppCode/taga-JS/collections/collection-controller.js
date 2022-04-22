@@ -7,7 +7,7 @@
 const PATH = require('path');
 const FS = require('fs');
 
-const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, TAGA_IMAGE_DIRECTORY, TAGGING_DB_MODULE, COLLECTION_DB_MODULE, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MASONRY } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, TAGGING_DB_MODULE, COLLECTION_DB_MODULE, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MASONRY } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 const { CLOSE_ICON_RED, CLOSE_ICON_BLACK } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 
@@ -65,6 +65,14 @@ async function Delete_Collection_Record_In_DB(collectioname) { //delete via file
 
 async function Get_Tagging_Annotation_From_DB(image_name) { //
     return await DB_MODULE.Get_Tagging_Record_From_DB(image_name);
+}
+
+
+async function Tagging_Random_DB_Images(num_of_records) {
+    return await DB_MODULE.Tagging_Random_DB_Images(num_of_records)
+}
+async function Meme_Tagging_Random_DB_Images(num_of_records) {
+    return await DB_MODULE.Meme_Tagging_Random_DB_Images(num_of_records)
 }
 
 async function Update_Collection_MEME_Connections(collectionName,current_memes,new_collection_memes) {
@@ -265,7 +273,7 @@ function Collection_Memes_Page() {
     gallery_html = ''
     if(memes_array != "" && memes_array.length > 0) {
         memes_array.forEach(meme_key => {
-            image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + meme_key
+            image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + meme_key
             if(FS.existsSync(image_path_tmp) == true) {
                         gallery_html += `
                                     <div class="collection-image-annotation-memes-grid-item-class">
@@ -283,7 +291,7 @@ function Collection_Memes_Page() {
     //event listener to modal focus image upon click
     if(memes_array != "" && memes_array.length > 0) {
         memes_array.forEach(function(meme_key) {
-            image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + meme_key
+            image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + meme_key
             if(FS.existsSync(image_path_tmp) == true) {
                 document.getElementById(`collection-image-annotation-memes-grid-img-id-${meme_key}`).onclick = function (event) {
                     Image_Clicked_Modal(meme_key)
@@ -309,7 +317,7 @@ async function Save_Meme_Changes(){
     current_memes = current_collection_obj.collectionMemes //get the memes of the current object
     meme_switch_booleans = []
     for (var ii = 0; ii < current_memes.length; ii++) {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + current_memes[ii]
+        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + current_memes[ii]
         if(FS.existsSync(image_path_tmp) == true){
             meme_boolean_tmp = document.getElementById(`meme-toggle-id-${current_memes[ii]}`).checked
             if(meme_boolean_tmp == true){
@@ -335,9 +343,11 @@ function Display_Gallery_Images() {
     gallery_div = document.getElementById("collections-images-gallery-grid-images-div-id")
     gallery_html_tmp = ''
     image_set = current_collection_obj.collectionImageSet
+    console.log(`line 346; image_set = ${image_set}`)
     image_set.forEach(function(image_filename) {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
+            console.log(` line 350 ; image_path_tmp exists = > ${image_path_tmp}`)
             gallery_html_tmp += `
                                 <div class="collection-images-gallery-grid-item-class">
                                     <label class="memeswitch" title="deselect / keep">
@@ -364,7 +374,7 @@ function Display_Gallery_Images() {
     });
     //event listener to modal focus image upon click
     image_set.forEach(function(image_filename) {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`collection-image-annotation-memes-grid-img-id-${image_filename}`).onclick = function (event) {
                 Image_Clicked_Modal(image_filename)    
@@ -378,7 +388,7 @@ async function Save_Gallery_Changes() {
     length_original = current_images.length
     gallery_switch_booleans = []
     for (var ii = 0; ii < current_images.length; ii++) {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + current_images[ii]
+        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + current_images[ii]
         if(FS.existsSync(image_path_tmp) == true){
             image_boolean_tmp = document.getElementById(`galleryimage-toggle-id-${current_images[ii]}`).checked
             if(image_boolean_tmp == true){
@@ -402,7 +412,7 @@ async function Check_Gallery_And_Profile_Image_Integrity(){
     //the Gallery image set for the entity
     image_set = current_collection_obj.collectionImageSet
     image_set_present = image_set.map( (image_filename) => {
-                                                path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+                                                path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
                                                 if(FS.existsSync(path_tmp) == true){
                                                     return image_filename
                                                 } else {
@@ -410,7 +420,7 @@ async function Check_Gallery_And_Profile_Image_Integrity(){
                                                 }
                                                 }).filter( (e) => e != false)
     entity_profile_pic = current_collection_obj.collectionImage
-    image_path_profile_pic = TAGA_IMAGE_DIRECTORY + PATH.sep + entity_profile_pic
+    image_path_profile_pic = TAGA_DATA_DIRECTORY + PATH.sep + entity_profile_pic
     profile_pic_present_bool = FS.existsSync(image_path_profile_pic)
     //1-profile image is missing, and image set is empty (or none present to show)
     if(profile_pic_present_bool == false && image_set_present.length == 0) {
@@ -452,7 +462,7 @@ async function Show_Collection() {
     if(reload_bool == true) {
         current_collection_obj = await Get_Collection_Record_From_DB(entity_key_or_obj) //Get_Collection_Record_In_DB(entity_key_or_obj) //!!! indexeddb !!!
     }
-    document.getElementById("collection-profile-image-img-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + current_collection_obj.collectionImage;
+    document.getElementById("collection-profile-image-img-id").src = TAGA_DATA_DIRECTORY + PATH.sep + current_collection_obj.collectionImage;
     document.getElementById("collection-profile-image-img-id").onclick = function (event) {
         Image_Clicked_Modal(current_collection_obj.collectionImage)    
     }
@@ -600,7 +610,7 @@ Initialize_Collection_Page()
 //and list the tags and emotions
 async function Image_Clicked_Modal(filename){
 
-    document.getElementById("modal-image-clicked-displayimg-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + filename
+    document.getElementById("modal-image-clicked-displayimg-id").src = TAGA_DATA_DIRECTORY + PATH.sep + filename
     
     // Show the modal
     var modal_meme_click = document.getElementById("modal-image-clicked-top-id");
@@ -714,7 +724,7 @@ async function Change_Profile_Image() {
     document.querySelectorAll(".modal-image-search-profileimageresult-single-image-div-class").forEach(el => el.remove());
     profile_search_display_inner_tmp = ''
     current_collection_obj.collectionImageSet.forEach( image_filename => {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             profile_search_display_inner_tmp += `
                                                 <div class="modal-image-search-profileimageresult-single-image-div-class" id="modal-image-search-profileimageresult-single-image-div-id-${image_filename}">
@@ -738,12 +748,12 @@ async function Change_Profile_Image() {
     });
     //add image event listener so that a click on it makes it a choice
     current_collection_obj.collectionImageSet.forEach( image_filename => {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).onclick = async function() {
                 current_collection_obj.collectionImage = image_filename
                 await Update_Collection_In_DB(current_collection_obj)
-                document.getElementById("collection-profile-image-img-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+                document.getElementById("collection-profile-image-img-id").src = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
                 modal_profile_img_change.style.display = "none";
             }
         }
@@ -793,7 +803,7 @@ async function Collection_Profile_Image_Search_Action() {
     profile_search_display_inner_tmp = ''
     img_indices_sorted.forEach( index => {
         image_filename = current_collection_obj.collectionImageSet[index]
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             profile_search_display_inner_tmp += `
                                                 <div class="modal-image-search-profileimageresult-single-image-div-class" id="modal-image-search-profileimageresult-single-image-div-id-${image_filename}">
@@ -817,12 +827,12 @@ async function Collection_Profile_Image_Search_Action() {
     });
     //add image event listener so that a click on it makes it a choice
     current_collection_obj.collectionImageSet.forEach( image_filename => {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).onclick = async function() {
                 current_collection_obj.collectionImage = image_filename
                 await Update_Collection_In_DB(current_collection_obj)
-                document.getElementById("collection-profile-image-img-id").src = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+                document.getElementById("collection-profile-image-img-id").src = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
                 document.getElementById("search-profileimage-modal-click-top-id").style.display = "none";
             }
         }
@@ -895,11 +905,16 @@ async function Add_Gallery_Images() {
         }
     }
     //display default ordering first
+    if(search_image_results == '' && search_image_meme_results == '') {
+        search_image_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
+        search_image_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
+    }
+
     search_display_div = document.getElementById("modal-search-images-results-grid-div-area-id")
     search_display_div.innerHTML = ""
     search_display_inner_tmp = ''
-    all_image_keys.forEach( image_filename => {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+    search_image_results.forEach( image_filename => {
+        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${image_filename}">
@@ -917,8 +932,8 @@ async function Add_Gallery_Images() {
     search_meme_display_div = document.getElementById("modal-search-meme-images-results-grid-div-area-id")
     search_meme_display_div.innerHTML = ""
     search_display_inner_tmp = ''
-    all_image_keys.forEach( image_filename => {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+    search_image_meme_results.forEach( image_filename => {
+        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${image_filename}">
@@ -935,21 +950,28 @@ async function Add_Gallery_Images() {
     //add an event listener to the images to select them to be added to the gallery and the current obj and the collection DB updated
     document.getElementById("modal-search-images-results-select-images-order-button-id").onclick = async function() {
         update = false
-        all_image_keys.forEach( image_filename => {
-            image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+        search_image_results.forEach( image_filename => { //go through search images
+            image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
             if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
                 if(document.getElementById(`add-image-toggle-id-${image_filename}`).checked){
                     current_collection_obj.collectionImageSet.push(image_filename)
                     update = true
-                } else if(document.getElementById(`add-memes-meme-toggle-id-${image_filename}`).checked){
+                }
+            }
+        })
+        search_image_meme_results.forEach( image_filename => { //go through search images
+            image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
+            if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
+                if(document.getElementById(`add-memes-meme-toggle-id-${image_filename}`).checked) {
                     current_collection_obj.collectionImageSet.push(image_filename)
                     update = true
                 }
             }
         })
         if(update == true) {
-            await Update_Collection_In_DB(current_collection_obj)
-            await Show_Collection(all_collection_keys[current_key_index])            
+            // await Update_Collection_In_DB(current_collection_obj) //!!!indexeddb !!!
+            await Update_Collection_Record_In_DB(current_collection_obj)
+            await Show_Collection()   
         }
         modal_gallery_img_add.style.display = "none";
     }
@@ -967,7 +989,7 @@ async function Add_Gallery_Images() {
         }
         //reset toggles to default false
         all_image_keys.forEach( image_filename => {
-            image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+            image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
             if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
                 if(document.getElementById(`add-image-toggle-id-${image_filename}`).checked){
                     document.getElementById(`add-image-toggle-id-${image_filename}`).checked = false
@@ -1011,7 +1033,7 @@ async function Collection_Add_Image_Search_Action() {
     search_display_inner_tmp = ''
     img_indices_sorted.forEach( index => {
         image_filename = all_image_keys[index]
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${image_filename}">
@@ -1031,7 +1053,7 @@ async function Collection_Add_Image_Search_Action() {
     search_display_inner_tmp = ''
     meme_img_indices_sorted.forEach( index => {
         image_filename = all_image_keys[index]
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${image_filename}">
@@ -1152,7 +1174,7 @@ async function Add_Meme_Images() {
     search_display_div.innerHTML = ""
     search_display_inner_tmp = ''
     all_image_keys.forEach( image_filename => {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionMemes.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${image_filename}">
@@ -1171,7 +1193,7 @@ async function Add_Meme_Images() {
     search_meme_display_div.innerHTML = ""
     search_display_inner_tmp = ''
     all_image_keys.forEach( image_filename => {
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionMemes.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${image_filename}">
@@ -1189,7 +1211,7 @@ async function Add_Meme_Images() {
     document.getElementById("modal-search-add-memes-images-results-select-images-order-button-id").onclick = async function() {
         update = false
         all_image_keys.forEach( image_filename => {
-            image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+            image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
             if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionMemes.includes(image_filename)==false) {
                 if(document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked){
                     current_collection_obj.collectionMemes.push(image_filename)
@@ -1224,7 +1246,7 @@ async function Add_Meme_Images() {
         }
         //reset toggles to default false
         all_image_keys.forEach( image_filename => {
-            image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+            image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
             if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionMemes.includes(image_filename)==false) {
                 if(document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked){
                     document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked = false
@@ -1267,7 +1289,7 @@ async function Collection_Add_Memes_Search_Action(){
     search_display_inner_tmp = ''
     img_indices_sorted.forEach( index => {
         image_filename = all_image_keys[index]
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionMemes.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${image_filename}">
@@ -1287,7 +1309,7 @@ async function Collection_Add_Memes_Search_Action(){
     search_display_inner_tmp = ''
     meme_img_indices_sorted.forEach( index => {
         image_filename = all_image_keys[index]
-        image_path_tmp = TAGA_IMAGE_DIRECTORY + PATH.sep + image_filename
+        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionMemes.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${image_filename}">

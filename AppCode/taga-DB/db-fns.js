@@ -270,12 +270,19 @@ async function Meme_Tagging_Random_DB_Images(num_of_records) {
   filenames = []
   for(ii=0;ii<num_of_records;ii++) {
     filename_tmp = await GET_N_RAND_MEME_TAGGING_FILENAMES_STMT.all(1)
-    console.log(`line 281: filename_tmp[0].imageFileName  = ${filename_tmp[0].imageMemeFileName}`)
+    if(filename_tmp[0] == undefined) {
+      continue;
+    }
+    console.log(`line 281: filename_tmp[0].imageFileName  = ${filename_tmp[0]}`)
     filenames.push(filename_tmp[0].imageMemeFileName)
   }
-  console.log(`line 284: filenames = ${filenames}`)
-  filenames = [...new Set(filenames)];
-  return filenames;
+  if(filenames.length > 0) {
+    console.log(`line 284: filenames = ${filenames}`)
+    filenames = [...new Set(filenames)];
+    return filenames;
+  } else {
+    return filenames
+  }
 }
 exports.Meme_Tagging_Random_DB_Images = Meme_Tagging_Random_DB_Images
 
