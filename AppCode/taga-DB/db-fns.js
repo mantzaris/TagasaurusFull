@@ -412,8 +412,9 @@ async function Insert_Collection_Record_Into_DB(collection_obj) {
 exports.Insert_Collection_Record_Into_DB = Insert_Collection_Record_Into_DB;
 
 //update the tagging annotation object in the DB
-async function Update_Collection_Record_In_DB(tagging_obj) {
-  info = await UPDATE_FILENAME_COLLECTION_STMT.run(tagging_obj.imageFileName,tagging_obj.imageFileHash,tagging_obj.taggingRawDescription,JSON.stringify(tagging_obj.taggingTags),JSON.stringify(tagging_obj.taggingEmotions),JSON.stringify(tagging_obj.taggingMemeChoices),tagging_obj.imageFileName);
+async function Update_Collection_Record_In_DB(collection_obj) {
+  info = await UPDATE_FILENAME_COLLECTION_STMT.run(collection_obj.collectionName, collection_obj.collectionImage, JSON.stringify(collection_obj.collectionImageSet),
+  collection_obj.collectionDescription, JSON.stringify(collection_obj.collectionDescriptionTags), JSON.stringify(collection_obj.collectionEmotions), JSON.stringify(collection_obj.collectionMemes), collection_obj.collectionName );
 }
 exports.Update_Collection_Record_In_DB = Update_Collection_Record_In_DB
 

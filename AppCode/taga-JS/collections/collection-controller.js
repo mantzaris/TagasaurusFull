@@ -63,6 +63,10 @@ async function Delete_Collection_Record_In_DB(collectioname) { //delete via file
     return await DB_MODULE.Delete_Collection_DB(collectioname);
 }
 
+async function Get_Tagging_Annotation_From_DB(image_name) { //
+    return await DB_MODULE.Get_Tagging_Record_From_DB(image_name);
+}
+
 async function Update_Collection_MEME_Connections(collectionName,current_memes,new_collection_memes) {
     return await DB_MODULE.Update_Collection_MEME_Connections(collectionName,current_memes,new_collection_memes);
 }
@@ -614,7 +618,8 @@ async function Image_Clicked_Modal(filename){
         }
     }  
 
-    img_record_obj = await Get_Tagging_Record_In_DB(filename)
+    //img_record_obj = await Get_Tagging_Record_In_DB(filename) //!!!indexeddb !!!
+    img_record_obj = await Get_Tagging_Annotation_From_DB(filename)
     tag_array = img_record_obj["taggingTags"]
     modal_html_tmp = `Tags: `
     if( tag_array.length != 0 && !(tag_array.length == 1 && tag_array[0] == "") ){
