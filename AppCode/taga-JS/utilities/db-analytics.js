@@ -41,6 +41,7 @@ async function Display_Skill_Levels() {
 
     //all_data = await fns_DB.Return_All_DB_Data().then(function (results) { return results })
     random_filenames = await Tagging_Random_DB_Images(sample_num)
+    console.log(`random_filenames  = ${random_filenames}`)
     total_tagged_images = 0
     meme_connected_images = 0
     emotion_stamped_images = 0

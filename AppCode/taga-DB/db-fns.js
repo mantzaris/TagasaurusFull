@@ -312,7 +312,7 @@ const GET_COLLECTION_ROWID_FROM_COLLECTION_NAME_STMT = DB.prepare(`SELECT ROWID 
 const GET_RECORD_FROM_ROWID_COLLECTION_STMT = DB.prepare(`SELECT * FROM ${COLLECTIONS_TABLE_NAME} WHERE ROWID=?`);
 
 const INSERT_COLLECTION_STMT = DB.prepare(`INSERT INTO ${COLLECTIONS_TABLE_NAME} (collectionName, collectionImage, collectionImageSet, collectionDescription, collectionDescriptionTags, collectionEmotions, collectionMemes) VALUES (?, ?, ?, ?, ?, ?, ?)`);
-const UPDATE_FILENAME_TAGGING_STMT = DB.prepare(`UPDATE ${COLLECTIONS_TABLE_NAME} SET collectionName=?, collectionImage=?, collectionImageSet=?, collectionDescription=?, collectionDescriptionTags=?, collectionEmotions=?, collectionMemes=? WHERE collectionName=?`);
+const UPDATE_FILENAME_COLLECTION_STMT = DB.prepare(`UPDATE ${COLLECTIONS_TABLE_NAME} SET collectionName=?, collectionImage=?, collectionImageSet=?, collectionDescription=?, collectionDescriptionTags=?, collectionEmotions=?, collectionMemes=? WHERE collectionName=?`);
 const DELETE_COLLECTION_STMT = DB.prepare(`DELETE FROM ${COLLECTIONS_TABLE_NAME} WHERE collectionName=?`);
 
 const GET_NEXT_COLLECTION_ROWID_STMT = DB.prepare(`SELECT ROWID FROM ${COLLECTIONS_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
@@ -352,6 +352,11 @@ async function Get_ROWID_From_CollectionName(CollectionName) {
   return res.rowid;
 }
 exports.Get_ROWID_From_CollectionName = Get_ROWID_From_CollectionName;
+
+function Set_ROWID_From_ROWID(rowid) {
+  rowid_current_collection = rowid
+}
+exports.Set_ROWID_From_ROWID = Set_ROWID_From_ROWID
 
 //the function expects a +1,-1,0 for movement about the current rowid
 async function Step_Get_Collection_Annotation(collectionName,step) {
@@ -399,14 +404,16 @@ function Get_Collection_Obj_Fields_From_Record(record) {
 //fn to insert into the collection DB the collection record of the 
 //column template: (collectionName TEXT, collectionImage TEXT, collectionDescription TEXT, collectionImageSet TEXT, collectionEmotions TEXT, collectionMemes TEXT)
 async function Insert_Collection_Record_Into_DB(collection_obj) {
-  info = await INSERT_COLLECTION_STMT.run(collection_obj.collectionName,collection_obj.collectionImage,JSON.stringify(collection_obj.collectionImageSet),collection_obj.collectionDescription,collection_obj.collectionDescriptionTags,JSON.stringify(collection_obj.collectionEmotions),JSON.stringify(collection_obj.collectionMemes));
+  console.log(` line 407: Insert Collection collection_obj stringify = ${JSON.stringify(collection_obj)}`)
+  info = await INSERT_COLLECTION_STMT.run( collection_obj.collectionName, collection_obj.collectionImage, JSON.stringify(collection_obj.collectionImageSet),
+                            collection_obj.collectionDescription, JSON.stringify(collection_obj.collectionDescriptionTags), JSON.stringify(collection_obj.collectionEmotions), JSON.stringify(collection_obj.collectionMemes) );
   await Set_Max_Min_Rowid_Collection();
 }
 exports.Insert_Collection_Record_Into_DB = Insert_Collection_Record_Into_DB;
 
 //update the tagging annotation object in the DB
 async function Update_Collection_Record_In_DB(tagging_obj) {
-  info = await UPDATE_FILENAME_TAGGING_STMT.run(tagging_obj.imageFileName,tagging_obj.imageFileHash,tagging_obj.taggingRawDescription,JSON.stringify(tagging_obj.taggingTags),JSON.stringify(tagging_obj.taggingEmotions),JSON.stringify(tagging_obj.taggingMemeChoices),tagging_obj.imageFileName);
+  info = await UPDATE_FILENAME_COLLECTION_STMT.run(tagging_obj.imageFileName,tagging_obj.imageFileHash,tagging_obj.taggingRawDescription,JSON.stringify(tagging_obj.taggingTags),JSON.stringify(tagging_obj.taggingEmotions),JSON.stringify(tagging_obj.taggingMemeChoices),tagging_obj.imageFileName);
 }
 exports.Update_Collection_Record_In_DB = Update_Collection_Record_In_DB
 
