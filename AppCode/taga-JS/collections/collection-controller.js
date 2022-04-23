@@ -698,7 +698,7 @@ async function Change_Profile_Image() {
     }
 
     //handler for the emotion label and value entry additions and then the deletion handling, all emotions are added by default and handled 
-    document.getElementById("modal-search-profileimage-emotion-entry-button-id").onclick = function (event) {        
+    document.getElementById("modal-search-profileimage-emotion-entry-button-id").onclick = function (event) {
         emotion_key_tmp = document.getElementById("modal-search-profileimage-emotion-label-value-textarea-entry-id").value
         if(emotion_key_tmp != "") { 
             emotion_value_tmp = document.getElementById("modal-search-profileimage-emotion-value-range-entry-id").value
@@ -732,7 +732,7 @@ async function Change_Profile_Image() {
     profile_search_display_inner_tmp = ''
     current_collection_obj.collectionImageSet.forEach( image_filename => {
         image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
-        if(FS.existsSync(image_path_tmp) == true){
+        if(FS.existsSync(image_path_tmp) == true) {
             profile_search_display_inner_tmp += `
                                                 <div class="modal-image-search-profileimageresult-single-image-div-class" id="modal-image-search-profileimageresult-single-image-div-id-${image_filename}">
                                                     <img class="modal-image-search-profileimageresult-single-image-img-obj-class" id="modal-image-search-profileimageresult-single-image-img-id-${image_filename}" src="${image_path_tmp}" title="view" alt="image"/>
@@ -802,16 +802,17 @@ async function Collection_Profile_Image_Search_Action() {
 
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
-    img_indices_sorted = await SEARCH_MODULE.Collection_Profile_Image_Search_Fn(collection_profile_search_obj,current_collection_obj.collectionImageSet,Get_Tagging_Record_In_DB)
-    
+    //img_indices_sorted = await SEARCH_MODULE.Collection_Profile_Image_Search_Fn(collection_profile_search_obj,current_collection_obj.collectionImageSet,Get_Tagging_Record_In_DB) //!!!indices !!!
+    profile_img_sorted = await SEARCH_MODULE.Collection_Profile_Image_Search_Fn(collection_profile_search_obj,current_collection_obj.collectionImageSet,Get_Tagging_Annotation_From_DB)
+
     //present new sorted ordering now!
     profile_search_display_div = document.getElementById("collections-profileimages-gallery-grid-images-div-id")
     document.querySelectorAll(".modal-image-search-profileimageresult-single-image-div-class").forEach(el => el.remove());
     profile_search_display_inner_tmp = ''
-    img_indices_sorted.forEach( index => {
-        image_filename = current_collection_obj.collectionImageSet[index]
+    profile_img_sorted.forEach( image_filename => {
+        //image_filename = current_collection_obj.collectionImageSet[index] //!!!indices !!!
         image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
-        if(FS.existsSync(image_path_tmp) == true){
+        if(FS.existsSync(image_path_tmp) == true) {
             profile_search_display_inner_tmp += `
                                                 <div class="modal-image-search-profileimageresult-single-image-div-class" id="modal-image-search-profileimageresult-single-image-div-id-${image_filename}">
                                                     <img class="modal-image-search-profileimageresult-single-image-img-obj-class" id="modal-image-search-profileimageresult-single-image-img-id-${image_filename}" src="${image_path_tmp}" title="view" alt="image"/>
@@ -838,7 +839,8 @@ async function Collection_Profile_Image_Search_Action() {
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).onclick = async function() {
                 current_collection_obj.collectionImage = image_filename
-                await Update_Collection_In_DB(current_collection_obj)
+                //await Update_Collection_In_DB(current_collection_obj) //!!!indexeddb !!!
+                await Update_Collection_Record_In_DB(current_collection_obj)
                 document.getElementById("collection-profile-image-img-id").src = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
                 document.getElementById("search-profileimage-modal-click-top-id").style.display = "none";
             }
@@ -1013,7 +1015,7 @@ async function Add_Gallery_Images() {
         })
     }
     //add the event listener for the SEARCH BUTTON on the modal
-    document.getElementById("modal-search-main-button-id").onclick = function() {        
+    document.getElementById("modal-search-main-button-id").onclick = function() {
         Collection_Add_Image_Search_Action()
     }
 }
