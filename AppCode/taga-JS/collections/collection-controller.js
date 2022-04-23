@@ -75,6 +75,13 @@ async function Meme_Tagging_Random_DB_Images(num_of_records) {
     return await DB_MODULE.Meme_Tagging_Random_DB_Images(num_of_records)
 }
 
+async function Tagging_Image_DB_Iterator() {
+    return DB_MODULE.Tagging_Image_DB_Iterator();
+}
+async function Tagging_MEME_Image_DB_Iterator() {
+    return DB_MODULE.Tagging_MEME_Image_DB_Iterator();
+}
+
 async function Update_Collection_MEME_Connections(collectionName,current_memes,new_collection_memes) {
     return await DB_MODULE.Update_Collection_MEME_Connections(collectionName,current_memes,new_collection_memes);
 }
@@ -1023,16 +1030,21 @@ async function Collection_Add_Image_Search_Action() {
     
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
-    image_search_result_obj = await SEARCH_MODULE.Image_Addition_Search_Fn(collection_gallery_search_obj,all_image_keys,Get_Tagging_Record_In_DB)
-    img_indices_sorted = image_search_result_obj.imgInds  
-    meme_img_indices_sorted = image_search_result_obj.memeInds
+    // image_search_result_obj = await SEARCH_MODULE.Image_Addition_Search_Fn(collection_gallery_search_obj,all_image_keys,Get_Tagging_Record_In_DB) //!!! indexeddb !!!
+    // img_indices_sorted = image_search_result_obj.imgInds  //!!! indexeddb !!!
+    // meme_img_indices_sorted = image_search_result_obj.memeInds //!!! indexeddb !!!
+
+    tagging_db_iterator = await Tagging_Image_DB_Iterator();
+    search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_gallery_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
+    tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
+    search_image_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(collection_gallery_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
 
     //display the search order with the image order first and then the memes that are relevant
     search_display_div = document.getElementById("modal-search-images-results-grid-div-area-id")
     search_display_div.innerHTML = ""
     search_display_inner_tmp = ''
-    img_indices_sorted.forEach( index => {
-        image_filename = all_image_keys[index]
+    search_image_results.forEach( image_filename => {
+        // image_filename = all_image_keys[index] //!!!indexeddb !!!
         image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
             search_display_inner_tmp += `
@@ -1051,8 +1063,8 @@ async function Collection_Add_Image_Search_Action() {
     search_meme_display_div = document.getElementById("modal-search-meme-images-results-grid-div-area-id")
     search_meme_display_div.innerHTML = ""
     search_display_inner_tmp = ''
-    meme_img_indices_sorted.forEach( index => {
-        image_filename = all_image_keys[index]
+    search_image_meme_results.forEach( image_filename => {
+        //image_filename = all_image_keys[index] //!!!indexeddb !!!
         image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
             search_display_inner_tmp += `
