@@ -395,7 +395,11 @@ exports.Step_Get_Collection_Annotation = Step_Get_Collection_Annotation;
 
 async function Get_Collection_Record_From_DB(collectionname) {
   row_obj = await GET_COLLECTION_FROM_NAME_STMT.get(collectionname);
-  return Get_Collection_Obj_Fields_From_Record(row_obj);
+  if(row_obj == undefined) {
+    return undefined;
+  } else {
+    return Get_Collection_Obj_Fields_From_Record(row_obj);
+  }
 }
 exports.Get_Collection_Record_From_DB = Get_Collection_Record_From_DB;
 
