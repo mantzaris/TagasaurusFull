@@ -911,7 +911,7 @@ async function Add_Gallery_Images() {
             })
         }
     }
-    //display default ordering first
+    //display default random ordering first
     if(search_image_results == '' && search_image_meme_results == '') {
         search_image_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
         search_image_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
@@ -995,12 +995,17 @@ async function Add_Gallery_Images() {
             searchMemeTags:[]
         }
         //reset toggles to default false
-        all_image_keys.forEach( image_filename => {
+        search_image_results.forEach( image_filename => {
             image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
             if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
                 if(document.getElementById(`add-image-toggle-id-${image_filename}`).checked){
                     document.getElementById(`add-image-toggle-id-${image_filename}`).checked = false
-                } 
+                }
+            }
+        })
+        search_image_meme_results.forEach( image_filename => {
+            image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
+            if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
                 if(document.getElementById(`add-memes-meme-toggle-id-${image_filename}`).checked){
                     document.getElementById(`add-memes-meme-toggle-id-${image_filename}`).checked = false
                 }
@@ -1182,10 +1187,15 @@ async function Add_Meme_Images() {
         }
     }
     //display default ordering first
+    if(meme_search_image_results == '' && meme_search_image_meme_results == '') {
+        meme_search_image_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
+        meme_search_image_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
+    }
+
     search_display_div = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
     search_display_div.innerHTML = ""
     search_display_inner_tmp = ''
-    all_image_keys.forEach( image_filename => {
+    meme_search_image_results.forEach( image_filename => {
         image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionMemes.includes(image_filename)==false) {
             search_display_inner_tmp += `
@@ -1204,7 +1214,7 @@ async function Add_Meme_Images() {
     search_meme_display_div = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
     search_meme_display_div.innerHTML = ""
     search_display_inner_tmp = ''
-    all_image_keys.forEach( image_filename => {
+    meme_search_image_meme_results.forEach( image_filename => {
         image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionMemes.includes(image_filename)==false) {
             search_display_inner_tmp += `
@@ -1222,21 +1232,29 @@ async function Add_Meme_Images() {
     //add an event listener to the images to select them to be added to the gallery and the current obj and the collection DB updated
     document.getElementById("modal-search-add-memes-images-results-select-images-order-button-id").onclick = async function() {
         update = false
-        all_image_keys.forEach( image_filename => {
+        original_memes_tmp = [...current_collection_obj.collectionMemes]
+        meme_search_image_results.forEach( image_filename => {
             image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
             if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionMemes.includes(image_filename)==false) {
                 if(document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked){
                     current_collection_obj.collectionMemes.push(image_filename)
                     update = true
-                } else if(document.getElementById(`add-meme-image-meme-toggle-id-${image_filename}`).checked){
+                }
+            }
+        })
+        meme_search_image_meme_results.forEach( image_filename => {
+            image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
+            if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionMemes.includes(image_filename)==false) {
+                if(document.getElementById(`add-meme-image-meme-toggle-id-${image_filename}`).checked){
                     current_collection_obj.collectionMemes.push(image_filename)
                     update = true
                 }
             }
         })
         if(update == true) {
-            await Update_Collection_In_DB(current_collection_obj)
-            await Show_Collection(all_collection_keys[current_key_index])            
+            await Update_Collection_Record_In_DB(current_collection_obj)
+            await Update_Collection_MEME_Connections(current_collection_obj.collectionName, original_memes_tmp, current_collection_obj.collectionMemes)
+            await Show_Collection()
         }
         modal_meme_img_add.style.display = "none";
     }
@@ -1257,12 +1275,17 @@ async function Add_Meme_Images() {
             searchMemeTags:[]
         }
         //reset toggles to default false
-        all_image_keys.forEach( image_filename => {
+        meme_search_image_results.forEach( image_filename => {
             image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
             if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionMemes.includes(image_filename)==false) {
                 if(document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked){
                     document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked = false
-                } 
+                }
+            }
+        })
+        meme_search_image_meme_results.forEach( image_filename => {
+            image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
+            if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionMemes.includes(image_filename)==false) {
                 if(document.getElementById(`add-meme-image-meme-toggle-id-${image_filename}`).checked){
                     document.getElementById(`add-meme-image-meme-toggle-id-${image_filename}`).checked = false
                 }
@@ -1291,16 +1314,21 @@ async function Collection_Add_Memes_Search_Action(){
 
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
-    meme_search_result_obj = await SEARCH_MODULE.Meme_Addition_Search_Fn(collection_meme_search_obj,all_image_keys,Get_Tagging_Record_In_DB)
-    img_indices_sorted = meme_search_result_obj.imgInds  
-    meme_img_indices_sorted = meme_search_result_obj.memeInds
+    // meme_search_result_obj = await SEARCH_MODULE.Meme_Addition_Search_Fn(collection_meme_search_obj,all_image_keys,Get_Tagging_Record_In_DB) //!!!indexeddb !!!
+    // img_indices_sorted = meme_search_result_obj.imgInds  
+    // meme_img_indices_sorted = meme_search_result_obj.memeInds
+
+    tagging_db_iterator = await Tagging_Image_DB_Iterator();
+    meme_search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_meme_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
+    tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
+    meme_search_image_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(collection_meme_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
 
     //display the search order with the image order first and then the memes that are relevant
     search_display_div = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
     search_display_div.innerHTML = ""
     search_display_inner_tmp = ''
-    img_indices_sorted.forEach( index => {
-        image_filename = all_image_keys[index]
+    meme_search_image_results.forEach( image_filename => {
+        //image_filename = all_image_keys[index] //!!!indexeddb !!!
         image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionMemes.includes(image_filename)==false) {
             search_display_inner_tmp += `
@@ -1319,8 +1347,8 @@ async function Collection_Add_Memes_Search_Action(){
     search_meme_display_div = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
     search_meme_display_div.innerHTML = ""
     search_display_inner_tmp = ''
-    meme_img_indices_sorted.forEach( index => {
-        image_filename = all_image_keys[index]
+    meme_search_image_meme_results.forEach( image_filename => {
+        //image_filename = all_image_keys[index] //!!!indexeddb !!!
         image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionMemes.includes(image_filename)==false) {
             search_display_inner_tmp += `
