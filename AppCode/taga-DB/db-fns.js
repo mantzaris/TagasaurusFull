@@ -350,7 +350,7 @@ async function Set_Max_Min_Rowid_Collection() {
   rowid_max_collection = res.rowid;
   res = GET_MIN_ROWID_STMT_COLLECTION.get();
   rowid_min_collection = res.rowid;
-  rowid_current_collection = rowid_min;
+  rowid_current_collection = rowid_min_collection;
 }
 Set_Max_Min_Rowid_Collection();
 
@@ -367,16 +367,21 @@ exports.Set_ROWID_From_ROWID = Set_ROWID_From_ROWID
 
 //the function expects a +1,-1,0 for movement about the current rowid
 async function Step_Get_Collection_Annotation(collectionName,step) {
+  console.log(` dbfns line370; rowid_current_collection = ${rowid_current_collection}`)
+  console.log(` dbfn line 371; collectionName & step  = ${collectionName} and step = ${step}`)
   if( step == 0 && collectionName == '' ) {
     record = await GET_RECORD_FROM_ROWID_COLLECTION_STMT.get(rowid_current_collection);
     return Get_Collection_Obj_Fields_From_Record(record);
   }
   rowid_current_collection = await Get_ROWID_From_CollectionName(collectionName);
+  console.log(` line 377 dbfns rowid_current_collection = ${rowid_current_collection}`)
   if(step == 1) {
     rowid_res = await GET_NEXT_COLLECTION_ROWID_STMT.get(rowid_current_collection);
+    console.log(` line 380 dbfns = rowid_res = ${JSON.stringify(rowid_res)}`)
     if(rowid_res == undefined) {
       rowid_current_collection = rowid_min_collection;
     } else {
+      console.log(` line 384 dbfns = rowid_res.rowid = ${JSON.stringify(rowid_res.rowid)}`)
       rowid_current_collection = rowid_res.rowid;
     }
   } else if(step == -1) {
@@ -387,7 +392,8 @@ async function Step_Get_Collection_Annotation(collectionName,step) {
       rowid_current_collection = rowid_res.rowid;
     }
   }
-  record = await GET_RECORD_FROM_ROWID_COLLECTION_STMT.get(rowid_current);
+  console.log(` dbfns line 393; rowid_current_collection = ${rowid_current_collection}`)
+  record = await GET_RECORD_FROM_ROWID_COLLECTION_STMT.get(rowid_current_collection);
   return Get_Collection_Obj_Fields_From_Record(record);
 }
 exports.Step_Get_Collection_Annotation = Step_Get_Collection_Annotation;

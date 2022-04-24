@@ -60,7 +60,7 @@ async function Update_Collection_Record_In_DB(collect_obj) { //delete via file n
     return await DB_MODULE.Update_Collection_Record_In_DB(collect_obj);
 }
 async function Delete_Collection_Record_In_DB(collectioname) { //delete via file name
-    return await DB_MODULE.Delete_Collection_DB(collectioname);
+    return await DB_MODULE.Delete_Collection_Record_In_DB(collectioname);
 }
 
 async function Get_Tagging_Annotation_From_DB(image_name) { //
@@ -507,6 +507,8 @@ async function Show_Collection() {
 
 //called from the gallery widget, where 'n' is the number of images forward or backwards to move
 async function New_Collection_Display(n) {
+    console.log(` line 510; New_Collection_Display(n) n = ${n}`)
+    console.log( ` line 511; current_collection_obj = ${JSON.stringify(current_collection_obj)} `)
     if( current_collection_obj == undefined || n == 0 ) {
         current_collection_obj = await Step_Get_Collection_Annotation('',0);
     } else if(n == 1) {
@@ -514,6 +516,7 @@ async function New_Collection_Display(n) {
     } else if(n == -1) {
         current_collection_obj = await Step_Get_Collection_Annotation(current_collection_obj.collectionName,-1);
     }
+    console.log( ` line 519; current_collection_obj = ${JSON.stringify(current_collection_obj)} `)
     Show_Collection();
 }
 
@@ -599,8 +602,9 @@ async function Initialize_Collection_Page(){
         collection_name_param = window.location.search.split("=")[1]
         //current_key_index = all_collection_keys.indexOf(collection_name_param)//!!!indexeddb !!!
         //await Show_Collection(collection_name_param)
+        console.log(` line605 controller start; collection_name_param = ${collection_name_param}`)
         current_collection_obj = await Get_Collection_Record_From_DB(collection_name_param) 
-        row_id_tmp = Get_ROWID_From_CollectionName(current_collection_obj.collectionName)
+        row_id_tmp = await Get_ROWID_From_CollectionName(current_collection_obj.collectionName)
         Set_ROWID_From_ROWID( row_id_tmp )
         await New_Collection_Display( 0 )
     } else {
