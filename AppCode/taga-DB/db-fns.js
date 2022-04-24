@@ -490,6 +490,31 @@ function Get_Obj_Fields_From_Collection_MEME_Record(record) {
 }
 //fn for the update of the collection image table connections
 
+//when an image is deleted its ability to serve as a meme is removed and it must be removed from collection meme sets
+async function Handle_Delete_Collection_MEME_references(imageFileName) {
+  //this image may be a meme, get the meme links and from those images remove the refs to this imageFileName
+  meme_row_obj = await GET_MEME_COLLECTION_TABLE_STMT.get(imageFileName);
+  console.log(`line497; meme_row_obj = ${JSON.stringify(meme_row_obj)}`)
+  if(meme_row_obj == undefined) { //is not listed as a meme for any other image
+    return
+  }
+  meme_row_obj = Get_Obj_Fields_From_Collection_MEME_Record(meme_row_obj);
+  console.log(`line502; meme_row_obj = ${JSON.stringify(meme_row_obj)}`)
+  meme_row_obj["collectionNames"].forEach( async filename => {
+    record_tmp = await Get_Collection_Record_From_DB(filename);
+    console.log(`line505; record_tmp = ${JSON.stringify(record_tmp)}`)
+    new_meme_choices_tmp = record_tmp.collectionMemes.filter(item => item !== imageFileName)
+    console.log(`line507; record_tmp = ${JSON.stringify(new_meme_choices_tmp)}`)
+    if( new_meme_choices_tmp.length != record_tmp.collectionMemes.length ) {
+      record_tmp.collectionMemes = new_meme_choices_tmp
+      await Update_Collection_Record_In_DB(record_tmp);
+    }
+  })
+  //remove this image as a meme in the meme table
+  DELETE_COLLECTION_MEME_TABLE_ENTRY_STMT.run( imageFileName )
+}
+exports.Handle_Delete_Collection_MEME_references = Handle_Delete_Collection_MEME_references;
+
 //!!! make call to this when image is deleted from tagging to update collection meme table !!!
 // async function Handle_Delete_Image_MEME_references(imageFileName) {
 //   //this image may be a meme, get the meme links and from those images remove the refs to this imageFileName

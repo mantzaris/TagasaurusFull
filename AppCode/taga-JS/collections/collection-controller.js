@@ -86,6 +86,8 @@ async function Update_Collection_MEME_Connections(collectionName,current_memes,n
     return await DB_MODULE.Update_Collection_MEME_Connections(collectionName,current_memes,new_collection_memes);
 }
 
+
+
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END<<<
 
 // **MODEL ACCESS FUNCTIONS START**
@@ -521,6 +523,8 @@ async function New_Collection_Display(n) {
 }
 
 async function Handle_Empty_DB() {
+    taga_source_path = PATH.resolve()+PATH.sep+'Taga.png';
+    FS.copyFileSync(taga_source_path, `${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL);
     new_default_obj = {...COLLECTION_DEFAULT_EMPTY_OBJECT}
     rand_int = Math.floor(Math.random() * 10000000); //OK way to handle filling up with default???
     new_default_obj.collectionName = 'Taga' + '0'.repeat(10 - rand_int.toString().length) + Math.floor(Math.random() * 1000000);
