@@ -9,6 +9,8 @@ const TAGGING_TABLE_NAME = 'TAGGING';
 const TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
 const COLLECTIONS_TABLE_NAME = 'COLLECTIONS'
 const COLLECTION_MEME_TABLE_NAME = 'COLLECTIONMEMES';
+const COLLECTION_IMAGESET_TABLE_NAME = 'COLLECTIONIMAGESET'
+
 
 
 const TAGA_FILES_DIRECTORY = PATH.join(PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles')
@@ -514,6 +516,20 @@ async function Handle_Delete_Collection_MEME_references(imageFileName) {
   DELETE_COLLECTION_MEME_TABLE_ENTRY_STMT.run( imageFileName )
 }
 exports.Handle_Delete_Collection_MEME_references = Handle_Delete_Collection_MEME_references;
+
+
+//fns to handle the imageset set look up so that when an image in the tagging is deleted the collections containing that image has it removed
+//from its imageset and the functionality should take into account when that image is the collection profile image as well
+// COLLECTION_IMAGESET_TABLE_NAME    collectionImageFileName TEXT, collectionNames TEXT)
+
+//update fn where the collection obj is provided and it checks to see if the image set is in the imageset collection look up table
+
+//delete fn where when an image is deleted all the collections it is a member of remove it as an imageset member and delete the row if necessary
+//the condition of when the image set member is also the profile image needs to be taken into consideration
+
+
+
+
 
 //!!! make call to this when image is deleted from tagging to update collection meme table !!!
 // async function Handle_Delete_Image_MEME_references(imageFileName) {

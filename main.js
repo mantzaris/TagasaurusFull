@@ -39,6 +39,8 @@ TAGGING_TABLE_NAME = 'TAGGING';
 TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
 COLLECTIONS_TABLE_NAME = 'COLLECTIONS';
 COLLECTION_MEME_TABLE_NAME = 'COLLECTIONMEMES';
+COLLECTION_IMAGESET_TABLE_NAME = 'COLLECTIONIMAGESET'
+
 
 if( FS.existsSync(TAGA_FILES_DIRECTORY) == false ) { //directory for files exists?
   FS.mkdirSync(TAGA_FILES_DIRECTORY);
@@ -98,6 +100,18 @@ if( collection_meme_table_exists_res["count(*)"] == 0 ) {
                     (collectionMemeFileName TEXT, collectionNames TEXT)`);
   STMT.run(); //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
   STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX collectionMemeFileNameIndex ON ${COLLECTION_MEME_TABLE_NAME} (collectionMemeFileName); `);
+  STMT_index1.run();
+}
+//The collections also have an 'imageSet' as a gallery for the images associated with the collection name
+//this needs to be updated so that when an image in the tagging phase is deleted, that there is an efficient look up to remove stale/lingering links
+collection_imageset_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTION_IMAGESET_TABLE_NAME}'; `);
+collection_imageset_table_exists_res = collection_imageset_table_exists_stmt.get();
+//if collection table does not exit, so create it
+if( collection_imageset_table_exists_res["count(*)"] == 0 ) {
+  STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTION_IMAGESET_TABLE_NAME}
+                    (collectionImageFileName TEXT, collectionNames TEXT)`);
+  STMT.run(); //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
+  STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX collectionImageFileNameIndex ON ${COLLECTION_IMAGESET_TABLE_NAME} (collectionImageFileName); `);
   STMT_index1.run();
 }
 //DB SET UP END<<<
