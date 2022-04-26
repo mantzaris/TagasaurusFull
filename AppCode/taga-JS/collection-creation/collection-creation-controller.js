@@ -62,6 +62,10 @@ async function Tagging_MEME_Image_DB_Iterator() {
 async function Update_Collection_MEME_Connections(collectionName,current_memes,new_collection_memes) {
     return await DB_MODULE.Update_Collection_MEME_Connections(collectionName,current_memes,new_collection_memes);
 }
+
+async function Update_Collection_IMAGE_Connections(collectionName,current_collection_images,new_collection_images) {
+    return await DB_MODULE.Update_Collection_IMAGE_Connections(collectionName,current_collection_images,new_collection_images)
+}
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END<<<
 
 
@@ -143,6 +147,8 @@ async function Creation_Next_Btn() {
         //await COLLECTION_DB_MODULE.Insert_Record(COLLECTION_DEFAULT_EMPTY_OBJECT) //!!!indexeddb !!!
         await Insert_Collection_Record_Into_DB(COLLECTION_DEFAULT_EMPTY_OBJECT)
         await Update_Collection_MEME_Connections(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName, [], COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes)
+        await Update_Collection_IMAGE_Connections(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName, [],COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet)
+
         //window redirect and pass collection name as a parameter
         window.location = "collections.html" + '?' + `collectionName=${COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName}`
     }

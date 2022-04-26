@@ -397,7 +397,7 @@ function Display_Gallery_Images() {
 }
 //to save the edits to the gallery images which is the deletions
 async function Save_Gallery_Changes() {
-    current_images = current_collection_obj.collectionImageSet //get the memes of the current object
+    current_images = [...current_collection_obj.collectionImageSet] //get the memes of the current object
     length_original = current_images.length
     gallery_switch_booleans = []
     for (var ii = 0; ii < current_images.length; ii++) {
@@ -424,7 +424,7 @@ async function Save_Gallery_Changes() {
 async function Check_Gallery_And_Profile_Image_Integrity(){
     changes_made = false
     //the Gallery image set for the entity
-    image_set = current_collection_obj.collectionImageSet
+    image_set = [...current_collection_obj.collectionImageSet]
     image_set_present = image_set.map( (image_filename) => {
                                                 path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
                                                 if(FS.existsSync(path_tmp) == true){
@@ -530,7 +530,9 @@ async function New_Collection_Display(n) {
 
 async function Handle_Empty_DB() {
     taga_source_path = PATH.resolve()+PATH.sep+'Taga.png';
-    FS.copyFileSync(taga_source_path, `${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL);
+    if( FS.existsSync(taga_source_path) == false ) {        
+        FS.copyFileSync(taga_source_path, `${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL);
+    }
     new_default_obj = {...COLLECTION_DEFAULT_EMPTY_OBJECT}
     rand_int = Math.floor(Math.random() * 10000000); //OK way to handle filling up with default???
     new_default_obj.collectionName = 'Taga' + '0'.repeat(10 - rand_int.toString().length) + Math.floor(Math.random() * 1000000);
@@ -974,6 +976,7 @@ async function Add_Gallery_Images() {
     //add an event listener to the images to select them to be added to the gallery and the current obj and the collection DB updated
     document.getElementById("modal-search-images-results-select-images-order-button-id").onclick = async function() {
         update = false
+        imageSet_original = [...current_collection_obj.collectionImageSet]
         search_image_results.forEach( image_filename => { //go through search images
             image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
             if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
@@ -995,6 +998,7 @@ async function Add_Gallery_Images() {
         if(update == true) {
             // await Update_Collection_In_DB(current_collection_obj) //!!!indexeddb !!!
             await Update_Collection_Record_In_DB(current_collection_obj)
+            await Update_Collection_IMAGE_Connections(current_collection_obj.collectionName,imageSet_original,current_collection_obj.collectionImageSet)
             await Show_Collection()   
         }
         modal_gallery_img_add.style.display = "none";
