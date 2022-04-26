@@ -86,6 +86,9 @@ async function Update_Collection_MEME_Connections(collectionName,current_memes,n
     return await DB_MODULE.Update_Collection_MEME_Connections(collectionName,current_memes,new_collection_memes);
 }
 
+async function Update_Collection_IMAGE_Connections(collectionName,current_collection_images,new_collection_images) {
+    return await DB_MODULE.Update_Collection_IMAGE_Connections(collectionName,current_collection_images,new_collection_images)
+}
 
 
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END<<<
@@ -126,6 +129,7 @@ async function Update_Collection_MEME_Connections(collectionName,current_memes,n
 //this function deletes the entity object currently in focus from var 'current_key_index', and calls for the refresh of the next entity to be in view
 async function Delete_Collection() {
     await Update_Collection_MEME_Connections(current_collection_obj.collectionName,current_collection_obj.collectionMemes,[])
+    await Update_Collection_IMAGE_Connections(current_collection_obj.collectionName,current_collection_obj.collectionImageSet,[])
     collections_remaining = await Delete_Collection_Record_In_DB(current_collection_obj.collectionName)
     console.log(`collections_remaining = ${collections_remaining}`)
     if(collections_remaining == 0) {
@@ -413,6 +417,7 @@ async function Save_Gallery_Changes() {
         //await Update_Collection_In_DB(current_collection_obj) //!!!indexeddb !!!
         await Update_Collection_Record_In_DB(current_collection_obj)
         await Check_Gallery_And_Profile_Image_Integrity()
+        await Update_Collection_IMAGE_Connections(current_collection_obj.collectionName,current_images,current_collection_obj.collectionImageSet)
         Display_Gallery_Images()
     }
 }
@@ -454,6 +459,7 @@ async function Check_Gallery_And_Profile_Image_Integrity(){
     if(changes_made == true){
         //await Update_Collection_In_DB(current_collection_obj) //!!!indexeddb !!!
         await Update_Collection_Record_In_DB(current_collection_obj)
+        await Update_Collection_IMAGE_Connections(current_collection_obj.collectionName,image_set,current_collection_obj.collectionImageSet)
     }
     return(changes_made)
 }
@@ -533,6 +539,7 @@ async function Handle_Empty_DB() {
     //await Insert_Collection_Record_Into_DB(new_default_obj) //!!! indexeddb !!!
     await Insert_Collection_Record_Into_DB(new_default_obj)
     current_collection_obj = new_default_obj
+    await Update_Collection_IMAGE_Connections(current_collection_obj.collectionName,[],current_collection_obj.collectionImageSet)
 }
 //The missing image filtering is not done in the initial stage here like in the Tagging where all missing
 //images are removed and the annotation objects removed

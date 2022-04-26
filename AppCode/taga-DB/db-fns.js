@@ -521,12 +521,74 @@ exports.Handle_Delete_Collection_MEME_references = Handle_Delete_Collection_MEME
 //fns to handle the imageset set look up so that when an image in the tagging is deleted the collections containing that image has it removed
 //from its imageset and the functionality should take into account when that image is the collection profile image as well
 // COLLECTION_IMAGESET_TABLE_NAME    collectionImageFileName TEXT, collectionNames TEXT)
+const GET_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT = DB.prepare(`SELECT * FROM ${COLLECTION_IMAGESET_TABLE_NAME} WHERE collectionImageFileName=?`);
+const UPDATE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT = DB.prepare(`UPDATE ${COLLECTION_IMAGESET_TABLE_NAME} SET collectionNames=? WHERE collectionImageFileName=?`);
+const INSERT_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT = DB.prepare(`INSERT INTO ${COLLECTION_IMAGESET_TABLE_NAME} (collectionImageFileName, collectionNames) VALUES (?, ?)`);
+const DELETE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT = DB.prepare(`DELETE FROM ${COLLECTION_IMAGESET_TABLE_NAME} WHERE collectionImageFileName=?`)
 
-//update fn where the collection obj is provided and it checks to see if the image set is in the imageset collection look up table
 
-//delete fn where when an image is deleted all the collections it is a member of remove it as an imageset member and delete the row if necessary
-//the condition of when the image set member is also the profile image needs to be taken into consideration
+async function Get_Collection_IMAGE_Record_From_DB(imageName) {
+  row_obj = await GET_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.get(imageName);
+  if(row_obj == undefined) { //record non-existant so make one
+    INSERT_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.run( imageName, JSON.stringify( [] ) );
+    row_obj = await GET_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.get(imageName);
+  }
+  row_obj = Get_Obj_Fields_From_Collection_IMAGE_Record(row_obj);
+  return row_obj;
+}
+exports.Get_Collection_IMAGE_Record_From_DB = Get_Collection_IMAGE_Record_From_DB;
 
+function Get_Obj_Fields_From_Collection_IMAGE_Record(record) {
+  record.collectionNames = JSON.parse(record.collectionNames);
+  return record;
+}
+
+async function Update_Collection_IMAGE_Connections(collectionName,current_collection_images,new_collection_images) {
+  // get the memes which no longer include this file (left difference [1,2,3] diff-> [1,3,4] => [2]) and from [2] remove/subtract the image filename from the array: difference = arr1.filter(x => !arr2.includes(x));
+  remove_as_images_filenames = current_collection_images.filter(x => !new_collection_images.includes(x)); //remove from meme connection
+  remove_as_images_filenames.forEach(async iamge_filename => {
+    image_table_record = await Get_Collection_IMAGE_Record_From_DB(iamge_filename);
+    new_array_tmp = image_table_record.collectionNames.filter(item => item !== collectionName)
+    if( new_array_tmp.length == 0) {
+      DELETE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.run( iamge_filename )
+    } else {
+      UPDATE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.run( JSON.stringify(new_array_tmp) , iamge_filename )
+    }
+  });
+  // get the right difference ([1,2,3] diff -> [1,3,4] => [4]) and from [4] include/add this imagefilename in the array: diff2 = b.filter(x => !a.includes(x));
+  add_as_images_filenames = new_collection_images.filter(x => !current_collection_images.includes(x)); //new meme connections to record
+  add_as_images_filenames.forEach(async image_filename => {
+    image_table_record = await Get_Collection_IMAGE_Record_From_DB(image_filename);
+    image_table_record["collectionNames"].push( collectionName )
+    UPDATE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.run( JSON.stringify(image_table_record["collectionNames"]) , image_filename )
+  });
+}
+exports.Update_Collection_IMAGE_Connections = Update_Collection_IMAGE_Connections;
+
+//when an image is deleted its ability to serve as a collection image is removed and it must be removed from collection image sets
+async function Handle_Delete_Collection_IMAGE_references(imageFileName) {
+  //this image may be a meme, get the meme links and from those images remove the refs to this imageFileName
+  image_row_obj = await GET_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.get(imageFileName);
+  console.log(`line572; image_row_obj = ${JSON.stringify(image_row_obj)}`)
+  if(image_row_obj == undefined) { //is not listed as a meme for any other image
+    return
+  }
+  image_row_obj = Get_Obj_Fields_From_Collection_MEME_Record(image_row_obj);
+  console.log(`line577; image_row_obj = ${JSON.stringify(image_row_obj)}`)
+  image_row_obj["collectionNames"].forEach( async name => {
+    record_tmp = await Get_Collection_Record_From_DB(name);
+    console.log(`line580; record_tmp = ${JSON.stringify(record_tmp)}`)
+    new_image_choices_tmp = record_tmp.collectionImageSet.filter(item => item !== imageFileName)
+    console.log(`line582; record_tmp = ${JSON.stringify(new_image_choices_tmp)}`)
+    if( new_image_choices_tmp.length != record_tmp.collectionImageSet.length ) {
+      record_tmp.collectionImageSet = new_image_choices_tmp
+      await Update_Collection_Record_In_DB(record_tmp);
+    }
+  })
+  //remove this image as a meme in the meme table
+  DELETE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.run( imageFileName )
+}
+exports.Handle_Delete_Collection_IMAGE_references = Handle_Delete_Collection_IMAGE_references;
 
 
 
