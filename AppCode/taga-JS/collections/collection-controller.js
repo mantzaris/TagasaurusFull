@@ -7,7 +7,7 @@
 const PATH = require('path');
 const FS = require('fs');
 
-const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MASONRY } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MY_FILE_HELPER, MASONRY } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 const { CLOSE_ICON_RED, CLOSE_ICON_BLACK } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 
@@ -90,7 +90,12 @@ async function Update_Collection_IMAGE_Connections(collectionName,current_collec
     return await DB_MODULE.Update_Collection_IMAGE_Connections(collectionName,current_collection_images,new_collection_images)
 }
 
-
+async function Insert_Record_Into_DB(tagging_obj) {
+    await DB_MODULE.Insert_Record_Into_DB(tagging_obj);
+}
+async function Get_Tagging_Annotation_From_DB(image_name) { //
+    return await DB_MODULE.Get_Tagging_Record_From_DB(image_name);
+}
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END<<<
 
 // **MODEL ACCESS FUNCTIONS START**
@@ -529,10 +534,26 @@ async function New_Collection_Display(n) {
 }
 
 async function Handle_Empty_DB() {
-    taga_source_path = PATH.resolve()+PATH.sep+'Taga.png';
-    if( FS.existsSync(taga_source_path) == false ) {        
+    if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`) == false ) {      
+        taga_source_path = PATH.resolve()+PATH.sep+'Taga.png';  
         FS.copyFileSync(taga_source_path, `${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL);
     }
+    taga_obj_tmp = await DB_MODULE.Get_Tagging_Record_From_DB('Taga.png');
+    if( taga_obj_tmp == undefined ) {
+        var emtpy_annotation_tmp = {
+            "imageFileName": '',
+            "imageFileHash": '',
+            "taggingRawDescription": "",
+            "taggingTags": [],
+            "taggingEmotions": {good:0,bad:0},
+            "taggingMemeChoices": []
+            }
+        tagging_entry = JSON.parse(JSON.stringify(emtpy_annotation_tmp)); //clone the default obj
+        tagging_entry.imageFileName = 'Taga.png';
+        tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
+        await Insert_Record_Into_DB(tagging_entry); //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
+    }
+
     new_default_obj = {...COLLECTION_DEFAULT_EMPTY_OBJECT}
     rand_int = Math.floor(Math.random() * 10000000); //OK way to handle filling up with default???
     new_default_obj.collectionName = 'Taga' + '0'.repeat(10 - rand_int.toString().length) + Math.floor(Math.random() * 1000000);

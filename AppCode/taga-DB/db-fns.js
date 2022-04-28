@@ -98,7 +98,11 @@ exports.Step_Get_Annotation = Step_Get_Annotation;
 //fn to get the annotation record for an image by key_type of rowid or filename
 async function Get_Tagging_Record_From_DB(filename) {
   row_obj = await GET_FILENAME_TAGGING_STMT.get(filename);
-  return Get_Obj_Fields_From_Record(row_obj);
+  if( row_obj != undefined ) {
+    return Get_Obj_Fields_From_Record(row_obj);
+  } else {
+    return undefined;
+  }
 }
 exports.Get_Tagging_Record_From_DB = Get_Tagging_Record_From_DB;
 //fn to check the presence of a hash in the DB
@@ -576,13 +580,48 @@ async function Handle_Delete_Collection_IMAGE_references(imageFileName) {
   image_row_obj = Get_Obj_Fields_From_Collection_MEME_Record(image_row_obj);
   console.log(`line577; image_row_obj = ${JSON.stringify(image_row_obj)}`)
   image_row_obj["collectionNames"].forEach( async name => {
-    record_tmp = await Get_Collection_Record_From_DB(name);
-    console.log(`line580; record_tmp = ${JSON.stringify(record_tmp)}`)
-    new_image_choices_tmp = record_tmp.collectionImageSet.filter(item => item !== imageFileName)
-    console.log(`line582; record_tmp = ${JSON.stringify(new_image_choices_tmp)}`)
-    if( new_image_choices_tmp.length != record_tmp.collectionImageSet.length ) {
-      record_tmp.collectionImageSet = new_image_choices_tmp
-      await Update_Collection_Record_In_DB(record_tmp);
+    collection_tmp = await Get_Collection_Record_From_DB(name);
+    console.log(`line580; collection_tmp = ${JSON.stringify(collection_tmp)}`)
+    new_image_choices_tmp = collection_tmp.collectionImageSet.filter(item => item !== imageFileName)
+    console.log(`line582; collection_tmp = ${JSON.stringify(new_image_choices_tmp)}`)
+    if( new_image_choices_tmp.length != collection_tmp.collectionImageSet.length ) {
+      //new imageset allocated
+      collection_tmp.collectionImageSet = new_image_choices_tmp 
+      //check to see if the imageFileName removed is also the profile collectionImage then remove it 
+      if( collection_tmp.collectionImage == imageFileName ) {
+        collection_tmp.collectionImage = '';
+      }
+      //there are different situations to consider to maintain collection integrity
+      if( collection_tmp.collectionImageSet.length > 0 && collection_tmp.collectionImage != '' ) {
+        await Update_Collection_Record_In_DB(collection_tmp);
+      } else if( collection_tmp.collectionImageSet.length > 0 && collection_tmp.collectionImage == '' ) {
+        //replace the profile image since it was removed and we can sample from the set
+        rand_ind = Math.floor(Math.random() * collection_tmp.collectionImageSet.length)
+        collection_tmp.collectionImage = collection_tmp.collectionImageSet[rand_ind]
+        await Update_Collection_Record_In_DB(collection_tmp);
+      } else if( collection_tmp.collectionImageSet.length == 0 ) {
+        pic_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + 'Taga.png'
+        if( FS.existsSync(pic_path_tmp) == false ) {
+          taga_source_path = PATH.resolve()+PATH.sep+'Taga.png';
+          FS.copyFileSync(taga_source_path, `${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL);
+        }
+        var emtpy_annotation_tmp = {
+                  "imageFileName": '',
+                  "imageFileHash": '',
+                  "taggingRawDescription": "",
+                  "taggingTags": [],
+                  "taggingEmotions": {good:0,bad:0},
+                  "taggingMemeChoices": []
+                  }
+        tagging_entry = JSON.parse(JSON.stringify(emtpy_annotation_tmp)); //clone the default obj
+        tagging_entry.imageFileName = 'Taga.png';
+        tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
+        await Insert_Record_Into_DB(tagging_entry); //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
+
+        collection_tmp.collectionImageSet = ['Taga.png']
+        collection_tmp.collectionImage = 'Taga.png'
+        await Update_Collection_Record_In_DB(collection_tmp);
+      }
     }
   })
   //remove this image as a meme in the meme table

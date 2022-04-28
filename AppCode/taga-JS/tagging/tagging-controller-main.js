@@ -82,6 +82,10 @@ async function Tagging_Random_DB_Images(num_of_records) {
 async function Meme_Tagging_Random_DB_Images(num_of_records) {
     return await DB_MODULE.Meme_Tagging_Random_DB_Images(num_of_records)
 }
+
+async function Handle_Delete_Collection_IMAGE_references(imageFileName) {
+    return await DB_MODULE.Handle_Delete_Collection_IMAGE_references(imageFileName)
+}
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END>>>
 
 //DISPLAY THE MAIN IMAGE START>>>
@@ -386,6 +390,7 @@ async function Delete_Image() {
     await Update_Tagging_MEME_Connections(current_image_annotation.imageFileName,current_image_annotation.taggingMemeChoices,[])
     await Handle_Delete_Image_MEME_references(current_image_annotation.imageFileName)
     await Handle_Delete_Collection_MEME_references(current_image_annotation.imageFileName)
+    await Handle_Delete_Collection_IMAGE_references(current_image_annotation.imageFileName)
     New_Image_Display( 0 ); //pass zero to display current and not forward or backward
 }
 //dialog window explorer to select new images to import, and calls the functions to update the view
