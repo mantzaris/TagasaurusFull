@@ -1,8 +1,20 @@
 PATH = require('path');
 
-const { TAGGING_DB_MODULE } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const { DB_MODULE, MAX_SAMPLE_COUNT_RECORDS } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 
+var number_of_records;
+var sample_num;
+
+async function Number_of_Tagging_Records() {
+    return await DB_MODULE.Number_of_Tagging_Records();
+}
+async function Tagging_Random_DB_Images(num_of_records) {
+    return await DB_MODULE.Tagging_Random_DB_Images(num_of_records)
+}
+async function Get_Tagging_Annotation_From_DB(image_name) { //
+    return await DB_MODULE.Get_Tagging_Record_From_DB(image_name);
+}
 // algorithm DFLOW by EPA ( https://stats.stackexchange.com/a/430254/1098 )
 //$\mu_H = \left(\frac{\sum^{n_T - n_0}_{i=1} 1/x_i} {n_T - n_0}\right)^{-1} \times \frac{n_T - n_0} {n_T} ,$
 //where $\mu_H$ is the harmonic mean, $x_i$ is a nonzero value of the data vector, $n_T$ is the (total) sample size, and $n_0$ is the number of zero values. 
@@ -25,36 +37,32 @@ function Harmonic_Mean(arr) {
 }
 
 async function Display_Skill_Levels() {
-    await TAGGING_DB_MODULE.Create_Db()
 
-    //all_data = await fns_DB.Return_All_DB_Data().then(function (results) { return results })
-    all_data = await TAGGING_DB_MODULE.Get_All_From_DB()//.then(function(results) {return results})
-    total_images_in_db = all_data.length
+    random_filenames = await Tagging_Random_DB_Images(sample_num)
     total_tagged_images = 0
     meme_connected_images = 0
     emotion_stamped_images = 0
     images_scores_array = []
-    for (const key of Object.keys(all_data)) {    
-        value = (JSON.stringify(all_data[key]))
-        
-        try{ non_empty_entry = (all_data[key].taggingTags).find(element => element != "") 
+    for(filename of random_filenames) {    
+        record_tmp = await Get_Tagging_Annotation_From_DB(filename);
+
+        try{ non_empty_entry = (record_tmp.taggingTags).find(element => element != "") 
         } catch { non_empty_entry = undefined }
         if (non_empty_entry != undefined) { total_tagged_images = 1 + total_tagged_images }
-        meme_counts = (Object.values(all_data[key]["taggingMemeChoices"])).length//Object.keys(JSON.parse(value["taggingMemeChoices"])).length
+        meme_counts = (Object.values(record_tmp["taggingMemeChoices"])).length//Object.keys(JSON.parse(value["taggingMemeChoices"])).length
         if (meme_counts > 0) { meme_connected_images = 1 + meme_connected_images }
-        non_empty_emotion = (Object.values(all_data[key]["taggingEmotions"])).find(element => element != "0")
+        non_empty_emotion = (Object.values(record_tmp["taggingEmotions"])).find(element => element != "0")
         if (non_empty_emotion != undefined) { emotion_stamped_images = 1 + emotion_stamped_images }
 
         tagged_bool_num = + (non_empty_entry != undefined)
         memes_bool_num = + (meme_counts > 0)
         emotion_bool_num = + (non_empty_emotion != undefined)
         images_scores_array.push((tagged_bool_num + memes_bool_num + emotion_bool_num) / 3)
-
     }
 
-    tagged_percentage = 100 * (total_tagged_images / total_images_in_db)
-    meme_connected_percentage = 100 * (meme_connected_images / total_images_in_db)
-    emotion_stamped_images_percentage = 100 * (emotion_stamped_images / total_images_in_db)
+    tagged_percentage = 100 * (total_tagged_images / sample_num)
+    meme_connected_percentage = 100 * (meme_connected_images / sample_num)
+    emotion_stamped_images_percentage = 100 * (emotion_stamped_images / sample_num)
     scores_harmonic_mean = 100 * Harmonic_Mean(images_scores_array)
 
     document.getElementById("tagging-score-id").innerHTML = `${Math.round(tagged_percentage)}%`
@@ -71,4 +79,10 @@ async function Display_Skill_Levels() {
 
 }
 
-Display_Skill_Levels()
+async function Init_Analytics() {
+    number_of_records = await Number_of_Tagging_Records();
+    sample_num = number_of_records < MAX_SAMPLE_COUNT_RECORDS ? number_of_records : MAX_SAMPLE_COUNT_RECORDS
+    Display_Skill_Levels()
+}
+
+Init_Analytics()
