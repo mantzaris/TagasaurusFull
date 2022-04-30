@@ -147,8 +147,9 @@ async function Creation_Next_Btn() {
         //await COLLECTION_DB_MODULE.Insert_Record(COLLECTION_DEFAULT_EMPTY_OBJECT) //!!!indexeddb !!!
         await Insert_Collection_Record_Into_DB(COLLECTION_DEFAULT_EMPTY_OBJECT)
         await Update_Collection_MEME_Connections(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName, [], COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes)
+        COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.push(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage)
+        COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet = [...COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet]
         await Update_Collection_IMAGE_Connections(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName, [],COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet)
-
         //window redirect and pass collection name as a parameter
         window.location = "collections.html" + '?' + `collectionName=${COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName}`
     }
