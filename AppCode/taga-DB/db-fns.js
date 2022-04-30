@@ -18,7 +18,7 @@ const TAGA_FILES_DIRECTORY = PATH.join(PATH.resolve()+PATH.sep+'..'+PATH.sep+'Ta
 const {  } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 //set up the DB to use
-const DB = new DATABASE(TAGA_FILES_DIRECTORY+PATH.sep+DB_FILE_NAME, { verbose: console.log }); //open db in that directory
+const DB = new DATABASE(TAGA_FILES_DIRECTORY+PATH.sep+DB_FILE_NAME, { }) //verbose: console.log }); //open db in that directory
 //TAGGING START>>>
 const GET_FILENAME_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE imageFileName=?`); //!!! use the index
 const GET_HASH_TAGGING_STMT = DB.prepare(`SELECT imageFileHash FROM ${TAGGING_TABLE_NAME} WHERE imageFileHash=?`); //!!! use the index
@@ -154,10 +154,8 @@ async function Tagging_Random_DB_Images(num_of_records) {
   filenames = []
   for(ii=0;ii<num_of_records;ii++) {
     filename_tmp = await GET_N_RAND_TAGGING_FILENAMES_STMT.all(1)
-    console.log(`line 151: filename_tmp[0].imageFileName  = ${filename_tmp[0].imageFileName}`)
     filenames.push(filename_tmp[0].imageFileName)
   }
-  console.log(`line 153: filenames = ${filenames}`)
   filenames = [...new Set(filenames)];
   return filenames;
 }
@@ -200,9 +198,7 @@ const DELETE_MEME_TABLE_ENTRY_STMT = DB.prepare(`DELETE FROM ${TAGGING_MEME_TABL
 
 //change the stored obj to pure json obj on all the fields so no parsing at the controller side is needed for MEME
 function Get_Obj_Fields_From_MEME_Record(record) {
-  console.log(`   16 => record = ${record} : record stringify = ${JSON.stringify(record)}`)
   record.imageFileNames = JSON.parse(record.imageFileNames);
-  console.log(`   17 => record = ${record} : record stringify = ${JSON.stringify(record)}`)
   return record;
 }
 async function Get_Tagging_MEME_Record_From_DB(filename) {
@@ -217,32 +213,21 @@ async function Get_Tagging_MEME_Record_From_DB(filename) {
 exports.Get_Tagging_MEME_Record_From_DB = Get_Tagging_MEME_Record_From_DB;
 // provide the image being tagged and the before and after meme array and there will be an update to the meme table
 async function Update_Tagging_MEME_Connections(imageFileName,current_image_memes,new_image_memes) {
-  console.log(`   2 => imageFileName = ${imageFileName} : current_image_memes = ${current_image_memes} : new_image_memes = ${new_image_memes}  `)
   // get the memes which no longer include this file (left difference [1,2,3] diff-> [1,3,4] => [2]) and from [2] remove/subtract the image filename from the array: difference = arr1.filter(x => !arr2.includes(x));
   remove_as_memes_filenames = current_image_memes.filter(x => !new_image_memes.includes(x)); //remove from meme connection
-  console.log(`   3 => remove_as_memes_filenames = ${remove_as_memes_filenames}`)
   remove_as_memes_filenames.forEach(async meme_filename => {
-    console.log(`   4 => meme_filename = ${meme_filename}`)
     meme_table_record = await Get_Tagging_MEME_Record_From_DB(meme_filename);
-    console.log(`   5 => meme_table_record = ${meme_table_record}`)
     new_array_tmp = meme_table_record.imageFileNames.filter(item => item !== imageFileName)
-    console.log(`   6 => new_array_tmp = ${new_array_tmp}`)
     if( new_array_tmp.length == 0) {
-      console.log(`the MEME now points to ZERO IMAGES!!! THEREFORE DELETE (REMOVE) FROM MEMETAGGING TABLE`)
       DELETE_MEME_TABLE_ENTRY_STMT.run( meme_filename )
-      console.log(`now the meme entry was removed as it is no longer relevant`)
     }
     UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT.run( JSON.stringify(new_array_tmp) , meme_filename )
   });
   // get the right difference ([1,2,3] diff -> [1,3,4] => [4]) and from [4] include/add this imagefilename in the array: diff2 = b.filter(x => !a.includes(x));
   add_as_memes_filenames = new_image_memes.filter(x => !current_image_memes.includes(x)); //new meme connections to record
-  console.log(`   7 => add_as_memes_filenames = ${add_as_memes_filenames}`)
   add_as_memes_filenames.forEach(async meme_filename => {
-    console.log(`   8 => meme_filename = ${meme_filename}`)
     meme_table_record = await Get_Tagging_MEME_Record_From_DB(meme_filename);
-    console.log(`   9 => meme_table_record = ${meme_table_record} : imageFileName=${imageFileName} : meme_table_record["imageFileNames"] = ${meme_table_record["imageFileNames"]} :  meme_table_record stringigy = ${JSON.stringify(meme_table_record)}`)
     meme_table_record["imageFileNames"].push( imageFileName )
-    console.log(`   10 => meme_table_record = ${meme_table_record} : meme_table_record stringify = ${JSON.stringify(meme_table_record)} : imageFileName=${imageFileName} : meme_table_record["imageFileNames"] = ${meme_table_record["imageFileNames"]} `)
     UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT.run( JSON.stringify(meme_table_record["imageFileNames"]) , meme_filename )
   });
 }
@@ -279,11 +264,9 @@ async function Meme_Tagging_Random_DB_Images(num_of_records) {
     if(filename_tmp[0] == undefined) {
       continue;
     }
-    console.log(`line 281: filename_tmp[0].imageFileName  = ${filename_tmp[0]}`)
     filenames.push(filename_tmp[0].imageMemeFileName)
   }
   if(filenames.length > 0) {
-    console.log(`line 284: filenames = ${filenames}`)
     filenames = [...new Set(filenames)];
     return filenames;
   } else {
@@ -373,21 +356,16 @@ exports.Set_ROWID_From_ROWID = Set_ROWID_From_ROWID
 
 //the function expects a +1,-1,0 for movement about the current rowid
 async function Step_Get_Collection_Annotation(collectionName,step) {
-  console.log(` dbfns line370; rowid_current_collection = ${rowid_current_collection}`)
-  console.log(` dbfn line 371; collectionName & step  = ${collectionName} and step = ${step}`)
   if( step == 0 && collectionName == '' ) {
     record = await GET_RECORD_FROM_ROWID_COLLECTION_STMT.get(rowid_current_collection);
     return Get_Collection_Obj_Fields_From_Record(record);
   }
   rowid_current_collection = await Get_ROWID_From_CollectionName(collectionName);
-  console.log(` line 377 dbfns rowid_current_collection = ${rowid_current_collection}`)
   if(step == 1) {
     rowid_res = await GET_NEXT_COLLECTION_ROWID_STMT.get(rowid_current_collection);
-    console.log(` line 380 dbfns = rowid_res = ${JSON.stringify(rowid_res)}`)
     if(rowid_res == undefined) {
       rowid_current_collection = rowid_min_collection;
     } else {
-      console.log(` line 384 dbfns = rowid_res.rowid = ${JSON.stringify(rowid_res.rowid)}`)
       rowid_current_collection = rowid_res.rowid;
     }
   } else if(step == -1) {
@@ -398,7 +376,6 @@ async function Step_Get_Collection_Annotation(collectionName,step) {
       rowid_current_collection = rowid_res.rowid;
     }
   }
-  console.log(` dbfns line 393; rowid_current_collection = ${rowid_current_collection}`)
   record = await GET_RECORD_FROM_ROWID_COLLECTION_STMT.get(rowid_current_collection);
   return Get_Collection_Obj_Fields_From_Record(record);
 }
@@ -427,7 +404,6 @@ function Get_Collection_Obj_Fields_From_Record(record) {
 //fn to insert into the collection DB the collection record of the 
 //column template: (collectionName TEXT, collectionImage TEXT, collectionDescription TEXT, collectionImageSet TEXT, collectionEmotions TEXT, collectionMemes TEXT)
 async function Insert_Collection_Record_Into_DB(collection_obj) {
-  console.log(` line 407: Insert Collection collection_obj stringify = ${JSON.stringify(collection_obj)}`)
   info = await INSERT_COLLECTION_STMT.run( collection_obj.collectionName, collection_obj.collectionImage, JSON.stringify(collection_obj.collectionImageSet),
                             collection_obj.collectionDescription, JSON.stringify(collection_obj.collectionDescriptionTags), JSON.stringify(collection_obj.collectionEmotions), JSON.stringify(collection_obj.collectionMemes) );
   await Set_Max_Min_Rowid_Collection();
@@ -500,17 +476,13 @@ function Get_Obj_Fields_From_Collection_MEME_Record(record) {
 async function Handle_Delete_Collection_MEME_references(imageFileName) {
   //this image may be a meme, get the meme links and from those images remove the refs to this imageFileName
   meme_row_obj = await GET_MEME_COLLECTION_TABLE_STMT.get(imageFileName);
-  console.log(`line497; meme_row_obj = ${JSON.stringify(meme_row_obj)}`)
   if(meme_row_obj == undefined) { //is not listed as a meme for any other image
     return
   }
   meme_row_obj = Get_Obj_Fields_From_Collection_MEME_Record(meme_row_obj);
-  console.log(`line502; meme_row_obj = ${JSON.stringify(meme_row_obj)}`)
   meme_row_obj["collectionNames"].forEach( async filename => {
     record_tmp = await Get_Collection_Record_From_DB(filename);
-    console.log(`line505; record_tmp = ${JSON.stringify(record_tmp)}`)
     new_meme_choices_tmp = record_tmp.collectionMemes.filter(item => item !== imageFileName)
-    console.log(`line507; record_tmp = ${JSON.stringify(new_meme_choices_tmp)}`)
     if( new_meme_choices_tmp.length != record_tmp.collectionMemes.length ) {
       record_tmp.collectionMemes = new_meme_choices_tmp
       await Update_Collection_Record_In_DB(record_tmp);
@@ -550,13 +522,13 @@ function Get_Obj_Fields_From_Collection_IMAGE_Record(record) {
 async function Update_Collection_IMAGE_Connections(collectionName,current_collection_images,new_collection_images) {
   // get the memes which no longer include this file (left difference [1,2,3] diff-> [1,3,4] => [2]) and from [2] remove/subtract the image filename from the array: difference = arr1.filter(x => !arr2.includes(x));
   remove_as_images_filenames = current_collection_images.filter(x => !new_collection_images.includes(x)); //remove from meme connection
-  remove_as_images_filenames.forEach(async iamge_filename => {
-    image_table_record = await Get_Collection_IMAGE_Record_From_DB(iamge_filename);
+  remove_as_images_filenames.forEach(async image_filename => {
+    image_table_record = await Get_Collection_IMAGE_Record_From_DB(image_filename);
     new_array_tmp = image_table_record.collectionNames.filter(item => item !== collectionName)
     if( new_array_tmp.length == 0) {
-      DELETE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.run( iamge_filename )
+      DELETE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.run( image_filename )
     } else {
-      UPDATE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.run( JSON.stringify(new_array_tmp) , iamge_filename )
+      UPDATE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.run( JSON.stringify(new_array_tmp) , image_filename )
     }
   });
   // get the right difference ([1,2,3] diff -> [1,3,4] => [4]) and from [4] include/add this imagefilename in the array: diff2 = b.filter(x => !a.includes(x));
@@ -573,17 +545,13 @@ exports.Update_Collection_IMAGE_Connections = Update_Collection_IMAGE_Connection
 async function Handle_Delete_Collection_IMAGE_references(imageFileName) {
   //this image may be a meme, get the meme links and from those images remove the refs to this imageFileName
   image_row_obj = await GET_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.get(imageFileName);
-  console.log(`line572; image_row_obj = ${JSON.stringify(image_row_obj)}`)
   if(image_row_obj == undefined) { //is not listed as a meme for any other image
     return
   }
   image_row_obj = Get_Obj_Fields_From_Collection_MEME_Record(image_row_obj);
-  console.log(`line577; image_row_obj = ${JSON.stringify(image_row_obj)}`)
   image_row_obj["collectionNames"].forEach( async name => {
     collection_tmp = await Get_Collection_Record_From_DB(name);
-    console.log(`line580; collection_tmp = ${JSON.stringify(collection_tmp)}`)
     new_image_choices_tmp = collection_tmp.collectionImageSet.filter(item => item !== imageFileName)
-    console.log(`line582; collection_tmp = ${JSON.stringify(new_image_choices_tmp)}`)
     if( new_image_choices_tmp.length != collection_tmp.collectionImageSet.length ) {
       //new imageset allocated
       collection_tmp.collectionImageSet = new_image_choices_tmp 
@@ -600,27 +568,8 @@ async function Handle_Delete_Collection_IMAGE_references(imageFileName) {
         collection_tmp.collectionImage = collection_tmp.collectionImageSet[rand_ind]
         await Update_Collection_Record_In_DB(collection_tmp);
       } else if( collection_tmp.collectionImageSet.length == 0 ) {
-        pic_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + 'Taga.png'
-        if( FS.existsSync(pic_path_tmp) == false ) {
-          taga_source_path = PATH.resolve()+PATH.sep+'Taga.png';
-          FS.copyFileSync(taga_source_path, `${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL);
-        }
-        var emtpy_annotation_tmp = {
-                  "imageFileName": '',
-                  "imageFileHash": '',
-                  "taggingRawDescription": "",
-                  "taggingTags": [],
-                  "taggingEmotions": {good:0,bad:0},
-                  "taggingMemeChoices": []
-                  }
-        tagging_entry = JSON.parse(JSON.stringify(emtpy_annotation_tmp)); //clone the default obj
-        tagging_entry.imageFileName = 'Taga.png';
-        tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
-        await Insert_Record_Into_DB(tagging_entry); //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
-
-        collection_tmp.collectionImageSet = ['Taga.png']
-        collection_tmp.collectionImage = 'Taga.png'
-        await Update_Collection_Record_In_DB(collection_tmp);
+        //delete the collection since there are no images left, without images it fails to be a collection
+        await Delete_Collection_Record_In_DB(collection_tmp.collectionName);
       }
     }
   })

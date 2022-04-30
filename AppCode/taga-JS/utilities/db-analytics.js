@@ -1,6 +1,6 @@
 PATH = require('path');
 
-const { TAGGING_DB_MODULE, DB_MODULE, MAX_SAMPLE_COUNT_RECORDS } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const { DB_MODULE, MAX_SAMPLE_COUNT_RECORDS } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 
 var number_of_records;
@@ -37,19 +37,14 @@ function Harmonic_Mean(arr) {
 }
 
 async function Display_Skill_Levels() {
-    // await TAGGING_DB_MODULE.Create_Db()
 
-    //all_data = await fns_DB.Return_All_DB_Data().then(function (results) { return results })
     random_filenames = await Tagging_Random_DB_Images(sample_num)
-    console.log(`random_filenames  = ${random_filenames}`)
     total_tagged_images = 0
     meme_connected_images = 0
     emotion_stamped_images = 0
     images_scores_array = []
     for(filename of random_filenames) {    
-        console.log(`line 53: filename = ${filename}`)
         record_tmp = await Get_Tagging_Annotation_From_DB(filename);
-        console.log(`line 55: record_tmp string = ${JSON.stringify(record_tmp)}`)
 
         try{ non_empty_entry = (record_tmp.taggingTags).find(element => element != "") 
         } catch { non_empty_entry = undefined }
@@ -87,7 +82,6 @@ async function Display_Skill_Levels() {
 async function Init_Analytics() {
     number_of_records = await Number_of_Tagging_Records();
     sample_num = number_of_records < MAX_SAMPLE_COUNT_RECORDS ? number_of_records : MAX_SAMPLE_COUNT_RECORDS
-    console.log(sample_num)
     Display_Skill_Levels()
 }
 

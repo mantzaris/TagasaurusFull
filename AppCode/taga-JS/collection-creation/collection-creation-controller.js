@@ -142,8 +142,6 @@ async function Creation_Next_Btn() {
     }
     //the next button was pressed while at the final step so we now are completed and return after storing in DB new collection
     if(creation_step_num == 5) {
-        console.log("complete now!")
-        console.log("COLLECTION_DEFAULT_EMPTY_OBJECT="+JSON.stringify(COLLECTION_DEFAULT_EMPTY_OBJECT))
         //await COLLECTION_DB_MODULE.Insert_Record(COLLECTION_DEFAULT_EMPTY_OBJECT) //!!!indexeddb !!!
         await Insert_Collection_Record_Into_DB(COLLECTION_DEFAULT_EMPTY_OBJECT)
         await Update_Collection_MEME_Connections(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName, [], COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes)

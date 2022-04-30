@@ -67,6 +67,10 @@ async function Get_Tagging_Annotation_From_DB(image_name) { //
     return await DB_MODULE.Get_Tagging_Record_From_DB(image_name);
 }
 
+async function Get_Tagging_Hash_From_DB(hash) {
+    return await DB_MODULE.Get_Tagging_Hash_From_DB(hash)
+}
+
 
 async function Tagging_Random_DB_Images(num_of_records) {
     return await DB_MODULE.Tagging_Random_DB_Images(num_of_records)
@@ -136,7 +140,6 @@ async function Delete_Collection() {
     await Update_Collection_MEME_Connections(current_collection_obj.collectionName,current_collection_obj.collectionMemes,[])
     await Update_Collection_IMAGE_Connections(current_collection_obj.collectionName,current_collection_obj.collectionImageSet,[])
     collections_remaining = await Delete_Collection_Record_In_DB(current_collection_obj.collectionName)
-    console.log(`collections_remaining = ${collections_remaining}`)
     if(collections_remaining == 0) {
         await Handle_Empty_DB();
     }
@@ -361,11 +364,9 @@ function Display_Gallery_Images() {
     gallery_div = document.getElementById("collections-images-gallery-grid-images-div-id")
     gallery_html_tmp = ''
     image_set = current_collection_obj.collectionImageSet
-    console.log(`line 346; image_set = ${image_set}`)
     image_set.forEach(function(image_filename) {
         image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
-            console.log(` line 350 ; image_path_tmp exists = > ${image_path_tmp}`)
             gallery_html_tmp += `
                                 <div class="collection-images-gallery-grid-item-class">
                                     <label class="memeswitch" title="deselect / keep">
@@ -443,8 +444,26 @@ async function Check_Gallery_And_Profile_Image_Integrity(){
     profile_pic_present_bool = FS.existsSync(image_path_profile_pic)
     //1-profile image is missing, and image set is empty (or none present to show)
     if(profile_pic_present_bool == false && image_set_present.length == 0) {
-        current_collection_obj.collectionImage = 'Taga.png'
-        current_collection_obj.collectionImageSet.push('Taga.png')
+        default_path = PATH.resolve()+PATH.sep+'Taga.png';
+        default_hash = MY_FILE_HELPER.Return_File_Hash(default_path);
+        hash_tmp = Get_Tagging_Hash_From_DB(default_hash)
+        filename_tmp = 'Taga.png'
+        if( hash_tmp == undefined ) {
+            filename_tmp = await MY_FILE_HELPER.Copy_Non_Taga_Files(default_path,TAGA_DATA_DIRECTORY,Get_Tagging_Hash_From_DB);
+            var tagging_entry = {
+                "imageFileName": '',
+                "imageFileHash": '',
+                "taggingRawDescription": "",
+                "taggingTags": [],
+                "taggingEmotions": {good:0,bad:0},
+                "taggingMemeChoices": []
+            }
+            tagging_entry.imageFileName = filename_tmp
+            tagging_entry.imageFileHash = default_hash
+            Insert_Record_Into_DB(tagging_entry); //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
+        }
+        current_collection_obj.collectionImage = filename_tmp
+        current_collection_obj.collectionImageSet.push(filename_tmp)
         changes_made = true
     } //2-profile image is missing and image set is not empty (some shown)
     else if(profile_pic_present_bool == false && image_set_present.length > 0) {
@@ -520,8 +539,6 @@ async function Show_Collection() {
 
 //called from the gallery widget, where 'n' is the number of images forward or backwards to move
 async function New_Collection_Display(n) {
-    console.log(` line 510; New_Collection_Display(n) n = ${n}`)
-    console.log( ` line 511; current_collection_obj = ${JSON.stringify(current_collection_obj)} `)
     if( current_collection_obj == undefined || n == 0 ) {
         current_collection_obj = await Step_Get_Collection_Annotation('',0);
     } else if(n == 1) {
@@ -529,7 +546,6 @@ async function New_Collection_Display(n) {
     } else if(n == -1) {
         current_collection_obj = await Step_Get_Collection_Annotation(current_collection_obj.collectionName,-1);
     }
-    console.log( ` line 519; current_collection_obj = ${JSON.stringify(current_collection_obj)} `)
     Show_Collection();
 }
 
@@ -636,7 +652,6 @@ async function Initialize_Collection_Page(){
         collection_name_param = window.location.search.split("=")[1]
         //current_key_index = all_collection_keys.indexOf(collection_name_param)//!!!indexeddb !!!
         //await Show_Collection(collection_name_param)
-        console.log(` line605 controller start; collection_name_param = ${collection_name_param}`)
         current_collection_obj = await Get_Collection_Record_From_DB(collection_name_param) 
         row_id_tmp = await Get_ROWID_From_CollectionName(current_collection_obj.collectionName)
         Set_ROWID_From_ROWID( row_id_tmp )

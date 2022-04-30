@@ -327,7 +327,6 @@ async function First_Display_Init() {
     }, false);
 
     records_remaining = await Number_of_Tagging_Records();
-    console.log(`records_remaining = ${records_remaining}`)
     if(records_remaining == 0) {
         Load_Default_Taga_Image();
     }
@@ -383,7 +382,6 @@ async function Delete_Image() {
         FS.unlinkSync( `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation.imageFileName}` );
     }
     records_remaining = await Delete_Tagging_Annotation_DB( current_image_annotation.imageFileName );
-    console.log(`records_remaining = ${records_remaining}`)
     if(records_remaining == 0) {
         await Load_Default_Taga_Image();
     }
@@ -796,9 +794,7 @@ async function Add_New_Meme(){
                     }
             }
         }
-        console.log(`1 => current_image_annotation.imageFileName=${current_image_annotation.imageFileName} : memes_current=${memes_current} : meme_switch_booleans=${meme_switch_booleans}`)
         await Update_Tagging_MEME_Connections(current_image_annotation.imageFileName,JSON.parse(JSON.stringify(memes_current)),JSON.parse(JSON.stringify(meme_switch_booleans)))
-        console.log(`EXIT => current_image_annotation.imageFileName=${current_image_annotation.imageFileName} : memes_current=${memes_current} : meme_switch_booleans=${meme_switch_booleans}`)
         meme_switch_booleans.push(...current_image_annotation.taggingMemeChoices)
         current_image_annotation.taggingMemeChoices = [...new Set(meme_switch_booleans)] //add a 'unique' set of memes as the 'new Set' has unique contents
         await Update_Tagging_Annotation_DB(current_image_annotation);
