@@ -102,35 +102,6 @@ async function Get_Tagging_Annotation_From_DB(image_name) { //
 }
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END<<<
 
-// **MODEL ACCESS FUNCTIONS START**
-//pass the entity name which is the key to remove the collection from the DB
-// async function Create_Collection_DB_Instance() {
-//     await COLLECTION_DB_MODULE.Create_Db()
-// }
-// async function Insert_Collection_Record_Into_DB(obj) {
-//     COLLECTION_DB_MODULE.Insert_Record(obj)
-// }
-// async function Get_Collection_Record_In_DB(entity_key) {
-//     return await COLLECTION_DB_MODULE.Get_Record(entity_key)
-// }
-// async function Update_Collection_In_DB(current_collection_obj) {
-//     await COLLECTION_DB_MODULE.Update_Record(current_collection_obj)
-// }
-// async function Refresh_Collection_Keys_From_DB() {
-//     await COLLECTION_DB_MODULE.Get_All_Keys_From_DB() //refresh the current key list
-//     all_collection_keys = COLLECTION_DB_MODULE.Read_All_Keys_From_DB() //retrieve that key list and set to the local global variable
-// }
-// async function Create_Tagging_DB_Instance() {
-//     await TAGGING_DB_MODULE.Create_Db()
-// }
-// async function Get_Tagging_Record_In_DB(filename) {
-//     return await TAGGING_DB_MODULE.Get_Record(filename)
-// }
-// async function Set_All_Image_Keys_In_Tagging_DB() {
-//     await TAGGING_DB_MODULE.Get_All_Keys_From_DB()
-//     all_image_keys = TAGGING_DB_MODULE.Read_All_Keys_From_DB()
-// }
-// **MODEL ACCESS FUNCTIONS END**
 
 
 
@@ -143,7 +114,7 @@ async function Delete_Collection() {
     if(collections_remaining == 0) {
         await Handle_Empty_DB();
     }
-    //Show_Collection_From_Key_Or_Current_Collection( 0 ) //!!!indexeddb !!!
+    
     New_Collection_Display( 0 )
 }
 
@@ -181,7 +152,7 @@ async function Save_Collection_Description() {
     current_collection_obj.collectionDescription = document.getElementById("collection-image-annotation-description-textarea-id").value
     //now process  description text in order to have the tags
     current_collection_obj.collectionDescriptionTags = DESCRIPTION_PROCESS_MODULE.process_description(current_collection_obj.collectionDescription)
-    //Update_Collection_In_DB(current_collection_obj) //!!!indexeddb !!!
+    
     await Update_Collection_Record_In_DB(current_collection_obj)
     Collection_Description_Page()
 }
@@ -233,7 +204,7 @@ async function Delete_Emotion(emotion_key){
     element_emotion_entry_div = document.getElementById('emotion-entry-div-id-'+emotion_key);
     element_emotion_entry_div.remove();    
     delete current_collection_obj["collectionEmotions"][emotion_key];
-    //await Update_Collection_In_DB(current_collection_obj) //!!!indexeddb !!!
+    
     await Update_Collection_Record_In_DB(current_collection_obj)
     Collection_Emotion_Page()
 }
@@ -243,7 +214,6 @@ async function Save_Collection_Emotions() {
     for( var key of Object.keys(current_collection_obj["collectionEmotions"]) ) {
         current_collection_obj["collectionEmotions"][key] = document.getElementById('emotion-range-id-'+key).value
     }
-    //Update_Collection_In_DB(current_collection_obj) //!!!indexeddb !!!
     await Update_Collection_Record_In_DB(current_collection_obj)
     Collection_Emotion_Page()
 }
@@ -256,7 +226,7 @@ async function Add_New_Emotion() {
         if(boolean_included == false){            
             new_emotion_value = document.getElementById("collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id").value;
             current_collection_obj["collectionEmotions"][new_emotion_text] = new_emotion_value;
-            //await Update_Collection_In_DB(current_collection_obj) //!!!indexeddb !!!
+            
             await Update_Collection_Record_In_DB(current_collection_obj)
             //do not save upon addition of a new emotion, the save button is necessary
             document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value = "";
@@ -349,7 +319,7 @@ async function Save_Meme_Changes(){
         }
     }
     current_collection_obj.collectionMemes = meme_switch_booleans
-    //await Update_Collection_In_DB(current_collection_obj) //!!! indexeddb !!!
+    
     await Update_Collection_Record_In_DB(current_collection_obj)
     await Update_Collection_MEME_Connections(current_collection_obj.collectionName,current_memes,meme_switch_booleans)
     Collection_Memes_Page()
@@ -420,7 +390,7 @@ async function Save_Gallery_Changes() {
     length_new = gallery_switch_booleans.length
     if(length_new < length_original){
         current_collection_obj.collectionImageSet = gallery_switch_booleans
-        //await Update_Collection_In_DB(current_collection_obj) //!!!indexeddb !!!
+        
         await Update_Collection_Record_In_DB(current_collection_obj)
         await Check_Gallery_And_Profile_Image_Integrity()
         await Update_Collection_IMAGE_Connections(current_collection_obj.collectionName,current_images,current_collection_obj.collectionImageSet)
@@ -439,8 +409,8 @@ async function Check_Gallery_And_Profile_Image_Integrity(){
                                                     return false
                                                 }
                                                 }).filter( (e) => e != false)
-    entity_profile_pic = current_collection_obj.collectionImage
-    image_path_profile_pic = TAGA_DATA_DIRECTORY + PATH.sep + entity_profile_pic
+    profile_pic = current_collection_obj.collectionImage
+    image_path_profile_pic = TAGA_DATA_DIRECTORY + PATH.sep + profile_pic
     profile_pic_present_bool = FS.existsSync(image_path_profile_pic)
     //1-profile image is missing, and image set is empty (or none present to show)
     if(profile_pic_present_bool == false && image_set_present.length == 0) {
@@ -481,7 +451,7 @@ async function Check_Gallery_And_Profile_Image_Integrity(){
     }
 
     if(changes_made == true){
-        //await Update_Collection_In_DB(current_collection_obj) //!!!indexeddb !!!
+        
         await Update_Collection_Record_In_DB(current_collection_obj)
         await Update_Collection_IMAGE_Connections(current_collection_obj.collectionName,image_set,current_collection_obj.collectionImageSet)
     }
@@ -491,15 +461,11 @@ async function Check_Gallery_And_Profile_Image_Integrity(){
 //we use the key to pull the entity object from the DB, or if use_key=0 take the value
 //from the existing entity object global variable, also handles empty cases
 async function Show_Collection() {
-    //if using the key, the global object for the current entity shown is updated and this is 
-    //used, or else the current view from the data is presented.
-    // if(use_key == 1) { //!!!indexeddb !!!
-    //     current_collection_obj = await Get_Collection_Record_From_DB(entity_key_or_obj) //Get_Collection_Record_In_DB(entity_key_or_obj) //!!! indexeddb !!!
-    // }
+    
     //check for issues
     reload_bool = Check_Gallery_And_Profile_Image_Integrity()
     if(reload_bool == true) {
-        current_collection_obj = await Get_Collection_Record_From_DB(entity_key_or_obj) //Get_Collection_Record_In_DB(entity_key_or_obj) //!!! indexeddb !!!
+        current_collection_obj = await Get_Collection_Record_From_DB(current_collection_obj.collectionName)
     }
     document.getElementById("collection-profile-image-img-id").src = TAGA_DATA_DIRECTORY + PATH.sep + current_collection_obj.collectionImage;
     document.getElementById("collection-profile-image-img-id").onclick = function (event) {
@@ -518,24 +484,6 @@ async function Show_Collection() {
         Collection_Memes_Page()
     }
 }
-
-//functions for the button calls to go through the collections
-// function Prev_Collection() {
-//     if(current_key_index > 0) {
-//         current_key_index += -1
-//     } else {
-//         current_key_index = all_collection_keys.length-1
-//     }
-//     Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index])
-// }
-// async function Next_Collection() {
-//     if(current_key_index < all_collection_keys.length-1) {
-//         current_key_index += 1
-//     } else {
-//         current_key_index = 0
-//     }
-//     Show_Collection_From_Key_Or_Current_Collection(all_collection_keys[current_key_index])
-// }
 
 //called from the gallery widget, where 'n' is the number of images forward or backwards to move
 async function New_Collection_Display(n) {
@@ -575,7 +523,7 @@ async function Handle_Empty_DB() {
     new_default_obj.collectionName = 'Taga' + '0'.repeat(10 - rand_int.toString().length) + Math.floor(Math.random() * 1000000);
     new_default_obj.collectionImage = 'Taga.png'
     new_default_obj.collectionImageSet = ['Taga.png']
-    //await Insert_Collection_Record_Into_DB(new_default_obj) //!!! indexeddb !!!
+    
     await Insert_Collection_Record_Into_DB(new_default_obj)
     current_collection_obj = new_default_obj
     await Update_Collection_IMAGE_Connections(current_collection_obj.collectionName,[],current_collection_obj.collectionImageSet)
@@ -604,11 +552,9 @@ async function Initialize_Collection_Page(){
         Collection_Memes_Page()
     })
     document.getElementById("collection-control-button-previous-id").addEventListener("click", async function (event) {
-        //Prev_Collection() //!!!indexeddb !!!!
         await New_Collection_Display(-1)
     })
     document.getElementById("collection-control-button-next-id").addEventListener("click", async function (event) {
-        //Next_Collection() //!!!indexeddb !!!
         await New_Collection_Display(1)
     })
     document.getElementById("collection-image-annotation-description-textarea-save-button-id").addEventListener("click", function (event) {
@@ -639,10 +585,7 @@ async function Initialize_Collection_Page(){
         Add_Meme_Images()
     })
     
-    //await Create_Tagging_DB_Instance() //!!!indexeddb !!!
-    //await Create_Collection_DB_Instance() //sets a global variable in the module to hold the DB for access //!!!indexeddb !!!
-    //await Refresh_Collection_Keys_From_DB() //!!!indexeddb !!!
-    //await Set_All_Image_Keys_In_Tagging_DB() //!!!indexeddb !!!
+    
     record_num_tmp = await Number_of_Collection_Records()
     if( record_num_tmp == 0) {
         await Handle_Empty_DB()
@@ -650,14 +593,13 @@ async function Initialize_Collection_Page(){
 
     if (window.location.href.indexOf("collectionName") > -1) {
         collection_name_param = window.location.search.split("=")[1]
-        //current_key_index = all_collection_keys.indexOf(collection_name_param)//!!!indexeddb !!!
-        //await Show_Collection(collection_name_param)
+        
         current_collection_obj = await Get_Collection_Record_From_DB(collection_name_param) 
         row_id_tmp = await Get_ROWID_From_CollectionName(current_collection_obj.collectionName)
         Set_ROWID_From_ROWID( row_id_tmp )
         await New_Collection_Display( 0 )
     } else {
-        //await Show_Collection(all_collection_keys[0]) //set the first entity to be seen, populate entity object data on view //!!!indexeddb !!!
+        
         await New_Collection_Display( 0 )
     }
 }
@@ -688,7 +630,6 @@ async function Image_Clicked_Modal(filename){
         }
     }  
 
-    //img_record_obj = await Get_Tagging_Record_In_DB(filename) //!!!indexeddb !!!
     img_record_obj = await Get_Tagging_Annotation_From_DB(filename)
     tag_array = img_record_obj["taggingTags"]
     modal_html_tmp = `Tags: `
@@ -812,7 +753,7 @@ async function Change_Profile_Image() {
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).onclick = async function() {
                 current_collection_obj.collectionImage = image_filename
-                await Update_Collection_In_DB(current_collection_obj)
+                await Update_Collection_Record_In_DB(current_collection_obj)
                 document.getElementById("collection-profile-image-img-id").src = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
                 modal_profile_img_change.style.display = "none";
             }
@@ -863,7 +804,7 @@ async function Collection_Profile_Image_Search_Action() {
     document.querySelectorAll(".modal-image-search-profileimageresult-single-image-div-class").forEach(el => el.remove());
     profile_search_display_inner_tmp = ''
     profile_img_sorted.forEach( image_filename => {
-        //image_filename = current_collection_obj.collectionImageSet[index] //!!!indices !!!
+        
         image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true) {
             profile_search_display_inner_tmp += `
@@ -892,7 +833,7 @@ async function Collection_Profile_Image_Search_Action() {
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).onclick = async function() {
                 current_collection_obj.collectionImage = image_filename
-                //await Update_Collection_In_DB(current_collection_obj) //!!!indexeddb !!!
+                
                 await Update_Collection_Record_In_DB(current_collection_obj)
                 document.getElementById("collection-profile-image-img-id").src = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
                 document.getElementById("search-profileimage-modal-click-top-id").style.display = "none";
@@ -1032,7 +973,7 @@ async function Add_Gallery_Images() {
             }
         })
         if(update == true) {
-            // await Update_Collection_In_DB(current_collection_obj) //!!!indexeddb !!!
+            
             await Update_Collection_Record_In_DB(current_collection_obj)
             await Update_Collection_IMAGE_Connections(current_collection_obj.collectionName,imageSet_original,current_collection_obj.collectionImageSet)
             await Show_Collection()   
@@ -1092,9 +1033,6 @@ async function Collection_Add_Image_Search_Action() {
     
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
-    // image_search_result_obj = await SEARCH_MODULE.Image_Addition_Search_Fn(collection_gallery_search_obj,all_image_keys,Get_Tagging_Record_In_DB) //!!! indexeddb !!!
-    // img_indices_sorted = image_search_result_obj.imgInds  //!!! indexeddb !!!
-    // meme_img_indices_sorted = image_search_result_obj.memeInds //!!! indexeddb !!!
 
     tagging_db_iterator = await Tagging_Image_DB_Iterator();
     search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_gallery_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
@@ -1106,7 +1044,7 @@ async function Collection_Add_Image_Search_Action() {
     search_display_div.innerHTML = ""
     search_display_inner_tmp = ''
     search_image_results.forEach( image_filename => {
-        // image_filename = all_image_keys[index] //!!!indexeddb !!!
+        
         image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
             search_display_inner_tmp += `
@@ -1126,7 +1064,7 @@ async function Collection_Add_Image_Search_Action() {
     search_meme_display_div.innerHTML = ""
     search_display_inner_tmp = ''
     search_image_meme_results.forEach( image_filename => {
-        //image_filename = all_image_keys[index] //!!!indexeddb !!!
+        
         image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
             search_display_inner_tmp += `
@@ -1369,12 +1307,6 @@ async function Collection_Add_Memes_Search_Action(){
     collection_meme_search_obj["searchMemeTags"] = search_unique_meme_search_terms
     //emotion keys-values for tags and memes should already be in: collection_meme_search_obj
 
-    //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
-    //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
-    // meme_search_result_obj = await SEARCH_MODULE.Meme_Addition_Search_Fn(collection_meme_search_obj,all_image_keys,Get_Tagging_Record_In_DB) //!!!indexeddb !!!
-    // img_indices_sorted = meme_search_result_obj.imgInds  
-    // meme_img_indices_sorted = meme_search_result_obj.memeInds
-
     tagging_db_iterator = await Tagging_Image_DB_Iterator();
     meme_search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_meme_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
     tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
@@ -1385,7 +1317,7 @@ async function Collection_Add_Memes_Search_Action(){
     search_display_div.innerHTML = ""
     search_display_inner_tmp = ''
     meme_search_image_results.forEach( image_filename => {
-        //image_filename = all_image_keys[index] //!!!indexeddb !!!
+        
         image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionMemes.includes(image_filename)==false) {
             search_display_inner_tmp += `
@@ -1405,7 +1337,7 @@ async function Collection_Add_Memes_Search_Action(){
     search_meme_display_div.innerHTML = ""
     search_display_inner_tmp = ''
     meme_search_image_meme_results.forEach( image_filename => {
-        //image_filename = all_image_keys[index] //!!!indexeddb !!!
+        
         image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionMemes.includes(image_filename)==false) {
             search_display_inner_tmp += `
@@ -1442,3 +1374,42 @@ async function Collection_Add_Memes_Search_Action(){
     // for (var i = 0; i < len; ++i) indices[i] = i;
     // indices.sort(function (a, b) { return test[a] < test[b] ? -1 : test[a] > test[b] ? 1 : 0; });
     // console.log(indices); // prints [2,3,0,1]
+
+
+
+// **MODEL ACCESS FUNCTIONS START**
+//pass the entity name which is the key to remove the collection from the DB
+// async function Create_Collection_DB_Instance() {
+//     await COLLECTION_DB_MODULE.Create_Db()
+// }
+// async function Insert_Collection_Record_Into_DB(obj) {
+//     COLLECTION_DB_MODULE.Insert_Record(obj)
+// }
+// async function Get_Collection_Record_In_DB(entity_key) {
+//     return await COLLECTION_DB_MODULE.Get_Record(entity_key)
+// }
+// async function Update_Collection_In_DB(current_collection_obj) {
+//     await COLLECTION_DB_MODULE.Update_Record(current_collection_obj)
+// }
+// async function Refresh_Collection_Keys_From_DB() {
+//     await COLLECTION_DB_MODULE.Get_All_Keys_From_DB() //refresh the current key list
+//     all_collection_keys = COLLECTION_DB_MODULE.Read_All_Keys_From_DB() //retrieve that key list and set to the local global variable
+// }
+// async function Create_Tagging_DB_Instance() {
+//     await TAGGING_DB_MODULE.Create_Db()
+// }
+// async function Get_Tagging_Record_In_DB(filename) {
+//     return await TAGGING_DB_MODULE.Get_Record(filename)
+// }
+// async function Set_All_Image_Keys_In_Tagging_DB() {
+//     await TAGGING_DB_MODULE.Get_All_Keys_From_DB()
+//     all_image_keys = TAGGING_DB_MODULE.Read_All_Keys_From_DB()
+// }
+// **MODEL ACCESS FUNCTIONS END**
+
+//await Create_Tagging_DB_Instance() //!!!indexeddb !!!
+    //await Create_Collection_DB_Instance() //sets a global variable in the module to hold the DB for access //!!!indexeddb !!!
+    //await Refresh_Collection_Keys_From_DB() //!!!indexeddb !!!
+    //await Set_All_Image_Keys_In_Tagging_DB() //!!!indexeddb !!!
+
+

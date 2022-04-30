@@ -3,7 +3,7 @@
 const PATH = require('path');
 const FS = require('fs');
 
-const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, TAGGING_DB_MODULE, COLLECTION_DB_MODULE, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MASONRY } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MASONRY } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 const { CLOSE_ICON_RED, CLOSE_ICON_BLACK } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 
@@ -23,7 +23,6 @@ COLLECTION_DEFAULT_EMPTY_OBJECT = {
 
 
 var creation_step_num = 1 //of all the creation steps which one is the current one
-//var all_image_keys; // each image key in the tagging db
 var profile_search_image_results = '';
 
 var search_image_results = '';
@@ -142,7 +141,6 @@ async function Creation_Next_Btn() {
     }
     //the next button was pressed while at the final step so we now are completed and return after storing in DB new collection
     if(creation_step_num == 5) {
-        //await COLLECTION_DB_MODULE.Insert_Record(COLLECTION_DEFAULT_EMPTY_OBJECT) //!!!indexeddb !!!
         await Insert_Collection_Record_Into_DB(COLLECTION_DEFAULT_EMPTY_OBJECT)
         await Update_Collection_MEME_Connections(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName, [], COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes)
         COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.push(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage)
@@ -221,10 +219,7 @@ async function Initialize_Collection_Creation_Page() {
         Save_Meme_Changes()
     })
 
-    //init the collection DB
-    //await Create_Collection_DB_Instance() //!!!indexeddb !!!
-    //await Create_Tagging_DB_Instance() //!!!indexeddb !!!
-    //await Set_All_Image_Keys_In_Tagging_DB() //!!!indexeddb !!!
+    
     document.getElementById("creation-back-button-id").style.display = "none"
 }
 //the key starting point for the page>>>>>>>>>>>>
@@ -413,7 +408,7 @@ async function Check_Collection_Name() {
     if(collection_name_text_area == "") {
         return false
     }
-    //collection_obj = await Get_Collection_Record_In_DB(collection_name_text_area) //!!!indexeddb !!!
+    
     collection_obj = await Get_Collection_Record_From_DB(collection_name_text_area)
     if(collection_obj != undefined) {
         return false//exit without proceeding until unique name supplied

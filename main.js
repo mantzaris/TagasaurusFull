@@ -4,7 +4,6 @@ const {app, ipcMain, dialog, BrowserWindow} = require('electron');
 const PATH = require('path');
 const FS = require('fs');
 
-const TAGA_IMAGE_DIRECTORY = PATH.resolve(PATH.resolve(),'images') //!!! remove old reference
 const TAGA_FILES_DIRECTORY = PATH.join(PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles')
 const TAGA_DATA_DIRECTORY = PATH.resolve(TAGA_FILES_DIRECTORY,'data') 
 
@@ -131,7 +130,7 @@ ipcMain.handle('dialog:tagging-new-file-select', async (event, args) => {
 })
 //for the ability to load the entity creation for the selection of a profile image set
 ipcMain.handle('dialog:openEntityImageSet', async (_, args) => {
-  const result = dialog.showOpenDialog({ properties: ['openFile', 'multiSelections' ], defaultPath: TAGA_IMAGE_DIRECTORY }) //!!! remove old reference
+  const result = dialog.showOpenDialog({ properties: ['openFile', 'multiSelections' ], defaultPath: TAGA_DATA_DIRECTORY }) //!!! remove old reference
   return result
 })
 //for the ability to save a data export
