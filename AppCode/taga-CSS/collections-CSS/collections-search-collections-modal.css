@@ -217,25 +217,7 @@
   font-weight: bold;
   /* border-right: 2px #00c600 solid; */
 }
-/* #modal-search-images-memes-results-button-div-id {
-  background-color: #00c600;
 
-  /* height: 100%; */
-/* display: flex; */
-/* align-items: center; */
-/* justify-content: center; */
-/* grid-area: modal-search-images-memes-results-button-div-id; */
-/* }  */
-/* #modal-search-images-results-select-meme-images-order-button-id {
-  background-color: #1884ff;
-  /* height: 70%; */
-/* border-radius: 10%; */
-/* margin: 2px; */
-/* width: 70%; */
-/* font-size: 2.75vmin; */
-/* font-weight: bold; */
-/* border-left: 2px #00c600 solid; */
-/* } */
 #collections-modal-search-images-results-grid-div-area-id {
   background-color: #005000;
   overflow-y: scroll;
@@ -265,6 +247,7 @@
 .collection-selection-preview-single {
   min-height: 0; /* NEW */
   min-width: 0; /* NEW; needed for Firefox */
+  width: 100%;
 
   cursor: pointer;
   display: grid;
@@ -272,8 +255,8 @@
   grid-template-rows: 1fr 11fr;
   box-sizing: border-box;
   grid-template-areas:
-    "    collection-name-result-div-class       .      "
-    " collections-modal-search-thumbnail-img    .   ";
+    "    collection-name-result-div-class                  .  "
+    "  collections-modal-search-thumbnail-img    collections-search-result-collections-img-set-class   ";
 }
 
 .collection-name-result-div-class {
@@ -299,4 +282,27 @@
   display: block;
   margin: auto auto;
 }
-/* IMAGE SEARCH RESULTS END */
+
+.collections-search-result-collections-img-set-class {
+  grid-area: collections-search-result-collections-img-set-class;
+  /* background-color: crimson; */
+  padding-left: 8px;
+  width: 98%;
+  max-height: 27vh; /* height: 100%; */
+
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  overflow-x: auto;
+}
+
+.collections-modal-search-result-collection-gallery-img-class {
+  max-height: 24vh;
+  max-width: 40vw;
+  padding: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* COLLECTIONS SEARCH RESULTS END */
