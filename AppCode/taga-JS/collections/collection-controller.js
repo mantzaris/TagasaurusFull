@@ -100,6 +100,10 @@ async function Insert_Record_Into_DB(tagging_obj) {
 async function Get_Tagging_Annotation_From_DB(image_name) { //
     return await DB_MODULE.Get_Tagging_Record_From_DB(image_name);
 }
+
+async function Random_DB_Collections(num_of_records) {
+    return await DB_MODULE.Random_DB_Collections(num_of_records)
+}
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END<<<
 
 
@@ -584,7 +588,9 @@ async function Initialize_Collection_Page(){
     document.getElementById("collection-image-annotation-memes-new-memes-add-button-id").addEventListener("click", function (event) {
         Add_Meme_Images()
     })
-    
+    document.getElementById("collection-control-button-searchcollections-id").addEventListener("click", function (event) {
+        Search_Collections()
+    })
     
     record_num_tmp = await Number_of_Collection_Records()
     if( record_num_tmp == 0) {
@@ -1353,6 +1359,281 @@ async function Collection_Add_Memes_Search_Action(){
     })
     search_meme_display_div.innerHTML += search_display_inner_tmp
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // for( collectionName_tmp  of  rand_collections_init  ) {
+    // //await rand_collections_init.forEach( async collectionName_tmp => {
+    //     collection_tmp = await Get_Collection_Record_From_DB(collectionName_tmp)
+
+    //     console.log(` collection_tmp = ${JSON.stringify(collection_tmp)}`)
+        
+    //     image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + collection_tmp.collectionImage
+    //     collections_search_display_inner_tmp += `
+    //                                         <div class="modal-image-search-collections-single-collection-div-class" id="modal-collection-search-collectionresult-single-collection-div-id-${collectionName_tmp}">
+    //                                             <img class="modal-collection-search-collectionresult-single-collection-img-obj-class" id="modal-collection-search-collectionresult-single-image-img-id-${collectionName_tmp}" src="${image_path_tmp}" title="view" alt="image"/>
+    //                                         </div>
+    //                                         `
+
+
+        
+    //     // collections_search_display_inner_tmp += `
+    //     //                                     <div class="modal-image-search-collections-single-collection-div-class" id="modal-collection-search-collectionresult-single-collection-div-id-${image_filename}">
+    //     //                                         <img class="modal-image-search-profileimageresult-single-image-img-obj-class" id="modal-image-search-profileimageresult-single-image-img-id-${image_filename}" src="${image_path_tmp}" title="view" alt="image"/>
+    //     //                                     </div>
+    //     //                                     `
+
+
+
+
+        
+    // }  //)
+
+    // collections_search_display_div.innerHTML = collections_search_display_inner_tmp
+    // console.log(` collections_search_display_div.innerHTML = ${collections_search_display_div.innerHTML}`)
+
+
+    // return 
+
+
+//search the collections obj of user fields
+
+//TEMP :                      
+
+collection_search_obj = {
+    emotions:{},
+    searchTags:[],
+    searchMemeTags:[]
+}
+//called when the user want to add more images to the collections gallery
+async function Search_Collections() {
+    // Show the modal
+    var modal_gallery_img_add = document.getElementById("collection-search-modal-click-top-id");
+    modal_gallery_img_add.style.display = "block";
+    // Get the button that opens the modal
+    var modal_gallery_img_add_close_btn = document.getElementById("collection-modal-search-close-exit-view-button-id");
+    // When the user clicks on the button, close the modal
+    modal_gallery_img_add_close_btn.onclick = function () {
+        modal_gallery_img_add.style.display = "none";
+    }
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+        if (event.target == modal_gallery_img_add) {
+            modal_gallery_img_add.style.display = "none";
+        }
+    }
+    //clear the search obj to make it fresh and reset the fields
+    document.getElementById("collections-modal-search-tag-textarea-entry-id").value = ""
+    document.getElementById("collections-modal-search-meme-tag-textarea-entry-id").value = ""
+    document.getElementById("collections-modal-search-emotion-label-value-textarea-entry-id").value = ""
+    document.getElementById("collections-modal-search-emotion-value-range-entry-id").value = "0"
+    document.getElementById("collections-modal-search-emotion-label-value-display-container-div-id").innerHTML = ""
+    collection_search_obj = {
+        emotions:{},
+        searchTags:[],
+        searchMemeTags:[]
+    }
+
+    //handler for the emotion label and value entry additions and then the deletion handling, all emotions are added by default and handled 
+    document.getElementById("collections-modal-search-emotion-entry-button-id").onclick = function (event) {
+        emotion_key_tmp = document.getElementById("collections-modal-search-emotion-label-value-textarea-entry-id").value
+        if(emotion_key_tmp != "") { 
+            emotion_value_tmp = document.getElementById("collections-modal-search-emotion-value-range-entry-id").value
+            collection_search_obj["emotions"][emotion_key_tmp] = emotion_value_tmp //update the global profile image search object with the new key value
+            emotion_div_id = document.getElementById("collections-modal-search-emotion-label-value-display-container-div-id")
+            emotions_html_tmp = ""
+            Object.keys(collection_search_obj["emotions"]).forEach(emotion_key => {
+                        emotions_html_tmp += `
+                                            <span id="collections-modal-search-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
+                                                <img class="collections-modal-search-emotion-remove-button-class" id="collections-modal-search-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='${CLOSE_ICON_RED}'"
+                                                onmouseout="this.src='${CLOSE_ICON_BLACK}'" src="${CLOSE_ICON_BLACK}" title="close" />
+                                                (${emotion_key},${collection_search_obj["emotions"][emotion_key]})
+                                            </span>
+                                            `
+            })
+            emotion_div_id.innerHTML = emotions_html_tmp   
+            document.getElementById("collections-modal-search-emotion-label-value-textarea-entry-id").value = ""
+            document.getElementById("collections-modal-search-emotion-value-range-entry-id").value = "0"
+            //handler for the emotion deletion from search term and view on modal
+            Object.keys(collection_search_obj["emotions"]).forEach(emotion_key => {
+                document.getElementById(`collections-modal-search-emotion-remove-button-id-${emotion_key}`).onclick = function() {
+                    document.getElementById(`collections-modal-search-emotion-label-value-span-id-${emotion_key}`).remove();
+                    delete collection_search_obj["emotions"][emotion_key]
+                }
+            })
+        }
+    }
+
+
+    rand_collections_init = await Random_DB_Collections(MAX_COUNT_SEARCH_RESULTS)
+    //present random ordering first
+    
+
+
+
+    
+    
+    //display default random ordering first
+    if(search_image_results == '' && search_image_meme_results == '') {
+        search_image_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
+        search_image_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
+    }
+
+
+    
+    
+
+    search_display_div = document.getElementById("collections-modal-search-images-results-grid-div-area-id")
+    search_display_div.innerHTML = ""
+    search_display_inner_tmp = ''
+    search_image_results.forEach( image_filename => {
+        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
+        if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
+            search_display_inner_tmp += `
+                                        <div class="collections-modal-image-search-result-single-image-div-class" id="collections-modal-image-search-result-single-image-div-id-${image_filename}">
+                                            <label class="add-memes-memeswitch" title="deselect / include">
+                                                <input id="add-image-toggle-id-${image_filename}" type="checkbox">
+                                                <span class="add-memes-slider"></span>
+                                            </label>
+                                            <img class="collections-modal-image-search-result-single-image-img-obj-class" id="collections-modal-image-search-result-single-image-img-id-${image_filename}" src="${image_path_tmp}" title="view" alt="memes"/>
+                                        </div>
+                                        `
+        }
+    })
+    search_display_div.innerHTML += search_display_inner_tmp
+
+
+    return
+    
+    //add an event listener to the images to select them to be added to the gallery and the current obj and the collection DB updated
+    document.getElementById("collections-modal-search-images-results-select-images-order-button-id").onclick = async function() {
+        update = false
+        imageSet_original = [...current_collection_obj.collectionImageSet]
+        search_image_results.forEach( image_filename => { //go through search images
+            image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
+            if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
+                if(document.getElementById(`add-image-toggle-id-${image_filename}`).checked){
+                    current_collection_obj.collectionImageSet.push(image_filename)
+                    update = true
+                }
+            }
+        })
+        // search_image_meme_results.forEach( image_filename => { //go through search images
+        //     image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
+        //     if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
+        //         if(document.getElementById(`collections-add-memes-meme-toggle-id-${image_filename}`).checked) {
+        //             current_collection_obj.collectionImageSet.push(image_filename)
+        //             update = true
+        //         }
+        //     }
+        // })
+        if(update == true) {
+            
+            await Update_Collection_Record_In_DB(current_collection_obj)
+            await Update_Collection_IMAGE_Connections(current_collection_obj.collectionName,imageSet_original,current_collection_obj.collectionImageSet)
+            await Show_Collection()   
+        }
+        modal_gallery_img_add.style.display = "none";
+    }
+    //add the event listener for the RESET BUTTON on the modal
+    document.getElementById("collections-modal-search-main-reset-button-id").onclick = function() {
+        document.getElementById("collections-modal-search-tag-textarea-entry-id").value = ""
+        document.getElementById("collections-modal-search-meme-tag-textarea-entry-id").value = ""
+        document.getElementById("collections-modal-search-emotion-label-value-textarea-entry-id").value = ""
+        document.getElementById("collections-modal-search-emotion-value-range-entry-id").value = "0"
+        document.getElementById("collections-modal-search-emotion-label-value-display-container-div-id").innerHTML = ""
+        collection_search_obj = {
+            emotions:{},
+            searchTags:[],
+            searchMemeTags:[]
+        }
+        //reset toggles to default false
+        search_image_results.forEach( image_filename => {
+            image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
+            if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
+                if(document.getElementById(`add-image-toggle-id-${image_filename}`).checked){
+                    document.getElementById(`add-image-toggle-id-${image_filename}`).checked = false
+                }
+            }
+        })
+        search_image_meme_results.forEach( image_filename => {
+            image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
+            if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
+                if(document.getElementById(`collections-add-memes-meme-toggle-id-${image_filename}`).checked){
+                    document.getElementById(`collections-add-memes-meme-toggle-id-${image_filename}`).checked = false
+                }
+            }
+        })
+    }
+    //add the event listener for the SEARCH BUTTON on the modal
+    document.getElementById("collections-modal-search-main-button-id").onclick = function() {
+        Search_Collections_Search_Action()
+    }
+}
+//the search for the add images modal of the gallery of the collections
+async function Search_Collections_Search_Action() {
+    //get the tags input and get rid of nuissance chars
+    search_tags_input = document.getElementById("collections-modal-search-tag-textarea-entry-id").value
+    split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
+    search_unique_search_terms = [...new Set(split_search_string)]
+    search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
+    collection_search_obj["searchTags"] = search_unique_search_terms
+    //meme tags now    
+    search_meme_tags_input = document.getElementById("collections-modal-search-meme-tag-textarea-entry-id").value
+    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
+    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+    search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
+    collection_search_obj["searchMemeTags"] = search_unique_meme_search_terms
+    //emotion key value already is in: collection_search_obj
+    
+    //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
+    //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
+
+    tagging_db_iterator = await Tagging_Image_DB_Iterator();
+    search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
+    tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
+    search_image_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(collection_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
+
+    //display the search order with the image order first and then the memes that are relevant
+    search_display_div = document.getElementById("collections-modal-search-images-results-grid-div-area-id")
+    search_display_div.innerHTML = ""
+    search_display_inner_tmp = ''
+    search_image_results.forEach( image_filename => {
+        
+        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
+        if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
+            search_display_inner_tmp += `
+                                        <div class="collections-modal-image-search-result-single-image-div-class" id="collections-modal-image-search-result-single-image-div-id-${image_filename}">
+                                            <label class="add-memes-memeswitch" title="deselect / include">
+                                                <input id="add-image-toggle-id-${image_filename}" type="checkbox">
+                                                <span class="add-memes-slider"></span>
+                                            </label>
+                                            <img class="collections-modal-image-search-result-single-image-img-obj-class" id="collections-modal-image-search-result-single-image-img-id-${image_filename}" src="${image_path_tmp}" title="view" alt="memes"/>
+                                        </div>
+                                        `
+        }
+    })
+    search_display_div.innerHTML += search_display_inner_tmp
+    //listen for the user saying that the images are selected
+}
+
+
+
+
+
 
 
 

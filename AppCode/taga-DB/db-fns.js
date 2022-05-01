@@ -581,6 +581,22 @@ exports.Handle_Delete_Collection_IMAGE_references = Handle_Delete_Collection_IMA
 
 
 
+//COLLECTION SEARCH RELATED FNs START>>>
+//get random collectionNames from the collection records
+//`SELECT * FROM table WHERE rowid > (ABS(RANDOM()) % (SELECT max(rowid) FROM table)) LIMIT 1;` OR select * from quest order by RANDOM() LIMIT 1;
+const GET_N_RAND_COLLECTION_NAMES_STMT = DB.prepare(`SELECT collectionName FROM ${COLLECTIONS_TABLE_NAME} WHERE rowid > (ABS(RANDOM()) % (SELECT max(rowid) FROM ${COLLECTIONS_TABLE_NAME})) LIMIT ?;`)
+async function Random_DB_Collections(num_of_records) {
+  collectionNames = []
+  for(ii=0;ii<num_of_records;ii++) {
+    collectionNames_tmp = await GET_N_RAND_COLLECTION_NAMES_STMT.all(1)
+    collectionNames.push(collectionNames_tmp[0].collectionName)
+  }
+  collectionNames = [...new Set(collectionNames)];
+  return collectionNames;
+}
+exports.Random_DB_Collections = Random_DB_Collections
+//COLLECTION SEARCH RELATED FNs END<<<
+
 //!!! make call to this when image is deleted from tagging to update collection meme table !!!
 // async function Handle_Delete_Image_MEME_references(imageFileName) {
 //   //this image may be a meme, get the meme links and from those images remove the refs to this imageFileName

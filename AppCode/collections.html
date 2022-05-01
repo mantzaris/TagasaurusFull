@@ -26,6 +26,9 @@
 	<!-- The style sheet for style sheet for having clicked on individual images -->
 	<link rel="stylesheet" href="./taga-CSS/collections-CSS/collections-search-profile-image-modal.css">
 
+	<!-- The extra style for the elements of the collection search modal -->
+	<link rel="stylesheet" href="./taga-CSS/collections-CSS/collections-search-collections-modal.css">
+
 	<!-- something to do with security -->
 	<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
 
@@ -38,6 +41,7 @@
 <div id="collection-name-gridarea-id">
 	<img id="collection-name-hashtags-icon-id" src="taga-ui-icons/HashtagGreen.png" alt="hashtags"/>
 	<span id="collection-name-text-label-id"></span>
+	<button class="center-buttons fun-button-blue" type="button" id="collection-control-button-searchcollections-id">SEARCH</button>
 </div>
 
 
@@ -192,7 +196,150 @@
 </div>
 
 
+
+
+
+
+
+
+
+
+
 <!-- MODALS BEGIN -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- MODAL COLLECTION SEARCH COLLECTIONS START -->
+<div id="collection-search-modal-click-top-id" class="modal-top-class">
+	<!-- MEME MODAL CLOSE -->
+	<img
+			class="modal-close-button-class" id="collection-modal-search-close-exit-view-button-id" onmouseover="this.src='taga-ui-icons/CloseRed.png';" onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close"
+	/>
+	<!-- Modal content container -->
+	<div class="modal-content-container">
+		<div id="collections-modal-search-top-grid-div-id">
+			
+			<!-- search button -->
+			<div id="collections-modal-search-main-button-container-div-id">
+				<button type="button" class="fun-button-blue" id="collections-modal-search-main-button-id">SEARCH BUTTON</button>
+				<button type="button" class="fun-button-red" id="collections-modal-search-main-reset-button-id">RESET FIELDS</button>
+			</div>
+			
+			<!-- image tag entry -->
+			<div id="collections-modal-search-tag-entry-container-div-id">
+				<span id="collections-modal-search-tag-label-id">
+					Tag list:
+				</span>
+				<div id="collections-modal-search-tag-textarea-entry-div-id">
+					<textarea
+							id="collections-modal-search-tag-textarea-entry-id" placeholder="enter image #tags to search for" name="search-modal-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')"
+					></textarea>
+				</div>
+			</div>
+			
+			<!-- search meme tag entry start -->
+			<div id="collections-modal-search-meme-tag-entry-top-div-id">
+				<span id="collections-modal-search-meme-tag-label-id">
+					Meme Tag list:
+				</span>
+				<div id="collections-modal-search-meme-tag-textarea-entry-div-id">
+					<textarea
+							id="collections-modal-search-meme-tag-textarea-entry-id" placeholder="enter meme #tags connected to image search" name="search-modal-meme-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')"
+					></textarea>
+				</div>
+			</div>
+			<!-- search meme tag entry start -->
+			
+			<!-- add emotion/value entry -->
+			<div id="collections-modal-search-emotion-entry-top-div-id">
+				
+				<!-- <div id="collections-grid-emotion-area-1-id"></div> -->
+				<button type="button" class="fun-button-blue" id="collections-modal-search-emotion-entry-button-id">INCLUDE EMOTION</button>
+				<!-- </div> -->
+				
+				<!-- <div id="collections-grid-emotion-area-2-id"> -->
+				<div id="collections-modal-search-emotion-label-and-value-entry-container-div-id">
+					<textarea
+							list="emotion-recommend" id="collections-modal-search-emotion-label-value-textarea-entry-id" placeholder="emotion label" name="search-modal-emotion-tag-textarea" oninput="this.value = this.value.replace(/[ \n]/g,'')"
+					></textarea>
+					<input id="collections-modal-search-emotion-value-range-entry-id" type="range" min="0" max="100" value="0">
+				</div>
+				<!-- </div> -->
+				
+				<!-- <div id="collections-grid-emotion-area-3-id"> -->
+				<div id="collections-modal-search-emotion-label-value-display-container-div-id">
+					
+					<!-- <span id="collections-modal-search-emotion-label-value-span-id-EMOTIONKEY" style="white-space:nowrap">
+						<img class="collections-modal-search-emotion-remove-button-class" id="collections-modal-search-emotion-remove-button-id-EMOTIONKEY" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+							onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+						(emotion1,10)
+					</span>  -->
+				
+				</div>
+				<!-- </div> -->
+			</div>
+			
+			<!-- COLLECTION SEARCH RESULTS START -->
+			<div id="collections-modal-search-images-results-display-id">
+				<div id="collections-modal-search-images-results-button-div-id">
+					<label id="collections-modal-search-images-results-select-images-order-button-id">Click on Collection Choice</label>
+					<!-- <button type="button" class="fun-button-blue" id="collections-modal-search-images-results-select-images-order-button-id">Click on Collection Choice</button> -->
+				</div>
+				<!-- for the image annotation matches -->
+				<div id="collections-modal-search-images-results-grid-div-area-id">
+					
+					<!-- <div class="collections-modal-image-search-result-single-image-div-class" id="collections-modal-image-search-result-single-image-div-id-Taga.png">
+						<label class="add-memes-memeswitch" title="deselect / include">
+							<input id="collections-add-memes-meme-toggle-id-Taga.png" type="checkbox">
+							<span class="add-memes-slider"></span>
+						</label>
+						<img class="collections-modal-image-search-result-single-image-img-obj-class" id="collections-modal-image-search-result-single-image-img-id-Taga.png" src="images/water.jpg" title="view" alt="memes"/>
+					</div>
+					-->
+
+				</div>				
+			</div>
+			<!-- COLLECTION SEARCH RESULTS END -->
+		
+		</div>
+	</div>
+</div>
+<!-- MODAL COLLECTION SEARCH COLLECTIONS END -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <!-- MODAL COLLECTION SEARCH IMAGES START -->

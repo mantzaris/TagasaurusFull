@@ -99,7 +99,8 @@ body {
 }
 #collection-control-button-delete-id,
 #collection-control-button-returntomain-id,
-#collection-control-button-createcollection-id {
+#collection-control-button-createcollection-id,
+#collection-control-button-searchcollections-id {
   padding-left: 10px;
   padding-right: 10px;
   /* font-size: min(2vw, 2vh); */
@@ -107,7 +108,8 @@ body {
 @media screen and (max-width: 767px) {
   #collection-control-button-delete-id,
   #collection-control-button-returntomain-id,
-  #collection-control-button-createcollection-id {
+  #collection-control-button-createcollection-id,
+  #collection-control-button-searchcollections-id {
     padding-left: 5px;
     padding-right: 5px;
   }
