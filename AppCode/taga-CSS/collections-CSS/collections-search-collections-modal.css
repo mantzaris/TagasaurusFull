@@ -255,32 +255,44 @@
   grid-template-rows: 1fr 11fr;
   box-sizing: border-box;
   grid-template-areas:
-    "    collection-name-result-div-class                  .  "
-    "  collections-modal-search-thumbnail-img    collections-search-result-collections-img-set-class   ";
+    "    collection-name-result-div-class                  collection-name-result-div-class  "
+    " collection-profileimage-search-div    collections-search-result-collections-img-set-class   ";
 }
 
 .collection-name-result-div-class {
   grid-area: collection-name-result-div-class;
+  display: inline-block;
+  /* justify-content: left;
+  align-items: center; */
+  font-size: 1.5rem;
+
+  line-height: 1.8rem;
+  height: 2rem;
+  background-color: #00c600;
+  height: 100%;
+  overflow-x: scroll;
+  white-space: nowrap;
+}
+
+.collection-profileimage-search-div {
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
-  font-size: 2vmin;
-  background-color: #00c600;
+  align-items: center;
 }
 
 .collections-modal-search-result-collection-profileimg-class {
   grid-area: collections-modal-search-thumbnail-img;
   box-sizing: border-box;
-  /* object-fit: contain;
-  height: 25vh;
-  width: 100%;
-  max-height: 100%; */
 
-  height: 99999px;
-  object-fit: contain;
-  max-height: 27vh; /*100%;*/
+  object-fit: fill;
+
+  /* height: 99999px;
+  object-fit: contain; */
+  /* position: relative; */
   max-width: 100%;
-  display: block;
-  margin: auto auto;
+  max-height: 26vh; /*100%;*/
 }
 
 .collections-search-result-collections-img-set-class {

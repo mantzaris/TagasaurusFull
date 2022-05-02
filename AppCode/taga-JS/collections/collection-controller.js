@@ -1477,10 +1477,40 @@ async function Search_Collections() {
         }
     }
 
-
+    return
     rand_collections_init = await Random_DB_Collections(MAX_COUNT_SEARCH_RESULTS)
     //present random ordering first
-    
+    search_display_div = document.getElementById("collections-modal-search-images-results-grid-div-area-id")
+    search_display_div.innerHTML = ""
+    search_display_inner_tmp = ''
+
+    // for( collectionName_tmp  of  rand_collections_init  ) {
+
+    //     collection_tmp = await Get_Collection_Record_From_DB(collectionName_tmp)
+    //     image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + collection_tmp.collectionImage  // collectionImageSet
+        
+    //     if( FS.existsSync(image_path_tmp) == true ) {
+    //         search_display_inner_tmp += `
+    //                                     <div class="collection-view-container-class">
+    //                                         <div class="collection-selection-preview-single">
+    //                                             <div class="collection-name-result-div-class"> ${collectionName_tmp} </div>
+    //                                             <img class="collections-modal-search-result-collection-profileimg-class" id="collections-modal-image-search-result-single-image-img-id-${collectionName_tmp}" src="${image_path_tmp}" title="view" alt="memes"/>
+                                            
+    //                                             <div class="collections-search-result-collections-img-set-class">
+                                                    
+    //                                                 <img class="collections-modal-search-result-collection-gallery-img-class" id="collections-modal-image-search-result-single-image-img-id-${collectionName_tmp}" src="${image_path_tmp}" title="view" alt="memes"/>
+    //                                                 <img class="collections-modal-search-result-collection-gallery-img-class" id="collections-modal-image-search-result-single-image-img-id-${collectionName_tmp}" src="${image_path_tmp}" title="view" alt="memes"/>
+    //                                                 <img class="collections-modal-search-result-collection-gallery-img-class" id="collections-modal-image-search-result-single-image-img-id-${collectionName_tmp}" src="${image_path_tmp}" title="view" alt="memes"/>
+
+    //                                             </div>
+                                            
+    //                                         </div>
+    //                                     </div>
+    //                                     `
+    //     }
+    // }
+
+    search_display_div.innerHTML += search_display_inner_tmp
 
 
     return
