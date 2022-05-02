@@ -274,11 +274,11 @@
 
 .collection-profileimage-search-div {
   grid-area: collection-profileimage-search-div;
-  width: 100%;
+  width: 98%;
   height: 100%;
-  display: flex;
+  /* display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: flex-start; */
 }
 
 .collections-modal-search-result-collection-profileimg-class {
@@ -287,19 +287,24 @@
   z-index: 1;
   position: relative;
   object-fit: fill;
-  padding: 4px;
-  /* height: 99999px;
-  object-fit: contain; */
-  /* position: relative; */
-  max-width: 100%;
+  padding: 0px;
+
+  height: 99999px;
+  object-fit: contain;
+  max-height: 98%;
+  max-width: 99%;
+  display: block;
+  margin: auto auto;
+
+  /* max-width: 98%; */
   max-height: 25vh; /*100%;*/
 }
 
 .collections-search-result-collections-img-set-class {
   grid-area: collections-search-result-collections-img-set-class;
   /* background-color: crimson; */
-  padding-left: 8px;
-  width: 98%;
+  padding-left: 0px;
+  width: 99%;
   max-height: 25vh; /* height: 100%; */
   z-index: 3;
   display: flex;
@@ -311,7 +316,7 @@
 .collections-modal-search-result-collection-gallery-img-class {
   max-height: 24vh;
   max-width: 40vw;
-  padding: 4px;
+  padding: 0px;
   display: flex;
   justify-content: center;
   align-items: center;
