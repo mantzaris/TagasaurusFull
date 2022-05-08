@@ -104,6 +104,9 @@ async function Get_Tagging_Annotation_From_DB(image_name) { //
 async function Random_DB_Collections(num_of_records) {
     return await DB_MODULE.Random_DB_Collections(num_of_records)
 }
+async function Collection_DB_Iterator() {
+    return DB_MODULE.Collection_DB_Iterator();
+}
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END<<<
 
 
@@ -1478,7 +1481,6 @@ async function Search_Collections() {
     search_display_div.innerHTML += search_display_inner_tmp
     //add image event listener so that a click on it makes it a choice        
     rand_collections_init.forEach( collectionName_tmp => {
-        console.log(`about to add click listener for : ${collectionName_tmp}`)
         document.getElementById(`collection-selection-option-id-${collectionName_tmp}`).onclick = async function() {
             collection_tmp = await Get_Collection_Record_From_DB(collectionName_tmp)
             current_collection_obj = collection_tmp
@@ -1524,32 +1526,57 @@ async function Search_Collections_Search_Action() {
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
 
-    tagging_db_iterator = await Tagging_Image_DB_Iterator();
-    search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
-    tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
-    search_image_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(collection_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
-
-    //display the search order with the image order first and then the memes that are relevant
+    collection_db_iterator = await Collection_DB_Iterator();
+    search_collection_results = await SEARCH_MODULE.Collection_Search_DB(collection_search_obj,collection_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
+    
+    console.log(`search_collection_results = ${JSON.stringify(search_collection_results)}`)
+    
     search_display_div = document.getElementById("collections-modal-search-images-results-grid-div-area-id")
     search_display_div.innerHTML = ""
     search_display_inner_tmp = ''
-    search_image_results.forEach( image_filename => {
-        
-        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
-        if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
+    for( collectionName_tmp  of  search_collection_results  ) {
+        collection_tmp = await Get_Collection_Record_From_DB(collectionName_tmp)
+        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + collection_tmp.collectionImage  // collectionImageSet
+        if( FS.existsSync(image_path_tmp) == true ) {
+
             search_display_inner_tmp += `
-                                        <div class="collections-modal-image-search-result-single-image-div-class" id="collections-modal-image-search-result-single-image-div-id-${image_filename}">
-                                            <label class="add-memes-memeswitch" title="deselect / include">
-                                                <input id="add-image-toggle-id-${image_filename}" type="checkbox">
-                                                <span class="add-memes-slider"></span>
-                                            </label>
-                                            <img class="collections-modal-image-search-result-single-image-img-obj-class" id="collections-modal-image-search-result-single-image-img-id-${image_filename}" src="${image_path_tmp}" title="view" alt="memes"/>
+                                        <div class="collection-view-container-class" id="collection-selection-option-id-${collectionName_tmp}">
+                                            <div class="collection-selection-preview-single">
+                                                <div class="collection-name-result-div-class"> ${collectionName_tmp} </div>
+                                                <div class="collection-profileimage-search-div">
+                                                    <img class="collections-modal-search-result-collection-profileimg-class" id="collections-modal-image-search-result-single-image-img-id-${collectionName_tmp}" src="${image_path_tmp}" title="view" alt="collection"/>
+                                                </div>
+                                                <div class="collections-search-result-collections-img-set-class">
+                                        `
+
+            for( image_tmp of collection_tmp.collectionImageSet ) {
+                if( image_tmp == collection_tmp.collectionImage ) {
+                    continue
+                }
+                imageset_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_tmp  // collectionImageSet
+                search_display_inner_tmp += `
+                                            <img class="collections-modal-search-result-collection-gallery-img-class" src="${imageset_path_tmp}" title="view" alt="image"/>
+                                            `
+            }
+            search_display_inner_tmp += `
+                                        </div>
+                                        </div>
                                         </div>
                                         `
         }
-    })
+    }
     search_display_div.innerHTML += search_display_inner_tmp
-    //listen for the user saying that the images are selected
+    //add image event listener so that a click on it makes it a choice   
+    modal_gallery_img_add = document.getElementById("collection-search-modal-click-top-id");     
+    search_collection_results.forEach( collectionName_tmp => {
+        document.getElementById(`collection-selection-option-id-${collectionName_tmp}`).onclick = async function() {
+            collection_tmp = await Get_Collection_Record_From_DB(collectionName_tmp)
+            current_collection_obj = collection_tmp
+            Show_Collection()
+            modal_gallery_img_add.style.display = "none";
+        }
+    })
+    
 }
 
 

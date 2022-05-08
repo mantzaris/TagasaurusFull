@@ -595,6 +595,31 @@ async function Random_DB_Collections(num_of_records) {
   return collectionNames;
 }
 exports.Random_DB_Collections = Random_DB_Collections
+
+
+//use via 'iter = await Collection_DB_Iterator()' and 'rr = await iter()'
+//after all collections complete 'undefined' is returned
+async function Collection_DB_Iterator() {
+  iter_current_rowid = await GET_MIN_ROWID_STMT_COLLECTION.get().rowid;
+  //inner function for closure
+  async function Collection_Iterator_Next() {
+    if(iter_current_rowid == undefined) {
+      return undefined;
+    }
+    current_record = Get_Collection_Obj_Fields_From_Record(await GET_RECORD_FROM_ROWID_COLLECTION_STMT.get(iter_current_rowid));
+    tmp_rowid = await GET_NEXT_COLLECTION_ROWID_STMT.get(iter_current_rowid);
+    if( tmp_rowid != undefined ) {
+      iter_current_rowid = tmp_rowid.rowid;
+    } else {
+      iter_current_rowid = undefined;
+    }
+    return current_record;
+  }
+  return Collection_Iterator_Next;
+}
+exports.Collection_DB_Iterator = Collection_DB_Iterator;
+//SEARCH FUNCTION ITERATOR VIA CLOSURE END<<<
+
 //COLLECTION SEARCH RELATED FNs END<<<
 
 //!!! make call to this when image is deleted from tagging to update collection meme table !!!

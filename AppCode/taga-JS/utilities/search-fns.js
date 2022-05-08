@@ -346,6 +346,94 @@ exports.Collection_Profile_Image_Search_Fn = Collection_Profile_Image_Search_Fn
 
 
 
+//COLLECTION SEARCH MODAL IN TAGGING START>>>
+//search function for the image additions
+//to iterate through the images: use via 'iter = await Tagging_Image_DB_Iterator()' and 'rr = await iter()' after all rows complete 'undefined' is returned
+//passing in the search criteria object, the iterator function handle, the get record annotation from DB and the max counts allowed.
+async function Collection_Search_DB(search_obj,collection_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS) {        
+    search_tags_lowercase = search_obj["searchTags"].map(function(x){return x.toLowerCase();})
+    search_memetags_lowercase = search_obj["searchMemeTags"].map(function(x){return x.toLowerCase();})
+    //empty array to store the scores of the images against the search
+    collection_search_scores = [];
+    collection_search_scores_filenames = [];    
+    collection_tagging_annotation_obj_tmp = await collection_db_iterator();
+    while( collection_tagging_annotation_obj_tmp != undefined ) {
+        total_collection_match_score = await Collection_Scoring(search_obj,collection_tagging_annotation_obj_tmp,Get_Tagging_Annotation_From_DB,search_tags_lowercase,search_memetags_lowercase);
+        //get the overlap score for this image tmp
+        if( collection_search_scores.length <= MAX_COUNT_SEARCH_RESULTS ) {
+            collection_search_scores.push(total_collection_match_score);
+            collection_search_scores_filenames.push(collection_tagging_annotation_obj_tmp.imageFileName);
+        } else {
+            min_imgscore_tmp = Math.min(...collection_search_scores);
+            if( total_collection_match_score > min_imgscore_tmp) { //place image in the set since it is bigger than the current minimum
+                index_min_tmp = collection_search_scores.indexOf(min_imgscore_tmp);
+                collection_search_scores[index_min_tmp] = total_collection_match_score;
+                collection_search_scores_filenames[index_min_tmp] = collection_tagging_annotation_obj_tmp.imageFileName;
+            }
+        }
+        collection_tagging_annotation_obj_tmp = await collection_db_iterator(); //next record extract and undefined if finished all records in table
+    }
+    //sort the scores and return the indices order from largest to smallest
+    img_indices_sorted = new Array(collection_search_scores.length);
+    for (i = 0; i < collection_search_scores.length; ++i) img_indices_sorted[i] = i;
+    img_indices_sorted.sort(function (a, b) { return collection_search_scores[a] < collection_search_scores[b] ? 1 : collection_search_scores[a] > collection_search_scores[b] ? -1 : 0; });
+    //ranked filenames now
+    collection_search_scores_filenames = img_indices_sorted.map(i => collection_search_scores_filenames[i]);   
+    return collection_search_scores_filenames;
+}
+exports.Collection_Search_DB = Collection_Search_DB
+//called in each loop for each image
+async function Collection_Scoring(search_obj,collection_tagging_annotation_obj_tmp,Get_Tagging_Annotation_From_DB,search_tags_lowercase,search_memetags_lowercase) {
+    record_tmp_tags = collection_tagging_annotation_obj_tmp["collectionDescriptionTags"];
+    record_tmp_emotions = collection_tagging_annotation_obj_tmp["collectionEmotions"];
+    record_tmp_memes = collection_tagging_annotation_obj_tmp["collectionMemes"];
+    record_tmp_imgs = collection_tagging_annotation_obj_tmp["collectionImageSet"];
+    //scores for the tags/emotions/memes
+    //get the score of the overlap of the object with the search terms
+    tags_overlap_score = (record_tmp_tags.filter(tag => (search_tags_lowercase).includes(tag.toLowerCase()))).length;
+    //get the score for the emotions overlap scores range [-1,1] for each emotion that is accumulated
+    emotion_overlap_score = 0;
+    record_tmp_emotion_keys = Object.keys(record_tmp_emotions)
+    search_emotions_keys = Object.keys(search_obj["emotions"])
+    search_emotions_keys.forEach(search_key_emotion_label => {
+        record_tmp_emotion_keys.forEach(record_emotion_key_label => {
+            if(search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()) {
+                delta_tmp = (record_tmp_emotions[record_emotion_key_label] - search_obj["emotions"][search_key_emotion_label]) / 50
+                emotion_overlap_score_tmp = 1 - Math.abs( delta_tmp )
+                emotion_overlap_score += emotion_overlap_score_tmp //scores range [-1,1]
+            }
+        })
+    })
+    //get the score for the memes
+    meme_tag_overlap_score = 0
+    for (let rtm=0; rtm<record_tmp_memes.length; rtm++) {
+        meme_record_tmp = await Get_Tagging_Annotation_From_DB(record_tmp_memes[rtm]); ///
+        meme_tmp_tags = meme_record_tmp["taggingTags"];
+        meme_tag_overlap_score += (meme_tmp_tags.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length;
+    }
+
+    //get the score for the image of the collection in terms of the overlap
+    img_tag_overlap_score = 0
+    for (let rtm=0; rtm<record_tmp_imgs.length; rtm++) {
+        img_record_tmp = await Get_Tagging_Annotation_From_DB(record_tmp_imgs[rtm]); ///
+        img_tmp_tags = img_record_tmp["taggingTags"];
+        img_tag_overlap_score += (img_tmp_tags.filter(tag => (search_tags_lowercase).includes(tag.toLowerCase()))).length;
+    }
+
+    total_collection_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score + img_tag_overlap_score;
+    return total_collection_match_score;
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
