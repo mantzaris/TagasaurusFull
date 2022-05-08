@@ -362,13 +362,13 @@ async function Collection_Search_DB(search_obj,collection_db_iterator,Get_Taggin
         //get the overlap score for this image tmp
         if( collection_search_scores.length <= MAX_COUNT_SEARCH_RESULTS ) {
             collection_search_scores.push(total_collection_match_score);
-            collection_search_scores_filenames.push(collection_tagging_annotation_obj_tmp.imageFileName);
+            collection_search_scores_filenames.push(collection_tagging_annotation_obj_tmp.collectionName);
         } else {
             min_imgscore_tmp = Math.min(...collection_search_scores);
             if( total_collection_match_score > min_imgscore_tmp) { //place image in the set since it is bigger than the current minimum
                 index_min_tmp = collection_search_scores.indexOf(min_imgscore_tmp);
                 collection_search_scores[index_min_tmp] = total_collection_match_score;
-                collection_search_scores_filenames[index_min_tmp] = collection_tagging_annotation_obj_tmp.imageFileName;
+                collection_search_scores_filenames[index_min_tmp] = collection_tagging_annotation_obj_tmp.collectionName;
             }
         }
         collection_tagging_annotation_obj_tmp = await collection_db_iterator(); //next record extract and undefined if finished all records in table

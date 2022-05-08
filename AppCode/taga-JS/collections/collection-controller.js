@@ -1529,7 +1529,6 @@ async function Search_Collections_Search_Action() {
     collection_db_iterator = await Collection_DB_Iterator();
     search_collection_results = await SEARCH_MODULE.Collection_Search_DB(collection_search_obj,collection_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
     
-    console.log(`search_collection_results = ${JSON.stringify(search_collection_results)}`)
     
     search_display_div = document.getElementById("collections-modal-search-images-results-grid-div-area-id")
     search_display_div.innerHTML = ""
