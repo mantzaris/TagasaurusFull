@@ -31,7 +31,7 @@ async function Collection_MEME_DB_Iterator() {
 //functionality for the export of all the information, this
 async function Export_User_Annotation_Data() {
     
-    const save_promise = IPC_Renderer.invoke('dialog:save')
+    const save_promise = IPC_Renderer.invoke('dialog:export')
     save_promise.then( async function(path_chosen) {
         //get ready to export data
         if(path_chosen.canceled == false) {
@@ -113,23 +113,37 @@ async function Export_User_Annotation_Data() {
 
 }
 
-//put the annotation data to disk for the user's chosen folder
-function Write_Export_Data(file_path,db_rows){
-    //write the json data out to the folder
-    file_name_data = PATH.sep + 'TagasaurusAnnotations.json'    
-    FS.writeFileSync( file_path+file_name_data, JSON.stringify(db_rows) );    
-    //now copy the files as well to a new 'images' directory
-    FS.mkdirSync( file_path + PATH.sep + 'images');
-    FSE.copy( TAGA_IMAGE_DIRECTORY, file_path + PATH.sep + 'images', err => {
-        if (err){ return console.error(err) }
-        else { console.log('folder copy success!') }
-    })
-    console.log("finished writing the annotations json file and copying images folder")
-}
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// //put the annotation data to disk for the user's chosen folder
+// function Write_Export_Data(file_path,db_rows){
+//     //write the json data out to the folder
+//     file_name_data = PATH.sep + 'TagasaurusAnnotations.json'    
+//     FS.writeFileSync( file_path+file_name_data, JSON.stringify(db_rows) );    
+//     //now copy the files as well to a new 'images' directory
+//     FS.mkdirSync( file_path + PATH.sep + 'images');
+//     FSE.copy( TAGA_IMAGE_DIRECTORY, file_path + PATH.sep + 'images', err => {
+//         if (err){ return console.error(err) }
+//         else { console.log('folder copy success!') }
+//     })
+//     console.log("finished writing the annotations json file and copying images folder")
+// }
 
     // await COLLECTION_DB_MODULE.Create_Db() //sets a global variable in the module to hold the DB for access
     // db_entities = COLLECTION_DB_MODULE.Get_DB()

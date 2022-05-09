@@ -134,8 +134,8 @@ ipcMain.handle('dialog:openEntityImageSet', async (_, args) => {
   return result
 })
 //for the ability to save a data export
-ipcMain.handle('dialog:save', async (_, args) => {
-  const result = dialog.showSaveDialog({ title: "Enter Folder Name to Create"})
+ipcMain.handle('dialog:export', async (_, args) => {
+  const result = dialog.showSaveDialog({ title: "Enter Folder Name to Create", defaultPath: PATH.join(PATH.resolve()+PATH.sep+'..'+PATH.sep) })
   return result
 })
 //FILE SELECTION DIALOGUE WINDOWS END<<<
