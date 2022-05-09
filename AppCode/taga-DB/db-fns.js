@@ -620,6 +620,77 @@ async function Collection_DB_Iterator() {
 exports.Collection_DB_Iterator = Collection_DB_Iterator;
 //SEARCH FUNCTION ITERATOR VIA CLOSURE END<<<
 
+
+//iterator for the imageset of the collections
+const GET_NEXT_IMAGE_COLLECTION_ROWID_STMT = DB.prepare(`SELECT ROWID FROM ${COLLECTION_IMAGESET_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
+const GET_RECORD_FROM_ROWID_IMAGE_COLLECTION_STMT = DB.prepare(`SELECT * FROM ${COLLECTION_IMAGESET_TABLE_NAME} WHERE ROWID=?`);
+const GET_MIN_ROWID_STMT_IMAGE_COLLECTION = DB.prepare(`SELECT MIN(ROWID) AS rowid FROM ${COLLECTION_IMAGESET_TABLE_NAME}`);
+
+async function Collection_IMAGE_DB_Iterator() {
+  iter_current_rowid = await GET_MIN_ROWID_STMT_IMAGE_COLLECTION.get().rowid;
+  //inner function for closure
+  async function Collection_IMAGE_Iterator_Next() {
+    if(iter_current_rowid == undefined) {
+      return undefined;
+    }
+    current_record = Get_IMAGE_Collection_Obj_Fields_From_Record(await GET_RECORD_FROM_ROWID_IMAGE_COLLECTION_STMT.get(iter_current_rowid));
+    tmp_rowid = await GET_NEXT_IMAGE_COLLECTION_ROWID_STMT.get(iter_current_rowid);
+    if( tmp_rowid != undefined ) {
+      iter_current_rowid = tmp_rowid.rowid;
+    } else {
+      iter_current_rowid = undefined;
+    }
+    return current_record;
+  }
+  return Collection_IMAGE_Iterator_Next;
+}
+exports.Collection_IMAGE_DB_Iterator = Collection_IMAGE_DB_Iterator;
+
+function Get_IMAGE_Collection_Obj_Fields_From_Record(record) {
+  record.collectionNames = JSON.parse(record.collectionNames);
+  return record;
+}
+
+
+//iterator for the memeset of the collections
+const GET_NEXT_MEME_COLLECTION_ROWID_STMT = DB.prepare(`SELECT ROWID FROM ${COLLECTION_MEME_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
+const GET_RECORD_FROM_ROWID_MEME_COLLECTION_STMT = DB.prepare(`SELECT * FROM ${COLLECTION_MEME_TABLE_NAME} WHERE ROWID=?`);
+const GET_MIN_ROWID_STMT_MEME_COLLECTION = DB.prepare(`SELECT MIN(ROWID) AS rowid FROM ${COLLECTION_MEME_TABLE_NAME}`);
+
+async function Collection_MEME_DB_Iterator() {
+  iter_current_rowid = await GET_MIN_ROWID_STMT_MEME_COLLECTION.get().rowid;
+  //inner function for closure
+  async function Collection_MEME_Iterator_Next() {
+    if(iter_current_rowid == undefined) {
+      return undefined;
+    }
+    current_record = Get_MEME_Collection_Obj_Fields_From_Record(await GET_RECORD_FROM_ROWID_MEME_COLLECTION_STMT.get(iter_current_rowid));
+    tmp_rowid = await GET_NEXT_MEME_COLLECTION_ROWID_STMT.get(iter_current_rowid);
+    if( tmp_rowid != undefined ) {
+      iter_current_rowid = tmp_rowid.rowid;
+    } else {
+      iter_current_rowid = undefined;
+    }
+    return current_record;
+  }
+  return Collection_MEME_Iterator_Next;
+}
+exports.Collection_MEME_DB_Iterator = Collection_MEME_DB_Iterator;
+
+function Get_MEME_Collection_Obj_Fields_From_Record(record) {
+  record.collectionNames = JSON.parse(record.collectionNames);
+  return record;
+}
+
+
+
+
+
+
+
+
+
+
 //COLLECTION SEARCH RELATED FNs END<<<
 
 //!!! make call to this when image is deleted from tagging to update collection meme table !!!
