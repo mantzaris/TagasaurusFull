@@ -17,9 +17,7 @@ const TAGA_DATA_DIRECTORY3 = PATH.resolve(TAGA_FILES_DIRECTORY,'data');
 //db path that holds the import data
 DB_path = ''
 
-//db that holds the import data
 DB_import = ''
-
 
 TAGGING_TABLE_NAME = 'TAGGING';
 TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
@@ -48,15 +46,76 @@ async function Import_User_Annotation_Data() {
 
 //this function will take the importing DB and perform checks before imports and copies
 async function Begin_DB_Import() {
+    //make sure the file which is a db has the tables required
     res = await Check_DB_Tables()
-    console.log(`res = ${res}`)
     if(res != 1) {
         console.log(`something wrong with the tables in the db file`)
         return
     } else {
         console.log(`file to import, is a good DB with the necessary tables`)
     }
+    //handle the tagging data to import first
+    Import_Tagging_Data()
 
+
+}
+
+
+//go through the tagging table
+//1 check the file image is present
+//2 see if the file image hash is present in the source db, 
+//3 if so; merge the annotation information. 
+//4 if not: insert into the db and copy over the image file. 
+//5 check the memes and meme table to make sure they are valid as well
+async function Import_Tagging_Data() {
+
+
+    iter = await Import_Tagging_Image_DB_Iterator()
+    record_tmp = await iter()
+    while( record_tmp != undefined ) {
+
+        
+        console.log(` record_tmp = ${JSON.stringify(record_tmp)}`)
+        record_tmp = await iter()
+
+
+    }
+
+}
+
+
+
+
+//TAGGING ITERATOR VIA CLOSURE START>>>
+//use via 'iter = await Import_Tagging_Image_DB_Iterator()' and 'rr = await iter()'
+//after all rows complete 'undefined' is returned
+async function Import_Tagging_Image_DB_Iterator() {
+    IMPORT_GET_MIN_ROWID_STMT = DB_import.prepare(`SELECT MIN(ROWID) AS rowid FROM ${TAGGING_TABLE_NAME}`);
+    IMPORT_GET_RECORD_FROM_ROWID_TAGGING_STMT = DB_import.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE ROWID=?`);
+    IMPORT_GET_NEXT_ROWID_STMT = DB_import.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
+
+    iter_current_rowid = await IMPORT_GET_MIN_ROWID_STMT.get().rowid;
+    //inner function for closure
+    async function Import_Tagging_Iterator_Next() {
+        if(iter_current_rowid == undefined) {
+        return undefined;
+        }
+        current_record = Get_Obj_Fields_From_Record(await IMPORT_GET_RECORD_FROM_ROWID_TAGGING_STMT.get(iter_current_rowid));
+        tmp_rowid = await IMPORT_GET_NEXT_ROWID_STMT.get(iter_current_rowid);
+        if( tmp_rowid != undefined ) {
+        iter_current_rowid = tmp_rowid.rowid;
+        } else {
+        iter_current_rowid = undefined;
+        }
+        return current_record;
+    }
+    return Import_Tagging_Iterator_Next;
+}
+function Get_Obj_Fields_From_Record(record) {
+    record.taggingTags = JSON.parse(record.taggingTags);
+    record.taggingEmotions = JSON.parse(record.taggingEmotions);
+    record.taggingMemeChoices = JSON.parse(record.taggingMemeChoices);
+    return record;
 }
 
 
