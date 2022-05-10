@@ -9,7 +9,7 @@ body {
 #welcome-screen-body-div-id {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 1fr 6fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 6fr 1fr 1fr 1fr 1fr 1fr;
   min-width: 0;
   min-height: 0;
   height: 100vh;
@@ -21,6 +21,7 @@ body {
     "tagging-button"
     "collection-button"
     "export-button"
+    "import-button"
     "support-button";
   background-color: #808a80;
 }
@@ -113,6 +114,12 @@ body {
 }
 #export-button-div-id {
   grid-area: export-button;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+#import-button-div-id {
+  grid-area: import-button;
   display: flex;
   align-items: flex-end;
   justify-content: center;
