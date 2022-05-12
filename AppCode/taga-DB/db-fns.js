@@ -21,6 +21,7 @@ const {  } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-cod
 const DB = new DATABASE(TAGA_FILES_DIRECTORY+PATH.sep+DB_FILE_NAME, { }) //verbose: console.log }); //open db in that directory
 //TAGGING START>>>
 const GET_FILENAME_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE imageFileName=?`); //!!! use the index
+const GET_RECORD_FROM_HASH_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE imageFileHash=?`); //!!! use the index
 const GET_HASH_TAGGING_STMT = DB.prepare(`SELECT imageFileHash FROM ${TAGGING_TABLE_NAME} WHERE imageFileHash=?`); //!!! use the index
 const GET_RECORD_FROM_ROWID_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE ROWID=?`);
 const INSERT_TAGGING_STMT = DB.prepare(`INSERT INTO ${TAGGING_TABLE_NAME} (imageFileName, imageFileHash, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices) VALUES (?, ?, ?, ?, ?, ?)`);
@@ -105,6 +106,18 @@ async function Get_Tagging_Record_From_DB(filename) {
   }
 }
 exports.Get_Tagging_Record_From_DB = Get_Tagging_Record_From_DB;
+
+//fn to get the annotation record for an image by key_type of rowid or filename
+async function Get_Record_With_Tagging_Hash_From_DB(hash) {
+  row_obj = await GET_RECORD_FROM_HASH_TAGGING_STMT.get(hash);
+  if( row_obj != undefined ) {
+    return Get_Obj_Fields_From_Record(row_obj);
+  } else {
+    return undefined;
+  }
+}
+exports.Get_Record_With_Tagging_Hash_From_DB = Get_Record_With_Tagging_Hash_From_DB;
+
 //fn to check the presence of a hash in the DB
 async function Get_Tagging_Hash_From_DB(hash) {
   hash_res = await GET_HASH_TAGGING_STMT.get(hash)

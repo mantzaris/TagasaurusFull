@@ -15,6 +15,7 @@ function Make_Salt() {
     }
     return salt;
 }
+exports.Make_Salt = Make_Salt
 
 
 async function Copy_Non_Taga_Files(result,dir_pics,Get_Tagging_Hash_From_DB){
@@ -23,17 +24,12 @@ async function Copy_Non_Taga_Files(result,dir_pics,Get_Tagging_Hash_From_DB){
     current_file_hashes_tmp = []
     file_paths_unique_hash = []
     file_paths = result.filePaths    
-    console.log(`file_paths = ${file_paths}`)
     for(ii=0; ii<file_paths.length;ii++) {  //
         file_path = file_paths[ii]
         //await file_paths.forEach( async file_path => {
         file_hash_tmp = Return_File_Hash(file_path);
-        console.log(`file_hash_tmp = ${file_hash_tmp}`)
         hash_tmp = await Get_Tagging_Hash_From_DB( file_hash_tmp );
-        console.log(`DB hash_tmp = ${hash_tmp}`)
-        console.log(`hash_tmp = ${hash_tmp}`)
         if(hash_tmp == undefined) {
-            console.log(`ready to handle file_path = ${file_path}`)
             filename = PATH.parse(file_path).base;
             filename_path_to_local = dir_pics+PATH.sep+filename
             if(FS.existsSync(filename_path_to_local)) {
@@ -50,7 +46,6 @@ async function Copy_Non_Taga_Files(result,dir_pics,Get_Tagging_Hash_From_DB){
 
         }
     }//)
-    console.log(`new_filename_array = ${new_filename_array}`)
     return new_filename_array
 }
 exports.Copy_Non_Taga_Files = Copy_Non_Taga_Files
