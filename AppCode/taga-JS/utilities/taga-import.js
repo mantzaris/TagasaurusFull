@@ -87,32 +87,29 @@ async function Import_FileName_Changes_Table_Fill() {
         destination_hash_record_tmp = Get_Record_With_Tagging_Hash_From_DB(filehash_tmp_import)
         filename_eql = destination_hash_record_tmp.imageFileName == filename_tmp_import
 
-        //file contents unique and no filename conflict: insert name and record as is
+        //file contents unique and no filename conflict: insert name and record as is-copy file over
         if( destination_filename_record_tmp == undefined && destination_hash_record_tmp == undefined ) {
             await INSERT_NAME_CHANGE_STMT.run( filename_tmp_import, filename_tmp_import, 'insert' );
             FS.copyFileSync(DB_import_data+filename_tmp_import, TAGA_DATA_destination+PATH.sep+filename_tmp_import, FS.constants.COPYFILE_EXCL)
         }
-        //file contents is present but filename is not overlapping: change name to destination name and merge records
+        //file contents is present but filename is not overlapping: change name to destination name and merge records-no copy needed
         if( destination_filename_record_tmp == undefined && destination_hash_record_tmp != undefined ) {
             await INSERT_NAME_CHANGE_STMT.run( filename_tmp_import, destination_hash_record_tmp.imageFileName, 'merge' );
-            FS.copyFileSync(DB_import_data+filename_tmp_import, TAGA_DATA_destination+PATH.sep+destination_hash_record_tmp.imageFileName, FS.constants.COPYFILE_EXCL)
         }
-        //file contents unique but filename is present conflicting with content: change name to unique name and insert records
+        //file contents unique but filename is present conflicting with content: change name to unique name and insert records-copy file over
         if( destination_filename_record_tmp != undefined && destination_hash_record_tmp == undefined ) {
             salt_tmp = MY_FILE_HELPER.Make_Salt()
             new_filename_tmp = PATH.parse(filename_tmp_import).name + salt_tmp + PATH.parse(filename_tmp_import).ext
             await INSERT_NAME_CHANGE_STMT.run( filename_tmp_import, new_filename_tmp, 'insert' );
             FS.copyFileSync(DB_import_data+filename_tmp_import, TAGA_DATA_destination+PATH.sep+new_filename_tmp, FS.constants.COPYFILE_EXCL)
         }
-        //filename and contents present and the contents under same name: no name change and merge records
+        //filename and contents present and the contents under same name: no name change and merge records-no copy needed
         if( destination_filename_record_tmp != undefined && destination_hash_record_tmp != undefined && filename_eql == true ) {
             await INSERT_NAME_CHANGE_STMT.run( filename_tmp_import, filename_tmp_import, 'merge' );
-            FS.copyFileSync(DB_import_data+filename_tmp_import, TAGA_DATA_destination+PATH.sep+filename_tmp_import, FS.constants.COPYFILE_EXCL)
         }
-        //filename and contents present but contents under a different name: change name to hashname and merge
+        //filename and contents present but contents under a different name: change name to hashname and merge-no copy needed
         if( destination_filename_record_tmp != undefined && destination_hash_record_tmp != undefined && filename_eql == false ) {
             await INSERT_NAME_CHANGE_STMT.run( filename_tmp_import, destination_hash_record_tmp.imageFileName, 'merge' );
-            FS.copyFileSync(DB_import_data+filename_tmp_import, TAGA_DATA_destination+PATH.sep+destination_hash_record_tmp.imageFileName, FS.constants.COPYFILE_EXCL)
         }
         record_import_tmp = await iter_import()
     }
