@@ -62,6 +62,8 @@ async function Import_User_Annotation_Data() {
             }
             //now find the new names for the files, that is the file name they should have when copied over
             await Import_FileName_Changes_Table_Fill()
+            //now migrate the information from import db to destination db using the 
+            Import_Records_DB_Info_Migrate()
 
 
         }
@@ -69,11 +71,65 @@ async function Import_User_Annotation_Data() {
 }
 
 
+//the table schema for the import name changes (imageFileNameOrig TEXT, imageFileNameNew TEXT, actionType TEXT)
+async function Import_Records_DB_Info_Migrate() {
+    GET_NAME_CHANGE_STMT = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} WHERE imageFileNameOrig=?;`);
+
+    //iterate through all the to be imported tagging records to get the name changes and action type
+    iter_import = await Import_Tagging_Image_DB_Iterator()
+    record_import_tmp = await iter_import()
+    while( record_import_tmp != undefined ) {
+        console.log(`record_import_tmp = ${JSON.stringify(record_import_tmp)}`)
+        //get the record filename and handle data on insert or merge based upon new name changes table
+        filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_import_tmp.imageFileName)
+
+        if( filename_change_record_tmp.actionType == 'insert' ) {
+            record_import_tmp.imageFileName = filename_change_record_tmp.imageFileNameNew
+            await DB_destination.Insert_Record_Into_DB(record_import_tmp)
+        } else if( filename_change_record_tmp.actionType == 'merge' ) {
+
+            record_dest_tmp = await DB_destination.Get_Tagging_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
+            record_dest_tmp.taggingRawDescription = record_dest_tmp.taggingRawDescription + '+' + record_import_tmp.taggingRawDescription
+            //go through the emotion key -overlaps- and merge values
+            dest_tmp_emotion_keys = Object.keys(record_dest_tmp["taggingEmotions"])
+            import_emotions_keys = Object.keys(record_import_tmp["taggingEmotions"])
+            import_emotions_keys.forEach(import_key_emotion_label => {
+                dest_tmp_emotion_keys.forEach(dest_emotion_key_label => {
+                    //emotion label overlap found
+                    if(import_key_emotion_label.toLowerCase() == dest_emotion_key_label.toLowerCase()) {
+                        record_dest_tmp["taggingEmotions"][dest_emotion_key_label] = 0.75*record_dest_tmp["taggingEmotions"][dest_emotion_key_label] - 0.25*record_import_tmp["taggingEmotions"][import_key_emotion_label]  
+                        
+                    }
+                })
+            })
+            //array difference, those on the import to copy over
+            diff_emotion_keys = import_emotions_keys.filter(x => !dest_tmp_emotion_keys.includes(x));
+            diff_emotion_keys.forEach(new_emotion_tmp => {
+                record_dest_tmp["taggingEmotions"][new_emotion_tmp] = record_import_tmp["taggingEmotions"][new_emotion_tmp]
+            })
+            //now concatenate the tagging Tags
+            diff_tags = record_import_tmp["taggingTags"].filter(x => !record_dest_tmp["taggingTags"].includes(x));
+            record_dest_tmp["taggingTags"] = record_dest_tmp["taggingTags"].concat(diff_tags)
+            //now the meme choices to be concatenated, each file name of the meme list must 
+            //loop through each meme to be imported get the new name and add to the list
+            tmp_meme_filenames = []
+            record_import_tmp["taggingMemeChoices"].forEach(async meme_filename_orig_tmp => {
+                meme_filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(meme_filename_orig_tmp)
+                tmp_meme_filenames.push(meme_filename_change_record_tmp.imageFileNameNew)
+            })
+            record_dest_tmp["taggingMemeChoices"] = [...new Set( record_dest_tmp["taggingMemeChoices"].concat(tmp_meme_filenames) )]
+
+            await DB_destination.Update_Tagging_Annotation_DB(record_dest_tmp)
+        }
+        record_import_tmp = await iter_import()
+    }
+}
+
 
 
 //the table schema for the import name changes (imageFileNameOrig TEXT, imageFileNameNew TEXT, actionType TEXT)
 async function Import_FileName_Changes_Table_Fill() {
-    INSERT_NAME_CHANGE_STMT = DB_import.prepare(`INSERT INTO ${TAGGING_TABLE_NAME} (imageFileNameOrig, imageFileNameNew, actionType) VALUES (?, ?, ?)`);
+    INSERT_NAME_CHANGE_STMT = DB_import.prepare(`INSERT INTO ${IMPORT_TABLE_NAME_CHANGES} (imageFileNameOrig, imageFileNameNew, actionType) VALUES (?, ?, ?)`);
     //iterate through all the to be imported tagging records to get the name changes and action type
     iter_import = await Import_Tagging_Image_DB_Iterator()
     record_import_tmp = await iter_import()
@@ -115,75 +171,6 @@ async function Import_FileName_Changes_Table_Fill() {
     }
 }
 
-
-//go through the tagging table
-//1 check the file image is present
-//2 see if the file image hash is present in the source db, 
-//3 if so; merge the annotation information. 
-//4 if not: insert into the db and copy over the image file. 
-//5 check the memes and meme table to make sure they are valid as well
-async function Import_Tagging_Data() {
-
-    //iterate over all the to be imported files of tagging START>>>
-    iter = await Import_Tagging_Image_DB_Iterator()
-    record_tmp = await iter()
-    while( record_tmp != undefined ) {
-
-        //check to make sure the data file is present/exists
-        filename_tmp = record_tmp.imageFileName
-        console.log(` record_tmp typeof = ${typeof(record_tmp)}`)
-        console.log(`DB_import_data+filename_tmp = ${DB_import_data+filename_tmp}`)
-        if( FS3.existsSync(DB_import_data+filename_tmp) == true ) {
-            console.log( `record_tmp = ${JSON.stringify(record_tmp)}` )
-            hash_tmp = record_tmp.imageFileHash
-            //see if the hash is present in the other user DB
-            hash_present = await Get_Tagging_Hash_From_DB(hash_tmp)
-            console.log(` hash_present = ${hash_present}`)
-            //file hash is not present so insert new record and copy file over
-            if( hash_present == undefined ) {
-                //copy the file over to the user data dir
-                filename_new = await MY_FILE_HELPER.Copy_Non_Taga_Files(DB_import_data+filename_tmp,TAGA_DATA_destination,Get_Tagging_Hash_From_DB);
-                record_tmp.imageFileName = filename_new
-                //now check for the memes associated with this new record inserted check images are present in file and records themselves
-                memes_tmp = JSON.parse(record_tmp.taggingMemeChoices)
-                memes_new = []
-                for( meme of memes_tmp ) {
-                    if( FS3.existsSync(DB_import_data+meme) == true ) {
-                        //there are more checks to be made but they can wait for a future version
-                        memes_new.push(meme)
-                    }
-                }
-                record_tmp.taggingMemeChoices = memes_new
-                await Insert_Record_Into_DB( record_tmp )
-            } else {
-                //merge records to combine annotation information since they overlap on an image annotation
-                record_orig = Get_Record_With_Tagging_Hash_From_DB( hash_tmp )
-                record_orig.taggingRawDescription = record_orig.taggingRawDescription + '     ' + record_tmp.taggingRawDescription
-                record_orig.taggingTags = [... new Set(record_orig.taggingTags.concat(record_tmp.taggingTags))]
-                record_orig_emotions = record_orig["taggingEmotions"];
-                record_orig_emotions_emotion_keys = Object.keys(record_orig_emotions)
-                record_tmp_emotions = JSON.parse(record_tmp["taggingEmotions"]);
-                record_tmp_emotions_emotion_keys = Object.keys(record_tmp_emotions)
-                record_tmp_emotions_emotion_keys.forEach( emotion_tmp_key => {
-                    //merge emotion
-                    if( record_orig_emotions_emotion_keys.includes(emotion_tmp_key) == true ) {
-                        record_orig["taggingEmotions"][emotion_tmp_key] = 0.8*(record_orig["taggingEmotions"][emotion_tmp_key]) + 0.2*(record_tmp["taggingEmotions"][emotion_tmp_key])
-                    } else {
-                        //include emotion
-                        record_orig["taggingEmotions"][emotion_tmp_key] = record_tmp["taggingEmotions"][emotion_tmp_key]
-                    }
-                })
-                record_orig["taggingMemeChoices"] = [... new Set( record_orig["taggingMemeChoices"].concat(JSON.parse(record_tmp["taggingMemeChoices"])) )]
-                await Update_Tagging_Annotation_DB(record_orig)
-            }
-        } else {
-            console.log('file not present!!!')
-        }
-        record_tmp = await iter()
-    }
-    //iterate over all the to be imported files of tagging END<<<
-
-}
 
 
 
