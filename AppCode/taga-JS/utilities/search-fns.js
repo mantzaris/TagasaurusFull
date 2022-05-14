@@ -74,7 +74,7 @@ async function Image_Meme_Search_DB(search_obj,tagging_meme_db_iterator,Get_Tagg
     meme_key_relevance_scores_filenames = [];
     image_tagging_meme_annotation_obj_tmp = await tagging_meme_db_iterator();
     while( image_tagging_meme_annotation_obj_tmp != undefined ) {
-        console.log(`line 77: image_tagging_meme_annotation_obj_tmp.imageMemeFileName = ${image_tagging_meme_annotation_obj_tmp.imageMemeFileName}`)
+        //console.log(`line 77: image_tagging_meme_annotation_obj_tmp.imageMemeFileName = ${image_tagging_meme_annotation_obj_tmp.imageMemeFileName}`)
         total_image_meme_match_score = await Meme_Image_Scoring(search_obj,image_tagging_meme_annotation_obj_tmp,Get_Tagging_Annotation_From_DB,search_tags_lowercase,search_memetags_lowercase);
         //get the overlap score for this image tmp
         if( meme_key_relevance_scores.length <= MAX_COUNT_SEARCH_RESULTS ) {
@@ -97,7 +97,7 @@ async function Image_Meme_Search_DB(search_obj,tagging_meme_db_iterator,Get_Tagg
     meme_img_indices_sorted.sort(function (a, b) { return meme_key_relevance_scores[a] < meme_key_relevance_scores[b] ? 1 : meme_key_relevance_scores[a] > meme_key_relevance_scores[b] ? -1 : 0; });
     
     meme_key_relevance_scores_filenames = meme_img_indices_sorted.map(i => meme_key_relevance_scores_filenames[i]);    
-    console.log(`meme_key_relevance_scores_filenames = ${meme_key_relevance_scores_filenames}`)
+    //console.log(`meme_key_relevance_scores_filenames = ${meme_key_relevance_scores_filenames}`)
     return meme_key_relevance_scores_filenames;
 }
 exports.Image_Meme_Search_DB = Image_Meme_Search_DB;
@@ -165,8 +165,8 @@ async function Meme_Addition_Image_Search_DB(search_obj,taggin_DB_iterator,Get_T
 exports.Meme_Addition_Image_Search_DB = Meme_Addition_Image_Search_DB
 //called in each loop for each image
 async function Meme_Addition_Image_Scoring(search_obj,image_tagging_annotation_obj_tmp,Get_Tagging_Annotation_From_DB,search_tags_lowercase,search_memetags_lowercase) {
-    console.log(`Meme_Addition_Image_Scoring search_obj json stringify = ${JSON.stringify(search_obj)}`)
-    console.log(`  search_obj = ${search_obj}`)
+    //console.log(`Meme_Addition_Image_Scoring search_obj json stringify = ${JSON.stringify(search_obj)}`)
+    //console.log(`  search_obj = ${search_obj}`)
     record_tmp_tags = image_tagging_annotation_obj_tmp["taggingTags"];
     record_tmp_emotions = image_tagging_annotation_obj_tmp["taggingEmotions"];
     record_tmp_memes = image_tagging_annotation_obj_tmp["taggingMemeChoices"];
@@ -189,15 +189,15 @@ async function Meme_Addition_Image_Scoring(search_obj,image_tagging_annotation_o
     //get the score for the memes
     meme_tag_overlap_score = 0
     meme_emotion_overlap_score = 0;
-    console.log(`line 192: image_tagging_annotation_obj_tmp = ${JSON.stringify(image_tagging_annotation_obj_tmp)}`)
+    //console.log(`line 192: image_tagging_annotation_obj_tmp = ${JSON.stringify(image_tagging_annotation_obj_tmp)}`)
     for (let rtm=0; rtm<record_tmp_memes.length; rtm++) {
         meme_record_tmp = await Get_Tagging_Annotation_From_DB(record_tmp_memes[rtm]);
-        console.log(`line 195: meme_record_tmp = ${JSON.stringify(meme_record_tmp)}`)
+        //console.log(`line 195: meme_record_tmp = ${JSON.stringify(meme_record_tmp)}`)
         meme_tmp_tags = meme_record_tmp["taggingTags"];
         meme_tag_overlap_score += (meme_tmp_tags.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length;
         record_tmp_emotions = meme_record_tmp["taggingEmotions"];
         record_tmp_emotion_keys = Object.keys(record_tmp_emotions)
-        console.log(`search_obj["meme_emotions"] = ${search_obj["meme_emotions"]}`)
+        //console.log(`search_obj["meme_emotions"] = ${search_obj["meme_emotions"]}`)
         search_emotions_keys = Object.keys(search_obj["meme_emotions"])
         search_emotions_keys.forEach(search_key_emotion_label => {
             record_tmp_emotion_keys.forEach(record_emotion_key_label => {
@@ -209,7 +209,7 @@ async function Meme_Addition_Image_Scoring(search_obj,image_tagging_annotation_o
             })
         })
     }
-    console.log(`line 212 total_image_match_score = ${tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score + meme_emotion_overlap_score}`)
+    //console.log(`line 212 total_image_match_score = ${tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score + meme_emotion_overlap_score}`)
     total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score + meme_emotion_overlap_score;
     return total_image_match_score;
 }
@@ -244,7 +244,7 @@ async function Meme_Addition_Image_Meme_Search_DB(search_obj,tagging_meme_db_ite
     meme_img_indices_sorted.sort(function (a, b) { return meme_key_relevance_scores[a] < meme_key_relevance_scores[b] ? 1 : meme_key_relevance_scores[a] > meme_key_relevance_scores[b] ? -1 : 0; });
     
     meme_key_relevance_scores_filenames = meme_img_indices_sorted.map(i => meme_key_relevance_scores_filenames[i]);    
-    console.log(`meme_key_relevance_scores_filenames = ${meme_key_relevance_scores_filenames}`)
+    //console.log(`meme_key_relevance_scores_filenames = ${meme_key_relevance_scores_filenames}`)
     return meme_key_relevance_scores_filenames;
 }
 exports.Meme_Addition_Image_Meme_Search_DB = Meme_Addition_Image_Meme_Search_DB;
