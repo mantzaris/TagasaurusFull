@@ -92,7 +92,7 @@ async function Import_Collection_ImageSet_Table_Records_Info_Migrate() {
     iter_collection_imageset_table_import = await Import_Collections_ImageSet_Table_Image_DB_Iterator()
     record_collection_imageset_table_import_tmp = await iter_collection_imageset_table_import()
     while( record_collection_imageset_table_import_tmp != undefined ) {
-        console.log(`record_collection_imageset_table_import_tmp = ${JSON.stringify(record_collection_imageset_table_import_tmp)}`)
+        //console.log(`record_collection_imageset_table_import_tmp = ${JSON.stringify(record_collection_imageset_table_import_tmp)}`)
         filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_collection_imageset_table_import_tmp.collectionImageFileName)
         collection_imageset_dest_record_tmp = await DB_destination.Get_Collection_IMAGE_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
         if( collection_imageset_dest_record_tmp == undefined ) { //image is not a meme in the destination db so 'insert'            
@@ -121,7 +121,7 @@ async function Import_Collection_Meme_Table_Records_Info_Migrate() {
     iter_collection_meme_table_import = await Import_Collections_Meme_Table_Image_DB_Iterator()
     record_collection_meme_table_import_tmp = await iter_collection_meme_table_import()
     while( record_collection_meme_table_import_tmp != undefined ) {
-        console.log(`record_collection_meme_table_import_tmp = ${JSON.stringify(record_collection_meme_table_import_tmp)}`)
+        //console.log(`record_collection_meme_table_import_tmp = ${JSON.stringify(record_collection_meme_table_import_tmp)}`)
         filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_collection_meme_table_import_tmp.collectionMemeFileName)
         meme_collection_dest_record_tmp = await DB_destination.Get_Collection_MEME_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
         if( meme_collection_dest_record_tmp == undefined ) { //image is not a meme in the destination db so 'insert'
@@ -149,7 +149,7 @@ async function Import_Collections_Records_Info_Migrate() {
     iter_collection_import = await Import_Collections_Image_DB_Iterator()
     record_collection_import_tmp = await iter_collection_import()
     while( record_collection_import_tmp != undefined ) {
-        console.log(`record_collection_import_tmp = ${JSON.stringify(record_collection_import_tmp)}`)
+        //console.log(`record_collection_import_tmp = ${JSON.stringify(record_collection_import_tmp)}`)
         collection_dest_record_tmp = await DB_destination.Get_Collection_Record_From_DB(record_collection_import_tmp.collectionName)
         if( collection_dest_record_tmp == undefined ) { //collection is not in the destination db so 'insert'
             //translate the file names for the destination file namespace created
@@ -228,7 +228,7 @@ async function Import_Meme_Table_Records_Info_Migrate() {
     iter_meme_table_import = await Import_Meme_Tagging_Image_DB_Iterator()
     record_meme_table_import_tmp = await iter_meme_table_import()
     while( record_meme_table_import_tmp != undefined ) {
-        console.log(`record_meme_table_import_tmp = ${JSON.stringify(record_meme_table_import_tmp)}`)
+        //console.log(`record_meme_table_import_tmp = ${JSON.stringify(record_meme_table_import_tmp)}`)
         filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_meme_table_import_tmp.imageMemeFileName)
         meme_tagging_dest_record_tmp = await DB_destination.Get_Tagging_MEME_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
         if( meme_tagging_dest_record_tmp == undefined ) { //image is not a meme in the destination db so 'insert'
@@ -264,7 +264,7 @@ async function Import_Records_DB_Info_Migrate() {
     iter_import = await Import_Tagging_Image_DB_Iterator()
     record_import_tmp = await iter_import()
     while( record_import_tmp != undefined ) {
-        console.log(`record_import_tmp = ${JSON.stringify(record_import_tmp)}`)
+        //console.log(`record_import_tmp = ${JSON.stringify(record_import_tmp)}`)
         //get the record filename and handle data on insert or merge based upon new name changes table
         filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_import_tmp.imageFileName)
 
@@ -326,7 +326,7 @@ async function Import_FileName_Changes_Table_Fill() {
     iter_import = await Import_Tagging_Image_DB_Iterator()
     record_import_tmp = await iter_import()
     while( record_import_tmp != undefined ) {
-        console.log(`record_import_tmp = ${JSON.stringify(record_import_tmp)}`)
+        //console.log(`record_import_tmp = ${JSON.stringify(record_import_tmp)}`)
         //get the record filename and hash to check if present or not
         filename_tmp_import = record_import_tmp.imageFileName
         filehash_tmp_import = record_import_tmp.imageFileHash
