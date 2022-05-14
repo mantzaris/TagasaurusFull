@@ -68,10 +68,71 @@ async function Import_User_Annotation_Data() {
             await Import_Meme_Table_Records_Info_Migrate()
             //now migrate the collections list from the import db to the destination DB 
             await Import_Collections_Records_Info_Migrate()
+            //now migrate the collections meme table from the import db to the destination DB
+            await Import_Collection_Meme_Table_Records_Info_Migrate()
+            //now migrate the collections imageset table from the import db to the destination DB
+            await Import_Collection_ImageSet_Table_Records_Info_Migrate()
 
         }
     })
 }
+
+
+
+
+//go through the collection image set table of the import db, this is the table which lists the 
+//image files which exist as image gallery members and for which collections they are memes of
+//eg. image1.jpg ->meme of-> [collection1, collection2, coolCollection]
+//use the iterator to iterate through the image  lists and insert or merge this record
+//(collectionImageFileName TEXT, collectionNames TEXT)`)
+async function Import_Collection_ImageSet_Table_Records_Info_Migrate() {
+    GET_NAME_CHANGE_STMT = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} WHERE imageFileNameOrig=?;`);
+
+    iter_collection_imageset_table_import = await Import_Collections_ImageSet_Table_Image_DB_Iterator()
+    record_collection_meme_table_import_tmp = await iter_collection_imageset_table_import()
+    while( record_collection_meme_table_import_tmp != undefined ) {
+        console.log(`record_collection_meme_table_import_tmp = ${JSON.stringify(record_collection_meme_table_import_tmp)}`)
+        filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_collection_meme_table_import_tmp.collectionImageFileName)
+        meme_tagging_dest_record_tmp = await DB_destination.Get_Collection_IMAGE_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
+        if( meme_tagging_dest_record_tmp == undefined ) { //image is not a meme in the destination db so 'insert'            
+            record_collection_meme_table_import_tmp.collectionImageFileName = filename_change_record_tmp.imageFileNameNew
+            await DB_destination.Insert_Collection_IMAGE_Record_From_DB(record_collection_meme_table_import_tmp)
+        } else { //image is a meme in destination, so concatenate the meme list for this image to include the images array
+            new_image_memes = [... new Set( meme_tagging_dest_record_tmp.collectionNames.concat(record_collection_meme_table_import_tmp.collectionNames) ) ]
+            await DB_destination.Update_Collection_IMAGE_Connections(filename_change_record_tmp.imageFileNameNew,meme_tagging_dest_record_tmp.collectionNames,new_image_memes)
+        }
+    }
+    record_collection_meme_table_import_tmp = await iter_collection_imageset_table_import()
+}
+
+
+
+
+//go through the collection meme table of the import db, this is the table which lists the 
+//image files which exist as memes and for which collections they are memes of
+//eg. meme1.jpg ->meme of-> [collection1, collection2.png, coolCollection]
+//use the iterator to iterate through the meme lists and insert or merge this record
+//(collectionMemeFileName TEXT, collectionNames TEXT)
+async function Import_Collection_Meme_Table_Records_Info_Migrate() {
+    GET_NAME_CHANGE_STMT = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} WHERE imageFileNameOrig=?;`);
+
+    iter_collection_meme_table_import = await Import_Collections_Meme_Table_Image_DB_Iterator()
+    record_collection_meme_table_import_tmp = await iter_collection_meme_table_import()
+    while( record_collection_meme_table_import_tmp != undefined ) {
+        console.log(`record_collection_meme_table_import_tmp = ${JSON.stringify(record_collection_meme_table_import_tmp)}`)
+        filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_collection_meme_table_import_tmp.collectionMemeFileName)
+        meme_tagging_dest_record_tmp = await DB_destination.Get_Collection_MEME_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
+        if( meme_tagging_dest_record_tmp == undefined ) { //image is not a meme in the destination db so 'insert'            
+            record_collection_meme_table_import_tmp.imageMemeFileName = filename_change_record_tmp.imageFileNameNew
+            await DB_destination.Insert_Meme_Tagging_Entry(record_collection_meme_table_import_tmp)
+        } else { //image is a meme in destination, so concatenate the meme list for this image to include the images array
+            new_image_memes = [... new Set( meme_tagging_dest_record_tmp.collectionNames.concat(record_collection_meme_table_import_tmp.collectionNames) ) ]
+            await DB_destination.Update_Collection_MEME_Connections(filename_change_record_tmp.imageFileNameNew,meme_tagging_dest_record_tmp.collectionNames,new_image_memes)
+        }
+    }
+    record_collection_meme_table_import_tmp = await iter_collection_meme_table_import()
+}
+
 
 
 
@@ -159,7 +220,7 @@ async function Import_Meme_Table_Records_Info_Migrate() {
     record_meme_table_import_tmp = await iter_meme_table_import()
     while( record_meme_table_import_tmp != undefined ) {
         console.log(`record_meme_table_import_tmp = ${JSON.stringify(record_meme_table_import_tmp)}`)
-        filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_meme_table_import_tmp.imageFileName)
+        filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_meme_table_import_tmp.imageMemeFileName)
         meme_tagging_dest_record_tmp = await DB_destination.Get_Tagging_MEME_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
         if( meme_tagging_dest_record_tmp == undefined ) { //image is not a meme in the destination db so 'insert'
             new_names_tmp = []
@@ -440,7 +501,7 @@ function Get_Obj_Meme_Table_Fields_From_Record(record) {
 
 
 
-//for the meme list of the importing db to merge/insert into the destination db
+//for the collection list of the importing db to merge/insert into the destination db
 //use via 'iter = await Import_Collections_Image_DB_Iterator()' and 'rr = await iter()'
 //after all rows complete 'undefined' is returned
 async function Import_Collections_Image_DB_Iterator() {
@@ -470,6 +531,72 @@ function Get_Obj_Collections_Fields_From_Record(record) {
     record.collectionDescriptionTags = JSON.parse(record.collectionDescriptionTags);
     record.collectionEmotions = JSON.parse(record.collectionEmotions);
     record.collectionMemes = JSON.parse(record.collectionMemes);
+    return record;
+}
+
+
+
+//for the collection meme table list of the importing db to merge/insert into the destination db
+//use via 'iter = await Import_Collections_Meme_Table_Image_DB_Iterator()' and 'rr = await iter()'
+//after all rows complete 'undefined' is returned
+async function Import_Collections_Meme_Table_Image_DB_Iterator() {
+    IMPORT_GET_COLLECTIONS_MEME_TABLE_MIN_ROWID_STMT = DB_import.prepare(`SELECT MIN(ROWID) AS rowid FROM ${COLLECTION_MEME_TABLE_NAME}`);
+    IMPORT_GET_COLLECTIONS_MEME_TABLE_RECORD_FROM_ROWID_TAGGING_STMT = DB_import.prepare(`SELECT * FROM ${COLLECTION_MEME_TABLE_NAME} WHERE ROWID=?`);
+    IMPORT_GET_COLLECTIONS_MEME_TABLE_NEXT_ROWID_STMT = DB_import.prepare(`SELECT ROWID FROM ${COLLECTION_MEME_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
+
+    iter_current_rowid = await IMPORT_GET_COLLECTIONS_MEME_TABLE_MIN_ROWID_STMT.get().rowid;
+    //inner function for closure
+    async function Import_Tagging_Collections_Meme_Table_Iterator_Next() {
+        if(iter_current_rowid == undefined) {
+        return undefined;
+        }
+        current_record = Get_Obj_Collections_Meme_Table_Fields_From_Record(await IMPORT_GET_COLLECTIONS_MEME_TABLE_RECORD_FROM_ROWID_TAGGING_STMT.get(iter_current_rowid));
+        tmp_rowid = await IMPORT_GET_COLLECTIONS_MEME_TABLE_NEXT_ROWID_STMT.get(iter_current_rowid);
+        if( tmp_rowid != undefined ) {
+        iter_current_rowid = tmp_rowid.rowid;
+        } else {
+        iter_current_rowid = undefined;
+        }
+        return current_record;
+    }
+    return Import_Tagging_Collections_Meme_Table_Iterator_Next;
+}
+function Get_Obj_Collections_Meme_Table_Fields_From_Record(record) {
+    record.collectionNames = JSON.parse(record.collectionNames);
+    return record;
+}
+
+
+
+
+//for the collection imageset table list of the importing db to merge/insert into the destination db
+//use via 'iter = await Import_Collections_ImageSet_Table_Image_DB_Iterator()' and 'rr = await iter()'
+//after all rows complete 'undefined' is returned
+//(collectionImageFileName TEXT, collectionNames TEXT)`)
+async function Import_Collections_ImageSet_Table_Image_DB_Iterator() {
+    IMPORT_GET_COLLECTIONS_IMAGESET_TABLE_MIN_ROWID_STMT = DB_import.prepare(`SELECT MIN(ROWID) AS rowid FROM ${COLLECTION_IMAGESET_TABLE_NAME}`);
+    IMPORT_GET_COLLECTIONS_IMAGESET_TABLE_RECORD_FROM_ROWID_TAGGING_STMT = DB_import.prepare(`SELECT * FROM ${COLLECTION_IMAGESET_TABLE_NAME} WHERE ROWID=?`);
+    IMPORT_GET_COLLECTIONS_IMAGESET_TABLE_NEXT_ROWID_STMT = DB_import.prepare(`SELECT ROWID FROM ${COLLECTION_IMAGESET_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
+
+    iter_current_rowid = await IMPORT_GET_COLLECTIONS_IMAGESET_TABLE_MIN_ROWID_STMT.get().rowid;
+    //inner function for closure
+    async function Import_Tagging_Collections_ImageSet_Iterator_Next() {
+        if(iter_current_rowid == undefined) {
+        return undefined;
+        }
+        current_record = Get_Obj_Collections_ImageSet_Table_Fields_From_Record(await IMPORT_GET_COLLECTIONS_IMAGESET_TABLE_RECORD_FROM_ROWID_TAGGING_STMT.get(iter_current_rowid));
+        tmp_rowid = await IMPORT_GET_COLLECTIONS_IMAGESET_TABLE_NEXT_ROWID_STMT.get(iter_current_rowid);
+        if( tmp_rowid != undefined ) {
+        iter_current_rowid = tmp_rowid.rowid;
+        } else {
+        iter_current_rowid = undefined;
+        }
+        return current_record;
+    }
+    return Import_Tagging_Collections_ImageSet_Iterator_Next;
+}
+function Get_Obj_Collections_ImageSet_Table_Fields_From_Record(record) {
+    record.collectionNames = JSON.parse(record.collectionNames);
     return record;
 }
 

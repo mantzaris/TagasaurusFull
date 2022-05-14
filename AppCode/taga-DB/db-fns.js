@@ -451,6 +451,11 @@ const UPDATE_FILENAME_MEME_TABLE_COLLECTION_STMT = DB.prepare(`UPDATE ${COLLECTI
 const INSERT_MEME_TABLE_COLLECTION_STMT = DB.prepare(`INSERT INTO ${COLLECTION_MEME_TABLE_NAME} (collectionMemeFileName, collectionNames) VALUES (?, ?)`);
 
 
+async function Insert_Collection_MEME_Record_From_DB(record) {
+  await INSERT_MEME_TABLE_COLLECTION_STMT.run( collectionName.collectionMemeFileName, JSON.stringify( collectionName.collectionNames ) );
+}
+exports.Insert_Collection_MEME_Record_From_DB = Insert_Collection_MEME_Record_From_DB;
+
 async function Update_Collection_MEME_Connections(collectionName,current_collection_memes,new_collection_memes) {
   // get the memes which no longer include this file (left difference [1,2,3] diff-> [1,3,4] => [2]) and from [2] remove/subtract the image filename from the array: difference = arr1.filter(x => !arr2.includes(x));
   remove_as_memes_filenames = current_collection_memes.filter(x => !new_collection_memes.includes(x)); //remove from meme connection
@@ -518,6 +523,12 @@ const GET_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT = DB.prepare(`SELECT * FROM ${C
 const UPDATE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT = DB.prepare(`UPDATE ${COLLECTION_IMAGESET_TABLE_NAME} SET collectionNames=? WHERE collectionImageFileName=?`);
 const INSERT_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT = DB.prepare(`INSERT INTO ${COLLECTION_IMAGESET_TABLE_NAME} (collectionImageFileName, collectionNames) VALUES (?, ?)`);
 const DELETE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT = DB.prepare(`DELETE FROM ${COLLECTION_IMAGESET_TABLE_NAME} WHERE collectionImageFileName=?`)
+
+
+async function Update_Collection_IMAGE_Record_From_DB(record) {
+  await INSERT_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.run( record.collectionImageFileName, JSON.stringify( collectionNames ) );
+}
+exports.Update_Collection_IMAGE_Record_From_DB = Update_Collection_IMAGE_Record_From_DB;
 
 
 async function Get_Collection_IMAGE_Record_From_DB(imageName) {
