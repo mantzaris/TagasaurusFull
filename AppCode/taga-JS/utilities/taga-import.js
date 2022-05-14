@@ -63,14 +63,55 @@ async function Import_User_Annotation_Data() {
             //now find the new names for the files, that is the file name they should have when copied over
             await Import_FileName_Changes_Table_Fill()
             //now migrate the information from import db to destination db using the 
-            Import_Records_DB_Info_Migrate()
-
+            await Import_Records_DB_Info_Migrate()
+            //now migrate the meme list from the import db to the destination DB using new file names
+            await Import_Meme_Table_Records_Info_Migrate()
+            //now migrate the collections list from the import db to the destination DB 
 
         }
     })
 }
 
 
+
+//go through the meme table of the import db, this is the table which lists the 
+//image files which exist as memes and for which images they are memes of
+//eg. meme1.jpg ->meme of-> [image1.jpg, image2.png, coolpic.jpg]
+//use the iterator to iterate through the meme lists and insert or merge this record
+//(imageMemeFileName TEXT, imageFileNames TEXT)
+async function Import_Meme_Table_Records_Info_Migrate() {
+    GET_NAME_CHANGE_STMT = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} WHERE imageFileNameOrig=?;`);
+
+    iter_meme_table_import = await Import_Meme_Tagging_Image_DB_Iterator()
+    record_meme_table_import_tmp = await iter_meme_table_import()
+    while( record_meme_table_import_tmp != undefined ) {
+        console.log(`record_meme_table_import_tmp = ${JSON.stringify(record_meme_table_import_tmp)}`)
+        filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_meme_table_import_tmp.imageFileName)
+        meme_tagging_dest_record_tmp = DB_destination.Get_Tagging_MEME_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
+        if( meme_tagging_dest_record_tmp == undefined ) { //image is not a meme in the destination db so 'insert'
+            new_names_tmp = []
+            for( image_name_tmp of record_meme_table_import_tmp.imageFileNames ) {
+                tmp_change = await GET_NAME_CHANGE_STMT.get(record_meme_table_import_tmp.imageFileName)
+                new_names_tmp.push(tmp_change.imageFileNameNew)
+            }
+            meme_table_entry_tmp = {imageMemeFileName: filename_change_record_tmp.imageFileNameNew, imageFileNames: new_names_tmp}
+            await DB_destination.Insert_Meme_Tagging_Entry(meme_table_entry_tmp)
+        } else { //image is a meme in destination, so concatenate the meme list for this image to include the images array
+            new_names_tmp = []
+            for( image_name_tmp of record_meme_table_import_tmp.imageFileNames ) {
+                tmp_change = await GET_NAME_CHANGE_STMT.get(record_meme_table_import_tmp.imageFileName)
+                new_names_tmp.push(tmp_change.imageFileNameNew)
+            }
+            new_image_memes = [... new Set( meme_tagging_dest_record_tmp.imageFileNames.concat(new_names_tmp) ) ]
+            await DB_destination.Update_Tagging_MEME_Connections(filename_change_record_tmp.imageFileNameNew,meme_tagging_dest_record_tmp.imageFileNames,new_image_memes)
+        }
+    }
+    record_meme_table_import_tmp = await iter_meme_table_import()
+}
+
+
+
+//insert or merge the recods from import db into the destination db
 //the table schema for the import name changes (imageFileNameOrig TEXT, imageFileNameNew TEXT, actionType TEXT)
 async function Import_Records_DB_Info_Migrate() {
     GET_NAME_CHANGE_STMT = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} WHERE imageFileNameOrig=?;`);
@@ -113,10 +154,10 @@ async function Import_Records_DB_Info_Migrate() {
             //now the meme choices to be concatenated, each file name of the meme list must 
             //loop through each meme to be imported get the new name and add to the list
             tmp_meme_filenames = []
-            record_import_tmp["taggingMemeChoices"].forEach(async meme_filename_orig_tmp => {
+            for( meme_filename_orig_tmp of record_import_tmp["taggingMemeChoices"] ) {
                 meme_filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(meme_filename_orig_tmp)
                 tmp_meme_filenames.push(meme_filename_change_record_tmp.imageFileNameNew)
-            })
+            }
             record_dest_tmp["taggingMemeChoices"] = [...new Set( record_dest_tmp["taggingMemeChoices"].concat(tmp_meme_filenames) )]
 
             await DB_destination.Update_Tagging_Annotation_DB(record_dest_tmp)
@@ -287,8 +328,36 @@ function Get_Obj_Fields_From_Record(record) {
     return record;
 }
 
+//for the meme list of the importing db to merge/insert into the destination db
+//use via 'iter = await Import_Meme_Tagging_Image_DB_Iterator()' and 'rr = await iter()'
+//after all rows complete 'undefined' is returned
+async function Import_Meme_Tagging_Image_DB_Iterator() {
+    IMPORT_GET_MEME_TABLE_MIN_ROWID_STMT = DB_import.prepare(`SELECT MIN(ROWID) AS rowid FROM ${TAGGING_MEME_TABLE_NAME}`);
+    IMPORT_GET_MEME_TABLE_RECORD_FROM_ROWID_TAGGING_STMT = DB_import.prepare(`SELECT * FROM ${TAGGING_MEME_TABLE_NAME} WHERE ROWID=?`);
+    IMPORT_GET_MEME_TABLE_NEXT_ROWID_STMT = DB_import.prepare(`SELECT ROWID FROM ${TAGGING_MEME_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
 
-
+    iter_current_rowid = await IMPORT_GET_MEME_TABLE_MIN_ROWID_STMT.get().rowid;
+    //inner function for closure
+    async function Import_Tagging_Meme_Table_Iterator_Next() {
+        if(iter_current_rowid == undefined) {
+        return undefined;
+        }
+        current_record = Get_Obj_Meme_Table_Fields_From_Record(await IMPORT_GET_MEME_TABLE_RECORD_FROM_ROWID_TAGGING_STMT.get(iter_current_rowid));
+        tmp_rowid = await IMPORT_GET_MEME_TABLE_NEXT_ROWID_STMT.get(iter_current_rowid);
+        if( tmp_rowid != undefined ) {
+        iter_current_rowid = tmp_rowid.rowid;
+        } else {
+        iter_current_rowid = undefined;
+        }
+        return current_record;
+    }
+    return Import_Tagging_Meme_Table_Iterator_Next;
+}
+function Get_Obj_Meme_Table_Fields_From_Record(record) {
+    //(imageMemeFileName TEXT, imageFileNames TEXT)
+    record.imageFileNames = JSON.parse(record.imageFileNames);
+    return record;
+}
 
 
 

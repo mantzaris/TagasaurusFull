@@ -208,6 +208,10 @@ const UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT = DB.prepare(`UPDATE ${TAGGING_MEM
 const INSERT_MEME_TABLE_TAGGING_STMT = DB.prepare(`INSERT INTO ${TAGGING_MEME_TABLE_NAME} (imageMemeFileName, imageFileNames) VALUES (?, ?)`);
 const DELETE_MEME_TABLE_ENTRY_STMT = DB.prepare(`DELETE FROM ${TAGGING_MEME_TABLE_NAME} WHERE imageMemeFileName=?`)
 
+async function Insert_Meme_Tagging_Entry(record) {
+  INSERT_MEME_TABLE_TAGGING_STMT.run( record.imageMemeFileName, JSON.stringify(record.imageFileNames) );
+}
+exports.Insert_Meme_Tagging_Entry = Insert_Meme_Tagging_Entry
 
 //change the stored obj to pure json obj on all the fields so no parsing at the controller side is needed for MEME
 function Get_Obj_Fields_From_MEME_Record(record) {
