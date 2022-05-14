@@ -102,8 +102,8 @@ async function Import_Collection_ImageSet_Table_Records_Info_Migrate() {
             new_image_of_collections = [... new Set( collection_imageset_dest_record_tmp["collectionNames"].concat(record_collection_imageset_table_import_tmp["collectionNames"]) ) ]
             await DB_destination.Update_Collection_IMAGE_Connections(filename_change_record_tmp.imageFileNameNew,collection_imageset_dest_record_tmp.collectionNames,new_image_of_collections)
         }
+        record_collection_imageset_table_import_tmp = await iter_collection_imageset_table_import()
     }
-    record_collection_imageset_table_import_tmp = await iter_collection_imageset_table_import()
 }
 
 
@@ -132,8 +132,8 @@ async function Import_Collection_Meme_Table_Records_Info_Migrate() {
             new_meme_collections = [... new Set( meme_collection_dest_record_tmp["collectionNames"].concat(record_collection_meme_table_import_tmp["collectionNames"]) ) ]
             await DB_destination.Update_Collection_MEME_Connections(filename_change_record_tmp.imageFileNameNew,meme_collection_dest_record_tmp.collectionNames,new_meme_collections)
         }
+        record_collection_meme_table_import_tmp = await iter_collection_meme_table_import()
     }
-    record_collection_meme_table_import_tmp = await iter_collection_meme_table_import()
 }
 
 
@@ -183,7 +183,11 @@ async function Import_Collections_Records_Info_Migrate() {
             }
             collection_dest_record_tmp.collectionMemes =   [... new Set( collection_dest_record_tmp["collectionMemes"].concat(new_meme_image_names_tmp) ) ]
 
-            collection_dest_record_tmp.collectionDescription = collection_dest_record_tmp.collectionDescription + ' imported : ' + record_collection_import_tmp.collectionDescription
+            if( record_collection_import_tmp.collectionDescription.length > 0 ) {
+                collection_dest_record_tmp.collectionDescription = collection_dest_record_tmp.collectionDescription + ' :imported: ' + record_collection_import_tmp.collectionDescription
+            } else {
+                collection_dest_record_tmp.collectionDescription = collection_dest_record_tmp.collectionDescription
+            }
             //now concatenate the tagging Tags
             diff_tags = record_collection_import_tmp["collectionDescriptionTags"].filter(x => !collection_dest_record_tmp["collectionDescriptionTags"].includes(x));
             collection_dest_record_tmp["collectionDescriptionTags"] = collection_dest_record_tmp["collectionDescriptionTags"].concat(diff_tags)
@@ -208,8 +212,8 @@ async function Import_Collections_Records_Info_Migrate() {
 
             await DB_destination.Update_Collection_Record_In_DB(collection_dest_record_tmp)
         }
+        record_collection_import_tmp = await iter_collection_import()
     }
-    record_collection_import_tmp = await iter_collection_import()
 }
 
 //go through the meme table of the import db, this is the table which lists the 
@@ -244,8 +248,8 @@ async function Import_Meme_Table_Records_Info_Migrate() {
             new_image_memes = [... new Set( meme_tagging_dest_record_tmp["imageFileNames"].concat(new_names_tmp) ) ]
             await DB_destination.Update_Tagging_MEME_Connections(filename_change_record_tmp.imageFileNameNew,meme_tagging_dest_record_tmp.imageFileNames,new_image_memes)
         }
-    }
-    record_meme_table_import_tmp = await iter_meme_table_import()
+        record_meme_table_import_tmp = await iter_meme_table_import()
+    }    
 }
 
 
@@ -329,7 +333,10 @@ async function Import_FileName_Changes_Table_Fill() {
 
         destination_filename_record_tmp = await DB_destination.Get_Tagging_Record_From_DB(filename_tmp_import)
         destination_hash_record_tmp = await DB_destination.Get_Record_With_Tagging_Hash_From_DB(filehash_tmp_import)
-        filename_eql = destination_hash_record_tmp.imageFileName == filename_tmp_import
+        filename_eql = false
+        if( destination_hash_record_tmp != undefined ) {
+            filename_eql = destination_hash_record_tmp.imageFileName == filename_tmp_import
+        }
 
         //file contents unique and no filename conflict: insert name and record as is-copy file over
         if( destination_filename_record_tmp == undefined && destination_hash_record_tmp == undefined ) {
@@ -493,9 +500,9 @@ async function Import_Meme_Tagging_Image_DB_Iterator() {
         current_record = Get_Obj_Meme_Table_Fields_From_Record(await IMPORT_GET_MEME_TABLE_RECORD_FROM_ROWID_TAGGING_STMT.get(iter_current_rowid));
         tmp_rowid = await IMPORT_GET_MEME_TABLE_NEXT_ROWID_STMT.get(iter_current_rowid);
         if( tmp_rowid != undefined ) {
-        iter_current_rowid = tmp_rowid.rowid;
+            iter_current_rowid = tmp_rowid.rowid;
         } else {
-        iter_current_rowid = undefined;
+            iter_current_rowid = undefined;
         }
         return current_record;
     }
