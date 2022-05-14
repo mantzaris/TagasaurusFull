@@ -477,11 +477,11 @@ async function Update_Collection_MEME_Connections(collectionName,current_collect
 }
 exports.Update_Collection_MEME_Connections = Update_Collection_MEME_Connections;
 
-async function Get_Collection_MEME_Record_From_DB(collectionName) {
-  row_obj = await GET_MEME_COLLECTION_TABLE_STMT.get(collectionName);
+async function Get_Collection_MEME_Record_From_DB(memeFileName) {
+  row_obj = await GET_MEME_COLLECTION_TABLE_STMT.get(memeFileName);
   if(row_obj == undefined) { //record non-existant so make one
-    INSERT_MEME_TABLE_COLLECTION_STMT.run( collectionName, JSON.stringify( [] ) );
-    row_obj = await GET_MEME_COLLECTION_TABLE_STMT.get(collectionName);
+    INSERT_MEME_TABLE_COLLECTION_STMT.run( memeFileName, JSON.stringify( [] ) );
+    row_obj = await GET_MEME_COLLECTION_TABLE_STMT.get(memeFileName);
   }
   row_obj = Get_Obj_Fields_From_Collection_MEME_Record(row_obj);
   return row_obj;
@@ -525,10 +525,10 @@ const INSERT_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT = DB.prepare(`INSERT INTO ${
 const DELETE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT = DB.prepare(`DELETE FROM ${COLLECTION_IMAGESET_TABLE_NAME} WHERE collectionImageFileName=?`)
 
 
-async function Update_Collection_IMAGE_Record_From_DB(record) {
+async function Insert_Collection_IMAGE_Record_From_DB(record) {
   await INSERT_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.run( record.collectionImageFileName, JSON.stringify( collectionNames ) );
 }
-exports.Update_Collection_IMAGE_Record_From_DB = Update_Collection_IMAGE_Record_From_DB;
+exports.Insert_Collection_IMAGE_Record_From_DB = Insert_Collection_IMAGE_Record_From_DB;
 
 
 async function Get_Collection_IMAGE_Record_From_DB(imageName) {
