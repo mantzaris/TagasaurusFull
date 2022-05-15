@@ -1,7 +1,7 @@
 
 ## This application presents for users a way of uniquely annotating a locally stored collection of images.
 
-A key feature is that emotions are stored by the user's explicit input over a set of values for a set of different emotions. This is in contrast to many models where emoticons represent a small set of specific emotions a user must choose from rather than _tune_
+A key feature is that emotions are stored by the user's explicit input over a set of values for a set of different emotions. This is in contrast to many models where emoticons represent a small set of specific emotions a user must choose from rather than _tune_. Another key feature is the ability for any image to become a meme of another image. Collections of images with memes for a collection can also be made. The user has the ability to search through images and collections based upon the annotation information overlaps, and also find relevant memes through the use of a search on the bi-partite graph. That is 'which images are memes to images with such criteria?'
 
 ## Using Tagasaurus
 
@@ -27,6 +27,13 @@ Mantzaris AV, Pandohie R, Hopwood M, Pho P, Ehling D, Walker TG.
 "Introducing Tagasaurus, an Approach to Reduce Cognitive Fatigue from Long-Term Interface Usage When Storing Descriptions and Impressions from Photographs."
 Technologies. 2021; 9(3):45. https://doi.org/10.3390/technologies9030045 
 ```
+
+![tagging](/TagasaurusReflections/screenshot1.png)
+
+![search](/TagasaurusReflections/screenshot2.png)
+
+![collections](/TagasaurusReflections/screenshot3.png)
+
 
 Connect on the social
 
