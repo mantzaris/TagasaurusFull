@@ -1,8 +1,143 @@
+Remember the awesome time of Nokia phones? But do you remember some of
+their software that came with it such as the Nokia LifeBlog?
+(https://en.wikipedia.org/wiki/Nokia_Lifeblog) it was great! What was
+missing from it were TAGS, a sharing mechanism, and the incentive
+dynamic.
 
-Kalashnikov: "Things that are complex are not useful, Things that are
-useful are simple."*
+Tim Berners-Lee describes his motivation and thinking for the URL in
+his biographies which emphasize the emergence of the WWW. Those
+concepts have taken not only root but rest like the Turtle which
+supposedly held up the universe. Do URLs and URIs with their
+insistance, or effort, to make things unique, not end up supporting
+our world on this hard but brittle 'shell'?  Our world has redundancy
+and the organic nature of life promotes redundancy. Resources in
+nature have duplicates and it is a natural occurance which is not
+truly embraced with the 'U' in URLs.
 
-- What do we want to do? Solve problems.
+This document, https://www.ietf.org/rfc/rfc3986.txt, describes in more
+detail the motivational mindset that continues on this path when
+defining the URI in 2005. From the Abstract: <...resolving URI
+references that might be in relative form, along with guidelines and
+security considerations for the use of URIs on the Internet. The URI
+syntax defines a grammar that is a superset of all valid URIs...>, and
+the keywords 'resolving'/'security'/'valid'. These keywords have to
+emerge once you place that letter 'U' for universal/unique/uniform
+etc. It is a basic axiom from which other assumptions emerge
+directly. What is wrong with them? You have to 'resolve' issues from
+the stochastic nature of life to keep a common understanding, you have
+to keep it secure as to have the uniform it will need a central
+authority. This introduces, a vulnerability to the whole network and
+the word valid means there has to be a gatekeeper regardless of how
+that deciding entity is given access.
+
+Even from early on in the document: 1.1. Overview of URIs
+
+   URIs are characterized as follows:
+
+   Uniform
+
+      Uniformity provides several benefits.  It allows different types
+      of resource identifiers to be used in the same context, even
+      when the mechanisms used to access those resources may differ.
+      It allows uniform semantic interpretation of common syntactic
+      conventions across different types of resource identifiers.  It
+      allows introduction of new types of resource identifiers without
+      interfering with the way that existing identifiers are used.  It
+      allows the identifiers to be reused in many different contexts,
+      thus permitting new applications or protocols to leverage a pre-
+      existing, large, and widely used set of resource identifiers.
+
+<Uniformity provides some benefits...> Ok, but does it take any other
+benefits away?.. < It allows different types of resource identifiers
+to be used in the same context> Yes, that is correct but can you then
+use those types in different context without making mix ups?
+
+And Tim Berners-Lee finds it surprising that the web and data is under
+control and is trying to fix it with Inrupt and Solid using the same
+axioms of information space?..
+
+It is reinforced throughout the document; "Each URI begins with a
+scheme name, as defined in Section 3.1, that refers to a specification
+for assigning identifiers within that scheme. As such, the URI syntax
+is a federated" and how does he find himself surprised that the
+internet evolved the way it did when its design designates a single
+mapping source all resources rely on? There are some key
+impracticalities such as "A URI often has to be remembered by people,
+and it is easier for people to remember a URI when it consists of
+meaningful or familiar components.", but how can those be easy if all
+resources get compressed into a single universal namespace? It becomes
+obvious what challenges are imposed by looking at the remaining
+document outlining a bureaucracy of how to deal with all of the issues
+of the locations and identifications of resources. Yes, it brings a
+benefit set listed, but the question is; if I let go of those
+requirements can I get something in return for the loss? Hopefully
+something equally as good. At the moment it looks like a realestate
+competition.
+
+The Good Stuff ---- After having pointed out all the things that can
+be reassessed, there are some brilliant concepts that should be
+utilized. Especially the concept of the RDF Triple store:
+https://en.wikipedia.org/wiki/Triplestore and
+https://www.w3.org/TR/rdf11-concepts/#section-triples that was
+introduced with the concept of the semantic web. This creates a three
+component entity of each resource into: (Subject, Predicate,
+Object). An example can be (Subject='Steve', Predicate='is',
+Object='happy') where each triple store element can be seen as a node
+and these elements/literals can be connected with a directed
+edge. What is even more amazing is that this creates a directed set of
+nodes which other triple stores can overlap due to their common use of
+node entity references and ... subsequently create a network!
+(remember that networks are powerful)
+
+Each subject can be seen as an Actor to make an Actor-network. It then
+can tell a story which can be a play that might remind some of the
+Shakespeare quote that we are all actors in a play, but did you know
+that the Roman philosopher Epectitus said something similar many years
+before that?! What is more interesting is that the romantic languages
+(and others) give the ability for verbs to apply to inanimate objects
+and for them to have grammatical gender so that they are given a bit
+of personality. This in Homer is evident in parts where its described
+how the arrow raced with all its might to the target, or even in
+George Martin's Game of Thrones books which also uses the Homer
+structure where there are chapters for each character in the great
+war; when Tyrion is in the underground tunnel system turning the
+frozen lock and its described how the 'lock screamed in protest'. So
+this means our triple store can have even
+(Subject1,Predicate,Subject2) since they have a connection declaration
+where another possible Subject acts as an Object. Niklas Luhmann
+discussed the actor-network in his theories.
+
+If the 'U' is dropped then there can be disjoint graphs and also
+within connected nodes contradicting associations producing
+effectively Multiple views which are different universes each sees so;
+there is a MULTIVERSE. Funny enough, Luhmann touched on this and from
+<https://link.springer.com/chapter/10.1057/9781137015297_13> 'society
+can be represented as a multiverse and not a single unique universe'
+when considering the 'autopoietic self-constructed perceptions of
+reality'. Why would separations on ontological graphs create anything
+as grand as a 'multiverse'? It is because it allows for a local view
+of entity interactions to exist without succumbing to the over arching
+influence of the dominant analogous entity in the superset.
+
+(@mantzaris: my dad, Panos Mantzaris, made a remark that the approach
+is more Aristotelian than Platonic since Plato promoted the idea that
+there are ideal constructions all of us use in references of language
+while Aristotle believed in the individual perspective being what an
+individual uses to make decisions.
+
+There are implications for this basic initial fork in the philosophy.
+Just take a look at https://www.w3.org/DesignIssues/HTTP-URI.html
+where Tim Berners Lee makes a long spiral chain of arguments to pin
+down what a URI means when it is engineered. The attempt to
+"philosophically engineer" even emails is confronted with a range of
+theoretical solutions which appear to lead no where after rounds of
+debate and consideration;
+https://www.w3.org/DesignIssues/PhilosophicalEngineering.html. The
+central unit organization has a lot of work to make sure local
+stochasticity does not disrupt and spread. To avoid handling all those
+issues, protocols and regulations try to catch similar circumstances
+in the future to save time and money for the command center (or
+consortium).
 
 - What problem have we identified? Adding suitable meta-data (like
   tags) to resources/content/media/files is cumbersome and time
@@ -15,9 +150,10 @@ useful are simple."*
 
 - How will that work? Meta-data is applied to content by users which
   is then shared, users receiving new content and the associated
-  meta-data sample the compatibility of the datasets applying a confirmation or
-  disapproval of the meta-data which is then used to decide whether
-  the source user's data is compatible for a merge or not.
+  meta-data sample the compatibility of the datasets applying a
+  confirmation or disapproval of the meta-data which is then used to
+  decide whether the source user's data is compatible for a merge or
+  not.
 
 - Why will people bother using it? Time is precious and this tool will
   take time from the user, to help them avoid wasting even more time
@@ -38,45 +174,66 @@ very easily. It can be kept simple by relying on the premise that any
 activity which a user produces can be shared with other users that can
 express their approval or disapproval.
 
-Why not use the method of Marko Rodriguez, the famous graph database scientist
-behind TitanDB and infamous Twitter user who also is a chicken farmer?
-Yes, the method of <Rodriguez, M. A. (2009). A graph analysis of the linked data cloud. arXiv preprint arXiv:0903.0194.>
-is very intresting but even in the abstract he says "integrating Resource Description Framework (RDF)data sets into a single unified representation"
-and does not deviate from that premise. There is the effort to do this
-'automatically' in <Rodriguez, M. A., Bollen, J., & Sompel, H. V. D. (2009). Automatic metadata generation using associative networks. ACM Transactions on Information Systems (TOIS), 27(2), 1-20.>
-but all those automatic approaches always find barriers in the inability to appreciate rich media content. You may even bring up his work of
-<Rodriguez, M. A. (2007, January). Social decision making with multi-relational networks and grammar-based particle swarms. In 2007 40th Annual Hawaii International Conference on System Sciences (HICSS'07) (pp. 39-39). IEEE.> 
-where the relations propagate through the network; but it never actually involves the user in that propagation! 
-The propagation without a user filtration for context means that errors can grow from the constant relevant signal of ontological information. 
-There is also an approach by Mantzaris <Mantzaris, A. V., Walker, T. G., Taylor, C. E., & Ehling, D. (2019). Adaptive network diagram constructions 
-for representing big data event streams on monitoring dashboards. Journal of Big Data, 6(1), 1-19.> 
-which allows meta-data variables to associate through frequency of co-occurances, but even though that does allow for overlaps of ontological tags, 
-and a natural growth of edge types for separations permitting even disjoint networks; 
-its method of analysis is aimed at people being able to visualize the network topologies rather than incentive them to tag or to organize 
-their accumulated resource set.
+Why not use the method of Marko Rodriguez, the famous graph database
+scientist behind TitanDB and infamous Twitter user who also is a
+chicken farmer?  Yes, the method of <Rodriguez, M. A. (2009). A graph
+analysis of the linked data cloud. arXiv preprint arXiv:0903.0194.> is
+very intresting but even in the abstract he says "integrating Resource
+Description Framework (RDF)data sets into a single unified
+representation" and does not deviate from that premise. There is the
+effort to do this 'automatically' in <Rodriguez, M. A., Bollen, J., &
+Sompel, H. V. D. (2009). Automatic metadata generation using
+associative networks. ACM Transactions on Information Systems (TOIS),
+27(2), 1-20.> but all those automatic approaches always find barriers
+in the inability to appreciate rich media content from different
+content reference points. You may even bring up his work of
+<Rodriguez, M. A. (2007, January). Social decision making with
+multi-relational networks and grammar-based particle swarms. In 2007
+40th Annual Hawaii International Conference on System Sciences
+(HICSS'07) (pp. 39-39). IEEE.> where the relations propagate through
+the network; but it never actually involves the user in that
+propagation!  The propagation without a user filtration for context
+means that errors can grow from the constant relevant signal of
+ontological information.  There is also an approach by Mantzaris
+<Mantzaris, A. V., Walker, T. G., Taylor, C. E., & Ehling,
+D. (2019). Adaptive network diagram constructions for representing big
+data event streams on monitoring dashboards. Journal of Big Data,
+6(1), 1-19.> which allows meta-data variables to associate through
+frequency of co-occurances, but even though that does allow for
+overlaps of ontological tags, and a natural growth of edge types for
+separations permitting even disjoint networks; its method of analysis
+is aimed at people being able to visualize the network topologies
+rather than incentive them to tag or to organize their accumulated
+resource set.
 
-Once completed would this not fulfill the aspriration of Marvin Minsky to build a database of
-common sense? Yes and no. He wanted a database for all common sense of people as a single map
-which would mean that there would be so many exceptions for each rule/association that it would
-not generalize well. People evolve and so does their view of common sense. What is even more daunting
-is the realization that as 'common sense' evolves, changes, there are pockets of localized deviations
-which are highly specific to a group which may or may not propagate through the network. 
-The idea of relying upon localized incentive to perform the actions in an ad-hoc localized manner seems more plausible. 
+Once completed would this not fulfill the aspriration of Marvin Minsky
+to build a database of common sense? Yes and no. He wanted a database
+for all common sense of people as a single map which would mean that
+there would be so many exceptions for each rule/association that it
+would not generalize well. People evolve and so does their view of
+common sense. What is even more daunting is the realization that as
+'common sense' evolves, changes, there are pockets of localized
+deviations which are highly specific to a group which may or may not
+propagate through the network.  The idea of relying upon localized
+incentive to perform the actions in an ad-hoc localized manner seems
+more plausible.
 
-*There is another version of this quote by Kalashnikov: "When a
-young man, I read somewhere the following: God the Almighty said, 
-'All that is too complex is unnecessary, and it is simple that is needed'
-So this has been my lifetime motto – I have been creating weapons to defend the borders of
-my fatherland, to be simple and reliable.”
+*There is another version of this quote by Kalashnikov: "When a young
+man, I read somewhere the following: God the Almighty said, 'All that
+is too complex is unnecessary, and it is simple that is needed' So
+this has been my lifetime motto – I have been creating weapons to
+defend the borders of my fatherland, to be simple and reliable.” This
+was restated in the future as "Things that are complex are not useful,
+things that are useful are simple."
 
-From the book, "The Unfinished Revolution: How to Make Technology Work for Us--Instead of the Other Way Around", by the late Michael Dertouzos 
-we can understand that his vision assumed individuals with local storage that would then choose to integrate their 
-searches and data with others based upon the chosen demand. 
+From the book, "The Unfinished Revolution: How to Make Technology Work
+for Us--Instead of the Other Way Around", by the late Michael
+Dertouzos we can understand that his vision assumed individuals with
+local storage that would then choose to integrate their searches and
+data with others based upon the chosen demand.
 
-Linus Torvalds: "Talk is cheap, show me the code"
--why is it cheap?
-Martti Malmi: "Code speaks louder than words"
--and again, why?
+Linus Torvalds: "Talk is cheap, show me the code" -why is it cheap?
+Martti Malmi: "Code speaks louder than words" -and again, why?
 Marshall McLuhan: "the medium is the message"
 
 Chaos. Good news.
