@@ -1,14 +1,16 @@
 {
   "name": "tagasaurus",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Tag the Planet!",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
+  "author": "Alexander V. Mantzaris",
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mantzaris/Tagasaurus.git"
+    "url": "https://github.com/mantzaris/Tagasaurus.git"
+  },
+  "homepage": "https://github.com/mantzaris/Tagasaurus#readme",
+  "bugs": {
+    "url": "https://github.com/mantzaris/Tagasaurus/issues"
   },
   "keywords": [
     "tagging",
@@ -19,10 +21,13 @@
     "sentiment",
     "hastags"
   ],
-  "author": "Alexander V. Mantzaris, Thomas G. Walker",
-  "license": "CC0-1.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
   "devDependencies": {
     "electron": "^18.0.0",
+    "electron-builder": "^23.0.3",
     "electron-rebuild": "^3.2.7",
     "electron-reload": "^1.5.0",
     "electron-reloader": "^1.2.0"
@@ -36,11 +41,46 @@
     "json": "^11.0.0",
     "masonry-layout": "^4.2.2",
     "path": "^0.12.7",
-    "sql.js": "^1.5.0",
-    "sqlite3": "^5.0.2"
+    "sql.js": "^1.5.0"
   },
-  "bugs": {
-    "url": "https://github.com/mantzaris/Tagasaurus/issues"
+  "selfUpdate": false,
+  "build": {
+    "appId": "tagasaurus",
+    "artifactName": "tagasaurus.app",
+    "files": [
+      "!.github",
+      "!README.md"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable",
+        "zip"
+      ],
+      "icon": "build/TagaIcon1024x1024.ico"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "snap",
+        "deb",
+        "rpm",
+        "pacman",
+        "tar.gz"
+      ],
+      "icon": "build/TagaIcon1024x1024.png",
+      "maintainer": "mantzaris",
+      "category": "utility"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": false,
+      "artifactName": "tagasaurus.app"
+    },
+    "portable": {
+      "artifactName": "tagasaurus.app"
+    }
   },
-  "homepage": "https://github.com/mantzaris/Tagasaurus#readme"
+  "postinstall": "electron-builder install-app-deps"
 }
