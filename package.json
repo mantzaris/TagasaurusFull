@@ -46,7 +46,7 @@
   "selfUpdate": false,
   "build": {
     "appId": "tagasaurus",
-    "artifactName": "tagasaurus.app",
+    "artifactName": "${productName}_${version}_${os}.${ext}",
     "files": [
       "!.github",
       "!README.md"
@@ -61,12 +61,7 @@
     },
     "linux": {
       "target": [
-        "AppImage",
-        "snap",
-        "deb",
-        "rpm",
-        "pacman",
-        "tar.gz"
+        "deb"
       ],
       "icon": "build/TagaIcon1024x1024.png",
       "maintainer": "mantzaris",

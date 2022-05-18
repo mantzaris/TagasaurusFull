@@ -166,7 +166,7 @@ app.on('window-all-closed', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV;
 if (env === 'development') {
   require('electron-reload')(__dirname, {
       electron: PATH.join(__dirname, 'node_modules', '.bin', 'electron'),
