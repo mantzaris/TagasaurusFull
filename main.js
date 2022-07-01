@@ -26,7 +26,8 @@ function createWindow () {
     }
   })
   //LOAD THE STARTING .html OF THE APP->
-  mainWindow.loadFile(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'welcome-screen.html')
+  //mainWindow.loadFile(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'welcome-screen.html')
+  mainWindow.loadFile(PATH.resolve(__dirname,'./AppCode/welcome-screen.html'))
   // mainWindow.webContents.openDevTools()
 }
 
