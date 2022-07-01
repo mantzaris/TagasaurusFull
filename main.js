@@ -69,8 +69,7 @@ tagging_meme_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master
 tagging_meme_table_exists_res = tagging_meme_table_exists_stmt.get();
 //if tagging table does not exit, so create it
 if( tagging_meme_table_exists_res["count(*)"] == 0 ){
-  STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${TAGGING_MEME_TABLE_NAME}
-                    (imageMemeFileName TEXT, imageFileNames TEXT)`);
+  STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${TAGGING_MEME_TABLE_NAME} (imageMemeFileName TEXT, imageFileNames TEXT)`);
   STMT.run();
   //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
   STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX imageMemeFileNameIndex ON ${TAGGING_MEME_TABLE_NAME} (imageMemeFileName); `);
@@ -81,8 +80,7 @@ collection_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master W
 collection_table_exists_res = collection_table_exists_stmt.get();
 //if collection table does not exit, so create it
 if( collection_table_exists_res["count(*)"] == 0 ){
-  STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTIONS_TABLE_NAME}
-                    (collectionName TEXT, collectionImage TEXT, collectionImageSet TEXT, 
+  STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTIONS_TABLE_NAME} (collectionName TEXT, collectionImage TEXT, collectionImageSet TEXT, 
                       collectionDescription TEXT, collectionDescriptionTags TEXT,
                       collectionEmotions TEXT, collectionMemes TEXT)`);
   STMT.run();
@@ -96,11 +94,12 @@ collection_meme_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_mas
 collection_meme_table_exists_res = collection_meme_table_exists_stmt.get();
 //if collection table does not exit, so create it
 if( collection_meme_table_exists_res["count(*)"] == 0 ) {
-  STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTION_MEME_TABLE_NAME}
-                    (collectionMemeFileName TEXT, collectionNames TEXT)`);
+  STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTION_MEME_TABLE_NAME} (collectionMemeFileName TEXT, collectionNames TEXT)`);
   STMT.run(); //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
   STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX collectionMemeFileNameIndex ON ${COLLECTION_MEME_TABLE_NAME} (collectionMemeFileName); `);
   STMT_index1.run();
+} else {
+  console.log('line 105 ')
 }
 //The collections also have an 'imageSet' as a gallery for the images associated with the collection name
 //this needs to be updated so that when an image in the tagging phase is deleted, that there is an efficient look up to remove stale/lingering links
@@ -108,11 +107,13 @@ collection_imageset_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite
 collection_imageset_table_exists_res = collection_imageset_table_exists_stmt.get();
 //if collection table does not exit, so create it
 if( collection_imageset_table_exists_res["count(*)"] == 0 ) {
-  STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTION_IMAGESET_TABLE_NAME}
-                    (collectionImageFileName TEXT, collectionNames TEXT)`);
+  console.log(`line 111 in main js about to create the COLLECTION_IMAGESET_TABLE_NAME again`)
+  STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTION_IMAGESET_TABLE_NAME} (collectionImageFileName TEXT, collectionNames TEXT)`);
   STMT.run(); //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
   STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX collectionImageFileNameIndex ON ${COLLECTION_IMAGESET_TABLE_NAME} (collectionImageFileName); `);
   STMT_index1.run();
+} else {
+  console.log(`not creating table in main js 117: collection_imageset_table_exists_res["count(*)"] = ${collection_imageset_table_exists_res["count(*)"]}`)
 }
 //DB SET UP END<<<
 

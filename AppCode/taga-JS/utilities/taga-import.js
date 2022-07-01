@@ -98,7 +98,9 @@ async function Import_Collection_ImageSet_Table_Records_Info_Migrate() {
     while( record_collection_imageset_table_import_tmp != undefined ) {
         //console.log(`record_collection_imageset_table_import_tmp = ${JSON.stringify(record_collection_imageset_table_import_tmp)}`)
         //console.log(`record_collection_imageset_table_import_tmp.collectionImageFileName= ${record_collection_imageset_table_import_tmp.collectionImageFileName}`)
+        console.log(`line 101; record_collection_imageset_table_import_tmp = ${JSON.stringify(record_collection_imageset_table_import_tmp)}`)
         filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_collection_imageset_table_import_tmp.collectionImageFileName)
+        console.log(`line 102; filename_change_record_tmp = ${filename_change_record_tmp}`)
         collection_imageset_dest_record_tmp = await DB_destination.Get_Collection_IMAGE_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
         if( collection_imageset_dest_record_tmp == undefined ) { //image is not a meme in the destination db so 'insert'            
             record_collection_imageset_table_import_tmp.collectionImageFileName = filename_change_record_tmp.imageFileNameNew
@@ -126,8 +128,10 @@ async function Import_Collection_Meme_Table_Records_Info_Migrate() {
     iter_collection_meme_table_import = await Import_Collections_Meme_Table_Image_DB_Iterator()
     record_collection_meme_table_import_tmp = await iter_collection_meme_table_import()
     while( record_collection_meme_table_import_tmp != undefined ) {
-        //console.log(`record_collection_meme_table_import_tmp = ${JSON.stringify(record_collection_meme_table_import_tmp)}`)
+        console.log(`record_collection_meme_table_import_tmp = ${JSON.stringify(record_collection_meme_table_import_tmp)}`)
+
         filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_collection_meme_table_import_tmp.collectionMemeFileName)
+        console.log(`line 133: filename_change_record_tmp = ${JSON.stringify(filename_change_record_tmp)}`)
         meme_collection_dest_record_tmp = await DB_destination.Get_Collection_MEME_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
         if( meme_collection_dest_record_tmp == undefined ) { //image is not a meme in the destination db so 'insert'
             record_collection_meme_table_import_tmp.collectionMemeFileName = filename_change_record_tmp.imageFileNameNew
@@ -285,7 +289,7 @@ async function Import_Records_DB_Info_Migrate() {
         if( filename_change_record_tmp.actionType == 'insert' ) {
             record_import_tmp.imageFileName = filename_change_record_tmp.imageFileNameNew
             tmp_meme_filenames = []
-            for( meme_filename_orig_tmp of record_import_tmp["taggingMemeChoices"] ) {
+            for( meme_filename_tmp of record_import_tmp["taggingMemeChoices"] ) {
             //record_import_tmp["taggingMemeChoices"].forEach(async meme_filename_tmp => {
                 meme_filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(meme_filename_tmp)
                 //console.log(`meme_filename_change_record_tmp = ${JSON.stringify(meme_filename_change_record_tmp)}`)

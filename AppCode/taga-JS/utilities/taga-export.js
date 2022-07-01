@@ -99,6 +99,7 @@ async function Export_User_Annotation_Data() {
                 iter_meme_collection = await Collection_MEME_DB_Iterator();
                 collection_meme_record_tmp = await iter_meme_collection()
                 while( collection_meme_record_tmp != undefined ) {
+                    console.log(`collection_meme_record_tmp = `,collection_meme_record_tmp)
                     let content = JSON.stringify(collection_meme_record_tmp)
                     content += "\n";
                     FS.appendFile(path_chosen.filePath + PATH.sep + 'COLLECTIONS-MEMES.json', content, (err) => {

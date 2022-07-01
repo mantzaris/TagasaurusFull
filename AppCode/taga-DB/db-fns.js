@@ -455,11 +455,12 @@ const INSERT_MEME_TABLE_COLLECTION_STMT = DB.prepare(`INSERT INTO ${COLLECTION_M
 
 
 async function Insert_Collection_MEME_Record_From_DB(record) {
-  await INSERT_MEME_TABLE_COLLECTION_STMT.run( collectionName.collectionMemeFileName, JSON.stringify( collectionName.collectionNames ) );
+  await INSERT_MEME_TABLE_COLLECTION_STMT.run( record.collectionMemeFileName, JSON.stringify( record.collectionNames ) );
 }
 exports.Insert_Collection_MEME_Record_From_DB = Insert_Collection_MEME_Record_From_DB;
 
 async function Update_Collection_MEME_Connections(collectionName,current_collection_memes,new_collection_memes) {
+  //alter the left diff in the meme set and then alter the right diff in the meme set
   // get the memes which no longer include this file (left difference [1,2,3] diff-> [1,3,4] => [2]) and from [2] remove/subtract the image filename from the array: difference = arr1.filter(x => !arr2.includes(x));
   remove_as_memes_filenames = current_collection_memes.filter(x => !new_collection_memes.includes(x)); //remove from meme connection
   for(meme_filename of remove_as_memes_filenames) {
@@ -467,9 +468,9 @@ async function Update_Collection_MEME_Connections(collectionName,current_collect
     meme_table_record = await Get_Collection_MEME_Record_From_DB(meme_filename);
     new_array_tmp = meme_table_record.collectionNames.filter(item => item !== collectionName)
     if( new_array_tmp.length == 0) {
-      DELETE_COLLECTION_MEME_TABLE_ENTRY_STMT.run( meme_filename )
+      await DELETE_COLLECTION_MEME_TABLE_ENTRY_STMT.run( meme_filename )
     }
-    UPDATE_FILENAME_MEME_TABLE_COLLECTION_STMT.run( JSON.stringify(new_array_tmp) , meme_filename )
+    await UPDATE_FILENAME_MEME_TABLE_COLLECTION_STMT.run( JSON.stringify(new_array_tmp) , meme_filename )
   }//);
   // get the right difference ([1,2,3] diff -> [1,3,4] => [4]) and from [4] include/add this imagefilename in the array: diff2 = b.filter(x => !a.includes(x));
   add_as_memes_filenames = new_collection_memes.filter(x => !current_collection_memes.includes(x)); //new meme connections to record
@@ -477,7 +478,7 @@ async function Update_Collection_MEME_Connections(collectionName,current_collect
   //add_as_memes_filenames.forEach(async meme_filename => {
     meme_table_record = await Get_Collection_MEME_Record_From_DB(meme_filename);
     meme_table_record["collectionNames"].push( collectionName )
-    UPDATE_FILENAME_MEME_TABLE_COLLECTION_STMT.run( JSON.stringify(meme_table_record["collectionNames"]) , meme_filename )
+    await UPDATE_FILENAME_MEME_TABLE_COLLECTION_STMT.run( JSON.stringify(meme_table_record["collectionNames"]) , meme_filename )
   }//);
 }
 exports.Update_Collection_MEME_Connections = Update_Collection_MEME_Connections;
@@ -485,7 +486,7 @@ exports.Update_Collection_MEME_Connections = Update_Collection_MEME_Connections;
 async function Get_Collection_MEME_Record_From_DB(memeFileName) {
   row_obj = await GET_MEME_COLLECTION_TABLE_STMT.get(memeFileName);
   if(row_obj == undefined) { //record non-existant so make one
-    INSERT_MEME_TABLE_COLLECTION_STMT.run( memeFileName, JSON.stringify( [] ) );
+    await INSERT_MEME_TABLE_COLLECTION_STMT.run( memeFileName, JSON.stringify( [] ) );
     row_obj = await GET_MEME_COLLECTION_TABLE_STMT.get(memeFileName);
   }
   row_obj = Get_Obj_Fields_From_Collection_MEME_Record(row_obj);
@@ -507,8 +508,10 @@ async function Handle_Delete_Collection_MEME_references(imageFileName) {
     return
   }
   meme_row_obj = Get_Obj_Fields_From_Collection_MEME_Record(meme_row_obj);
-  for(filename of meme_row_obj["collectionNames"]) {
-    record_tmp = await Get_Collection_Record_From_DB(filename);
+  for(collectionName of meme_row_obj["collectionNames"]) {
+    record_tmp = await Get_Collection_Record_From_DB(collectionName);
+    console.log(`line 513 collectionName = `, collectionName)
+    console.log(`line 514 record_tmp = `,record_tmp)
     new_meme_choices_tmp = record_tmp.collectionMemes.filter(item => item !== imageFileName)
     if( new_meme_choices_tmp.length != record_tmp.collectionMemes.length ) {
       record_tmp.collectionMemes = new_meme_choices_tmp

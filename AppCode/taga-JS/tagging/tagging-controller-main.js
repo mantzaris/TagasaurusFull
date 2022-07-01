@@ -400,13 +400,11 @@ async function Load_New_Image() {
         return
     }
     last_user_image_directory_chosen = PATH.dirname(result.filePaths[0]);
-    console.log(`result in line 403 = ${JSON.stringify(result)}`)
     filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY,Get_Tagging_Hash_From_DB);
     if(filenames.length == 0){
         return
     }
     let tagging_entry = null;
-    console.log(`filenames 409 = ${filenames}`)
     for(filename of filenames) {
     //filenames.forEach( async filename => {
         tagging_entry_tmp = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //cloning obj
