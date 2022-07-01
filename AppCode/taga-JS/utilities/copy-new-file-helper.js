@@ -21,15 +21,16 @@ exports.Make_Salt = Make_Salt
 async function Copy_Non_Taga_Files(result,dir_pics,Get_Tagging_Hash_From_DB){
     new_filename_array = []
 
-    current_file_hashes_tmp = []
+    let current_file_hashes_tmp = new Set()
     file_paths_unique_hash = []
     file_paths = result.filePaths    
-    for(ii=0; ii<file_paths.length;ii++) {  //
+    for(let ii=0; ii<file_paths.length;ii++) {  //
         file_path = file_paths[ii]
         //await file_paths.forEach( async file_path => {
         file_hash_tmp = Return_File_Hash(file_path);
         hash_tmp = await Get_Tagging_Hash_From_DB( file_hash_tmp );
-        if(hash_tmp == undefined) {
+        if( hash_tmp == undefined && current_file_hashes_tmp.has(file_hash_tmp) == false ) {
+            current_file_hashes_tmp.add(file_hash_tmp)
             filename = PATH.parse(file_path).base;
             filename_path_to_local = dir_pics+PATH.sep+filename
             if(FS.existsSync(filename_path_to_local)) {

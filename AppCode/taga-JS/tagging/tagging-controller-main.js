@@ -400,19 +400,28 @@ async function Load_New_Image() {
         return
     }
     last_user_image_directory_chosen = PATH.dirname(result.filePaths[0]);
+    console.log(`result in line 403 = ${JSON.stringify(result)}`)
     filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY,Get_Tagging_Hash_From_DB);
     if(filenames.length == 0){
         return
     }
-    tagging_entry_tmp = '';
-    filenames.forEach( async filename => {
+    let tagging_entry = null;
+    console.log(`filenames 409 = ${filenames}`)
+    for(filename of filenames) {
+    //filenames.forEach( async filename => {
         tagging_entry_tmp = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //cloning obj
         tagging_entry_tmp.imageFileName = filename;
         tagging_entry_tmp.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${filename}`);
-        await Insert_Record_Into_DB(tagging_entry_tmp); //sqlite version
-    });
-    current_image_annotation = tagging_entry_tmp;
-    Load_State_Of_Image_IDB();
+        hash_present = await Get_Tagging_Hash_From_DB(tagging_entry_tmp.imageFileHash);
+        if(hash_present == undefined) {
+            await Insert_Record_Into_DB(tagging_entry_tmp); //sqlite version
+            tagging_entry = tagging_entry_tmp;
+        }
+    }//);
+    if(tagging_entry != null) {
+        current_image_annotation = tagging_entry;
+        Load_State_Of_Image_IDB();
+    }
     //New_Image_Display( 0 );
 }
 //SAVING, LOADING, DELETING, ETC END<<<
