@@ -18,7 +18,7 @@ const TAGA_FILES_DIRECTORY = PATH.join(PATH.resolve()+PATH.sep+'..'+PATH.sep+'Ta
 const {  } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 //set up the DB to use
-const DB = new DATABASE(TAGA_FILES_DIRECTORY+PATH.sep+DB_FILE_NAME, { }) //verbose: console.log }); //open db in that directory
+const DB = new DATABASE(TAGA_FILES_DIRECTORY+PATH.sep+DB_FILE_NAME, { verbose: console.log }) //verbose: console.log }); //open db in that directory
 //TAGGING START>>>
 const GET_FILENAME_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE imageFileName=?`); //!!! use the index
 const GET_RECORD_FROM_HASH_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE imageFileHash=?`); //!!! use the index
@@ -263,6 +263,7 @@ async function Handle_Delete_Image_MEME_references(imageFileName) {
   for(filename of meme_row_obj["imageFileNames"]) {
   //meme_row_obj["imageFileNames"].forEach( async filename => {
     record_tmp = await Get_Tagging_Record_From_DB(filename);
+    if(record_tmp == undefined) { continue }
     new_meme_choices_tmp = record_tmp.taggingMemeChoices.filter(item => item !== imageFileName)
     if( new_meme_choices_tmp.length != record_tmp.taggingMemeChoices.length ) {
       record_tmp.taggingMemeChoices = new_meme_choices_tmp
@@ -510,6 +511,7 @@ async function Handle_Delete_Collection_MEME_references(imageFileName) {
   meme_row_obj = Get_Obj_Fields_From_Collection_MEME_Record(meme_row_obj);
   for(collectionName of meme_row_obj["collectionNames"]) {
     record_tmp = await Get_Collection_Record_From_DB(collectionName);
+    if(record_tmp == undefined) { continue }
     console.log(`line 513 collectionName = `, collectionName)
     console.log(`line 514 record_tmp = `,record_tmp)
     new_meme_choices_tmp = record_tmp.collectionMemes.filter(item => item !== imageFileName)
@@ -590,6 +592,7 @@ async function Handle_Delete_Collection_IMAGE_references(imageFileName) {
   for(collection_name of image_row_obj["collectionNames"]) {
   //image_row_obj["collectionNames"].forEach( async name => {
     collection_tmp = await Get_Collection_Record_From_DB(collection_name);
+    if(collection_tmp == undefined) { continue }
     new_image_choices_tmp = collection_tmp.collectionImageSet.filter(item => item !== imageFileName)
     if( new_image_choices_tmp.length != collection_tmp.collectionImageSet.length ) {
       //new imageset allocated
