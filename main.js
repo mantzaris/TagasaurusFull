@@ -7,6 +7,8 @@ const FS = require('fs');
 const TAGA_FILES_DIRECTORY = PATH.join(PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles')
 const TAGA_DATA_DIRECTORY = PATH.resolve(TAGA_FILES_DIRECTORY,'data') 
 
+const MY_FILE_HELPER = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'copy-new-file-helper.js') //require('./myJS/copy-new-file-helper.js')
+
 const DATABASE = require('better-sqlite3');
 var DB;
 DB_FILE_NAME = 'test-better3.db'
@@ -63,6 +65,26 @@ if( tagging_table_exists_res["count(*)"] == 0 ){
   STMT_index1.run();
   STMT_index2 = DB.prepare(` CREATE UNIQUE INDEX imageFileHash_index ON ${TAGGING_TABLE_NAME} (imageFileHash); `);
   STMT_index2.run();
+
+  //also add a default tagging object to avoid errors at start up
+  let TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
+    "imageFileName": '',
+    "imageFileHash": '',
+    "taggingRawDescription": "",
+    "taggingTags": [],
+    "taggingEmotions": {good:0,bad:0},
+    "taggingMemeChoices": []
+    }
+    taga_source_path = PATH.resolve()+PATH.sep+'Taga.png';
+    FS.copyFileSync(taga_source_path, `${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL);
+    tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
+    tagging_entry.imageFileName = 'Taga.png';
+    tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
+
+    INSERT_TAGGING_STMT = DB.prepare(`INSERT INTO ${TAGGING_TABLE_NAME} (imageFileName, imageFileHash, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices) VALUES (?, ?, ?, ?, ?, ?)`);
+    info = INSERT_TAGGING_STMT.run(tagging_entry.imageFileName,tagging_entry.imageFileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices));
+    console.log(`loging in the main js line 86`)
+
 }
 //check to see if the TAGGING MEME table exists
 tagging_meme_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${TAGGING_MEME_TABLE_NAME}'; `);
