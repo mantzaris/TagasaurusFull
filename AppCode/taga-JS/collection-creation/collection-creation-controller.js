@@ -141,11 +141,13 @@ async function Creation_Next_Btn() {
     }
     //the next button was pressed while at the final step so we now are completed and return after storing in DB new collection
     if(creation_step_num == 5) {
+        
         await Insert_Collection_Record_Into_DB(COLLECTION_DEFAULT_EMPTY_OBJECT)
         await Update_Collection_MEME_Connections(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName, [], COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes)
         COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.push(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage)
         COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet = [...COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet]
         await Update_Collection_IMAGE_Connections(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName, [],COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet)
+        //console.log(`ending the step 5 on collection creation = `, COLLECTION_DEFAULT_EMPTY_OBJECT)
         //window redirect and pass collection name as a parameter
         window.location = "collections.html" + '?' + `collectionName=${COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName}`
     }

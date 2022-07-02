@@ -230,25 +230,24 @@ async function Get_Tagging_MEME_Record_From_DB(filename) {
 exports.Get_Tagging_MEME_Record_From_DB = Get_Tagging_MEME_Record_From_DB;
 // provide the image being tagged and the before and after meme array and there will be an update to the meme table
 async function Update_Tagging_MEME_Connections(imageFileName,current_image_memes,new_image_memes) {
-  // get the memes which no longer include this file (left difference [1,2,3] diff-> [1,3,4] => [2]) and from [2] remove/subtract the image filename from the array: difference = arr1.filter(x => !arr2.includes(x));
-  remove_as_memes_filenames = current_image_memes.filter(x => !new_image_memes.includes(x)); //remove from meme connection
-  for(meme_filename of remove_as_memes_filenames) {
-  //remove_as_memes_filenames.forEach(async meme_filename => {
-    meme_table_record = await Get_Tagging_MEME_Record_From_DB(meme_filename);
-    new_array_tmp = meme_table_record.imageFileNames.filter(item => item !== imageFileName)
-    if( new_array_tmp.length == 0) {
-      DELETE_MEME_TABLE_ENTRY_STMT.run( meme_filename )
-    }
-    UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT.run( JSON.stringify(new_array_tmp) , meme_filename )
-  }//);
   // get the right difference ([1,2,3] diff -> [1,3,4] => [4]) and from [4] include/add this imagefilename in the array: diff2 = b.filter(x => !a.includes(x));
   add_as_memes_filenames = new_image_memes.filter(x => !current_image_memes.includes(x)); //new meme connections to record
   for(meme_filename of add_as_memes_filenames) {
-  //add_as_memes_filenames.forEach(async meme_filename => {
     meme_table_record = await Get_Tagging_MEME_Record_From_DB(meme_filename);
     meme_table_record["imageFileNames"].push( imageFileName )
-    UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT.run( JSON.stringify(meme_table_record["imageFileNames"]) , meme_filename )
-  }//);
+    await UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT.run( JSON.stringify(meme_table_record["imageFileNames"]) , meme_filename )
+  }
+  // get the memes which no longer include this file (left difference [1,2,3] diff-> [1,3,4] => [2]) and from [2] remove/subtract the image filename from the array: difference = arr1.filter(x => !arr2.includes(x));
+  remove_as_memes_filenames = current_image_memes.filter(x => !new_image_memes.includes(x)); //remove from meme connection
+  for(meme_filename of remove_as_memes_filenames) {
+    meme_table_record = await Get_Tagging_MEME_Record_From_DB(meme_filename);
+    new_array_tmp = meme_table_record.imageFileNames.filter(item => item !== imageFileName)
+    if( new_array_tmp.length == 0) {
+      await DELETE_MEME_TABLE_ENTRY_STMT.run( meme_filename )
+    } else {
+      await UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT.run( JSON.stringify(new_array_tmp) , meme_filename )
+    }
+  }
 }
 exports.Update_Tagging_MEME_Connections = Update_Tagging_MEME_Connections;
 //when an image is deleted it no longer can be a meme on other images, so we 
@@ -261,7 +260,6 @@ async function Handle_Delete_Image_MEME_references(imageFileName) {
   }
   meme_row_obj = Get_Obj_Fields_From_MEME_Record(meme_row_obj);
   for(filename of meme_row_obj["imageFileNames"]) {
-  //meme_row_obj["imageFileNames"].forEach( async filename => {
     record_tmp = await Get_Tagging_Record_From_DB(filename);
     if(record_tmp == undefined) { continue }
     new_meme_choices_tmp = record_tmp.taggingMemeChoices.filter(item => item !== imageFileName)
@@ -269,7 +267,7 @@ async function Handle_Delete_Image_MEME_references(imageFileName) {
       record_tmp.taggingMemeChoices = new_meme_choices_tmp
       await Update_Tagging_Annotation_DB(record_tmp);
     }
-  }//)
+  }
   //remove this image as a meme in the meme table
   DELETE_MEME_TABLE_ENTRY_STMT.run( imageFileName )
 }
@@ -462,25 +460,25 @@ exports.Insert_Collection_MEME_Record_From_DB = Insert_Collection_MEME_Record_Fr
 
 async function Update_Collection_MEME_Connections(collectionName,current_collection_memes,new_collection_memes) {
   //alter the left diff in the meme set and then alter the right diff in the meme set
+  // get the right difference ([1,2,3] diff -> [1,3,4] => [4]) and from [4] include/add this imagefilename in the array: diff2 = b.filter(x => !a.includes(x));
+  add_as_memes_filenames = new_collection_memes.filter(x => !current_collection_memes.includes(x)); //new meme connections to record
+  for(meme_filename of add_as_memes_filenames) {
+    meme_table_record = await Get_Collection_MEME_Record_From_DB(meme_filename);
+    meme_table_record["collectionNames"].push( collectionName )
+    await UPDATE_FILENAME_MEME_TABLE_COLLECTION_STMT.run( JSON.stringify(meme_table_record["collectionNames"]) , meme_filename )
+  }
   // get the memes which no longer include this file (left difference [1,2,3] diff-> [1,3,4] => [2]) and from [2] remove/subtract the image filename from the array: difference = arr1.filter(x => !arr2.includes(x));
   remove_as_memes_filenames = current_collection_memes.filter(x => !new_collection_memes.includes(x)); //remove from meme connection
   for(meme_filename of remove_as_memes_filenames) {
-  //remove_as_memes_filenames.forEach(async meme_filename => {
     meme_table_record = await Get_Collection_MEME_Record_From_DB(meme_filename);
     new_array_tmp = meme_table_record.collectionNames.filter(item => item !== collectionName)
     if( new_array_tmp.length == 0) {
       await DELETE_COLLECTION_MEME_TABLE_ENTRY_STMT.run( meme_filename )
+    } else {
+      await UPDATE_FILENAME_MEME_TABLE_COLLECTION_STMT.run( JSON.stringify(new_array_tmp) , meme_filename )
     }
-    await UPDATE_FILENAME_MEME_TABLE_COLLECTION_STMT.run( JSON.stringify(new_array_tmp) , meme_filename )
-  }//);
-  // get the right difference ([1,2,3] diff -> [1,3,4] => [4]) and from [4] include/add this imagefilename in the array: diff2 = b.filter(x => !a.includes(x));
-  add_as_memes_filenames = new_collection_memes.filter(x => !current_collection_memes.includes(x)); //new meme connections to record
-  for(meme_filename of add_as_memes_filenames) {
-  //add_as_memes_filenames.forEach(async meme_filename => {
-    meme_table_record = await Get_Collection_MEME_Record_From_DB(meme_filename);
-    meme_table_record["collectionNames"].push( collectionName )
-    await UPDATE_FILENAME_MEME_TABLE_COLLECTION_STMT.run( JSON.stringify(meme_table_record["collectionNames"]) , meme_filename )
-  }//);
+  }
+
 }
 exports.Update_Collection_MEME_Connections = Update_Collection_MEME_Connections;
 
@@ -512,8 +510,6 @@ async function Handle_Delete_Collection_MEME_references(imageFileName) {
   for(collectionName of meme_row_obj["collectionNames"]) {
     record_tmp = await Get_Collection_Record_From_DB(collectionName);
     if(record_tmp == undefined) { continue }
-    console.log(`line 513 collectionName = `, collectionName)
-    console.log(`line 514 record_tmp = `,record_tmp)
     new_meme_choices_tmp = record_tmp.collectionMemes.filter(item => item !== imageFileName)
     if( new_meme_choices_tmp.length != record_tmp.collectionMemes.length ) {
       record_tmp.collectionMemes = new_meme_choices_tmp
@@ -558,10 +554,18 @@ function Get_Obj_Fields_From_Collection_IMAGE_Record(record) {
 }
 
 async function Update_Collection_IMAGE_Connections(collectionName,current_collection_images,new_collection_images) {
+  // get the right difference ([1,2,3] diff -> [1,3,4] => [4]) and from [4] include/add this imagefilename in the array: diff2 = b.filter(x => !a.includes(x));
+  add_as_images_filenames = new_collection_images.filter(x => !current_collection_images.includes(x)); //new meme connections to record
+  for(image_filename of add_as_images_filenames) {
+    image_table_record = await Get_Collection_IMAGE_Record_From_DB(image_filename);
+    if( !image_table_record["collectionNames"].includes(collectionName) ) {
+      image_table_record["collectionNames"].push( collectionName )
+      UPDATE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.run( JSON.stringify(image_table_record["collectionNames"]) , image_filename )
+    }
+  }
   // get the memes which no longer include this file (left difference [1,2,3] diff-> [1,3,4] => [2]) and from [2] remove/subtract the image filename from the array: difference = arr1.filter(x => !arr2.includes(x));
   remove_as_images_filenames = current_collection_images.filter(x => !new_collection_images.includes(x)); //remove from meme connection
   for(image_filename of remove_as_images_filenames) {
-  //remove_as_images_filenames.forEach(async image_filename => {
     image_table_record = await Get_Collection_IMAGE_Record_From_DB(image_filename);
     new_array_tmp = image_table_record.collectionNames.filter(item => item !== collectionName)
     if( new_array_tmp.length == 0) {
@@ -569,15 +573,9 @@ async function Update_Collection_IMAGE_Connections(collectionName,current_collec
     } else {
       UPDATE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.run( JSON.stringify(new_array_tmp) , image_filename )
     }
-  }//);
-  // get the right difference ([1,2,3] diff -> [1,3,4] => [4]) and from [4] include/add this imagefilename in the array: diff2 = b.filter(x => !a.includes(x));
-  add_as_images_filenames = new_collection_images.filter(x => !current_collection_images.includes(x)); //new meme connections to record
-  for(image_filename of add_as_images_filenames) {
-  //add_as_images_filenames.forEach(async image_filename => {
-    image_table_record = await Get_Collection_IMAGE_Record_From_DB(image_filename);
-    image_table_record["collectionNames"].push( collectionName )
-    UPDATE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.run( JSON.stringify(image_table_record["collectionNames"]) , image_filename )
-  }//);
+  }
+
+  console.log(`image_table_record in the update = ${JSON.stringify(image_table_record)}`)
 }
 exports.Update_Collection_IMAGE_Connections = Update_Collection_IMAGE_Connections;
 
@@ -592,7 +590,7 @@ async function Handle_Delete_Collection_IMAGE_references(imageFileName) {
   for(collection_name of image_row_obj["collectionNames"]) {
   //image_row_obj["collectionNames"].forEach( async name => {
     collection_tmp = await Get_Collection_Record_From_DB(collection_name);
-    if(collection_tmp == undefined) { continue }
+    if(collection_tmp == undefined) { console.log; continue }
     new_image_choices_tmp = collection_tmp.collectionImageSet.filter(item => item !== imageFileName)
     if( new_image_choices_tmp.length != collection_tmp.collectionImageSet.length ) {
       //new imageset allocated
