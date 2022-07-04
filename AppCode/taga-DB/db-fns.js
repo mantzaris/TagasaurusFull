@@ -458,6 +458,9 @@ async function Insert_Collection_MEME_Record_From_DB(record) {
 }
 exports.Insert_Collection_MEME_Record_From_DB = Insert_Collection_MEME_Record_From_DB;
 
+//when a collection adds a meme filename the table which holds the meme filename to collections table each needs to update 
+//so that each holds that collection name (registers that membership)
+//pass in the collection name and then original meme array of file names, and then the new array of collection meme filenames
 async function Update_Collection_MEME_Connections(collectionName,current_collection_memes,new_collection_memes) {
   //alter the left diff in the meme set and then alter the right diff in the meme set
   // get the right difference ([1,2,3] diff -> [1,3,4] => [4]) and from [4] include/add this imagefilename in the array: diff2 = b.filter(x => !a.includes(x));
@@ -482,6 +485,7 @@ async function Update_Collection_MEME_Connections(collectionName,current_collect
 }
 exports.Update_Collection_MEME_Connections = Update_Collection_MEME_Connections;
 
+//never returns undefined, if it is not present, it is inserted by default
 async function Get_Collection_MEME_Record_From_DB(memeFileName) {
   row_obj = await GET_MEME_COLLECTION_TABLE_STMT.get(memeFileName);
   if(row_obj == undefined) { //record non-existant so make one
@@ -575,7 +579,7 @@ async function Update_Collection_IMAGE_Connections(collectionName,current_collec
     }
   }
 
-  console.log(`image_table_record in the update = ${JSON.stringify(image_table_record)}`)
+  //console.log(`image_table_record in the update = ${JSON.stringify(image_table_record)}`)
 }
 exports.Update_Collection_IMAGE_Connections = Update_Collection_IMAGE_Connections;
 

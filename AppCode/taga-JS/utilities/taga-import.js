@@ -87,30 +87,30 @@ async function Import_User_Annotation_Data() {
 //(collectionImageFileName TEXT, collectionNames TEXT)`)
 //the table schema for the import name changes (imageFileNameOrig TEXT, imageFileNameNew TEXT, actionType TEXT)
 async function Import_Collection_ImageSet_Table_Records_Info_Migrate() {
-    GET_NAME_CHANGE_STMT = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} WHERE imageFileNameOrig=?;`);
+    // GET_NAME_CHANGE_STMT = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} WHERE imageFileNameOrig=?;`);
 
-    //GET_NAME_CHANGE_STMT2 = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES};`);
-    //tmp = GET_NAME_CHANGE_STMT2.all()
-    //console.log(`tmp = ${JSON.stringify(tmp)}`)
+    // //GET_NAME_CHANGE_STMT2 = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES};`);
+    // //tmp = GET_NAME_CHANGE_STMT2.all()
+    // //console.log(`tmp = ${JSON.stringify(tmp)}`)
 
-    iter_collection_imageset_table_import = await Import_Collections_ImageSet_Table_Image_DB_Iterator()
-    record_collection_imageset_table_import_tmp = await iter_collection_imageset_table_import()
-    while( record_collection_imageset_table_import_tmp != undefined ) {
-        //console.log(`record_collection_imageset_table_import_tmp = ${JSON.stringify(record_collection_imageset_table_import_tmp)}`)
-        //console.log(`record_collection_imageset_table_import_tmp.collectionImageFileName= ${record_collection_imageset_table_import_tmp.collectionImageFileName}`)
-        console.log(`line 101; record_collection_imageset_table_import_tmp = ${JSON.stringify(record_collection_imageset_table_import_tmp)}`)
-        filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_collection_imageset_table_import_tmp.collectionImageFileName)
-        console.log(`line 102; filename_change_record_tmp = ${filename_change_record_tmp}`)
-        collection_imageset_dest_record_tmp = await DB_destination.Get_Collection_IMAGE_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
-        if( collection_imageset_dest_record_tmp == undefined ) { //image is not a meme in the destination db so 'insert'            
-            record_collection_imageset_table_import_tmp.collectionImageFileName = filename_change_record_tmp.imageFileNameNew
-            await DB_destination.Insert_Collection_IMAGE_Record_From_DB(record_collection_imageset_table_import_tmp)
-        } else { //image is a meme in destination, so concatenate the meme list for this image to include the images array
-            new_image_of_collections = [... new Set( collection_imageset_dest_record_tmp["collectionNames"].concat(record_collection_imageset_table_import_tmp["collectionNames"]) ) ]
-            await DB_destination.Update_Collection_IMAGE_Connections(filename_change_record_tmp.imageFileNameNew,collection_imageset_dest_record_tmp.collectionNames,new_image_of_collections)
-        }
-        record_collection_imageset_table_import_tmp = await iter_collection_imageset_table_import()
-    }
+    // iter_collection_imageset_table_import = await Import_Collections_ImageSet_Table_Image_DB_Iterator()
+    // record_collection_imageset_table_import_tmp = await iter_collection_imageset_table_import()
+    // while( record_collection_imageset_table_import_tmp != undefined ) {
+    //     //console.log(`record_collection_imageset_table_import_tmp = ${JSON.stringify(record_collection_imageset_table_import_tmp)}`)
+    //     //console.log(`record_collection_imageset_table_import_tmp.collectionImageFileName= ${record_collection_imageset_table_import_tmp.collectionImageFileName}`)
+    //     console.log(`line 101; record_collection_imageset_table_import_tmp = ${JSON.stringify(record_collection_imageset_table_import_tmp)}`)
+    //     filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_collection_imageset_table_import_tmp.collectionImageFileName)
+    //     console.log(`line 102; filename_change_record_tmp = ${filename_change_record_tmp}`)
+    //     collection_imageset_dest_record_tmp = await DB_destination.Get_Collection_IMAGE_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
+    //     if( collection_imageset_dest_record_tmp == undefined ) { //image is not a meme in the destination db so 'insert'            
+    //         record_collection_imageset_table_import_tmp.collectionImageFileName = filename_change_record_tmp.imageFileNameNew
+    //         await DB_destination.Insert_Collection_IMAGE_Record_From_DB(record_collection_imageset_table_import_tmp)
+    //     } else { //image is a meme in destination, so concatenate the meme list for this image to include the images array
+    //         new_image_of_collections = [... new Set( collection_imageset_dest_record_tmp["collectionNames"].concat(record_collection_imageset_table_import_tmp["collectionNames"]) ) ]
+    //         await DB_destination.Update_Collection_IMAGE_Connections(filename_change_record_tmp.imageFileNameNew,collection_imageset_dest_record_tmp.collectionNames,new_image_of_collections)
+    //     }
+    //     record_collection_imageset_table_import_tmp = await iter_collection_imageset_table_import()
+    // }
 }
 
 
@@ -123,26 +123,79 @@ async function Import_Collection_ImageSet_Table_Records_Info_Migrate() {
 //(collectionMemeFileName TEXT, collectionNames TEXT)
 //the table schema for the import name changes (imageFileNameOrig TEXT, imageFileNameNew TEXT, actionType TEXT)
 async function Import_Collection_Meme_Table_Records_Info_Migrate() {
-    GET_NAME_CHANGE_STMT = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} WHERE imageFileNameOrig=?;`);
+    // GET_NAME_CHANGE_STMT = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} WHERE imageFileNameOrig=?;`);
+    // GET_COLLECTION_FROM_NAME_STMT = DB_import.prepare(`SELECT * FROM ${COLLECTIONS_TABLE_NAME} WHERE collectionName=?`);
 
-    iter_collection_meme_table_import = await Import_Collections_Meme_Table_Image_DB_Iterator()
-    record_collection_meme_table_import_tmp = await iter_collection_meme_table_import()
-    while( record_collection_meme_table_import_tmp != undefined ) {
-        console.log(`record_collection_meme_table_import_tmp = ${JSON.stringify(record_collection_meme_table_import_tmp)}`)
+    // testq = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} ; `);
+    // console.table(testq.all())
 
-        filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_collection_meme_table_import_tmp.collectionMemeFileName)
-        console.log(`line 133: filename_change_record_tmp = ${JSON.stringify(filename_change_record_tmp)}`)
-        meme_collection_dest_record_tmp = await DB_destination.Get_Collection_MEME_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
-        if( meme_collection_dest_record_tmp == undefined ) { //image is not a meme in the destination db so 'insert'
-            record_collection_meme_table_import_tmp.collectionMemeFileName = filename_change_record_tmp.imageFileNameNew
-            //collectionNames stays as is since they are file independent
-            await DB_destination.Insert_Collection_MEME_Record_From_DB(record_collection_meme_table_import_tmp)
-        } else { //image is a meme in destination, so concatenate the collection list for this image to include the images array
-            new_meme_collections = [... new Set( meme_collection_dest_record_tmp["collectionNames"].concat(record_collection_meme_table_import_tmp["collectionNames"]) ) ]
-            await DB_destination.Update_Collection_MEME_Connections(filename_change_record_tmp.imageFileNameNew,meme_collection_dest_record_tmp.collectionNames,new_meme_collections)
-        }
-        record_collection_meme_table_import_tmp = await iter_collection_meme_table_import()
-    }
+    // iter_collection_meme_table_import = await Import_Collections_Meme_Table_Image_DB_Iterator()
+    // record_collection_meme_table_import_tmp = await iter_collection_meme_table_import()
+    // //go through each meme record of collection membershipds from the import iterator
+    // //go through each collection name, check that the collection exists and update the memes to include this file
+    // while( record_collection_meme_table_import_tmp != undefined ) {
+    //     console.log(`record_collection_meme_table_import_tmp = ${JSON.stringify(record_collection_meme_table_import_tmp)}`)
+
+    //     //get the record for the table holding the new filename mappings
+    //     filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_collection_meme_table_import_tmp.collectionMemeFileName)
+    //     new_meme_filename_tmp = filename_change_record_tmp.imageFileNameNew
+        
+    //     for(collection_name_tmp of record_collection_meme_table_import_tmp.collectionNames) {
+    //         console.log(`collection_name_tmp = ${JSON.stringify(collection_name_tmp)}`)
+
+    //         collection_dest_record_tmp = await DB_destination.Get_Collection_Record_From_DB(collection_name_tmp)
+    //         //update the collection record to include this new memefilename if an addition
+    //         if( collection_dest_record_tmp != undefined ) {
+    //             console.log(`about to check for updating the meme list of the collection`)
+    //             console.log(`collection_dest_record_tmp.collectionMemes = ${JSON.stringify(collection_dest_record_tmp.collectionMemes)}`)
+    //             console.log(`new_meme_filename_tmp = ${JSON.stringify(new_meme_filename_tmp)}`)
+    //             memes_aggregate_tmp = collection_dest_record_tmp.collectionMemes.concat(new_meme_filename_tmp)
+    //             memes_aggregate_tmp =  [...new Set(memes_aggregate_tmp)]
+    //             console.log(`collection_dest_record_tmp.collectionMemes = ${JSON.stringify(collection_dest_record_tmp.collectionMemes)}`)
+    //             console.log(`memes_aggregate_tmp = ${JSON.stringify(memes_aggregate_tmp)}`)
+    //             if(collection_dest_record_tmp.collectionMemes.length != memes_aggregate_tmp.length) {
+    //                 console.log(`updating`)
+    //                 await DB_destination.Update_Collection_MEME_Connections(collection_name_tmp, collection_dest_record_tmp.collectionMemes,memes_aggregate_tmp)
+    //                 console.log(`Update_Collection_MEME_Connections = ${JSON.stringify(collection_name_tmp)}, ${JSON.stringify(collection_dest_record_tmp.collectionMemes)}, ${JSON.stringify(memes_aggregate_tmp)}`)    
+    //             }
+    //         }
+
+    //     }
+
+
+                // console.log(`record_collection_meme_table_import_tmp = ${JSON.stringify(record_collection_meme_table_import_tmp)}`)
+                // filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_collection_meme_table_import_tmp.collectionMemeFileName)
+                // console.log(`filename_change_record_tmp = ${JSON.stringify(filename_change_record_tmp)}`)
+                // //the Get_Collection_MEME_Record_From_DB returns an empty collection set for the meme if not present, never undefined
+                // //use the import record to get the new name record
+                // meme_collection_dest_record_tmp = await DB_destination.Get_Collection_MEME_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
+                // console.log(`meme_collection_dest_record_tmp = ${JSON.stringify(meme_collection_dest_record_tmp)}`)
+                
+                // if( meme_collection_dest_record_tmp == undefined ) { //image is not a meme in the destination db so 'insert'
+                //     console.log(`inserting meme entry`)
+                //     record_collection_meme_table_import_tmp.collectionMemeFileName = filename_change_record_tmp.imageFileNameNew
+                //     //collectionNames stays as is since they are file independent
+                //     await DB_destination.Insert_Collection_MEME_Record_From_DB(record_collection_meme_table_import_tmp)
+                // } else { //image is a meme in destination, so concatenate the collection list for this image to include the images array
+                //     console.log(`updating meme entry`)
+                //     //new_meme_collections = [... new Set( meme_collection_dest_record_tmp["collectionNames"].concat(record_collection_meme_table_import_tmp["collectionNames"]) ) ]
+                //     //console.log(` meme_collection_dest_record_tmp["collectionNames"] = ${JSON.stringify(meme_collection_dest_record_tmp["collectionNames"])} `)
+                //     //console.log(`record_collection_meme_table_import_tmp["collectionNames"] = ${JSON.stringify(record_collection_meme_table_import_tmp["collectionNames"])}`)
+                //     for(collection_name of record_collection_meme_table_import_tmp.collectionNames) {
+                //         collection_tmp = await GET_COLLECTION_FROM_NAME_STMT.get(collection_name)
+                //         console.log(`collection_tmp= ${JSON.stringify(collection_tmp)}`)
+                //         new_collections_tmp = [... JSON.parse(collection_tmp.collectionMemes), filename_change_record_tmp.imageFileNameNew ]
+                //         console.log(`new_collections_tmp = ${JSON.stringify(new_collections_tmp)}`)
+                //         await DB_destination.Update_Collection_MEME_Connections(collection_name, collection_tmp.collectionMemes,new_collections_tmp)
+                //     }            
+                    
+                // }
+
+    //     record_collection_meme_table_import_tmp = await iter_collection_meme_table_import()
+    // }
+
+
+    // alert('stop')
 }
 
 
@@ -177,9 +230,17 @@ async function Import_Collections_Records_Info_Migrate() {
                 new_meme_image_names_tmp.push(tmp_change.imageFileNameNew)
             }//)
             record_collection_import_tmp.collectionMemes = new_meme_image_names_tmp
-
+            
             await DB_destination.Insert_Collection_Record_Into_DB(record_collection_import_tmp)
+
+            //!!! now update the meme collection record table to register the meme collection membership to this collection
+            //this will create the collection meme reference record if not already present
+            await DB_destination.Update_Collection_MEME_Connections(record_collection_import_tmp.collectionName, [], record_collection_import_tmp.collectionMemes)
+            //similarly for the collection imagesets
+            await DB_destination.Update_Collection_IMAGE_Connections(record_collection_import_tmp.collectionName, [], record_collection_import_tmp.collectionImageSet)
+
         } else { //collection is present so perform a 'merge' of the annotation information
+            collection_dest_images_original_tmp = JSON.parse(JSON.stringify(collection_dest_record_tmp.collectionImageSet))
             new_collection_image_names_tmp = []
             for( image_name_tmp of record_collection_import_tmp.collectionImageSet ) {
             //record_collection_import_tmp.collectionImageSet.forEach(async image_name_tmp => {
@@ -188,6 +249,7 @@ async function Import_Collections_Records_Info_Migrate() {
             }//)
             collection_dest_record_tmp.collectionImageSet =  [... new Set( collection_dest_record_tmp["collectionImageSet"].concat(new_collection_image_names_tmp) ) ]
 
+            collection_dest_memes_original_tmp = JSON.parse(JSON.stringify(collection_dest_record_tmp.collectionMemes))
             new_meme_image_names_tmp = []
             for( image_name_tmp of record_collection_import_tmp.collectionMemes ) {
             //record_collection_import_tmp.collectionMemes.forEach(async image_name_tmp => {
@@ -224,6 +286,13 @@ async function Import_Collections_Records_Info_Migrate() {
             })
 
             await DB_destination.Update_Collection_Record_In_DB(collection_dest_record_tmp)
+
+            //!!! now update the meme collection record table to register the meme collection membership to this collection
+            //this will create the collection meme reference record if not already present
+            await DB_destination.Update_Collection_MEME_Connections(collection_dest_record_tmp.collectionName, collection_dest_memes_original_tmp, collection_dest_record_tmp.collectionMemes)
+            //similarly for the collection imagesets
+            await DB_destination.Update_Collection_IMAGE_Connections(collection_dest_record_tmp.collectionName, collection_dest_images_original_tmp, collection_dest_record_tmp.collectionImageSet)
+
         }
         record_collection_import_tmp = await iter_collection_import()
     }
@@ -236,38 +305,38 @@ async function Import_Collections_Records_Info_Migrate() {
 //(imageMemeFileName TEXT, imageFileNames TEXT)
 //the table schema for the import name changes (imageFileNameOrig TEXT, imageFileNameNew TEXT, actionType TEXT)
 async function Import_Meme_Table_Records_Info_Migrate() {
-    GET_NAME_CHANGE_STMT = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} WHERE imageFileNameOrig=?;`);
-    //GET_NAME_CHANGE_STMT2 = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES}`);
-    //tmp = GET_NAME_CHANGE_STMT2.all()
-    //console.log(`GET_NAME_CHANGE_STMT2 tmp = ${JSON.stringify(tmp)}`)
-    iter_meme_table_import = await Import_Meme_Tagging_Image_DB_Iterator()
-    record_meme_table_import_tmp = await iter_meme_table_import()
-    while( record_meme_table_import_tmp != undefined ) {
-        //console.log(`record_meme_table_import_tmp = ${JSON.stringify(record_meme_table_import_tmp)}`)
-        filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_meme_table_import_tmp.imageMemeFileName)
-        meme_tagging_dest_record_tmp = await DB_destination.Get_Tagging_MEME_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
-        if( meme_tagging_dest_record_tmp == undefined ) { //image is not a meme in the destination db so 'insert'
-            new_names_tmp = []
-            for( image_name_tmp of record_meme_table_import_tmp.imageFileNames ) {
-            //record_meme_table_import_tmp.imageFileNames.forEach(async image_name_tmp => {
-                tmp_change = await GET_NAME_CHANGE_STMT.get(image_name_tmp)
-                new_names_tmp.push(tmp_change.imageFileNameNew)
-            }//)
-            meme_table_entry_tmp = {imageMemeFileName: filename_change_record_tmp.imageFileNameNew, imageFileNames: new_names_tmp}
-            await DB_destination.Insert_Meme_Tagging_Entry(meme_table_entry_tmp)
-        } else { //image is a meme in destination, so concatenate the meme list for this image to include the images array
-            new_names_tmp = []
-            for( image_name_tmp of record_meme_table_import_tmp.imageFileNames ) {
-            //record_meme_table_import_tmp.imageFileNames.forEach(async image_name_tmp => {
-                //console.log(`image_name_tmp = ${image_name_tmp}`)
-                tmp_change = await GET_NAME_CHANGE_STMT.get(image_name_tmp)
-                new_names_tmp.push(tmp_change.imageFileNameNew)
-            }//)
-            new_image_memes = [... new Set( meme_tagging_dest_record_tmp["imageFileNames"].concat(new_names_tmp) ) ]
-            await DB_destination.Update_Tagging_MEME_Connections(filename_change_record_tmp.imageFileNameNew,meme_tagging_dest_record_tmp.imageFileNames,new_image_memes)
-        }
-        record_meme_table_import_tmp = await iter_meme_table_import()
-    }    
+    // GET_NAME_CHANGE_STMT = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} WHERE imageFileNameOrig=?;`);
+    // //GET_NAME_CHANGE_STMT2 = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES}`);
+    // //tmp = GET_NAME_CHANGE_STMT2.all()
+    // //console.log(`GET_NAME_CHANGE_STMT2 tmp = ${JSON.stringify(tmp)}`)
+    // iter_meme_table_import = await Import_Meme_Tagging_Image_DB_Iterator()
+    // record_meme_table_import_tmp = await iter_meme_table_import()
+    // while( record_meme_table_import_tmp != undefined ) {
+    //     //console.log(`record_meme_table_import_tmp = ${JSON.stringify(record_meme_table_import_tmp)}`)
+    //     filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_meme_table_import_tmp.imageMemeFileName)
+    //     meme_tagging_dest_record_tmp = await DB_destination.Get_Tagging_MEME_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
+    //     if( meme_tagging_dest_record_tmp == undefined ) { //image is not a meme in the destination db so 'insert'
+    //         new_names_tmp = []
+    //         for( image_name_tmp of record_meme_table_import_tmp.imageFileNames ) {
+    //         //record_meme_table_import_tmp.imageFileNames.forEach(async image_name_tmp => {
+    //             tmp_change = await GET_NAME_CHANGE_STMT.get(image_name_tmp)
+    //             new_names_tmp.push(tmp_change.imageFileNameNew)
+    //         }//)
+    //         meme_table_entry_tmp = {imageMemeFileName: filename_change_record_tmp.imageFileNameNew, imageFileNames: new_names_tmp}
+    //         await DB_destination.Insert_Meme_Tagging_Entry(meme_table_entry_tmp)
+    //     } else { //image is a meme in destination, so concatenate the meme list for this image to include the images array
+    //         new_names_tmp = []
+    //         for( image_name_tmp of record_meme_table_import_tmp.imageFileNames ) {
+    //         //record_meme_table_import_tmp.imageFileNames.forEach(async image_name_tmp => {
+    //             //console.log(`image_name_tmp = ${image_name_tmp}`)
+    //             tmp_change = await GET_NAME_CHANGE_STMT.get(image_name_tmp)
+    //             new_names_tmp.push(tmp_change.imageFileNameNew)
+    //         }//)
+    //         new_image_memes = [... new Set( meme_tagging_dest_record_tmp["imageFileNames"].concat(new_names_tmp) ) ]
+    //         await DB_destination.Update_Tagging_MEME_Connections(filename_change_record_tmp.imageFileNameNew,meme_tagging_dest_record_tmp.imageFileNames,new_image_memes)
+    //     }
+    //     record_meme_table_import_tmp = await iter_meme_table_import()
+    // }    
 }
 
 
@@ -297,8 +366,13 @@ async function Import_Records_DB_Info_Migrate() {
             }//)
             record_import_tmp["taggingMemeChoices"] = tmp_meme_filenames
             await DB_destination.Insert_Record_Into_DB(record_import_tmp)
+
+            //!!!the tagging meme connections can be created and updated through this function
+            await DB_destination.Update_Tagging_MEME_Connections(record_import_tmp.imageFileName, [], record_import_tmp["taggingMemeChoices"])
+
         } else if( filename_change_record_tmp.actionType == 'merge' ) {
 
+            //alert('in the tagging merge')
             record_dest_tmp = await DB_destination.Get_Tagging_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
             record_dest_tmp.taggingRawDescription = record_dest_tmp.taggingRawDescription + ' imported : ' + record_import_tmp.taggingRawDescription
             //go through the emotion key -overlaps- and merge values
@@ -323,6 +397,8 @@ async function Import_Records_DB_Info_Migrate() {
             record_dest_tmp["taggingTags"] = record_dest_tmp["taggingTags"].concat(diff_tags)
             //now the meme choices to be concatenated, each file name of the meme list
             //loop through each meme to be imported get the new name and add to the list
+
+            record_original_memes_tmp = JSON.parse(JSON.stringify(record_dest_tmp["taggingMemeChoices"]))
             tmp_meme_filenames = []
             for( meme_filename_orig_tmp of record_import_tmp["taggingMemeChoices"] ) {
             //record_import_tmp["taggingMemeChoices"].forEach(async meme_filename_orig_tmp => {
@@ -333,6 +409,10 @@ async function Import_Records_DB_Info_Migrate() {
             record_dest_tmp["taggingMemeChoices"] = [...new Set( record_dest_tmp["taggingMemeChoices"].concat(tmp_meme_filenames) )]
 
             await DB_destination.Update_Tagging_Annotation_DB(record_dest_tmp)
+
+            //!!!the tagging meme connections can be created and updated through this function
+            await DB_destination.Update_Tagging_MEME_Connections(record_dest_tmp.imageFileName, record_original_memes_tmp, record_dest_tmp["taggingMemeChoices"])
+
         }
         record_import_tmp = await iter_import()
     }
@@ -390,6 +470,11 @@ async function Import_FileName_Changes_Table_Fill() {
         }
         record_import_tmp = await iter_import()
     }
+
+    testq = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} ; `);
+    tmp = testq.all()
+    console.table(tmp)
+    //alert('stop')
 }
 
 
@@ -593,7 +678,8 @@ async function Import_Collections_Meme_Table_Image_DB_Iterator() {
         if(iter_current_rowid == undefined) {
         return undefined;
         }
-        current_record = Get_Obj_Collections_Meme_Table_Fields_From_Record(await IMPORT_GET_COLLECTIONS_MEME_TABLE_RECORD_FROM_ROWID_TAGGING_STMT.get(iter_current_rowid));
+        tmp_rowid_res = await IMPORT_GET_COLLECTIONS_MEME_TABLE_RECORD_FROM_ROWID_TAGGING_STMT.get(iter_current_rowid)
+        current_record = Get_Obj_Collections_Meme_Table_Fields_From_Record(tmp_rowid_res);
         tmp_rowid = await IMPORT_GET_COLLECTIONS_MEME_TABLE_NEXT_ROWID_STMT.get(iter_current_rowid);
         if( tmp_rowid != undefined ) {
         iter_current_rowid = tmp_rowid.rowid;
