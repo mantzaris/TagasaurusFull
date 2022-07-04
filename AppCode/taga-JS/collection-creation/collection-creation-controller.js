@@ -533,7 +533,7 @@ async function Change_Profile_Image() {
                                                                                             }
     //add the event listener for the RESET BUTTON on the modal
     document.getElementById("modal-search-profileimage-main-reset-button-id").onclick = function() {
-        console.log("yo reset")
+        //console.log("yo reset")
         document.getElementById("modal-search-profileimage-tag-textarea-entry-id").value = ""
         document.getElementById("modal-search-profileimage-meme-tag-textarea-entry-id").value = ""
         document.getElementById("modal-search-profileimage-emotion-label-value-textarea-entry-id").value = ""

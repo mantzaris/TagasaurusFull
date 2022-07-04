@@ -83,7 +83,7 @@ if( tagging_table_exists_res["count(*)"] == 0 ){
 
     INSERT_TAGGING_STMT = DB.prepare(`INSERT INTO ${TAGGING_TABLE_NAME} (imageFileName, imageFileHash, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices) VALUES (?, ?, ?, ?, ?, ?)`);
     info = INSERT_TAGGING_STMT.run(tagging_entry.imageFileName,tagging_entry.imageFileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices));
-    console.log(`loging in the main js line 86`)
+    //console.log(`loging in the main js line 86`)
 
 }
 //check to see if the TAGGING MEME table exists
@@ -121,7 +121,7 @@ if( collection_meme_table_exists_res["count(*)"] == 0 ) {
   STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX collectionMemeFileNameIndex ON ${COLLECTION_MEME_TABLE_NAME} (collectionMemeFileName); `);
   STMT_index1.run();
 } else {
-  console.log('line 105 ')
+  //console.log('line 105 ')
 }
 //The collections also have an 'imageSet' as a gallery for the images associated with the collection name
 //this needs to be updated so that when an image in the tagging phase is deleted, that there is an efficient look up to remove stale/lingering links
@@ -129,13 +129,13 @@ collection_imageset_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite
 collection_imageset_table_exists_res = collection_imageset_table_exists_stmt.get();
 //if collection table does not exit, so create it
 if( collection_imageset_table_exists_res["count(*)"] == 0 ) {
-  console.log(`line 111 in main js about to create the COLLECTION_IMAGESET_TABLE_NAME again`)
+  //console.log(`line 111 in main js about to create the COLLECTION_IMAGESET_TABLE_NAME again`)
   STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTION_IMAGESET_TABLE_NAME} (collectionImageFileName TEXT, collectionNames TEXT)`);
   STMT.run(); //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
   STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX collectionImageFileNameIndex ON ${COLLECTION_IMAGESET_TABLE_NAME} (collectionImageFileName); `);
   STMT_index1.run();
 } else {
-  console.log(`not creating table in main js 117: collection_imageset_table_exists_res["count(*)"] = ${collection_imageset_table_exists_res["count(*)"]}`)
+  //console.log(`not creating table in main js 117: collection_imageset_table_exists_res["count(*)"] = ${collection_imageset_table_exists_res["count(*)"]}`)
 }
 //DB SET UP END<<<
 

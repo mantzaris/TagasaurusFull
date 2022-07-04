@@ -594,7 +594,7 @@ async function Handle_Delete_Collection_IMAGE_references(imageFileName) {
   for(collection_name of image_row_obj["collectionNames"]) {
   //image_row_obj["collectionNames"].forEach( async name => {
     collection_tmp = await Get_Collection_Record_From_DB(collection_name);
-    if(collection_tmp == undefined) { console.log; continue }
+    if(collection_tmp == undefined) { continue }
     new_image_choices_tmp = collection_tmp.collectionImageSet.filter(item => item !== imageFileName)
     if( new_image_choices_tmp.length != collection_tmp.collectionImageSet.length ) {
       //new imageset allocated
