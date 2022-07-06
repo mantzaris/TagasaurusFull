@@ -8,8 +8,8 @@ const FS = require('fs');
 PATH = require('path');
 const FSE = require('fs-extra');
 
-const { TAGA_DATA_DIRECTORY, TAGA_FILES_DIRECTORY } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
-const DB_MODULE2 = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'db-fns.js');
+const { TAGA_DATA_DIRECTORY, TAGA_FILES_DIRECTORY } = require(PATH.join(__dirname,'..','constants','constants-code.js')) // require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const DB_MODULE2 = require(PATH.join(__dirname,'taga-DB','db-fns.js')) // require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'db-fns.js');
 
 async function Tagging_Image_DB_Iterator() {
     return await DB_MODULE2.Tagging_Image_DB_Iterator();

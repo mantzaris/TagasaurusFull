@@ -1,5 +1,7 @@
 //main.js should have created the folders for the db and the data if they don't exist and
 //should have created the tables and indexes as well
+//v = window.USER_DATA_PATH
+
 const PATH = require('path');
 const FS = require('fs');
 const DATABASE = require('better-sqlite3');
@@ -12,13 +14,14 @@ const COLLECTION_MEME_TABLE_NAME = 'COLLECTIONMEMES';
 const COLLECTION_IMAGESET_TABLE_NAME = 'COLLECTIONIMAGESET'
 
 
-
-const TAGA_FILES_DIRECTORY = PATH.join(PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles')
-
-const {  } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
-
+const TAGA_FILES_DIRECTORY = PATH.join(USER_DATA_PATH,'TagasaurusFiles') //PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles')
 //set up the DB to use
-const DB = new DATABASE(TAGA_FILES_DIRECTORY+PATH.sep+DB_FILE_NAME, { verbose: console.log }) //verbose: console.log }); //open db in that directory
+console.log(`PATH.join(TAGA_FILES_DIRECTORY,DB_FILE_NAME) = `,PATH.join(TAGA_FILES_DIRECTORY,DB_FILE_NAME))
+const DB = new DATABASE( PATH.join(TAGA_FILES_DIRECTORY,DB_FILE_NAME), { verbose: console.log }) //new DATABASE(TAGA_FILES_DIRECTORY+PATH.sep+DB_FILE_NAME, { verbose: console.log }) //verbose: console.log }); //open db in that directory
+
+//const {  } = require( PATH.join('constants','constants-code.js') ) //PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+
+
 //TAGGING START>>>
 const GET_FILENAME_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE imageFileName=?`); //!!! use the index
 const GET_RECORD_FROM_HASH_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE imageFileHash=?`); //!!! use the index

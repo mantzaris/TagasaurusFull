@@ -1,6 +1,7 @@
 PATH = require('path');
 
-const { DB_MODULE, MAX_SAMPLE_COUNT_RECORDS } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const { DB_MODULE, MAX_SAMPLE_COUNT_RECORDS } = require(PATH.join(__dirname,'..','constants','constants-code.js')); //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+
 
 
 var number_of_records;

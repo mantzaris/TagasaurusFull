@@ -10,9 +10,10 @@ PATH3 = require('path');
 const FSE3 = require('fs-extra');
 const DATABASE3 = require('better-sqlite3');
 
-const { MY_FILE_HELPER } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
-const DB_destination = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'db-fns.js');
-const TAGA_DATA_destination = PATH.resolve(TAGA_FILES_DIRECTORY,'data');
+console.log(`${PATH.join(USER_DATA_PATH,'TagasaurusFiles','data')}`)
+const { MY_FILE_HELPER } = require(PATH.join(__dirname,'..','constants','constants-code.js')); // require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const DB_destination = require(PATH.join(__dirname,'taga-DB','db-fns.js')); // require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'db-fns.js');
+const TAGA_DATA_destination = PATH.join(USER_DATA_PATH,'TagasaurusFiles','data'); // PATH.resolve(TAGA_FILES_DIRECTORY,'data');
 
 
 

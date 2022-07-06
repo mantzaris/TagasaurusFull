@@ -6,9 +6,9 @@ const IPC_RENDERER = require('electron').ipcRenderer
 //const FSE = require('fs-extra');
 
 
-const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MY_FILE_HELPER } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MY_FILE_HELPER } = require(PATH.join(__dirname,'..','constants','constants-code.js')) // require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
-const { CLOSE_ICON_RED, CLOSE_ICON_BLACK, HASHTAG_ICON } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
+const { CLOSE_ICON_RED, CLOSE_ICON_BLACK, HASHTAG_ICON } = require(PATH.join(__dirname,'..','constants','constants-icons.js')) //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 
 
 var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
@@ -369,7 +369,10 @@ async function Save_Image_Annotation_Changes() {
 }
 //load the default image, typically called to avoid having nothing in the DB but can be deleted later on
 async function Load_Default_Taga_Image() {
-    taga_source_path = PATH.resolve()+PATH.sep+'Taga.png';
+
+    app_path = await IPC_RENDERER.invoke('getAppPath')
+    taga_source_path = PATH.join(app_path,'Taga.png'); //PATH.resolve()+PATH.sep+'Taga.png';
+
     FS.copyFileSync(taga_source_path, `${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL);
     tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
     tagging_entry.imageFileName = 'Taga.png';

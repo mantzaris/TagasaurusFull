@@ -4,22 +4,30 @@ const {app, ipcMain, dialog, BrowserWindow} = require('electron');
 const PATH = require('path');
 const FS = require('fs');
 
-const TAGA_FILES_DIRECTORY = PATH.join(PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles')
-const TAGA_DATA_DIRECTORY = PATH.resolve(TAGA_FILES_DIRECTORY,'data') 
+const TAGA_FILES_DIRECTORY = PATH.join(app.getPath('userData'),'TagasaurusFiles') //PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles')
+const TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY,'data') //PATH.resolve(TAGA_FILES_DIRECTORY,'data') 
 
-const MY_FILE_HELPER = require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'copy-new-file-helper.js') //require('./myJS/copy-new-file-helper.js')
+const USER_DATA_PATH = app.getPath('userData')
+const APP_PATH = app.getAppPath()
+
+console.log(`__dirname = ${__dirname}`)
+console.log(`-mainjs- the app.getPath('userData') = ${app.getPath('userData')}`)
+console.log(`-mainjs- the app.getPath('appPath') = ${app.getAppPath()}`)
+
+const MY_FILE_HELPER = require( PATH.join(__dirname,'AppCode','taga-JS','utilities','copy-new-file-helper.js')) //PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'copy-new-file-helper.js') //require('./myJS/copy-new-file-helper.js')
 
 const DATABASE = require('better-sqlite3');
+//const { build } = require('electron-builder');
 var DB;
 DB_FILE_NAME = 'test-better3.db'
 
-
+console.log('icon path = ',PATH.join(__dirname,'build','icons','icon.ico'))
 function createWindow () {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 1000,
-    icon: PATH.join(PATH.resolve(),'taga-icon','TagaIcon1024x1024.png'),
+    icon: PATH.join(__dirname,'build','icons','icon.ico'),
     webPreferences: {
       preload: PATH.join(__dirname, 'preload.js'),
       nodeIntegration: true,
@@ -29,7 +37,7 @@ function createWindow () {
   })
   //LOAD THE STARTING .html OF THE APP->
   //mainWindow.loadFile(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'welcome-screen.html')
-  mainWindow.loadFile(PATH.resolve(__dirname,'./AppCode/welcome-screen.html'))
+  mainWindow.loadFile(PATH.join(__dirname,'AppCode','welcome-screen.html')) //PATH.resolve(__dirname,'./AppCode/welcome-screen.html'))
   // mainWindow.webContents.openDevTools()
 }
 
@@ -43,11 +51,13 @@ COLLECTIONS_TABLE_NAME = 'COLLECTIONS';
 COLLECTION_MEME_TABLE_NAME = 'COLLECTIONMEMES';
 COLLECTION_IMAGESET_TABLE_NAME = 'COLLECTIONIMAGESET'
 
-
+console.log(`about to make directory or not of ${TAGA_FILES_DIRECTORY}`)
 if( FS.existsSync(TAGA_FILES_DIRECTORY) == false ) { //directory for files exists?
+  console.log('directory TAGA_FILES_DIRECTORY does not exist')
   FS.mkdirSync(TAGA_FILES_DIRECTORY);
+  console.log('directory TAGA_FILES_DIRECTORY does not exist 2 ')
 }  
-DB = new DATABASE(TAGA_FILES_DIRECTORY+PATH.sep+DB_FILE_NAME, { verbose: console.log }); //open db in that directory
+DB = new DATABASE( PATH.join(TAGA_FILES_DIRECTORY,DB_FILE_NAME), { verbose: console.log }); //open db in that directory
 if( FS.existsSync(TAGA_FILES_DIRECTORY) == true && FS.existsSync(TAGA_DATA_DIRECTORY) == false ) { //directory for data exists?
   FS.mkdirSync(TAGA_DATA_DIRECTORY);
 }
@@ -75,11 +85,11 @@ if( tagging_table_exists_res["count(*)"] == 0 ){
     "taggingEmotions": {good:0,bad:0},
     "taggingMemeChoices": []
     }
-    taga_source_path = PATH.resolve()+PATH.sep+'Taga.png';
-    FS.copyFileSync(taga_source_path, `${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL);
+    taga_source_path = PATH.join(APP_PATH,'Taga.png') //PATH.resolve()+PATH.sep+'Taga.png';
+    FS.copyFileSync(taga_source_path, PATH.join(TAGA_DATA_DIRECTORY,'Taga.png'), FS.constants.COPYFILE_EXCL);
     tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
     tagging_entry.imageFileName = 'Taga.png';
-    tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
+    tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash( PATH.join(TAGA_DATA_DIRECTORY,'Taga.png') ) //`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
 
     INSERT_TAGGING_STMT = DB.prepare(`INSERT INTO ${TAGGING_TABLE_NAME} (imageFileName, imageFileHash, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices) VALUES (?, ?, ?, ?, ?, ?)`);
     info = INSERT_TAGGING_STMT.run(tagging_entry.imageFileName,tagging_entry.imageFileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices));
@@ -197,3 +207,29 @@ if (env === 'development' || app.isPackaged == false) {
       hardResetMethod: 'exit'
   });
 }
+
+
+//for functions to get the appPath
+ipcMain.handle('getAppPath', () => APP_PATH ) 
+
+
+// console.log(`__dirname = ${__dirname}`)
+// console.log(`-mainjs- the app.getPath('userData') = ${app.getPath('userData')}`)
+// console.log(`-mainjs- the app.getPath('userData') = ${app.getPath('appData')}`)
+
+// "win": {
+//   "target": [
+//     "nsis",
+//     "portable",
+//     "zip"
+//   ],
+//   "icon": "build/TagaIcon1024x1024.ico"
+// }
+
+// ,
+//     "nsis": {
+//       "oneClick": true,
+//       "perMachine": false,
+//       "createDesktopShortcut": false,
+//       "artifactName": "tagasaurus.app"
+//     }

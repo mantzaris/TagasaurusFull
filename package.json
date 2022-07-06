@@ -23,7 +23,8 @@
   ],
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder"
   },
   "devDependencies": {
     "electron": "^18.0.0",
@@ -36,12 +37,10 @@
     "better-sqlite3": "^7.5.0",
     "fs": "^0.0.1-security",
     "fs-extra": "^10.0.0",
-    "indexeddb-js": "^0.0.14",
     "install": "^0.13.0",
     "json": "^11.0.0",
     "masonry-layout": "^4.2.2",
-    "path": "^0.12.7",
-    "sql.js": "^1.5.0"
+    "path": "^0.12.7"
   },
   "selfUpdate": false,
   "build": {
@@ -51,27 +50,13 @@
       "!.github",
       "!README.md"
     ],
-    "win": {
-      "target": [
-        "nsis",
-        "portable",
-        "zip"
-      ],
-      "icon": "build/TagaIcon1024x1024.ico"
-    },
     "linux": {
       "target": [
         "deb"
       ],
-      "icon": "build/TagaIcon1024x1024.png",
+      "icon": "build/icons/512x512.png",
       "maintainer": "mantzaris",
       "category": "utility"
-    },
-    "nsis": {
-      "oneClick": true,
-      "perMachine": false,
-      "createDesktopShortcut": false,
-      "artifactName": "tagasaurus.app"
     },
     "portable": {
       "artifactName": "tagasaurus.app"

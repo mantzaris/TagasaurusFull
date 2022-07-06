@@ -3,13 +3,14 @@
 // const FSE = require('fs-extra');
 // const CRYPTO = require('crypto')
 // const MY_FILE_HELPER = require('./myJS/copy-new-file-helper.js')
+const IPC_RENDERER2 = require('electron').ipcRenderer 
 
 const PATH = require('path');
 const FS = require('fs');
 
-const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MY_FILE_HELPER, MASONRY } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MY_FILE_HELPER, MASONRY } = require(PATH.join(__dirname,'..','constants','constants-code.js')); //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
-const { CLOSE_ICON_RED, CLOSE_ICON_BLACK } = require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
+const { CLOSE_ICON_RED, CLOSE_ICON_BLACK } = require(PATH.join(__dirname,'..','constants','constants-icons.js')) //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 
 
 COLLECTION_DEFAULT_EMPTY_OBJECT = {
@@ -421,7 +422,9 @@ async function Check_Gallery_And_Profile_Image_Integrity(){
     profile_pic_present_bool = FS.existsSync(image_path_profile_pic)
     //1-profile image is missing, and image set is empty (or none present to show)
     if(profile_pic_present_bool == false && image_set_present.length == 0) {
-        default_path = PATH.resolve()+PATH.sep+'Taga.png';
+        app_path = await IPC_RENDERER2.invoke('getAppPath')
+        default_path = PATH.join(app_path,'Taga.png'); //PATH.resolve()+PATH.sep+'Taga.png';
+        //default_path = PATH.join(__dirname,'..','..','Taga.png')//PATH.resolve()+PATH.sep+'Taga.png';
         default_hash = MY_FILE_HELPER.Return_File_Hash(default_path);
         hash_tmp = Get_Tagging_Hash_From_DB(default_hash)
         filename_tmp = 'Taga.png'
@@ -506,7 +509,9 @@ async function New_Collection_Display(n) {
 
 async function Handle_Empty_DB() {
     if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`) == false ) {      
-        taga_source_path = PATH.resolve()+PATH.sep+'Taga.png';  
+        app_path = await IPC_RENDERER2.invoke('getAppPath')
+        taga_source_path = PATH.join(app_path,'Taga.png'); //PATH.resolve()+PATH.sep+'Taga.png';
+        //taga_source_path = PATH.join(__dirname,'..','..','Taga.png') //PATH.resolve()+PATH.sep+'Taga.png';  
         FS.copyFileSync(taga_source_path, `${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL);
     }
     taga_obj_tmp = await DB_MODULE.Get_Tagging_Record_From_DB('Taga.png');
