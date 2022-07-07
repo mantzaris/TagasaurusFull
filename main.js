@@ -1,6 +1,6 @@
 // Modules to control application life and create native browser window
 //'ipcMain' and 'dialog' are introduced to open the dialog window in slides.js
-const {app, ipcMain, dialog, BrowserWindow} = require('electron');
+const {app, ipcMain, dialog, BrowserWindow, Tray} = require('electron');
 const PATH = require('path');
 const FS = require('fs');
 
@@ -10,10 +10,6 @@ const TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY,'data') //PATH.resolv
 const USER_DATA_PATH = app.getPath('userData')
 const APP_PATH = app.getAppPath()
 
-console.log(`__dirname = ${__dirname}`)
-console.log(`-mainjs- the app.getPath('userData') = ${app.getPath('userData')}`)
-console.log(`-mainjs- the app.getPath('appPath') = ${app.getAppPath()}`)
-
 const MY_FILE_HELPER = require( PATH.join(__dirname,'AppCode','taga-JS','utilities','copy-new-file-helper.js')) //PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'copy-new-file-helper.js') //require('./myJS/copy-new-file-helper.js')
 
 const DATABASE = require('better-sqlite3');
@@ -21,13 +17,22 @@ const DATABASE = require('better-sqlite3');
 var DB;
 DB_FILE_NAME = 'test-better3.db'
 
-console.log('icon path = ',PATH.join(__dirname,'build','icons','icon.ico'))
+
+
+tmp_icon_dir = PATH.join(__dirname,'icon.png')
+console.log('icon path = ',  tmp_icon_dir   )
+exists = FS.existsSync( tmp_icon_dir  )
+console.log(`exists = `, exists)
+
+
 function createWindow () {
+  // //tray stuff
+  //const tray = new Tray(PATH.join(__dirname,"icon.png"))
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 1000,
-    icon: PATH.join(__dirname,'build','icons','icon.ico'),
+    icon: tmp_icon_dir,
     webPreferences: {
       preload: PATH.join(__dirname, 'preload.js'),
       nodeIntegration: true,
@@ -38,9 +43,9 @@ function createWindow () {
   //LOAD THE STARTING .html OF THE APP->
   //mainWindow.loadFile(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'welcome-screen.html')
   mainWindow.loadFile(PATH.join(__dirname,'AppCode','welcome-screen.html')) //PATH.resolve(__dirname,'./AppCode/welcome-screen.html'))
+  //mainWindow.setIcon(tmp_icon_dir)
   // mainWindow.webContents.openDevTools()
 }
-
 
 //DB SET UP START>>>
 //create folders for data and db -> check if db tables exist -> create indexes on tables
@@ -82,7 +87,7 @@ if( tagging_table_exists_res["count(*)"] == 0 ){
     "imageFileHash": '',
     "taggingRawDescription": "",
     "taggingTags": [],
-    "taggingEmotions": {good:0,bad:0},
+    "taggingEmotions": {good:"0",bad:"0"},
     "taggingMemeChoices": []
     }
     taga_source_path = PATH.join(APP_PATH,'Taga.png') //PATH.resolve()+PATH.sep+'Taga.png';
@@ -185,6 +190,8 @@ ipcMain.handle('dialog:importDB', async (_, args) => {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   createWindow()  
+  //tray stuff
+  //const tray = new Tray(PATH.join(__dirname,"icon.png"))
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
@@ -212,6 +219,11 @@ if (env === 'development' || app.isPackaged == false) {
 //for functions to get the appPath
 ipcMain.handle('getAppPath', () => APP_PATH ) 
 
+
+
+console.log(`__dirname = ${__dirname}`)
+console.log(`-mainjs- the app.getPath('userData') = ${app.getPath('userData')}`)
+console.log(`-mainjs- the app.getPath('appPath') = ${app.getAppPath()}`)
 
 // console.log(`__dirname = ${__dirname}`)
 // console.log(`-mainjs- the app.getPath('userData') = ${app.getPath('userData')}`)

@@ -19,7 +19,7 @@ COLLECTION_DEFAULT_EMPTY_OBJECT = {
                                     "collectionDescription": '',
                                     "collectionDescriptionTags": [],
                                     "collectionImageSet": [],
-                                    "collectionEmotions": {good:0,bad:0}, //{happy:happy_value,sad:sad_value,confused:confused_value},            
+                                    "collectionEmotions": {good:"0",bad:"0"}, //{happy:happy_value,sad:sad_value,confused:confused_value},            
                                     "collectionMemes": []
                                     }
 
@@ -112,7 +112,19 @@ async function Collection_DB_Iterator() {
 
 
 
-
+//utility for the adding the mouse hover icon events in the mouseovers for the emotions
+function addMouseOverIconSwitch_Collection(emotion_div,child_num=1) {
+    // Add button hover event listeners to each inage tag.
+    const children = emotion_div.children;
+    for (let i = 0; i < children.length; i++) {
+        let image;
+        if(child_num == 1) {image = children[i].children[0];}
+        else {image = children[i].children[0].children[0];}
+        image.addEventListener("mouseover", () => (image.src = CLOSE_ICON_RED));
+        image.addEventListener("mouseout", () => (image.src = CLOSE_ICON_BLACK));
+    }
+    //console.log('get ')
+}
 
 //this function deletes the entity object currently in focus from var 'current_key_index', and calls for the refresh of the next entity to be in view
 async function Delete_Collection() {
@@ -190,7 +202,7 @@ function Collection_Emotion_Page() {
         emotion_HTML += `
                         <div class="emotion-list-class" id="emotion-entry-div-id-${key}">
                             <div>
-                                <img onclick="" class="emotion-delete-icon-class" id="emotion-delete-button-id-${key}" onmouseover="this.src='${CLOSE_ICON_RED}'" onmouseout="this.src='${CLOSE_ICON_BLACK}'" src="${CLOSE_ICON_BLACK}" alt="emotion-${key}" title="remove"/>
+                                <img onclick="" class="emotion-delete-icon-class" id="emotion-delete-button-id-${key}" src="${CLOSE_ICON_BLACK}" alt="emotion-${key}" title="remove"/>
                                 <span class="emotion-label-view-class" id="emotion-id-label-view-name-${key}">${key}</span>
                             </div>
                             <input class="emotion-range-slider-class" id="emotion-range-id-${key}" type="range" min="0" max="100" value="0">
@@ -199,6 +211,10 @@ function Collection_Emotion_Page() {
     }
     emotions_show_div = document.getElementById("collection-image-annotation-emotions-labels-show-div-id")
     emotions_show_div.innerHTML = emotion_HTML
+
+    // Add button hover event listeners to each inage tag.!!!
+    addMouseOverIconSwitch_Collection(emotions_show_div,2)
+
     //set up the delete operation per emotion AND set values of slider
     Object.keys(emotions_collection).forEach(key_tmp => {
         document.getElementById(`emotion-delete-button-id-${key_tmp}`).onclick = function() {
@@ -435,7 +451,7 @@ async function Check_Gallery_And_Profile_Image_Integrity(){
                 "imageFileHash": '',
                 "taggingRawDescription": "",
                 "taggingTags": [],
-                "taggingEmotions": {good:0,bad:0},
+                "taggingEmotions": {good:"0",bad:"0"},
                 "taggingMemeChoices": []
             }
             tagging_entry.imageFileName = filename_tmp
@@ -521,7 +537,7 @@ async function Handle_Empty_DB() {
             "imageFileHash": '',
             "taggingRawDescription": "",
             "taggingTags": [],
-            "taggingEmotions": {good:0,bad:0},
+            "taggingEmotions": {good:"0",bad:"0"},
             "taggingMemeChoices": []
             }
         tagging_entry = JSON.parse(JSON.stringify(emtpy_annotation_tmp)); //clone the default obj
@@ -716,13 +732,17 @@ async function Change_Profile_Image() {
             Object.keys(collection_profile_search_obj["emotions"]).forEach(emotion_key => {
                         emotions_html_tmp += `
                                             <span id="modal-search-profileimage-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
-                                                <img class="modal-search-profileimage-emotion-remove-button-class" id="modal-search-profileimage-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='${CLOSE_ICON_RED}'"
-                                                onmouseout="this.src='${CLOSE_ICON_BLACK}'" src="${CLOSE_ICON_BLACK}" title="close" />
+                                                <img class="modal-search-profileimage-emotion-remove-button-class" id="modal-search-profileimage-emotion-remove-button-id-${emotion_key}"
+                                                src="${CLOSE_ICON_BLACK}" title="close" />
                                                 (${emotion_key},${collection_profile_search_obj["emotions"][emotion_key]})
                                             </span>
                                             `
             })
-            emotion_div_id.innerHTML = emotions_html_tmp   
+            emotion_div_id.innerHTML = emotions_html_tmp  
+            
+            // Add button hover event listeners to each inage tag.!!!
+            addMouseOverIconSwitch_Collection(emotion_div_id)
+            
             document.getElementById("modal-search-profileimage-emotion-label-value-textarea-entry-id").value = ""
             document.getElementById("modal-search-profileimage-emotion-value-range-entry-id").value = "0"
             //handler for the emotion deletion from search term and view on modal
@@ -903,13 +923,17 @@ async function Add_Gallery_Images() {
             Object.keys(collection_gallery_search_obj["emotions"]).forEach(emotion_key => {
                         emotions_html_tmp += `
                                             <span id="modal-search-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
-                                                <img class="modal-search-emotion-remove-button-class" id="modal-search-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='${CLOSE_ICON_RED}'"
-                                                onmouseout="this.src='${CLOSE_ICON_BLACK}'" src="${CLOSE_ICON_BLACK}" title="close" />
+                                                <img class="modal-search-emotion-remove-button-class" id="modal-search-emotion-remove-button-id-${emotion_key}"
+                                                src="${CLOSE_ICON_BLACK}" title="close" />
                                                 (${emotion_key},${collection_gallery_search_obj["emotions"][emotion_key]})
                                             </span>
                                             `
             })
             emotion_div_id.innerHTML = emotions_html_tmp   
+
+            // Add button hover event listeners to each inage tag.!!!
+            addMouseOverIconSwitch_Collection(emotion_div_id)
+
             document.getElementById("modal-search-emotion-label-value-textarea-entry-id").value = ""
             document.getElementById("modal-search-emotion-value-range-entry-id").value = "0"
             //handler for the emotion deletion from search term and view on modal
@@ -1148,13 +1172,17 @@ async function Add_Meme_Images() {
             Object.keys(collection_meme_search_obj["emotions"]).forEach(emotion_key => {
                         emotions_html_tmp += `
                                             <span id="modal-search-add-memes-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
-                                                <img class="modal-search-emotion-remove-button-class" id="modal-search-add-memes-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='${CLOSE_ICON_RED}'"
-                                                onmouseout="this.src='${CLOSE_ICON_BLACK}'" src="${CLOSE_ICON_BLACK}" title="close" />
+                                                <img class="modal-search-emotion-remove-button-class" id="modal-search-add-memes-emotion-remove-button-id-${emotion_key}"
+                                                src="${CLOSE_ICON_BLACK}" title="close" />
                                                 (${emotion_key},${collection_meme_search_obj["emotions"][emotion_key]})
                                             </span>
                                             `
             })
             emotion_div_id.innerHTML = emotions_html_tmp   
+
+            // Add button hover event listeners to each inage tag.!!!
+            addMouseOverIconSwitch_Collection(emotion_div_id)
+
             document.getElementById("modal-search-add-memes-emotion-label-value-textarea-entry-id").value = ""
             document.getElementById("modal-search-add-memes-emotion-value-range-entry-id").value = "0"
             //handler for the emotion deletion from search term and view on modal
@@ -1177,13 +1205,17 @@ async function Add_Meme_Images() {
             Object.keys(collection_meme_search_obj["meme_emotions"]).forEach(emotion_key => {
                         emotions_html_tmp += `
                                             <span id="modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}" style="white-space:nowrap">
-                                                <img class="modal-search-emotion-remove-button-class" id="modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}" onmouseover="this.src='${CLOSE_ICON_RED}'"
-                                                onmouseout="this.src='${CLOSE_ICON_BLACK}'" src="${CLOSE_ICON_BLACK}" title="close" />
+                                                <img class="modal-search-emotion-remove-button-class" id="modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}"
+                                                src="${CLOSE_ICON_BLACK}" title="close" />
                                                 (${emotion_key},${collection_meme_search_obj["meme_emotions"][emotion_key]})
                                             </span>
                                             `
             })
             emotion_div_id.innerHTML = emotions_html_tmp   
+
+            // Add button hover event listeners to each inage tag.!!!
+            addMouseOverIconSwitch_Collection(emotion_div_id)
+
             document.getElementById("modal-search-add-memes-emotion-meme-label-value-textarea-entry-id").value = ""
             document.getElementById("modal-search-add-memes-emotion-meme-value-range-entry-id").value = "0"
             //handler for the emotion deletion from search term and view on modal
@@ -1427,13 +1459,17 @@ async function Search_Collections() {
             Object.keys(collection_search_obj["emotions"]).forEach(emotion_key => {
                         emotions_html_tmp += `
                                             <span id="collections-modal-search-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
-                                                <img class="collections-modal-search-emotion-remove-button-class" id="collections-modal-search-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='${CLOSE_ICON_RED}'"
-                                                onmouseout="this.src='${CLOSE_ICON_BLACK}'" src="${CLOSE_ICON_BLACK}" title="close" />
+                                                <img class="collections-modal-search-emotion-remove-button-class" id="collections-modal-search-emotion-remove-button-id-${emotion_key}"
+                                                src="${CLOSE_ICON_BLACK}" title="close" />
                                                 (${emotion_key},${collection_search_obj["emotions"][emotion_key]})
                                             </span>
                                             `
             })
             emotion_div_id.innerHTML = emotions_html_tmp   
+
+            // Add button hover event listeners to each inage tag.!!!
+            addMouseOverIconSwitch_Collection(emotion_div_id)
+
             document.getElementById("collections-modal-search-emotion-label-value-textarea-entry-id").value = ""
             document.getElementById("collections-modal-search-emotion-value-range-entry-id").value = "0"
             //handler for the emotion deletion from search term and view on modal

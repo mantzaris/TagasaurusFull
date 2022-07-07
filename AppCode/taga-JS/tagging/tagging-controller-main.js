@@ -16,7 +16,7 @@ var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
                                     "imageFileHash": '',
                                     "taggingRawDescription": "",
                                     "taggingTags": [],
-                                    "taggingEmotions": {good:0,bad:0},
+                                    "taggingEmotions": {good:"0",bad:"0"},
                                     "taggingMemeChoices": []
                                     }
 
@@ -122,14 +122,18 @@ async function Emotion_Display_Fill() {
     emotion_html_tmp = ''
     for( var key of emotion_keys ) {
         emotion_html_tmp += `<div class="emotion-list-class" id="emotion-entry-div-id-${key}">
-                                <img class="emotion-delete-icon-class" id="emotion-delete-button-id-${key}" onmouseover="this.src='${CLOSE_ICON_RED}';"
-                                    onmouseout="this.src='${CLOSE_ICON_BLACK}';" src="${CLOSE_ICON_BLACK}" alt="emotions" title="remove"  />
+                                <img class="emotion-delete-icon-class" id="emotion-delete-button-id-${key}" 
+                                    src="${CLOSE_ICON_BLACK}" alt="emotions" title="remove"  />
                                 <span class="emotion-label-view-class" id="emotion-id-label-view-name-${key}">${key}</span>
                                 <input id="emotion-range-id-${key}" type="range" min="0" max="100" value="0">
                             </div>
                             `
     }
     emotion_div.innerHTML = emotion_html_tmp;
+
+    // Add button hover event listeners to each inage tag.!!!
+    addMouseOverIconSwitch(emotion_div)
+
     emotion_keys.forEach(function(key_tmp){
         document.getElementById(`emotion-delete-button-id-${key_tmp}`).onclick = function() {
             Delete_Emotion(`${key_tmp}`);
@@ -431,7 +435,17 @@ async function Load_New_Image() {
 //SAVING, LOADING, DELETING, ETC END<<<
 
 
-
+//utility for the adding the mouse hover icon events in the mouseovers for the emotions
+function addMouseOverIconSwitch(emotion_div) {
+    // Add button hover event listeners to each inage tag.
+    const children = emotion_div.children;
+    for (let i = 0; i < children.length; i++) {
+        const image = children[i].children[0];
+        image.addEventListener("mouseover", () => (image.src = CLOSE_ICON_RED));
+        image.addEventListener("mouseout", () => (image.src = CLOSE_ICON_BLACK));
+    }
+    //console.log('get ')
+}
 
 
 
@@ -504,12 +518,16 @@ async function Search_Images(){
         Object.keys(tagging_search_obj["emotions"]).forEach(emotion_key => {
             image_emotions_div_id.innerHTML += `
                                     <span id="modal-search-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
-                                    <img class="modal-search-emotion-remove-button-class" id="modal-search-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='${CLOSE_ICON_RED}';"
-                                        onmouseout="this.src='${CLOSE_ICON_BLACK}';" src="${CLOSE_ICON_BLACK}" title="close" />
+                                    <img class="modal-search-emotion-remove-button-class" id="modal-search-emotion-remove-button-id-${emotion_key}"
+                                        src="${CLOSE_ICON_BLACK}" title="close" />
                                     (${emotion_key},${tagging_search_obj["emotions"][emotion_key]})
                                     </span>
                                     `
         })
+
+        // Add button hover event listeners to each inage tag.!!!
+        addMouseOverIconSwitch(image_emotions_div_id)
+    
         //action listener for the removal of emotions populated from user entry
         Object.keys(tagging_search_obj["emotions"]).forEach(emotion_key => {
             document.getElementById(`modal-search-emotion-remove-button-id-${emotion_key}`).addEventListener("click", function() {
@@ -734,12 +752,17 @@ async function Add_New_Meme(){
             Object.keys(meme_tagging_search_obj["emotions"]).forEach(emotion_key => {
                 image_emotions_div_id.innerHTML += `
                                         <span id="modal-search-add-memes-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
-                                        <img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-remove-button-id-${emotion_key}" onmouseover="this.src='${CLOSE_ICON_RED}';"
-                                            onmouseout="this.src='${CLOSE_ICON_BLACK}';" src="${CLOSE_ICON_BLACK}" title="close" />
+                                        <img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-remove-button-id-${emotion_key}"
+                                            src="${CLOSE_ICON_BLACK}" title="close" />
                                         (${emotion_key},${meme_tagging_search_obj["emotions"][emotion_key]})
                                         </span>
                                         `
             })
+            
+            // Add button hover event listeners to each inage tag.!!!
+            addMouseOverIconSwitch(image_emotions_div_id)
+
+
             //action listener for the removal of emotions populated from user entry
             Object.keys(meme_tagging_search_obj["emotions"]).forEach(emotion_key => {
                 document.getElementById(`modal-search-add-memes-emotion-remove-button-id-${emotion_key}`).onclick = function() {
@@ -764,12 +787,17 @@ async function Add_New_Meme(){
             Object.keys(meme_tagging_search_obj["meme_emotions"]).forEach(emotion_key => {
                 image_memes_emotions_div_id.innerHTML += `
                                         <span id="modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}" style="white-space:nowrap">
-                                            <img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}" onmouseover="this.src='${CLOSE_ICON_RED}';"
-                                                onmouseout="this.src='${CLOSE_ICON_BLACK}';" src="${CLOSE_ICON_BLACK}" title="close" />
+                                            <img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}"
+                                                src="${CLOSE_ICON_BLACK}" title="close" />
                                             (${emotion_key},${meme_tagging_search_obj["meme_emotions"][emotion_key]})
                                         </span>
                                         `
             })
+                        
+            // Add button hover event listeners to each inage tag.!!!
+            addMouseOverIconSwitch(image_memes_emotions_div_id)
+            
+
             //action listener for the removal of meme emotions populated from user entry
             Object.keys(meme_tagging_search_obj["meme_emotions"]).forEach(emotion_key => {
                 document.getElementById(`modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}`).addEventListener("click", function() {
