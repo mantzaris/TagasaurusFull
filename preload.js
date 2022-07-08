@@ -24,7 +24,7 @@ function setupOSSpecificPaths() {
       case "win32":
           return PATH.join(process.env.APPDATA, APP_NAME);
       case "darwin":
-          return "Unimplimented OSX Paths";
+        return PATH.join(process.env.HOME, "Library", "Application Support", APP_NAME);
       default:
           return "Unimplimented Path for OS: " + process.platform;
   }

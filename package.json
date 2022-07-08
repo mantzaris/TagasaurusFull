@@ -24,8 +24,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder",
-    "package-test": "electron-builder . --platform=Linux --icon=Taga.png"  
+    "build": "electron-builder"
   },
   "devDependencies": {
     "electron": "^18.0.0",
@@ -45,16 +44,26 @@
   },
   "selfUpdate": false,
   "build": {
+    "name": "tagasaurus",
+    "description": "tag your world",
+    "homepage": "http://github.com/mantzaris/tagasaurus",
+    "license": "MIT",
+    "author": "mantzaris https://twitter.com/Tagasaurus_app",
     "appId": "tagasaurus",
+    "repository": {
+      "type": "git",
+      "url": "http://github.com/mantzaris/tagasaurus"
+    },
     "files": [
       "!.github",
-      "!README.md"
+      "!README.md",
+      "!dist/"
     ],
     "linux": {
       "target": [
         "deb"
       ],
-      "icon": "Taga.png",
+      "icon": "taga-icon/TagaIcon512x512.png",
       "maintainer": "mantzaris",
       "category": "utility"
     },

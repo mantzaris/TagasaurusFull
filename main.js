@@ -1,6 +1,6 @@
 // Modules to control application life and create native browser window
 //'ipcMain' and 'dialog' are introduced to open the dialog window in slides.js
-const {app, ipcMain, dialog, BrowserWindow, Tray} = require('electron');
+const {app, ipcMain, dialog, BrowserWindow} = require('electron');
 const PATH = require('path');
 const FS = require('fs');
 
@@ -18,8 +18,8 @@ var DB;
 DB_FILE_NAME = 'test-better3.db'
 
 
-
-tmp_icon_dir = PATH.join(__dirname,'icon.png')
+console.log(`APP_PATH = ${APP_PATH}`)
+tmp_icon_dir = PATH.join(APP_PATH,'taga-icon','TagaIcon512x512.png')
 console.log('icon path = ',  tmp_icon_dir   )
 exists = FS.existsSync( tmp_icon_dir  )
 console.log(`exists = `, exists)
