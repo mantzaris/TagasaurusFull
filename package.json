@@ -44,24 +44,14 @@
   },
   "selfUpdate": false,
   "build": {
-    "name": "tagasaurus",
-    "description": "tag your world",
-    "homepage": "http://github.com/mantzaris/tagasaurus",
-    "license": "MIT",
-    "author": "mantzaris https://twitter.com/Tagasaurus_app",
     "appId": "tagasaurus",
-    "repository": {
-      "type": "git",
-      "url": "http://github.com/mantzaris/tagasaurus"
-    },
     "files": [
       "!.github",
-      "!README.md",
-      "!dist/"
+      "!README.md"
     ],
     "linux": {
       "target": [
-        "deb"
+        "deb", "rpm", "tar.gz"
       ],
       "icon": "taga-icon/TagaIcon512x512.png",
       "maintainer": "mantzaris",
