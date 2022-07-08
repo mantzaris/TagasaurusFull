@@ -3,6 +3,25 @@
 
 A key feature is that emotions are stored by the user's explicit input over a set of values for a set of different emotions. This is in contrast to many models where emoticons represent a small set of specific emotions a user must choose from rather than _tune_. Another key feature is the ability for any image to become a meme of another image. Collections of images with memes for a collection can also be made. The user has the ability to search through images and collections based upon the annotation information overlaps, and also find relevant memes through the use of a search on the bi-partite graph. That is 'which images are memes to images with such criteria?'
 
+
+# Downloads
+
+## Windows 
+
+- Installer:  [download](https://drive.google.com/file/d/17mSLYUA0-gMl6-M2PAOlZjGWFdROG0pJ/view?usp=sharing)
+
+- Zip (unzip and run the executable file):  [download](https://drive.google.com/file/d/1xEL3hmH0mzEM-WoSXu3Z4_9a2OS7HbBC/view?usp=sharing)
+
+## Linux
+
+- Debian/Ubuntu (.deb, run with dpkg -i):  [download](https://drive.google.com/file/d/1p2ysZDArYFttweul5wVtT3qDhNRYKPDc/view?usp=sharing)
+
+- Fedora/RHEL (.rpm):  [download](https://drive.google.com/file/d/1p2ysZDArYFttweul5wVtT3qDhNRYKPDc/view?usp=sharing)
+
+- Generic Linux (.tar.gz, run the binary file 'tagasaurus'):  [download](https://drive.google.com/file/d/1p2ysZDArYFttweul5wVtT3qDhNRYKPDc/view?usp=sharing)
+
+
+
 ## Using Tagasaurus
 
 From the top level directory load **nodejs** and in that prompt type `npm start`. 
