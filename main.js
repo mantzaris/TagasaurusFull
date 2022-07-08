@@ -33,11 +33,13 @@ function createWindow () {
     width: 1200,
     height: 1000,
     icon: tmp_icon_dir,
+    autoHideMenuBar: true,
     webPreferences: {
       preload: PATH.join(__dirname, 'preload.js'),
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true
+      enableRemoteModule: true,
+      devTools: !app.isPackaged
     }
   })
   //LOAD THE STARTING .html OF THE APP->
