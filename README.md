@@ -24,7 +24,19 @@ A key feature is that emotions are stored by the user's explicit input over a se
 
 ## Using Tagasaurus
 
-From the top level directory load **nodejs** and in that prompt type `npm start`. 
+- The main menu lists the main actions to take and some scores to track the % of the images have been tagged or not.
+- New images can be loaded into the app when you go into the *tagging* page. The uploaded images then live in the taga space so they persist when deleted from their original position.
+- The tagging phase allows you to add text, emotions and memes (which are other images and any image can become a meme for another image).
+- Collection can be produced but in this page new images cannot be imported; only during tagging. A collection creation wizard helps a user produce a collection. 
+- Searching allows you to find a rank of relevant images based upon the overlap of the annotations with the search criteria. The searching also finds images which are memes for the criteria you searched for. When searching for memes to add this works in the opposite direction. Eg. when searching for a meme you may ask which are the memes relevant to images with this criteria (success kid with happy celebrations in the meme bar and parties/weddings in the image bar).The opposite question can be asked when looking for the criteria of the success kid with the images associated with it.  
+- If an image is not in the main focus you can click on it to bring it to focus in a modal.
+- To back-up your annotations you can export all the data which copies over all the files, database (sqlite3) and produces a text based set of files with the annotation data (for analytics). This can be re-imported later on or given to another taga user to 'import'. Upon imported if the same images are present a 'merge' of the data is produced. Same for the collections where the gallery is appended. 
+- Updating if you delete the app and then re-install another version (or same version) your data should be there. But you can export and then re-import just to be certain that you don't lose your annotation information. 
+
+
+## Scope
+
+This is developed using ElectronJS
 
 It is hoped that the flat level GUI will be intuitive. The welcome screen presents the options to tag images, create entities and also export the data. Tagging individual images involves the user loading in images and providing manually insterted annotations. The entity creation process has a similar workflow with the ability to group together images as a collective entity under the new label that is user provided. Representative images are chosen for the collectives. A wizard is there to assist in the creation of the entities. The export facility produces a JSON with all the image file annotations and entity collection information, with a directory of all the image resources used. 
 
