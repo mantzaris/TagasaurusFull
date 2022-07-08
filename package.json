@@ -34,7 +34,7 @@
     "electron-reloader": "^1.2.0"
   },
   "dependencies": {
-    "better-sqlite3": "^7.5.0",
+    "better-sqlite3": "^7.5.3",
     "fs": "^0.0.1-security",
     "fs-extra": "^10.0.0",
     "install": "^0.13.0",
