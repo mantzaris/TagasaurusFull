@@ -248,3 +248,4 @@ console.log(`-mainjs- the app.getPath('appPath') = ${app.getAppPath()}`)
 //       "createDesktopShortcut": false,
 //       "artifactName": "tagasaurus.app"
 //     }
+
