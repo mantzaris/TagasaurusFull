@@ -30,7 +30,7 @@ function setupOSSpecificPaths() {
 }
 
 window.USER_DATA_PATH = setupOSSpecificPaths();
-
+//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 //--------->>>>>>>>>>>>>>>
 //FACE RECOGNITION STUFF!!!
@@ -77,7 +77,7 @@ async function Get_Image_Face_Expresssions_From_File(imagePath) {
 window.Get_Image_Face_Expresssions_From_File = Get_Image_Face_Expresssions_From_File;
 
 
-console.log('in preload after face set up')
+//console.log('in preload after face set up')
 //---------<<<<<<<<<<<<<<<<<<<<<<
 
 

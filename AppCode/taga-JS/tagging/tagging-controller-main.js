@@ -32,6 +32,8 @@ var search_meme_results = ''; //meme search results
 var meme_search_results = ''; //when adding a meme the images panel (left)
 var meme_search_meme_results = ''; //when adding a meme the meme panel (right)
 
+var default_auto_fill_emotions = false;
+
 
 var reg_exp_delims = /[#:,;| ]+/
 
@@ -59,15 +61,26 @@ async function Auto_Fill_Emotions(filename, file_annotation_obj) {
     return { ...file_annotation_obj["taggingEmotions"], ...emotion_max_faces_tmp }
 }
 
-
+//actions for the AUTO-FILL emotions button being pressed, populate 
 document.getElementById(`auto-fill-emotions-button-id`).onclick = async function() {
     current_image_annotation["taggingEmotions"] = await Auto_Fill_Emotions(current_image_annotation["imageFileName"], current_image_annotation)
     await Update_Tagging_Annotation_DB(current_image_annotation);
     Emotion_Display_Fill();
 };
 
-auto_fill_user_value = document.getElementById(`auto-fill-emotions-check-box-id`).checked
-console.log(`auto_fill_user_value ${auto_fill_user_value}`)
+
+//default_auto_fill_emotions = document.getElementById(`auto-fill-emotions-check-box-id`).checked
+document.getElementById(`auto-fill-emotions-check-box-id`).addEventListener('change', function() {
+    if (this.checked) {
+        //console.log("Checkbox is checked..");
+        default_auto_fill_emotions = true;
+    } else {
+        //console.log("Checkbox is not checked..");
+        default_auto_fill_emotions = false;
+    }
+});
+
+//console.log(`auto_fill_user_value ${auto_fill_user_value}`)
 
 
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS START>>>
@@ -415,6 +428,10 @@ async function Load_Default_Taga_Image() {
     tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
     tagging_entry.imageFileName = 'Taga.png';
     tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
+    //for taga no emotion inference is needed but done for consistency
+    if( default_auto_fill_emotions == true ) {
+        tagging_entry["taggingEmotions"] = await Auto_Fill_Emotions(tagging_entry["imageFileName"], tagging_entry)
+    }
     await Insert_Record_Into_DB(tagging_entry); //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
 }
 //delete image from user choice
@@ -456,6 +473,10 @@ async function Load_New_Image() {
         tagging_entry_tmp.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${filename}`);
         hash_present = await Get_Tagging_Hash_From_DB(tagging_entry_tmp.imageFileHash);
         if(hash_present == undefined) {
+            //emotion inference upon the default selected
+            if( default_auto_fill_emotions == true ) {
+                tagging_entry_tmp["taggingEmotions"] = await Auto_Fill_Emotions(tagging_entry_tmp["imageFileName"], tagging_entry_tmp)
+            }
             await Insert_Record_Into_DB(tagging_entry_tmp); //sqlite version
             tagging_entry = tagging_entry_tmp;
         }
