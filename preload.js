@@ -15,7 +15,6 @@ window.addEventListener('DOMContentLoaded', () => {
 })
 
 
-
 function setupOSSpecificPaths() {
   const APP_NAME = "tagasaurus";
   switch (process.platform) {
@@ -31,6 +30,44 @@ function setupOSSpecificPaths() {
 }
 
 window.USER_DATA_PATH = setupOSSpecificPaths();
+
+
+//--------->>>>>>>>>>>>>>>
+//FACE RECOGNITION STUFF!!!
+let faceapi = require("face-api.js")
+
+const minConfidenceFace = 0.5;
+const faceapiOptions = new faceapi.SsdMobilenetv1Options({ minConfidenceFace });
+const detectionNet = faceapi.nets.ssdMobilenetv1;
+
+faceapi.env.monkeyPatch({
+    Canvas: HTMLCanvasElement,
+    Image: HTMLImageElement,
+    ImageData: ImageData,
+    Video: HTMLVideoElement,
+    createCanvasElement: () => document.createElement('canvas'),
+    createImageElement: () => document.createElement('img')
+});
+
+async function Get_Image_Face_Descriptions_From_File(imagePath) {
+  await detectionNet.load('../weights');
+  await faceapi.loadFaceExpressionModel('../weights');
+  await faceapi.loadFaceLandmarkModel('../weights');
+  await faceapi.loadFaceRecognitionModel('../weights');
+
+  var img = document.createElement('img'); // Use DOM HTMLImageElement
+  img.src = imagePath
+
+  return await faceapi.detectAllFaces(img).
+                                          withFaceLandmarks().
+                                          withFaceExpressions().
+                                          withFaceDescriptors()
+}
+window.Get_Image_Face_Descriptions_From_File = Get_Image_Face_Descriptions_From_File;
+
+console.log('in preload after face set up')
+//---------<<<<<<<<<<<<<<<<<<<<<<
+
 
 //console.log(`in preload before require`)
 //console.log('proces env ',process.env)

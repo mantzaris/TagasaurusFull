@@ -35,6 +35,10 @@ var meme_search_meme_results = ''; //when adding a meme the meme panel (right)
 
 var reg_exp_delims = /[#:,;| ]+/
 
+//TEST!!!
+super_res = Get_Image_Face_Descriptions_From_File('../pp1.jpg')
+console.log('super res', super_res )
+
 
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS START>>>
 async function Step_Get_Annotation(filename,step) {
