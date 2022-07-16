@@ -35,25 +35,37 @@ var meme_search_meme_results = ''; //when adding a meme the meme panel (right)
 
 var reg_exp_delims = /[#:,;| ]+/
 
-//TEST!!!
-document.getElementById(`auto-fill-emotions-button-id`).onclick = async function() {
-    console.log('auto fill emotions for this image');
-    console.log(`current annotation filename in tagging = `, PATH.join(TAGA_DATA_DIRECTORY,current_image_annotation["imageFileName"]) )
-    super_res = await Get_Image_Face_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY,current_image_annotation["imageFileName"]) )
-    console.log('super res', super_res.length )
-    console.log('super res', super_res )
-    for(let face_ii=0; face_ii < super_res.length; face_ii++) {
-        console.log(`super res expression[${face_ii}].expressions = `, super_res[face_ii].expressions)
-        
-        
-        for (let [key, value] of Object.entries(super_res[face_ii].expressions)) {
-            console.log(`${key}: ${value}`);
+
+
+//returns the obj with the extended emotions auto filled
+async function Auto_Fill_Emotions(filename, file_annotation_obj) {
+    super_res = await Get_Image_Face_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, filename) )
+    let emotion_max_faces_tmp = {}
+    if( super_res.length > 0 ) {
+        for(let face_ii=0; face_ii < super_res.length; face_ii++) {
+            for (let [key, value] of Object.entries(super_res[face_ii].expressions)) {        
+                if( Object.keys(file_annotation_obj["taggingEmotions"]).includes(key) == false ) { //don't alter emotions that are already there as added by the user
+                    if( emotion_max_faces_tmp[key] == undefined ) { //add emotion and value
+                        emotion_max_faces_tmp[key] = Math.round(value*100);
+                    } else { //check which emotion value should be used (take the largest value)
+                        if( emotion_max_faces_tmp[key] < (Math.round(value*100)) ) {
+                            emotion_max_faces_tmp[key] = Math.round(value*100);
+                        }
+                    }
+                }
+            }
         }
-
-
     }
+    return { ...file_annotation_obj["taggingEmotions"], ...emotion_max_faces_tmp }
+}
 
+
+document.getElementById(`auto-fill-emotions-button-id`).onclick = async function() {
+    current_image_annotation["taggingEmotions"] = await Auto_Fill_Emotions(current_image_annotation["imageFileName"], current_image_annotation)
+    await Update_Tagging_Annotation_DB(current_image_annotation);
+    Emotion_Display_Fill();
 };
+
 auto_fill_user_value = document.getElementById(`auto-fill-emotions-check-box-id`).checked
 console.log(`auto_fill_user_value ${auto_fill_user_value}`)
 
