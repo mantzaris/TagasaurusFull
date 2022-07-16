@@ -42,11 +42,18 @@
 
 			<!-- EMOTIONS New Label Components -->
 			<div id="emotions-innerbox-newemotions-id">
-				<textarea id="emotions-new-emotion-textarea-id" placeholder="new emotion entry..."
-					name="emotion-new-emotion-textarea-name" oninput="this.value = this.value.replace(/[ \n]/g,'')"></textarea>
-				<span id="emotion-text-range-value-label-left-id">0</span> <input id="new-emotion-range-id" type="range"
-					min="0" max="100" value="0"> <span id="emotion-text-range-value-label-right-id">100</span>
-				<button type="button" class="fun-button-blue" id="add-new-emotion-button-id">ADD NEW EMOTION</button>
+				<div id="emotions-new-entry-div-id">
+					<textarea id="emotions-new-emotion-textarea-id" placeholder="new emotion entry..."
+						name="emotion-new-emotion-textarea-name" oninput="this.value = this.value.replace(/[ \n]/g,'')"></textarea>
+					<span id="emotion-text-range-value-label-left-id">0</span> <input id="new-emotion-range-id" type="range"
+						min="0" max="100" value="0"> <span id="emotion-text-range-value-label-right-id">100</span>
+					<button type="button" class="fun-button-blue" id="add-new-emotion-button-id">ADD NEW EMOTION</button>
+				</div>
+				<div id="emotion-entry-spacer-div-id"></div>
+				<div id="auto-emotions-div-id">
+					<button type="button" class="fun-button-blue" id="auto-fill-emotions-button-id">AUTO-FILL</button>
+					<input type="checkbox" id="auto-fill-emotions-check-box-id" name="auto-emotions-check-box-name" value="check-auto-emotions">
+				</div>
 			</div>
 
 			<!-- EMOTIONS Values List -->
