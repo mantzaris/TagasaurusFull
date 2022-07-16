@@ -156,6 +156,10 @@ body {
   margin-right: auto;
   cursor: pointer;
 }
+
+#auto-fill-emotions-check-box-label-id {
+  font-size: 2vmin;
+}
 #auto-fill-emotions-check-box-id {
   display: inline-block;
   position: relative;

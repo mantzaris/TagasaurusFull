@@ -97,13 +97,13 @@ async function t0() {
     console.log(`dist = ${dist}`) // 10
 
 }
-t0()
+//t0()
 
 console.log('t1(../fd1.jpg)', t1('../fd1.jpg'))
 console.log('t1(../fd2.jpg)', t1('../fd2.jpg'))
 
-super_res = Get_Image_Face_Descriptions_From_File('../pp1.jpg')
-console.log('super res', super_res )
+//super_res = Get_Image_Face_Descriptions_From_File('../pp1.jpg')
+//console.log('super res', super_res )
 // async function f0() {
 //     let detectionNet = await faceapi.nets.ssdMobilenetv1;
 //     await detectionNet.load('../weights');

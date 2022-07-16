@@ -49,21 +49,33 @@ faceapi.env.monkeyPatch({
     createImageElement: () => document.createElement('img')
 });
 
-async function Get_Image_Face_Descriptions_From_File(imagePath) {
+async function Load_Face_Api_Model() {
   await detectionNet.load('../weights');
-  await faceapi.loadFaceExpressionModel('../weights');
   await faceapi.loadFaceLandmarkModel('../weights');
+  await faceapi.loadFaceExpressionModel('../weights');
   await faceapi.loadFaceRecognitionModel('../weights');
+}
+Load_Face_Api_Model()
 
+async function Get_Image_Face_Descriptors_And_Expresssions_From_File(imagePath) {
   var img = document.createElement('img'); // Use DOM HTMLImageElement
   img.src = imagePath
-
   return await faceapi.detectAllFaces(img).
                                           withFaceLandmarks().
                                           withFaceExpressions().
                                           withFaceDescriptors()
 }
-window.Get_Image_Face_Descriptions_From_File = Get_Image_Face_Descriptions_From_File;
+window.Get_Image_Face_Descriptors_And_Expresssions_From_File = Get_Image_Face_Descriptors_And_Expresssions_From_File;
+
+async function Get_Image_Face_Expresssions_From_File(imagePath) {
+  var img = document.createElement('img'); // Use DOM HTMLImageElement
+  img.src = imagePath
+  return await faceapi.detectAllFaces(img).
+                                          withFaceLandmarks().
+                                          withFaceExpressions()
+}
+window.Get_Image_Face_Expresssions_From_File = Get_Image_Face_Expresssions_From_File;
+
 
 console.log('in preload after face set up')
 //---------<<<<<<<<<<<<<<<<<<<<<<

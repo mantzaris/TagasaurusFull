@@ -36,8 +36,26 @@ var meme_search_meme_results = ''; //when adding a meme the meme panel (right)
 var reg_exp_delims = /[#:,;| ]+/
 
 //TEST!!!
-super_res = Get_Image_Face_Descriptions_From_File('../pp1.jpg')
-console.log('super res', super_res )
+document.getElementById(`auto-fill-emotions-button-id`).onclick = async function() {
+    console.log('auto fill emotions for this image');
+    console.log(`current annotation filename in tagging = `, PATH.join(TAGA_DATA_DIRECTORY,current_image_annotation["imageFileName"]) )
+    super_res = await Get_Image_Face_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY,current_image_annotation["imageFileName"]) )
+    console.log('super res', super_res.length )
+    console.log('super res', super_res )
+    for(let face_ii=0; face_ii < super_res.length; face_ii++) {
+        console.log(`super res expression[${face_ii}].expressions = `, super_res[face_ii].expressions)
+        
+        
+        for (let [key, value] of Object.entries(super_res[face_ii].expressions)) {
+            console.log(`${key}: ${value}`);
+        }
+
+
+    }
+
+};
+auto_fill_user_value = document.getElementById(`auto-fill-emotions-check-box-id`).checked
+console.log(`auto_fill_user_value ${auto_fill_user_value}`)
 
 
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS START>>>
