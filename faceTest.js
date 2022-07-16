@@ -16,18 +16,52 @@ faceapi.env.monkeyPatch({
 
 async function t0() {
     var img2 = document.createElement('img'); // Use DOM HTMLImageElement
-    img2.src = '../fd1.jpg';
+    img2.src = '../pp1.jpg';
     console.log(img2.src)
+
     //document.body.appendChild(img2);
     let detectionNet = faceapi.nets.ssdMobilenetv1;
     await detectionNet.load('../weights');
-    fullFaceDescription = await faceapi.detectSingleFace(img2)
+    fullFaceDescription = await faceapi.detectSingleFace(img2,faceapiOptions)
     console.log(fullFaceDescription)
 
     await faceapi.loadFaceExpressionModel('../weights');
+    await faceapi.loadFaceLandmarkModel('../weights');
 
-    detectionWithExpressions2 = await faceapi.detectSingleFace(img2).withFaceExpressions()
-    console.log( detectionWithExpressions2 )
+    detections = await faceapi.detectAllFaces(img2,faceapiOptions)
+    detectionWithExpressions2 = await faceapi.detectAllFaces(img2,faceapiOptions).withFaceLandmarks().withFaceExpressions()
+    console.log(detectionWithExpressions2)
+    detectionWithExpressions2.forEach(face_tmp => {
+        Object.keys(face_tmp["expressions"]).forEach(emotion => {
+            console.log(`${emotion}: ${face_tmp["expressions"][emotion]}`)
+        })
+    }); 
+
+    await faceapi.loadFaceRecognitionModel('../weights');
+
+    let img2_res = await faceapi.detectAllFaces(img2,faceapiOptions).withFaceLandmarks().withFaceDescriptors()
+    console.log('length',img2_res.length)
+    console.log('img2_res',img2_res)
+    faceMatcher_img2 = new faceapi.FaceMatcher(img2_res)
+    console.log('faceMatcher_img2',faceMatcher_img2)
+
+    res_big = await faceapi.detectAllFaces(img2,faceapiOptions).withFaceLandmarks().withFaceExpressions().withFaceDescriptors()
+    console.log('res_big',res_big.length)
+    console.log('res_big',res_big)
+    faceMatcher_res_big = new faceapi.FaceMatcher(res_big)
+    console.log('faceMatcher_res_big',faceMatcher_res_big)
+
+    var img3 = document.createElement('img'); // Use DOM HTMLImageElement
+    img3.src = '../pp2.jpg';
+    console.log(img3.src)
+
+    res_big_New = await faceapi.detectAllFaces(img3,faceapiOptions).withFaceLandmarks().withFaceExpressions().withFaceDescriptors()
+    res_big_New.forEach(fd => {
+        bestMatch = faceMatcher_res_big.findBestMatch(fd.descriptor)
+        console.log(bestMatch.toString())
+    })
+
+
 }
 t0()
 
