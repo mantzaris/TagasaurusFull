@@ -97,10 +97,75 @@ async function t0() {
     console.log(`dist = ${dist}`) // 10
 
 }
-t0()
+//t0()
 
-console.log('t1(../fd1.jpg)', t1('../fd1.jpg'))
-console.log('t1(../fd2.jpg)', t1('../fd2.jpg'))
+// console.log('t1(../fd1.jpg)', t1('../fd1.jpg'))
+// console.log('t1(../fd2.jpg)', t1('../fd2.jpg'))
+
+
+
+
+async function test1() {
+    await detectionNet.load('../weights');
+    await faceapi.loadFaceExpressionModel('../weights');
+    await faceapi.loadFaceLandmarkModel('../weights');
+    await faceapi.loadFaceRecognitionModel('../weights');
+
+    var img1 = document.createElement('img'); // Use DOM HTMLImageElement
+    img1.src = '../jd1.jpg';
+    var img2 = document.createElement('img'); // Use DOM HTMLImageElement
+    img2.src = '../jd4.jpg';
+    //document.body.appendChild(img2);
+    
+
+    let img1_res = await faceapi.detectAllFaces(img1,faceapiOptions).withFaceLandmarks().withFaceDescriptors()
+    console.log('length',img1_res.length)
+    console.log('img1_res',img1_res)
+
+    img2_res = await faceapi.detectAllFaces(img2,faceapiOptions).withFaceLandmarks().withFaceDescriptors()
+    console.log('img2_res',img2_res.length)
+    console.log('img2_res',img2_res)
+    
+
+    descriptor0 = img1_res[0].descriptor
+    descriptor1 = img2_res[0].descriptor
+    dist = faceapi.euclideanDistance(descriptor0, descriptor1)
+    console.log(`->DISTANCE = ${dist}`) // 10
+
+
+}
+//test1()
+
+
+
+async function test2() {
+    await detectionNet.load('../weights');
+    await faceapi.loadFaceExpressionModel('../weights');
+    await faceapi.loadFaceLandmarkModel('../weights');
+    await faceapi.loadFaceRecognitionModel('../weights');
+
+    var img1 = document.createElement('img'); // Use DOM HTMLImageElement
+    img1.src = '../bb3.jpg';
+    var img2 = document.createElement('img'); // Use DOM HTMLImageElement
+    img2.src = '../bb2.jpg';
+    //document.body.appendChild(img2);
+    
+
+    let img1_res = await faceapi.detectAllFaces(img1,faceapiOptions).withFaceLandmarks().withFaceDescriptors()
+    console.log('length',img1_res.length)
+    console.log('img1_res',img1_res)
+
+    img2_res = await faceapi.detectAllFaces(img2,faceapiOptions).withFaceLandmarks().withFaceDescriptors()
+    console.log('img2_res',img2_res.length)
+    console.log('img2_res',img2_res)
+    
+
+    score = await Get_Descriptors_DistanceScore(img1_res, img2_res)
+    console.log(`->super score = ${score}`) // 10
+
+
+}
+test2()
 
 //super_res = Get_Image_Face_Descriptions_From_File('../pp1.jpg')
 //console.log('super res', super_res )
