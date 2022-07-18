@@ -97,7 +97,7 @@ async function t0() {
     console.log(`dist = ${dist}`) // 10
 
 }
-//t0()
+t0()
 
 console.log('t1(../fd1.jpg)', t1('../fd1.jpg'))
 console.log('t1(../fd2.jpg)', t1('../fd2.jpg'))

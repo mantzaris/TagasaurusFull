@@ -17,7 +17,8 @@ var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
                                     "taggingRawDescription": "",
                                     "taggingTags": [],
                                     "taggingEmotions": {good:"0",bad:"0"},
-                                    "taggingMemeChoices": []
+                                    "taggingMemeChoices": [],
+                                    "faceDescriptors": []
                                     }
 
 //holds current annotation obj
@@ -39,13 +40,26 @@ var reg_exp_delims = /[#:,;| ]+/
 
 
 
+
 //returns the obj with the extended emotions auto filled
-async function Auto_Fill_Emotions(filename, file_annotation_obj) {
-    super_res = await Get_Image_Face_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, filename) )
+//faceapi.euclideanDistance( Object.values({'1':1,'2':2,'3':2}), Object.values({'1':-1,'2':0.2,'3':15}) ) -> 13.275541
+async function Get_Face_Descriptors_Arrays(super_res) {
+    let faces_descriptors_array_tmp = []
+    if( super_res.length > 0 ) {
+        for(let face_ii=0; face_ii < super_res.length; face_ii++) {
+            //each descriptor is an 'object' not an array so that each dimension of the descriptor feature vector has a key pointing to the value but we just use the values that are needed to compute the 'distace' between descriptors later faceapi.euclideanDistance( aa[0] , aa[1] ), faceapi.euclideanDistance( JSON.parse(res5[2].faceDescriptors)[0] , JSON.parse(res5[2].faceDescriptors)[2] ) (get face descriptors string, parse and then select to compare via euclidean distances)
+            faces_descriptors_array_tmp[face_ii] = Object.values(super_res[face_ii].descriptor)
+        }
+    }
+    return faces_descriptors_array_tmp
+}
+
+//returns the obj with the extended emotions auto filled (the object is not a full annotation obj, but just the extended obj for emotions)
+async function Auto_Fill_Emotions(super_res, file_annotation_obj) {
     let emotion_max_faces_tmp = {}
     if( super_res.length > 0 ) {
         for(let face_ii=0; face_ii < super_res.length; face_ii++) {
-            for (let [key, value] of Object.entries(super_res[face_ii].expressions)) {        
+            for (let [key, value] of Object.entries(super_res[face_ii].expressions)) {
                 if( Object.keys(file_annotation_obj["taggingEmotions"]).includes(key) == false ) { //don't alter emotions that are already there as added by the user
                     if( emotion_max_faces_tmp[key] == undefined ) { //add emotion and value
                         emotion_max_faces_tmp[key] = Math.round(value*100);
@@ -63,7 +77,8 @@ async function Auto_Fill_Emotions(filename, file_annotation_obj) {
 
 //actions for the AUTO-FILL emotions button being pressed, populate 
 document.getElementById(`auto-fill-emotions-button-id`).onclick = async function() {
-    current_image_annotation["taggingEmotions"] = await Auto_Fill_Emotions(current_image_annotation["imageFileName"], current_image_annotation)
+    super_res = await Get_Image_Face_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation["imageFileName"]) )
+    current_image_annotation["taggingEmotions"] = await Auto_Fill_Emotions(super_res, current_image_annotation)
     await Update_Tagging_Annotation_DB(current_image_annotation);
     Emotion_Display_Fill();
 };
@@ -429,9 +444,16 @@ async function Load_Default_Taga_Image() {
     tagging_entry.imageFileName = 'Taga.png';
     tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
     //for taga no emotion inference is needed but done for consistency
-    if( default_auto_fill_emotions == true ) {
-        tagging_entry["taggingEmotions"] = await Auto_Fill_Emotions(tagging_entry["imageFileName"], tagging_entry)
-    }
+    
+    //NO NEED WHEN THE DEFAULT IS TAGA, THERE IS NO FACE AND NO EMOTIONS
+    // if( default_auto_fill_emotions == true ) {
+    //     super_res = await Get_Image_Face_Descriptors_And_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry["imageFileName"]) )
+    //     tagging_entry["taggingEmotions"] = await Auto_Fill_Emotions(super_res, tagging_entry)
+    //     tagging_entry["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
+    // } else {
+    //     super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry["imageFileName"]) )
+    //     tagging_entry["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
+    // }
     await Insert_Record_Into_DB(tagging_entry); //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
 }
 //delete image from user choice
@@ -475,7 +497,12 @@ async function Load_New_Image() {
         if(hash_present == undefined) {
             //emotion inference upon the default selected
             if( default_auto_fill_emotions == true ) {
-                tagging_entry_tmp["taggingEmotions"] = await Auto_Fill_Emotions(tagging_entry_tmp["imageFileName"], tagging_entry_tmp)
+                super_res = await Get_Image_Face_Descriptors_And_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
+                tagging_entry_tmp["taggingEmotions"] = await Auto_Fill_Emotions(super_res, tagging_entry_tmp)                
+                tagging_entry_tmp["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
+            } else {
+                super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
+                tagging_entry_tmp["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
             }
             await Insert_Record_Into_DB(tagging_entry_tmp); //sqlite version
             tagging_entry = tagging_entry_tmp;

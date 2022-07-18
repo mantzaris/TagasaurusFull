@@ -452,7 +452,8 @@ async function Check_Gallery_And_Profile_Image_Integrity(){
                 "taggingRawDescription": "",
                 "taggingTags": [],
                 "taggingEmotions": {good:"0",bad:"0"},
-                "taggingMemeChoices": []
+                "taggingMemeChoices": [],
+                "faceDescriptors": []
             }
             tagging_entry.imageFileName = filename_tmp
             tagging_entry.imageFileHash = default_hash
@@ -538,7 +539,8 @@ async function Handle_Empty_DB() {
             "taggingRawDescription": "",
             "taggingTags": [],
             "taggingEmotions": {good:"0",bad:"0"},
-            "taggingMemeChoices": []
+            "taggingMemeChoices": [],
+            "faceDescriptors": []
             }
         tagging_entry = JSON.parse(JSON.stringify(emtpy_annotation_tmp)); //clone the default obj
         tagging_entry.imageFileName = 'Taga.png';

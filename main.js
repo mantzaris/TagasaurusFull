@@ -76,7 +76,8 @@ tagging_table_exists_res = tagging_table_exists_stmt.get();
 if( tagging_table_exists_res["count(*)"] == 0 ){
   STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${TAGGING_TABLE_NAME}
                     (imageFileName TEXT, imageFileHash TEXT, taggingRawDescription TEXT,
-                            taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT)`);
+                            taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT,
+                            faceDescriptors TEXT)`);
   STMT.run();
   //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
   STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX imageFileName_index ON ${TAGGING_TABLE_NAME} (imageFileName); `);
@@ -91,7 +92,8 @@ if( tagging_table_exists_res["count(*)"] == 0 ){
     "taggingRawDescription": "",
     "taggingTags": [],
     "taggingEmotions": {good:"0",bad:"0"},
-    "taggingMemeChoices": []
+    "taggingMemeChoices": [],
+    "faceDescriptors": []
     }
     taga_source_path = PATH.join(APP_PATH,'Taga.png') //PATH.resolve()+PATH.sep+'Taga.png';
     FS.copyFileSync(taga_source_path, PATH.join(TAGA_DATA_DIRECTORY,'Taga.png'), FS.constants.COPYFILE_EXCL);
@@ -99,8 +101,8 @@ if( tagging_table_exists_res["count(*)"] == 0 ){
     tagging_entry.imageFileName = 'Taga.png';
     tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash( PATH.join(TAGA_DATA_DIRECTORY,'Taga.png') ) //`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
 
-    INSERT_TAGGING_STMT = DB.prepare(`INSERT INTO ${TAGGING_TABLE_NAME} (imageFileName, imageFileHash, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices) VALUES (?, ?, ?, ?, ?, ?)`);
-    info = INSERT_TAGGING_STMT.run(tagging_entry.imageFileName,tagging_entry.imageFileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices));
+    INSERT_TAGGING_STMT = DB.prepare(`INSERT INTO ${TAGGING_TABLE_NAME} (imageFileName, imageFileHash, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors) VALUES (?, ?, ?, ?, ?, ?, ?)`);
+    info = INSERT_TAGGING_STMT.run(tagging_entry.imageFileName,tagging_entry.imageFileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices),JSON.stringify(tagging_entry.faceDescriptors));
     //console.log(`loging in the main js line 86`)
 
 }

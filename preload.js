@@ -76,6 +76,14 @@ async function Get_Image_Face_Expresssions_From_File(imagePath) {
 }
 window.Get_Image_Face_Expresssions_From_File = Get_Image_Face_Expresssions_From_File;
 
+async function Get_Image_Face_Descriptors_From_File(imagePath) {
+  var img = document.createElement('img'); // Use DOM HTMLImageElement
+  img.src = imagePath
+  return await faceapi.detectAllFaces(img).
+                                          withFaceLandmarks().
+                                          withFaceDescriptors()
+}
+window.Get_Image_Face_Descriptors_From_File = Get_Image_Face_Descriptors_From_File;
 
 //console.log('in preload after face set up')
 //---------<<<<<<<<<<<<<<<<<<<<<<
