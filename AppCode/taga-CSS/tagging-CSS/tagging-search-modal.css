@@ -18,12 +18,21 @@
   background-color: #00c600;
   grid-area: modal-search-main-button-container-div-id;
   display: flex;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
 }
 #modal-search-main-button-id {
   display: block;
-  width: 50%;
+  width: 25%;
+  height: 90%;
+  /* background-color: #1884ff; */
+  /* border-radius: 15%; */
+  font-weight: bold;
+  font-size: 2.5vmin;
+}
+#modal-search-similar-button-id {
+  display: block;
+  width: 25%;
   height: 90%;
   /* background-color: #1884ff; */
   /* border-radius: 15%; */

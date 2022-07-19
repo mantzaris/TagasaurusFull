@@ -36,6 +36,7 @@ async function Image_Search_DB(search_obj,taggin_DB_iterator,Get_Tagging_Annotat
 exports.Image_Search_DB = Image_Search_DB
 //called in each loop for each image
 async function Image_Scoring(search_obj,image_tagging_annotation_obj_tmp,Get_Tagging_Annotation_From_DB,search_tags_lowercase,search_memetags_lowercase) {
+    
     record_tmp_tags = image_tagging_annotation_obj_tmp["taggingTags"];
     record_tmp_emotions = image_tagging_annotation_obj_tmp["taggingEmotions"];
     record_tmp_memes = image_tagging_annotation_obj_tmp["taggingMemeChoices"];
@@ -62,7 +63,13 @@ async function Image_Scoring(search_obj,image_tagging_annotation_obj_tmp,Get_Tag
         meme_tmp_tags = meme_record_tmp["taggingTags"];
         meme_tag_overlap_score += (meme_tmp_tags.filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length;
     }
-    total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score;
+
+    //get the scores for the facial recognition 'search_obj' is our reference image descriptor data
+    face_recognition_score = 0
+    if( 'faceDescriptors' in search_obj && search_obj.faceDescriptors.length != 0 && image_tagging_annotation_obj_tmp.faceDescriptors.length != 0 ) {
+        face_recognition_score = await Get_Descriptors_DistanceScore(search_obj.faceDescriptors, image_tagging_annotation_obj_tmp.faceDescriptors)
+    }
+    total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score + face_recognition_score;
     return total_image_match_score;
 }
 async function Image_Meme_Search_DB(search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS) {
@@ -110,21 +117,27 @@ async function Meme_Image_Scoring(search_obj,image_tagging_meme_annotation_obj_t
     tag_img_overlap_score = 0;
     for(ii=0; ii < image_tagging_meme_annotation_obj_tmp.imageFileNames.length; ii++) {
         img_tmp = image_tagging_meme_annotation_obj_tmp.imageFileNames[ii]
-        record_tmp = await Get_Tagging_Annotation_From_DB(img_tmp);
-        tag_img_overlap_score += (record_tmp["taggingTags"].filter(tag => (search_tags_lowercase).includes(tag.toLowerCase()))).length;
-        record_tmp_emotion_keys = Object.keys(record_tmp["taggingEmotions"])
+        record_inner_tmp = await Get_Tagging_Annotation_From_DB(img_tmp);
+        tag_img_overlap_score += (record_inner_tmp["taggingTags"].filter(tag => (search_tags_lowercase).includes(tag.toLowerCase()))).length;
+        record_tmp_emotion_keys = Object.keys(record_inner_tmp["taggingEmotions"])
         search_emotions_keys = Object.keys(search_obj["emotions"])
         search_emotions_keys.forEach(search_key_emotion_label => {
             record_tmp_emotion_keys.forEach(record_emotion_key_label => {
                 if(search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()) {
-                    delta_tmp = (record_tmp[record_emotion_key_label] - search_obj["emotions"][search_key_emotion_label]) / 50
+                    delta_tmp = (record_inner_tmp["taggingEmotions"][record_emotion_key_label] - search_obj["emotions"][search_key_emotion_label]) / 50
                     emotion_overlap_score_tmp = 1 - Math.abs( delta_tmp )
                     emotion_overlap_score += emotion_overlap_score_tmp //scores range [-1,1]
                 }
             })
         })
     }
-    meme_score = meme_length_score + meme_tag_overlap_score + emotion_overlap_score + tag_img_overlap_score;
+
+    face_recognition_score = 0
+    if( 'faceDescriptors' in search_obj && search_obj.faceDescriptors.length != 0 && record_tmp.faceDescriptors.length != 0 ) {
+        face_recognition_score = await Get_Descriptors_DistanceScore(search_obj.faceDescriptors, record_tmp.faceDescriptors)
+    }
+
+    meme_score = meme_length_score + meme_tag_overlap_score + emotion_overlap_score + tag_img_overlap_score + face_recognition_score;
     return meme_score;
 }
 //IMAGE SEARCH MODAL IN TAGGING END<<<
@@ -423,11 +436,6 @@ async function Collection_Scoring(search_obj,collection_tagging_annotation_obj_t
     total_collection_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score + img_tag_overlap_score;
     return total_collection_match_score;
 }
-
-
-
-
-
 
 
 

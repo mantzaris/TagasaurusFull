@@ -100,8 +100,11 @@ async function Get_Descriptors_DistanceScore(descriptors_reference, descriptors_
     score_ref_face_ii = 0
     for(q_ii=0;q_ii < descriptors_query.length; q_ii++) {
       score_tmp = 0
-      distance_tmp = faceapi.euclideanDistance( descriptors_reference[ref_ii].descriptor , descriptors_query[q_ii].descriptor )      
-      console.log('distance_tmp = ', distance_tmp)
+      //console.log('descriptors_reference[ref_ii].descriptor = ', descriptors_reference[ref_ii])
+      //console.log('descriptors_query[ref_ii].descriptor = ', descriptors_query[ref_ii])
+      //distance_tmp = faceapi.euclideanDistance( descriptors_reference[ref_ii].descriptor , descriptors_query[q_ii].descriptor )      
+      distance_tmp = faceapi.euclideanDistance( descriptors_reference[ref_ii] , descriptors_query[q_ii] )      
+      //console.log('distance_tmp = ', distance_tmp)
       if( distance_tmp < 0.61 ) {
         score_tmp = 2**( 1 - 6*distance_tmp ) + 3
         if(score_ref_face_ii < score_tmp) {
@@ -111,12 +114,12 @@ async function Get_Descriptors_DistanceScore(descriptors_reference, descriptors_
     }
     ref_faces_scores_array[ref_ii] = score_ref_face_ii    
   }
-  console.log('ref_faces_scores_array= ',ref_faces_scores_array)
+  //console.log('ref_faces_scores_array= ',ref_faces_scores_array)
   ref_faces_scores_total = ref_faces_scores_array.reduce( (p,c) => p+c, 0)
   nonzeros_total = ref_faces_scores_array.filter(el => el != 0).length
   full_set_bonus = (nonzeros_total / descriptors_reference.length) * ref_faces_scores_total
   ref_faces_scores_total += full_set_bonus
-  console.log('full_set_bonus = ', full_set_bonus)
+  //console.log('full_set_bonus = ', full_set_bonus)
   return ref_faces_scores_total
 }
 window.Get_Descriptors_DistanceScore = Get_Descriptors_DistanceScore

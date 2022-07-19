@@ -688,28 +688,36 @@ async function Search_Images(){
     document.getElementById("modal-search-main-button-id").onclick = function() {
         Modal_Search_Entry()
     }
+    document.getElementById("modal-search-similar-button-id").onclick = function() {
+        Modal_Search_Similar()
+    }
 }
 //when the tagging search modal 'search' button is pressed
-async function Modal_Search_Entry() {
-    //annotation tags
-    search_tags_input = document.getElementById("modal-search-tag-textarea-entry-id").value
-    split_search_string = search_tags_input.split(reg_exp_delims)
-    search_unique_search_terms = [...new Set(split_search_string)]
-    search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
-    tagging_search_obj["searchTags"] = search_unique_search_terms
-    //meme tags now
-    search_meme_tags_input = document.getElementById("modal-search-meme-tag-textarea-entry-id").value
-    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
-    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
-    search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
-    tagging_search_obj["searchMemeTags"] = search_unique_meme_search_terms
-
+async function Modal_Search_Entry(search_similar=false, search_obj_similar_tmp={}) {
+    search_obj_tmp = tagging_search_obj
+    if(search_similar == false) {        
+        //annotation tags
+        search_tags_input = document.getElementById("modal-search-tag-textarea-entry-id").value
+        split_search_string = search_tags_input.split(reg_exp_delims)
+        search_unique_search_terms = [...new Set(split_search_string)]
+        search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
+        search_obj_tmp["searchTags"] = search_unique_search_terms
+        //meme tags now
+        search_meme_tags_input = document.getElementById("modal-search-meme-tag-textarea-entry-id").value
+        split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
+        search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+        search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
+        search_obj_tmp["searchMemeTags"] = search_unique_meme_search_terms
+    } else {
+        search_obj_tmp = search_obj_similar_tmp
+    }
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
     tagging_db_iterator = await Tagging_Image_DB_Iterator();
-    search_results = await SEARCH_MODULE.Image_Search_DB(tagging_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
+    search_results = await SEARCH_MODULE.Image_Search_DB(search_obj_tmp,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
     tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
-    search_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(tagging_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
+    search_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(search_obj_tmp,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
+    //console.log('search_meme_results = ', search_meme_results)
     //>>SHOW SEARCH RESULTS<<
     //search images results annotations
     search_image_results_output = document.getElementById("modal-search-images-results-grid-div-area-id")
@@ -755,6 +763,18 @@ async function Modal_Search_Entry() {
             };
         }
     });
+}
+
+//search similar images to the current image annotation using the face recognition api
+async function Modal_Search_Similar() {
+    //
+    //console.log("search similar!!")    
+    search_obj_similar_tmp = JSON.parse(JSON.stringify(tagging_search_obj))
+    search_obj_similar_tmp.emotions = current_image_annotation.taggingEmotions
+    search_obj_similar_tmp.searchTags = current_image_annotation.taggingTags
+    search_obj_similar_tmp.searchMemeTags = current_image_annotation.taggingMemeChoices
+    search_obj_similar_tmp.faceDescriptors = current_image_annotation.faceDescriptors
+    Modal_Search_Entry(true, search_obj_similar_tmp)
 }
 
 
