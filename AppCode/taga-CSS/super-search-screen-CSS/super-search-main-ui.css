@@ -1,0 +1,132 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Verdana, sans-serif;
+  box-sizing: border-box;
+}
+
+.top-buttons {
+    font-weight: bold;
+    border-radius: 25%;
+    width: 30%;
+    margin: auto;
+    font-size: 3vmin;
+    height: 100%;
+    cursor: pointer;
+}
+
+
+#tagging-screen-id {    
+    display: grid;
+    grid-template-columns: 12fr 8fr;
+    grid-template-rows: 2fr 18fr;
+    min-height: 0;
+    min-width: 0;
+    height: 100vh;
+    width: 100vw;
+    box-sizing: border-box;
+    grid-template-areas:
+      "top-area               results-area"
+      "search-criteria-area   results-area";
+    background-color: #808a80;
+    border-style: solid;
+    border-width: 3px;
+    border-color: #005000;
+}
+
+
+#top-div-id {
+    grid-area: top-area;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: teal;
+}
+#main-title-label {
+    font-weight: bold;
+    font-size: 3vmin;
+}
+
+
+#top-search-div-id {
+    grid-area: search-criteria-area;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 10fr 12fr;
+    min-height: 0;
+    min-width: 0;
+    /* height: 120vh; */
+    width: 100%; 
+    overflow-y: auto;
+    box-sizing: border-box;
+    grid-template-areas:
+      "annotation-criteria-area"
+      "facial-images-area";
+    background-color: #808a80;
+    border-style: solid;
+    border-width: 3px;
+    border-color: #005000;
+    background-color: tomato;
+}
+#annotation-criteria-div-id {
+    grid-area: annotation-criteria-area;
+    background-color: wheat;
+}
+#facial-images-div-id {
+    grid-area: facial-images-area;
+    background-color: violet;
+}
+
+
+
+/* where the super search results go */
+#top-results-div-id {
+    grid-area: results-area;
+    overflow-y: auto;
+    border: 3px solid #005000;
+    background-color: yellow;
+}
+#results-title-label {
+    font-size: 2.5vmin;
+}
+.super-search-div-class {
+    text-align: center;
+}
+.super-search-obj-class {
+    max-height: 25vh;
+    max-width: 100%;
+    cursor: pointer;
+}
+
+
+
+/* 
+#tagging-screen-id {
+    display: grid;
+    grid-template-columns: 12fr 8fr;
+    grid-template-rows: 2fr 3fr 12fr 24fr;
+    min-height: 0;
+    min-width: 0;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    grid-template-areas:
+      "title-area                 results-area2"
+      "main-search-button-area    results-area2"
+      "annotation-info-area       results-area2"
+      "facial-examples-area       results-area2";
+    background-color: #808a80;
+    border-style: solid;
+    border-width: 3px;
+    border-color: #005000;
+} */
+
+
+
+
+
+
+
+
+
