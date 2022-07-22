@@ -224,7 +224,7 @@ font-size: 2.4vmin;
     grid-area: facial-images-area;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr 4fr 4fr 6fr 2fr 6fr;
+    grid-template-rows: 1fr 3fr 2fr 6fr 2fr 6fr;
     min-height: 0;
     min-width: 0;
     height: 100%;
@@ -250,27 +250,95 @@ font-size: 2.4vmin;
     grid-area: facial-row-two-area;
     display: flex;
     justify-content: space-around;
+    align-items: center;
     background-color: rgb(153, 145, 28);
+}
+.search-row-two-buttons {
+    height: 80%;
+    font-size: 3vmin;
 }
 #facial-row-three-div-id {
     grid-area: facial-row-three-area;
-    background-color: blue;
+    display: flex;
+    align-items: flex-end;
+    background-color: rgb(99, 99, 207);
 }
+.search-row-three-buttons {
+    height: 100%;
+    font-size: 2.5vmin;
+    padding: 5px;
+}
+#row-three-label-id {
+    font-style: italic;
+    font-size: 1.8vmin;
+}
+
+
+
+
+
 #facial-row-four-div-id {
     grid-area: facial-row-four-area;
+
+    min-height: 0;
+    min-width: 0;
+    height: 100%;
+    width: 100%; 
+
+    overflow-y: hidden;
+    overflow-x: scroll;
+
+    white-space:nowrap;
+
+    border-bottom: 2px solid #005000;
+    border-top: 2px solid #005000;
     background-color: rgb(38, 128, 108);
+
+    text-align: center;
 }
+.recommended-search-div-class {
+    /* text-align: center; */
+    display: inline-block;
+    height: 100%;
+    /* display: flex; */
+    /* align-content: center; */
+    text-align: center;
+}
+.recommended-search-obj-class {
+    max-height: 100%;
+    max-width: 25vw;
+    cursor: pointer;
+    text-align: center;
+}
+
+
+
 #facial-row-five-div-id {
     grid-area: facial-row-five-area;
     background-color: rgb(114, 28, 76);
 }
 #facial-row-six-div-id {
     grid-area: facial-row-six-area;
-    background-color: bluesix
+    background-color: bluesix;
+
+
+    display: flex;
+    align-content: center;
+    flex-wrap: no-wrap;
+    overflow-x: auto;
+
+
 }
-
-
-
+.img2 {
+    /* flex: 0 0 auto; */
+    /* width: auto; */
+    height: 99999px;
+    object-fit: contain;
+    max-height: 100%;
+    max-width: 25vw;
+    display: block;
+    margin-right: 10px; 
+}
 
 
 
