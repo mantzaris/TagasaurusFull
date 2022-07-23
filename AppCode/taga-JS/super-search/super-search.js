@@ -4,7 +4,7 @@ const PATH = require('path');
 const IPC_RENDERER = require('electron').ipcRenderer 
 
 
-const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE } = require(PATH.join(__dirname,'..','constants','constants-code.js')) // require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, MY_FILE_HELPER } = require(PATH.join(__dirname,'..','constants','constants-code.js')) // require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 const { CLOSE_ICON_RED, CLOSE_ICON_BLACK, HASHTAG_ICON } = require(PATH.join(__dirname,'..','constants','constants-icons.js')) //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 
@@ -19,6 +19,8 @@ var reg_exp_delims = /[#:,;| ]+/
 
 search_results = '';
 selected_images = [];
+
+var last_user_image_directory_chosen = '';
 
 super_search_obj = {
     searchTags:[],
@@ -80,7 +82,7 @@ async function Get_Select_Recommended() {
 
     //user presses an image to select it from the images section, add onclick event listener
     search_results.forEach(file => {
-        document.getElementById(`recommened-check-box-id-${file}`).onclick = async function() {            
+        document.getElementById(`recommened-check-box-id-${file}`).onclick = function() {            
             console.log('check box clicked! file = ', file)
             Handle_Get_Recommended_Image_Checked(file)
         };
@@ -106,12 +108,13 @@ function Handle_Get_Recommended_Image_Checked(filename) {
     search_image_results_output.innerHTML += search_display_inner_tmp;
     //user presses an image to select it from the images section, add onclick event listener
     search_results.forEach(file => {
-        document.getElementById(`recommened-check-box-id-${file}`).onclick = async function() {            
+        document.getElementById(`recommened-check-box-id-${file}`).onclick = function() {            
             console.log('check box clicked! file = ', file)
             Handle_Get_Recommended_Image_Checked(file)
         };
     });
-    selected_images.push(filename)
+    selected_images.unshift(filename) //add to the start of the array
+    selected_images = [... new Set(selected_images)]
     Update_Selected_Images()
 }
 
@@ -124,13 +127,49 @@ function Update_Selected_Images() {
     selected_images.forEach(file_key => {
         search_display_inner_tmp += `
                                 <div class="recommended-img-div-class" id="search-image-selected-div-id-${file_key}">
-                                    <input type="checkbox" checked="true" class="recommended-img-check-box" id="recommened-check-box-id-${file_key}" name="" value="">
+                                    <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-${file_key}" name="" value="">
                                     <img class="selected-imgs" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="result" />
                                 </div>
                                 `
     })
     search_image_results_output.innerHTML += search_display_inner_tmp;
+
+    //user presses an image to select it from the images section, add onclick event listener
+    selected_images.forEach(file => {
+        document.getElementById(`selected-check-box-id-${file}`).onclick = function() {
+            console.log('check box >selected images< clicked! file = ', file)
+            //Handle_Selected_Image_Checked(file)
+            let index = selected_images.indexOf(file);
+            if (index > -1) { // only splice array when item is found
+                selected_images.splice(index, 1); // 2nd parameter means remove one item only
+            }
+            Update_Selected_Images()
+        };
+    });
 }
+
+
+document.getElementById("use-new-image-button-id").onclick = async function() {
+
+    console.log("use new image")
+
+
+    let result = await IPC_RENDERER.invoke('dialog:tagging-new-file-select',{directory: last_user_image_directory_chosen});
+    //ignore selections from the taga image folder store
+    if(result.canceled == true || PATH.dirname(result.filePaths[0]) == TAGA_DATA_DIRECTORY) {
+        return
+    }
+    last_user_image_directory_chosen = PATH.dirname(result.filePaths[0]);
+    console.log('result = ', result)
+
+
+    console.log("use new image")
+
+
+}
+
+
+
 
 //handler for the emotion label and value entry additions and then the deletion handling, all emotions are added by default and handled 
 document.getElementById("search-emotion-entry-button-id").onclick = function() {
