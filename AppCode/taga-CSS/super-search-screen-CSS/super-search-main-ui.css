@@ -218,7 +218,7 @@ font-size: 2.4vmin;
     grid-area: facial-images-area;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr 3fr 2fr 6fr 1fr 6fr;
+    grid-template-rows: 1fr 2fr 2fr 6fr 1fr 6fr;
     min-height: 0;
     min-width: 0;
     height: 100%;
@@ -287,6 +287,9 @@ font-size: 2.4vmin;
     width: 12%;
     height: 12%;
     cursor: pointer;
+}
+.recommended-img-check-box:hover  {
+    background-color:orange;
 }
 .recommended-search-img-class {
     height: 99999px;

@@ -8,8 +8,17 @@ const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE 
 
 const { CLOSE_ICON_RED, CLOSE_ICON_BLACK, HASHTAG_ICON } = require(PATH.join(__dirname,'..','constants','constants-icons.js')) //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 
+async function Tagging_Image_DB_Iterator() {
+    return DB_MODULE.Tagging_Image_DB_Iterator();
+}
+async function Get_Tagging_Annotation_From_DB(image_name) { //
+    return await DB_MODULE.Get_Tagging_Record_From_DB(image_name);
+}
+
 var reg_exp_delims = /[#:,;| ]+/
 
+search_results = '';
+selected_images = [];
 
 super_search_obj = {
     searchTags:[],
@@ -21,38 +30,107 @@ super_search_obj = {
 document.getElementById("super-search-button-id").onclick = function() {
     Super_Search()
 }
+//user presses the main search button for the add memes search modal
+document.getElementById("get-recommended-button-id").onclick = function() {
+    Get_Select_Recommended()
+}
 
 
-//default search results are the order the user has them now
-// if(search_results == '' && search_meme_results == '') {
-//     search_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
-//     search_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
-// }
+
 
 function Super_Search() {
     
-    search_tags_input = document.getElementById("search-tag-textarea-entry-id").value
-    split_search_string = search_tags_input.split(reg_exp_delims)
-    search_unique_search_terms = [...new Set(split_search_string)]
-    search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
-    super_search_obj["searchTags"] = search_unique_search_terms
-    //meme tags now
-    search_meme_tags_input = document.getElementById("search-meme-tag-textarea-entry-id").value
-    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
-    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
-    search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
-    super_search_obj["searchMemeTags"] = search_unique_meme_search_terms
-
-
-
-
+    Set_Search_Obj_Tags()
 
 
     console.log(`super_search_obj = `, super_search_obj)
 }
 
+//don't block cause the user can import a new image and use webcam
+//call without waiting
+async function Get_Select_Recommended() {
+
+    Set_Search_Obj_Tags()
+
+        //default search results are the order the user has them now
+        // if(search_results == '' && search_meme_results == '') {
+        //     search_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
+        //     search_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
+        // }
+
+    //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
+    tagging_db_iterator = await Tagging_Image_DB_Iterator();
+    search_results = await SEARCH_MODULE.Image_Search_DB(super_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
+
+    search_image_results_output = document.getElementById("facial-row-four-div-id");
+    search_image_results_output.innerHTML = "";
+    search_display_inner_tmp = '';
+    search_results.forEach(file_key => {
+        search_display_inner_tmp += `
+                                <div class="recommended-img-div-class" id="recommended-result-image-div-id-${file_key}" >
+                                    <input type="checkbox" class="recommended-img-check-box" id="recommened-check-box-id-${file_key}" name="" value="">
+                                    <img class="recommended-search-img-class" id="recommended-result-single-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="select" alt="result" />
+                                </div>
+                                `
+    })
+    search_image_results_output.innerHTML += search_display_inner_tmp;
+
+    console.log(`super_search_obj = `, super_search_obj)
+    console.log(`search_results = `, search_results)
+
+    //user presses an image to select it from the images section, add onclick event listener
+    search_results.forEach(file => {
+        document.getElementById(`recommened-check-box-id-${file}`).onclick = async function() {            
+            console.log('check box clicked! file = ', file)
+            Handle_Get_Recommended_Image_Checked(file)
+        };
+    });
+}
+
+function Handle_Get_Recommended_Image_Checked(filename) {
+    let index = search_results.indexOf(filename);
+    if (index > -1) { // only splice array when item is found
+        search_results.splice(index, 1); // 2nd parameter means remove one item only
+    }
+    search_image_results_output = document.getElementById("facial-row-four-div-id");
+    search_image_results_output.innerHTML = "";
+    search_display_inner_tmp = '';
+    search_results.forEach(file_key => {
+        search_display_inner_tmp += `
+                                <div class="recommended-img-div-class" id="recommended-result-image-div-id-${file_key}" >
+                                    <input type="checkbox" class="recommended-img-check-box" id="recommened-check-box-id-${file_key}" name="" value="">
+                                    <img class="recommended-search-img-class" id="recommended-result-single-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="select" alt="result" />
+                                </div>
+                                `
+    })
+    search_image_results_output.innerHTML += search_display_inner_tmp;
+    //user presses an image to select it from the images section, add onclick event listener
+    search_results.forEach(file => {
+        document.getElementById(`recommened-check-box-id-${file}`).onclick = async function() {            
+            console.log('check box clicked! file = ', file)
+            Handle_Get_Recommended_Image_Checked(file)
+        };
+    });
+    selected_images.push(filename)
+    Update_Selected_Images()
+}
 
 
+function Update_Selected_Images() {
+     //now put the image in the selected set
+    search_image_results_output = document.getElementById("facial-row-six-div-id");
+    search_image_results_output.innerHTML = "";
+    search_display_inner_tmp = '';
+    selected_images.forEach(file_key => {
+        search_display_inner_tmp += `
+                                <div class="recommended-img-div-class" id="search-image-selected-div-id-${file_key}">
+                                    <input type="checkbox" checked="true" class="recommended-img-check-box" id="recommened-check-box-id-${file_key}" name="" value="">
+                                    <img class="selected-imgs" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="result" />
+                                </div>
+                                `
+    })
+    search_image_results_output.innerHTML += search_display_inner_tmp;
+}
 
 //handler for the emotion label and value entry additions and then the deletion handling, all emotions are added by default and handled 
 document.getElementById("search-emotion-entry-button-id").onclick = function() {
@@ -98,9 +176,22 @@ function addMouseOverIconSwitch(emotion_div) {
     //console.log('get ')
 }
 
+function Set_Search_Obj_Tags() {
+    search_tags_input = document.getElementById("search-tag-textarea-entry-id").value
+    split_search_string = search_tags_input.split(reg_exp_delims)
+    search_unique_search_terms = [...new Set(split_search_string)]
+    search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
+    super_search_obj["searchTags"] = search_unique_search_terms
+    //meme tags now
+    search_meme_tags_input = document.getElementById("search-meme-tag-textarea-entry-id").value
+    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
+    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+    search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
+    super_search_obj["searchMemeTags"] = search_unique_meme_search_terms
+}
 
 
-console.log(`howdy neighbor!`)
+//console.log(`howdy neighbor!`)
 
 
 
