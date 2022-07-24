@@ -498,7 +498,7 @@ async function Load_New_Image() {
             //emotion inference upon the default selected
             if( default_auto_fill_emotions == true ) {
                 super_res = await Get_Image_Face_Descriptors_And_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
-                tagging_entry_tmp["taggingEmotions"] = await Auto_Fill_Emotions(super_res, tagging_entry_tmp)                
+                tagging_entry_tmp["taggingEmotions"] = await Auto_Fill_Emotions(super_res, tagging_entry_tmp)
                 tagging_entry_tmp["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
             } else {
                 super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )

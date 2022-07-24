@@ -26,7 +26,8 @@ var last_user_image_directory_chosen = '';
 super_search_obj = {
     searchTags:[],
     searchMemeTags:[],
-    emotions:{}
+    emotions:{},
+    faceDescriptors: []
 }
 
 //user presses the main search button for the add memes search modal
@@ -40,26 +41,87 @@ document.getElementById("get-recommended-button-id").onclick = function() {
 
 
 
-
-function Super_Search() {
+//only here is the face descriptors populated
+async function Super_Search() {
     
     Set_Search_Obj_Tags()
+    
+    faceDescriptors_search = []
+    for( img_ind = 0; img_ind < selected_images.length; img_ind++ ) {
+        //super_search_obj.faceDescriptors
+        faceDescriptors_tmp = []
 
+        if( selected_images_type[img_ind] == 'stored' ) {
+            console.log('selected_images[img_ind]', selected_images[img_ind])
+            super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, selected_images[img_ind]) )
+            console.log('super_res', super_res)
+            console.log('super_res.length = ', super_res.length)
+            if( super_res.length > 0 ) {
+                faceDescriptors_tmp = await Get_Face_Descriptors_Arrays(super_res)
+                for( let ind = 0; ind < faceDescriptors_tmp.length; ind++ ) {
+                    faceDescriptors_search.push(faceDescriptors_tmp[ind])
+                }
+            }
 
+        } else if( selected_images_type[img_ind] == 'new' ) {
+
+            super_res = await Get_Image_Face_Descriptors_From_File( selected_images[img_ind] )
+            console.log('super_res.length = ', super_res.length)
+            if( super_res.length > 0 ) {
+                faceDescriptors_tmp = await Get_Face_Descriptors_Arrays(super_res)
+                for( let ind = 0; ind < faceDescriptors_tmp.length; ind++ ) {
+                    faceDescriptors_search.push(faceDescriptors_tmp[ind])
+                }
+            }
+
+        } 
+        console.log( 'faceDescriptors_tmp = ', faceDescriptors_tmp )
+    }
+    console.log( 'faceDescriptors_search = ', faceDescriptors_search )
+    //console.log('faceDescriptors_tmp = ')
+    super_search_obj.faceDescriptors = faceDescriptors_search
     console.log(`super_search_obj = `, super_search_obj)
+
+    //perform the search
+    tagging_db_iterator = await Tagging_Image_DB_Iterator();
+    search_results = await SEARCH_MODULE.Image_Search_DB(super_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
+
+    console.log('search_results = ', search_results)
+
+    search_image_results_output = document.getElementById("top-results-div-id");
+    search_image_results_output.innerHTML = "";
+    search_display_inner_tmp = '';
+    search_results.forEach(file_key => {
+        search_display_inner_tmp += `
+                                <div class="super-search-div-class" id="search-result-image-div-id-${file_key}" >
+                                    <img class="super-search-obj-class" id="search-result-single-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="choose" alt="result" />
+                                </div>
+                                `
+    })
+    search_image_results_output.innerHTML += search_display_inner_tmp;
+
+    //user presses an image to select it from the images section, add onclick event listener
+    search_results.forEach(file => {
+        document.getElementById(`search-result-single-img-id-${file}`).onclick = function() {            
+            console.log(' result clicked! file = ', file)
+        };
+    });
+
 }
+
+//return to main screen
+document.getElementById("return-to-main-button-id").onclick = function() {
+    location.href = "welcome-screen.html";
+}
+
+
+
 
 //don't block cause the user can import a new image and use webcam
 //call without waiting
 async function Get_Select_Recommended() {
 
     Set_Search_Obj_Tags()
-
-        //default search results are the order the user has them now
-        // if(search_results == '' && search_meme_results == '') {
-        //     search_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
-        //     search_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
-        // }
 
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     tagging_db_iterator = await Tagging_Image_DB_Iterator();
@@ -146,7 +208,7 @@ function Update_Selected_Images() {
                                     `
         } else if( selected_images_type[index] == 'webcam' ) {
 
-            
+
 
         }
 
@@ -240,6 +302,16 @@ function Set_Search_Obj_Tags() {
     super_search_obj["searchMemeTags"] = search_unique_meme_search_terms
 }
 
+async function Get_Face_Descriptors_Arrays(super_res) {
+    let faces_descriptors_array_tmp = []
+    if( super_res.length > 0 ) {
+        for(let face_ii=0; face_ii < super_res.length; face_ii++) {
+            //each descriptor is an 'object' not an array so that each dimension of the descriptor feature vector has a key pointing to the value but we just use the values that are needed to compute the 'distace' between descriptors later faceapi.euclideanDistance( aa[0] , aa[1] ), faceapi.euclideanDistance( JSON.parse(res5[2].faceDescriptors)[0] , JSON.parse(res5[2].faceDescriptors)[2] ) (get face descriptors string, parse and then select to compare via euclidean distances)
+            faces_descriptors_array_tmp[face_ii] = Object.values(super_res[face_ii].descriptor)
+        }
+    }
+    return faces_descriptors_array_tmp
+}
 
 //console.log(`howdy neighbor!`)
 
