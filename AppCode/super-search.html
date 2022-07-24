@@ -10,6 +10,9 @@
 
     <link rel="stylesheet" href="../AppCode/taga-CSS/super-search-screen-CSS/super-search-main-ui.css">
 
+    <!-- general style for the modal pop ups -->
+	<link rel="stylesheet" href="./taga-CSS/modal-general-style.css">
+
     <meta charset="UTF-8" http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
 
 
@@ -110,16 +113,6 @@
         
                 <div class="recommended-img-div-class" id="recommended-result-image-div-id-Taga.png" >
                     <input type="checkbox" class="recommended-img-check-box" id="recommened-check-box-id-Taga.png" name="" value="">
-                    <img class="recommended-search-img-class" id="recommended-result-single-img-id-Taga.png" src="../tree.jpg" title="select" alt="result" />
-                </div>
-        
-                <div class="recommended-img-div-class" id="recommended-result-image-div-id-Taga.png" >
-                    <input type="checkbox" class="recommended-img-check-box" id="recommened-check-box-id-Taga.png" name="" value="">
-                    <img class="recommended-search-img-class" id="recommended-result-single-img-id-Taga.png" src="../Taga.png" title="select" alt="result" />
-                </div>
-        
-                <div class="recommended-img-div-class" id="recommended-result-image-div-id-Taga.png" >
-                    <input type="checkbox" class="recommended-img-check-box" id="recommened-check-box-id-Taga.png" name="" value="">
                     <img class="recommended-search-img-class" id="recommended-result-single-img-id-Taga.png" src="../beach.jpg" title="select" alt="result" />
                 </div>
         
@@ -151,18 +144,6 @@
                 <div class="recommended-img-div-class" id="search-image-selected-div-id-Taga.png">
                     <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-Taga.png" name="" value="">
                     <img class="selected-imgs" src="../tree.jpg" title="view" alt="result" />
-                </div>
-                <div class="recommended-img-div-class" id="search-image-selected-div-id-Taga.png">
-                    <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-Taga.png" name="" value="">
-                    <img class="selected-imgs" src="../Taga.png" title="view" alt="result" />
-                </div>
-                <div class="recommended-img-div-class" id="search-image-selected-div-id-Taga.png">
-                    <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-Taga.png" name="" value="">
-                    <img class="selected-imgs" src="../beach.jpg" title="view" alt="result" />
-                </div>
-                <div class="recommended-img-div-class" id="search-image-selected-div-id-Taga.png">
-                    <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-Taga.png" name="" value="">
-                    <img class="selected-imgs" src="../tree.jpg" title="view" alt="result" />
                 </div> -->
 
             </div>
@@ -176,7 +157,7 @@
     <div id="top-results-div-id">
         <label id="results-title-label" for="">Results (click choice):</label>
 
-        <div class="super-search-div-class" id="search-result-image-div-id-Taga.png" >
+        <!-- <div class="super-search-div-class" id="search-result-image-div-id-Taga.png" >
             <img class="super-search-obj-class" id="search-result-single-img-id-Taga.png" src="../Taga.png" title="view" alt="result" />
         </div>
 
@@ -200,9 +181,40 @@
             <img class="super-search-obj-class" id="search-result-single-img-id-Taga.png" src="../tree.jpg" title="view" alt="result" />
         </div>
 
+    </div> -->
+
+
+
+</div>
+
+
+<div id="modal-meme-clicked-top-id" class="webcam-top-class">
+    <!-- MEME MODAL CLOSE -->
+    <img class="webcam-close-button-class" id="modal-meme-clicked-close-button-id" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+                        onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+    <!-- Modal content container -->
+    <div class="webcam-content-container" id="webcam-inner-modal-div-id">
+        
+        <div id="webcam-buttons-div-id">           
+            <button class="fun-button-blue" id="capture-button-id"> CAPTURE (SPACE BAR) </button>
+            <button class="fun-button-blue" id="select-capture-button-id" style="display: none;"> SELECT IMAGE  </button>
+        </div>
+        
+        <div id="webcam-grid-container-id">
+
+            <canvas id="canvas-webcam-id">
+                
+            </canvas>
+
+            <img id="webcam-meme-clicked-displayimg-id" src="" title="" alt="" />
+
+            <video src="" id="webcam-video-id" >
+
+            </video>
+            <!-- <div id="modal-meme-clicked-image-gridbox-id"> -->
+            <!-- </div> -->
+        </div>
     </div>
-
-
 
 </div>
 

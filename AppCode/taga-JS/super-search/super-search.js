@@ -52,10 +52,10 @@ async function Super_Search() {
         faceDescriptors_tmp = []
 
         if( selected_images_type[img_ind] == 'stored' ) {
-            console.log('selected_images[img_ind]', selected_images[img_ind])
+            //console.log('selected_images[img_ind]', selected_images[img_ind])
             super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, selected_images[img_ind]) )
-            console.log('super_res', super_res)
-            console.log('super_res.length = ', super_res.length)
+            //console.log('super_res', super_res)
+            //console.log('super_res.length = ', super_res.length)
             if( super_res.length > 0 ) {
                 faceDescriptors_tmp = await Get_Face_Descriptors_Arrays(super_res)
                 for( let ind = 0; ind < faceDescriptors_tmp.length; ind++ ) {
@@ -66,7 +66,7 @@ async function Super_Search() {
         } else if( selected_images_type[img_ind] == 'new' ) {
 
             super_res = await Get_Image_Face_Descriptors_From_File( selected_images[img_ind] )
-            console.log('super_res.length = ', super_res.length)
+            //console.log('super_res.length = ', super_res.length)
             if( super_res.length > 0 ) {
                 faceDescriptors_tmp = await Get_Face_Descriptors_Arrays(super_res)
                 for( let ind = 0; ind < faceDescriptors_tmp.length; ind++ ) {
@@ -74,23 +74,35 @@ async function Super_Search() {
                 }
             }
 
-        } 
-        console.log( 'faceDescriptors_tmp = ', faceDescriptors_tmp )
+        } else if( selected_images_type[img_ind] == 'webcam' ) {
+
+            super_res = await Get_Image_Face_Descriptors_From_File( selected_images[img_ind] )
+            //console.log('super_res.length = ', super_res.length)
+            if( super_res.length > 0 ) {
+                faceDescriptors_tmp = await Get_Face_Descriptors_Arrays(super_res)
+                for( let ind = 0; ind < faceDescriptors_tmp.length; ind++ ) {
+                    faceDescriptors_search.push(faceDescriptors_tmp[ind])
+                }
+            }
+
+        }
+        //console.log( 'faceDescriptors_tmp = ', faceDescriptors_tmp )
     }
-    console.log( 'faceDescriptors_search = ', faceDescriptors_search )
+    //console.log( 'faceDescriptors_search = ', faceDescriptors_search )
     //console.log('faceDescriptors_tmp = ')
     super_search_obj.faceDescriptors = faceDescriptors_search
-    console.log(`super_search_obj = `, super_search_obj)
+    //console.log(`super_search_obj = `, super_search_obj)
 
     //perform the search
     tagging_db_iterator = await Tagging_Image_DB_Iterator();
     search_results = await SEARCH_MODULE.Image_Search_DB(super_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
 
-    console.log('search_results = ', search_results)
+    //console.log('search_results = ', search_results)
 
     search_image_results_output = document.getElementById("top-results-div-id");
     search_image_results_output.innerHTML = "";
     search_display_inner_tmp = '';
+    search_display_inner_tmp += `<label id="results-title-label" for="">Results (click choice):</label>`
     search_results.forEach(file_key => {
         search_display_inner_tmp += `
                                 <div class="super-search-div-class" id="search-result-image-div-id-${file_key}" >
@@ -103,7 +115,9 @@ async function Super_Search() {
     //user presses an image to select it from the images section, add onclick event listener
     search_results.forEach(file => {
         document.getElementById(`search-result-single-img-id-${file}`).onclick = function() {            
-            console.log(' result clicked! file = ', file)
+            //console.log(' result clicked! file = ', file)
+            window.location = "tagging.html" + '?' + `imageFileName=${file}`
+
         };
     });
 
@@ -112,6 +126,126 @@ async function Super_Search() {
 //return to main screen
 document.getElementById("return-to-main-button-id").onclick = function() {
     location.href = "welcome-screen.html";
+}
+
+
+//using the webcam
+document.getElementById("use-webcam-button-id").onclick = function() {
+
+    modal_meme_click_top_id_element = document.getElementById("modal-meme-clicked-top-id");
+    modal_meme_click_top_id_element.style.display = "block";
+
+    var meme_modal_close_btn = document.getElementById("modal-meme-clicked-close-button-id");
+    // When the user clicks on the button, close the modal
+    meme_modal_close_btn.onclick = function() {
+        Close_Modal()
+    }
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal_meme_click_top_id_element) {
+            Close_Modal()
+        }
+    }
+
+    let capture_button = document.getElementById("capture-button-id")
+    let select_capture_button = document.getElementById("select-capture-button-id")
+    let video = document.getElementById("webcam-video-id")
+    let canvas = document.getElementById("canvas-webcam-id")
+    let photo = document.getElementById("webcam-meme-clicked-displayimg-id")
+    
+
+    let width
+    let height
+
+    let data;
+
+    let stream
+
+    let captured = false
+
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    .then(function(s) {
+        stream = s
+        video.srcObject = stream;
+        video.play();
+    })
+    .catch(function(err) {
+        console.log("An error occurred: " + err);
+    });
+
+    let streaming
+    video.addEventListener('canplay', function(ev){
+        if (!streaming) {
+            height = video.videoHeight
+            width = video.videoWidth;
+            video.setAttribute('width', width);
+            video.setAttribute('height', height);
+            canvas.setAttribute('width', width);
+            canvas.setAttribute('height', height);
+            streaming = true;
+        }
+    }, false);
+
+    document.onkeydown = function(e) {
+        
+        if( e.keyCode == 32 || e.code == "Space" ) {
+            Take_Picture(e)
+        }
+        
+    }
+
+    capture_button.onclick = function(ev) {
+        Take_Picture(ev)
+    }
+
+    function clearphoto() {
+        const context = canvas.getContext('2d');
+        context.fillStyle = "#AAA";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+    
+        data = canvas.toDataURL('image/png');
+        photo.setAttribute('src', data);
+    }
+    function Take_Picture(ev) {
+        ev.preventDefault()
+        const context = canvas.getContext('2d');
+        if (width && height) {
+            canvas.width = width;
+            canvas.height = height;
+            context.drawImage(video, 0, 0, width, height);
+    
+            data = canvas.toDataURL('image/png');
+            //console.log('data = ', data)
+            photo.setAttribute('src', data);
+
+            select_capture_button.style.display = "block"
+            captured = true
+        } else {
+            clearphoto();
+        }
+    }
+
+    select_capture_button.onclick = function() {
+        selected_images_type.unshift('webcam')
+        selected_images.unshift(data) //add to the start of the array
+        selected_images = [... new Set(selected_images)]
+        Update_Selected_Images()
+        Close_Modal()
+    }
+
+    function Close_Modal() {
+        if(stream) {
+            stream.getTracks().forEach( track => {        
+                track.stop()
+            })
+        }
+        streaming = false
+        captured = false
+        select_capture_button.style.display = "none"
+        modal_meme_click_top_id_element.style.display = "none";
+        photo.src = ""
+    }
+    
 }
 
 
@@ -140,13 +274,13 @@ async function Get_Select_Recommended() {
     })
     search_image_results_output.innerHTML += search_display_inner_tmp;
 
-    console.log(`super_search_obj = `, super_search_obj)
-    console.log(`search_results = `, search_results)
+    //console.log(`super_search_obj = `, super_search_obj)
+    //console.log(`search_results = `, search_results)
 
     //user presses an image to select it from the images section, add onclick event listener
     search_results.forEach(file => {
         document.getElementById(`recommened-check-box-id-${file}`).onclick = function() {            
-            console.log('check box clicked! file = ', file)
+            //console.log('check box clicked! file = ', file)
             Handle_Get_Recommended_Image_Checked(file)
         };
     });
@@ -172,7 +306,7 @@ function Handle_Get_Recommended_Image_Checked(filename) {
     //user presses an image to select it from the images section, add onclick event listener
     search_results.forEach(file => {
         document.getElementById(`recommened-check-box-id-${file}`).onclick = function() {            
-            console.log('check box clicked! file = ', file)
+            //console.log('check box clicked! file = ', file)
             Handle_Get_Recommended_Image_Checked(file)
         };
     });
@@ -208,7 +342,13 @@ function Update_Selected_Images() {
                                     `
         } else if( selected_images_type[index] == 'webcam' ) {
 
-
+            file_path_tmp = element //TAGA_DATA_DIRECTORY + PATH.sep + element
+            search_display_inner_tmp += `
+                                    <div class="recommended-img-div-class" id="search-image-selected-div-id-${index}">
+                                        <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-${index}" name="" value="">
+                                        <img class="selected-imgs" src="${file_path_tmp}" title="view" alt="result" />
+                                    </div>
+                                    `
 
         }
 
@@ -217,7 +357,7 @@ function Update_Selected_Images() {
     //user presses an image to select it from the images section, add onclick event listener
     selected_images.forEach( (element, index) => {
         document.getElementById(`selected-check-box-id-${index}`).onclick = function() {
-            console.log('check box >selected images< clicked! file = ', element)
+            //console.log('check box >selected images< clicked! file = ', element)
             selected_images.splice(index, 1); // 2nd parameter means remove one item only
             selected_images_type.splice(index, 1); 
             Update_Selected_Images()

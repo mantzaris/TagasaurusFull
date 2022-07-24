@@ -395,9 +395,18 @@ async function First_Display_Init() {
     records_remaining = await Number_of_Tagging_Records();
     if(records_remaining == 0) {
         Load_Default_Taga_Image();
+    } else if( window.location.href.indexOf("imageFileName") > -1 ) {
+        tagging_name_param = window.location.search.split("=")[1]
+        // console.log('tagging_name_param = ', tagging_name_param)
+
+        current_image_annotation = await Get_Tagging_Annotation_From_DB(tagging_name_param);
+        Load_State_Of_Image_IDB();
+        
+        //window.location.href = tagging.html
+    } else {
+        await New_Image_Display(0)
+        await Load_State_Of_Image_IDB() //display the image in view currently and the annotations it has
     }
-    await New_Image_Display(0)
-    await Load_State_Of_Image_IDB() //display the image in view currently and the annotations it has
 }
 //init method to run upon loading
 First_Display_Init(); 
