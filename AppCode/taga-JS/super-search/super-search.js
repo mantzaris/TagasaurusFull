@@ -18,7 +18,8 @@ async function Get_Tagging_Annotation_From_DB(image_name) { //
 var reg_exp_delims = /[#:,;| ]+/
 
 search_results = '';
-selected_images = [];
+selected_images = []; 
+selected_images_type = []; // 'stored' / 'new' / 'webcam'
 
 var last_user_image_directory_chosen = '';
 
@@ -113,6 +114,7 @@ function Handle_Get_Recommended_Image_Checked(filename) {
             Handle_Get_Recommended_Image_Checked(file)
         };
     });
+    selected_images_type.unshift('stored')
     selected_images.unshift(filename) //add to the start of the array
     selected_images = [... new Set(selected_images)]
     Update_Selected_Images()
@@ -124,48 +126,57 @@ function Update_Selected_Images() {
     search_image_results_output = document.getElementById("facial-row-six-div-id");
     search_image_results_output.innerHTML = "";
     search_display_inner_tmp = '';
-    selected_images.forEach(file_key => {
-        search_display_inner_tmp += `
-                                <div class="recommended-img-div-class" id="search-image-selected-div-id-${file_key}">
-                                    <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-${file_key}" name="" value="">
-                                    <img class="selected-imgs" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="result" />
-                                </div>
-                                `
+    selected_images.forEach( (element, index) => {
+
+        if( selected_images_type[index] == 'stored' ) {
+            file_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + element
+            search_display_inner_tmp += `
+                                    <div class="recommended-img-div-class" id="search-image-selected-div-id-${index}">
+                                        <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-${index}" name="" value="">
+                                        <img class="selected-imgs" src="${file_path_tmp}" title="view" alt="result" />
+                                    </div>
+                                    `
+        } else if( selected_images_type[index] == 'new' ) {
+            file_path_tmp = element //TAGA_DATA_DIRECTORY + PATH.sep + element
+            search_display_inner_tmp += `
+                                    <div class="recommended-img-div-class" id="search-image-selected-div-id-${index}">
+                                        <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-${index}" name="" value="">
+                                        <img class="selected-imgs" src="${file_path_tmp}" title="view" alt="result" />
+                                    </div>
+                                    `
+        } else if( selected_images_type[index] == 'webcam' ) {
+
+            
+
+        }
+
     })
     search_image_results_output.innerHTML += search_display_inner_tmp;
-
     //user presses an image to select it from the images section, add onclick event listener
-    selected_images.forEach(file => {
-        document.getElementById(`selected-check-box-id-${file}`).onclick = function() {
-            console.log('check box >selected images< clicked! file = ', file)
-            //Handle_Selected_Image_Checked(file)
-            let index = selected_images.indexOf(file);
-            if (index > -1) { // only splice array when item is found
-                selected_images.splice(index, 1); // 2nd parameter means remove one item only
-            }
+    selected_images.forEach( (element, index) => {
+        document.getElementById(`selected-check-box-id-${index}`).onclick = function() {
+            console.log('check box >selected images< clicked! file = ', element)
+            selected_images.splice(index, 1); // 2nd parameter means remove one item only
+            selected_images_type.splice(index, 1); 
             Update_Selected_Images()
         };
     });
 }
 
-
 document.getElementById("use-new-image-button-id").onclick = async function() {
-
-    console.log("use new image")
-
-
     let result = await IPC_RENDERER.invoke('dialog:tagging-new-file-select',{directory: last_user_image_directory_chosen});
     //ignore selections from the taga image folder store
     if(result.canceled == true || PATH.dirname(result.filePaths[0]) == TAGA_DATA_DIRECTORY) {
         return
     }
     last_user_image_directory_chosen = PATH.dirname(result.filePaths[0]);
-    console.log('result = ', result)
 
-
-    console.log("use new image")
-
-
+    result.filePaths.forEach( (element, index) => {
+        selected_images_type.unshift('new')
+        selected_images.unshift(element) //add to the start of the array
+        selected_images = [... new Set(selected_images)]
+        Update_Selected_Images()
+    })
 }
 
 
