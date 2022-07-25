@@ -105,6 +105,48 @@ if( tagging_table_exists_res["count(*)"] == 0 ){
     info = INSERT_TAGGING_STMT.run(tagging_entry.imageFileName,tagging_entry.imageFileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices),JSON.stringify(tagging_entry.faceDescriptors));
     //console.log(`loging in the main js line 86`)
 
+    //extra images
+    file_names_description_obj = {
+      'Antikythera.jpg': "Ancient Greek Technology, the  - Antikythera mechanism - from 100 to 200 B.C., an example of an ancient Analogue Computer",
+      'TagzParrot.jpg': "A Macaw parrot flying! (from Wikipedia, user Lviatour https://commons.wikimedia.org/wiki/User:Lviatour)",
+      'TheKakapo.jpg': "A Kakapo parrot, from the book A History of the Birds of New Zealand by Walter Lawry Buller, published in 1873",
+      'YoungJamesClerkMaxwell.jpg': "Scottish scientist, James Clerk Maxwell. His discoveries changed the world (statistical mechanics, maxwell's equations, control theory and many more)",
+      'TE1_cover.jpg': "Front and Back cover of the comic Book, Totem Eclipse (episode 1) by Vasexandros, Makis and Paul Regklis. (on Amazon)",
+      'TE3_Fcover.jpg': "Front cover of the awesome comic Book, Totem Eclipse (episode 3) by Vasexandros, Makis and Paul Regklis. Find it on Amazon!",
+      'TE4_Fcover.jpg': "Front cover of the comic Book, Totem Eclipse (episode 4) by Vasexandros, Makis and Paul Regklis. (USA  https://www.amazon.com/dp/B086PLNK4B/ref=cm_sw_r_tw_dp_GB2TTR9A4NFMP1CFRSTE )",
+      'TE5_Fcover.png': "Front cover of the comic Book, Totem Eclipse (episode 5) by Vasexandros, Makis and Paul Regklis",
+      'TheLabor2sample.png': "The Second of Labor of Hercules by Vasexandros, and Paul Regklis (on Amazon)",
+      'TheLaborsOfHerculesAHerosGuide.png': "The Labors of Hercules by Vasexandros and Paul Regklis  (USA https://www.amazon.com/dp/B0977P9NV2/ref=cm_sw_r_tw_dp_ZE67RVGAEAR0ZK9ZM5BX ) ",
+      'TheLaborsOfHerculesAHerosGuideFRONTBACK.png': "great book, The Labors of Hercules by Vasexandros and Paul Regklis  (USA https://www.amazon.com/dp/B0977P9NV2/ref=cm_sw_r_tw_dp_ZE67RVGAEAR0ZK9ZM5BX )",
+      'TheCats.jpg': "Examples of cats (borrowed from Wikipedia picture by user; https://commons.wikimedia.org/wiki/User:Alvesgaspar",
+      'AristarchusOfSamos.jpg': "mathematician Aristarchus of Samos Island in Ancient Greece, in the 3rd century B.C. with calculations of the relative sizes of the Sun, Earth and Moon",
+      'ShannonAndMouse.png': "Claude Shannon (established Information theory), experimenting with a mechanical mouse names Theseus",
+      'JamesWebbSpaceTelescope.jpg': "The James Webb Telescope looks so different. Maybe new discoveries are made with it! Cool"
+    }
+    for( let [f_name, description_tmp] of Object.entries(file_names_description_obj) ) {
+
+      new_filename = f_name
+      tmp_path = PATH.join(APP_PATH, 'zExtraPics', new_filename) 
+      FS.copyFileSync(tmp_path, PATH.join(TAGA_DATA_DIRECTORY, new_filename), FS.constants.COPYFILE_EXCL);
+      tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
+      tagging_entry.imageFileName = new_filename;
+      tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash( PATH.join(TAGA_DATA_DIRECTORY,new_filename) ) 
+      tagging_entry.taggingRawDescription = description_tmp
+      info = INSERT_TAGGING_STMT.run(tagging_entry.imageFileName,tagging_entry.imageFileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices),JSON.stringify(tagging_entry.faceDescriptors));
+
+    }
+    
+    
+    // new_filename = 'TE1_cover.jpg'
+    // tmp_path = PATH.join(APP_PATH, new_filename) 
+    // FS.copyFileSync(tmp_path, PATH.join(TAGA_DATA_DIRECTORY,new_filename), FS.constants.COPYFILE_EXCL);
+    // tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
+    // tagging_entry.imageFileName = new_filename;
+    // tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash( PATH.join(TAGA_DATA_DIRECTORY,new_filename) ) 
+    // tagging_entry.taggingRawDescription = "Front and Back cover of the comic Book, Totem Eclipse (episode 1) by Vasexandros, Makis and Paul Regklis. Found on Amazon!"
+    // info = INSERT_TAGGING_STMT.run(tagging_entry.imageFileName,tagging_entry.imageFileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices),JSON.stringify(tagging_entry.faceDescriptors));
+
+
 }
 //check to see if the TAGGING MEME table exists
 tagging_meme_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${TAGGING_MEME_TABLE_NAME}'; `);
