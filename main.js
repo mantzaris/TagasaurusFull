@@ -1,5 +1,6 @@
 // Modules to control application life and create native browser window
 //'ipcMain' and 'dialog' are introduced to open the dialog window in slides.js
+//
 const {app, ipcMain, dialog, BrowserWindow} = require('electron');
 const PATH = require('path');
 const FS = require('fs');
@@ -75,7 +76,8 @@ tagging_table_exists_res = tagging_table_exists_stmt.get();
 if( tagging_table_exists_res["count(*)"] == 0 ){
   STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${TAGGING_TABLE_NAME}
                     (imageFileName TEXT, imageFileHash TEXT, taggingRawDescription TEXT,
-                            taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT)`);
+                            taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT,
+                            faceDescriptors TEXT)`);
   STMT.run();
   //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
   STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX imageFileName_index ON ${TAGGING_TABLE_NAME} (imageFileName); `);
@@ -90,7 +92,8 @@ if( tagging_table_exists_res["count(*)"] == 0 ){
     "taggingRawDescription": "",
     "taggingTags": [],
     "taggingEmotions": {good:"0",bad:"0"},
-    "taggingMemeChoices": []
+    "taggingMemeChoices": [],
+    "faceDescriptors": []
     }
     taga_source_path = PATH.join(APP_PATH,'Taga.png') //PATH.resolve()+PATH.sep+'Taga.png';
     FS.copyFileSync(taga_source_path, PATH.join(TAGA_DATA_DIRECTORY,'Taga.png'), FS.constants.COPYFILE_EXCL);
@@ -98,9 +101,51 @@ if( tagging_table_exists_res["count(*)"] == 0 ){
     tagging_entry.imageFileName = 'Taga.png';
     tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash( PATH.join(TAGA_DATA_DIRECTORY,'Taga.png') ) //`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
 
-    INSERT_TAGGING_STMT = DB.prepare(`INSERT INTO ${TAGGING_TABLE_NAME} (imageFileName, imageFileHash, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices) VALUES (?, ?, ?, ?, ?, ?)`);
-    info = INSERT_TAGGING_STMT.run(tagging_entry.imageFileName,tagging_entry.imageFileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices));
+    INSERT_TAGGING_STMT = DB.prepare(`INSERT INTO ${TAGGING_TABLE_NAME} (imageFileName, imageFileHash, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors) VALUES (?, ?, ?, ?, ?, ?, ?)`);
+    info = INSERT_TAGGING_STMT.run(tagging_entry.imageFileName,tagging_entry.imageFileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices),JSON.stringify(tagging_entry.faceDescriptors));
     //console.log(`loging in the main js line 86`)
+
+    //extra images
+    file_names_description_obj = {
+      'Antikythera.jpg': "Ancient Greek Technology, the  - Antikythera mechanism - from 100 to 200 B.C., an example of an ancient Analogue Computer",
+      'TagzParrot.jpg': "A Macaw parrot flying! (from Wikipedia, user Lviatour https://commons.wikimedia.org/wiki/User:Lviatour)",
+      'TheKakapo.jpg': "A Kakapo parrot, from the book A History of the Birds of New Zealand by Walter Lawry Buller, published in 1873",
+      'YoungJamesClerkMaxwell.jpg': "Scottish scientist, James Clerk Maxwell. His discoveries changed the world (statistical mechanics, maxwell's equations, control theory and many more)",
+      'TE1_cover.jpg': "Front and Back cover of the comic Book, Totem Eclipse (episode 1) by Vasexandros, Makis and Paul Regklis. (on Amazon)",
+      'TE3_Fcover.jpg': "Front cover of the awesome comic Book, Totem Eclipse (episode 3) by Vasexandros, Makis and Paul Regklis. Find it on Amazon!",
+      'TE4_Fcover.jpg': "Front cover of the comic Book, Totem Eclipse (episode 4) by Vasexandros, Makis and Paul Regklis. (USA  https://www.amazon.com/dp/B086PLNK4B/ref=cm_sw_r_tw_dp_GB2TTR9A4NFMP1CFRSTE )",
+      'TE5_Fcover.png': "Front cover of the comic Book, Totem Eclipse (episode 5) by Vasexandros, Makis and Paul Regklis",
+      'TheLabor2sample.png': "The Second of Labor of Hercules by Vasexandros, and Paul Regklis (on Amazon)",
+      'TheLaborsOfHerculesAHerosGuide.png': "The Labors of Hercules by Vasexandros and Paul Regklis  (USA https://www.amazon.com/dp/B0977P9NV2/ref=cm_sw_r_tw_dp_ZE67RVGAEAR0ZK9ZM5BX ) ",
+      'TheLaborsOfHerculesAHerosGuideFRONTBACK.png': "great book, The Labors of Hercules by Vasexandros and Paul Regklis  (USA https://www.amazon.com/dp/B0977P9NV2/ref=cm_sw_r_tw_dp_ZE67RVGAEAR0ZK9ZM5BX )",
+      'TheCats.jpg': "Examples of cats (borrowed from Wikipedia picture by user; https://commons.wikimedia.org/wiki/User:Alvesgaspar",
+      'AristarchusOfSamos.jpg': "mathematician Aristarchus of Samos Island in Ancient Greece, in the 3rd century B.C. with calculations of the relative sizes of the Sun, Earth and Moon",
+      'ShannonAndMouse.png': "Claude Shannon (established Information theory), experimenting with a mechanical mouse names Theseus",
+      'JamesWebbSpaceTelescope.jpg': "The James Webb Telescope looks so different. Maybe new discoveries are made with it! Cool"
+    }
+    for( let [f_name, description_tmp] of Object.entries(file_names_description_obj) ) {
+
+      new_filename = f_name
+      tmp_path = PATH.join(APP_PATH, 'zExtraPics', new_filename) 
+      FS.copyFileSync(tmp_path, PATH.join(TAGA_DATA_DIRECTORY, new_filename), FS.constants.COPYFILE_EXCL);
+      tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
+      tagging_entry.imageFileName = new_filename;
+      tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash( PATH.join(TAGA_DATA_DIRECTORY,new_filename) ) 
+      tagging_entry.taggingRawDescription = description_tmp
+      info = INSERT_TAGGING_STMT.run(tagging_entry.imageFileName,tagging_entry.imageFileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices),JSON.stringify(tagging_entry.faceDescriptors));
+
+    }
+    
+    
+    // new_filename = 'TE1_cover.jpg'
+    // tmp_path = PATH.join(APP_PATH, new_filename) 
+    // FS.copyFileSync(tmp_path, PATH.join(TAGA_DATA_DIRECTORY,new_filename), FS.constants.COPYFILE_EXCL);
+    // tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
+    // tagging_entry.imageFileName = new_filename;
+    // tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash( PATH.join(TAGA_DATA_DIRECTORY,new_filename) ) 
+    // tagging_entry.taggingRawDescription = "Front and Back cover of the comic Book, Totem Eclipse (episode 1) by Vasexandros, Makis and Paul Regklis. Found on Amazon!"
+    // info = INSERT_TAGGING_STMT.run(tagging_entry.imageFileName,tagging_entry.imageFileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices),JSON.stringify(tagging_entry.faceDescriptors));
+
 
 }
 //check to see if the TAGGING MEME table exists
@@ -247,3 +292,4 @@ console.log(`-mainjs- the app.getPath('appPath') = ${app.getAppPath()}`)
 //       "createDesktopShortcut": false,
 //       "artifactName": "tagasaurus.app"
 //     }
+

@@ -13,6 +13,8 @@ body {
   display: grid;
   grid-template-columns: 5fr 10fr 5fr;
   grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  min-height: 0;
+  min-width: 0;
   height: 100vh;
   width: 100vw;
   box-sizing: border-box;
@@ -33,7 +35,7 @@ body {
   background-color: #808a80;
   grid-area: emotions-gridbox-id;
   display: grid;
-  grid-template-rows: 2fr 4fr 14fr;
+  grid-template-rows: 2fr 6fr 14fr;
   box-sizing: border-box;
   grid-template-areas:
     "emotions-innerbox-label-id"
@@ -41,11 +43,6 @@ body {
     "emotions-innerbox-displayemotions-id";
 }
 
-#emotions-innerbox-newemotions-id {
-  /*background-color: #808a80;*/
-  grid-area: emotions-innerbox-newemotions-id;
-  overflow: hidden;
-}
 
 #hashtags-gridbox-id {
   /* background-color: #BBBBBB; */
@@ -85,28 +82,34 @@ body {
   float: left;
 }
 
+#emotion-entry-spacer-div-id {
+  height: 1vmin;
+}
+
 #add-new-emotion-button-id {
+  
   background-color: #1884ff;
   display: block;
   width: 95%;
-  margin-top: -0.2em;
+  margin-top: 0.0em;
   border-radius: 12px;
-  font-size: 2vmin;
+  font-size: 1.6vmin;
   margin-left: auto;
   margin-right: auto;
   cursor: pointer;
 }
 
 #emotions-new-emotion-textarea-id {
+  
   width: 95%;
   max-width: 95%;
-  height: 2vmin;
+  height: 1.8vmin;
   overflow: hidden;
-  font-size: 2vmin;
+  font-size: 1.7vmin;
   display: block;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 0.05em;
+  margin-top: 0.00em;
   border-radius: 5px;
   resize: none;
 }
@@ -128,8 +131,40 @@ body {
 }
 
 #new-emotion-range-id {
+  grid-area: emotion-range;
   width: 60%;
   background: #1884ff;
+}
+
+#auto-emotions-div-id {
+  
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  width: 90%;
+}
+#auto-fill-emotions-button-id {
+  background-color: #1884ff;
+  display: inline-block;
+  
+  width: 75%;
+  margin-top: 0.0em;
+  border-radius: 12px;
+  font-size: 1.6vmin;
+  margin-left: auto;
+  margin-right: auto;
+  cursor: pointer;
+}
+
+#auto-fill-emotions-check-box-label-id {
+  font-size: 2vmin;
+}
+#auto-fill-emotions-check-box-id {
+  display: inline-block;
+  position: relative;
+  outline: 2px solid #1884ff;
+  
 }
 
 #emotions-innerbox-displayemotions-id {
@@ -480,3 +515,4 @@ input:checked + .slider:before {
 }
 
 /* CENTER GRID AREA END */
+/*  */

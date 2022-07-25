@@ -173,7 +173,7 @@ async function Import_Collections_Records_Info_Migrate() {
 
 //insert or merge the recods from import db into the destination db
 //the table schema for the import name changes (imageFileNameOrig TEXT, imageFileNameNew TEXT, actionType TEXT)
-//tagging structure: (imageFileName TEXT, imageFileHash TEXT, taggingRawDescription TEXT, taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT)`)
+//tagging structure: (imageFileName TEXT, imageFileHash TEXT, taggingRawDescription TEXT, taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT, faceDescriptors TEXT)`)
 async function Import_Records_DB_Info_Migrate() {
     GET_NAME_CHANGE_STMT = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} WHERE imageFileNameOrig=?;`);
 
@@ -393,7 +393,7 @@ async function Check_DB_Tables() {
 //TAGGING ITERATOR VIA CLOSURE START>>>
 //use via 'iter = await Import_Tagging_Image_DB_Iterator()' and 'rr = await iter()'
 //after all rows complete 'undefined' is returned
-//(imageFileName TEXT, imageFileHash TEXT, taggingRawDescription TEXT, taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT)`)
+//(imageFileName TEXT, imageFileHash TEXT, taggingRawDescription TEXT, taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT, faceDescriptors TEXT)`)
 async function Import_Tagging_Image_DB_Iterator() {
     IMPORT_GET_MIN_ROWID_STMT = DB_import.prepare(`SELECT MIN(ROWID) AS rowid FROM ${TAGGING_TABLE_NAME}`);
     IMPORT_GET_RECORD_FROM_ROWID_TAGGING_STMT = DB_import.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE ROWID=?`);
@@ -420,6 +420,7 @@ function Get_Obj_Fields_From_Record(record) {
     record.taggingTags = JSON.parse(record.taggingTags);
     record.taggingEmotions = JSON.parse(record.taggingEmotions);
     record.taggingMemeChoices = JSON.parse(record.taggingMemeChoices);
+    record.faceDescriptors = JSON.parse(record.faceDescriptors);
     return record;
 }
 

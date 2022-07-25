@@ -1,0 +1,433 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Verdana, sans-serif;
+  box-sizing: border-box;
+}
+
+.top-buttons {
+    font-weight: bold;
+    border-radius: 25%;
+    width: 30%;
+    margin: auto;
+    font-size: 3vmin;
+    height: 90%;
+    cursor: pointer;
+}
+
+
+#tagging-screen-id {    
+    display: grid;
+    grid-template-columns: 12fr 8fr;
+    grid-template-rows: 2fr 18fr;
+    min-height: 0;
+    min-width: 0;
+    height: 100vh;
+    width: 100vw;
+    box-sizing: border-box;
+    grid-template-areas:
+      "top-area               results-area"
+      "search-criteria-area   results-area";
+    border-style: solid;
+    border-width: 3px;
+    border-color: #005000;
+    background-color: #aaaaaa;
+}
+
+
+#top-div-id {
+    grid-area: top-area;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #00c600;
+}
+#main-title-label {
+    font-weight: bold;
+    font-size: 3vmin;
+}
+
+
+#top-search-div-id {
+    grid-area: search-criteria-area;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 8fr 26fr;
+    min-height: 0;
+    min-width: 0;
+    /* height: 120vh; */
+    width: 100%; 
+    overflow-y: auto;
+    box-sizing: border-box;
+    grid-template-areas:
+      "annotation-criteria-area"
+      "facial-images-area";
+    border-style: solid;
+    border-width: 3px;
+    border-color: #005000;
+    /* background-color: #a0a880; */
+}
+#annotation-criteria-div-id {
+    grid-area: annotation-criteria-area;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 3fr 3fr 6fr;
+    min-height: 0;
+    min-width: 0;
+    height: 100%;
+    width: 100%; 
+    overflow-y: auto;
+    box-sizing: border-box;
+    grid-template-areas:
+      "image-keywords-area"
+      "meme-keywords-area"
+      "emotions-area";
+}
+#descriptions-keywords-div-id {
+    grid-area: image-keywords-area;
+    box-sizing: border-box;
+    min-height: 0; /* NEW */
+    min-width: 0; /* NEW; needed for Firefox */
+    display: flex;
+    /* background-color: wheat; */
+}
+#search-tag-label-id {
+    white-space: nowrap;
+    font-size: 3vmin;
+    font-weight: bold;
+    padding-left: 0.5%;
+    vertical-align: middle;
+    float: left;
+}
+#search-tag-textarea-entry-div-id {
+    flex-grow: 10;
+}
+#search-tag-textarea-entry-id {
+    height: 3vmin;
+    overflow: hidden;
+    font-size: 2.8vmin;
+    border-radius: 5px;
+    white-space: nowrap;
+    width: 95%;
+}
+#meme-keywords-div-id {
+    grid-area: meme-keywords-area;
+    box-sizing: border-box;
+    min-height: 0; /* NEW */
+    min-width: 0; /* NEW; needed for Firefox */
+    display: flex;
+    /* background-color: yellowgreen; */
+}
+#search-meme-tag-label-id {
+    white-space: nowrap;
+    font-size: 3vmin;
+    font-weight: bold;
+}
+#search-meme-tag-textarea-entry-div-id {
+    flex-grow: 10;
+}
+#search-meme-tag-textarea-entry-id {
+    height: 3vmin;
+    overflow:hidden;
+    font-size: 2.8vmin;
+    border-radius: 5px;
+    white-space: nowrap;
+    width: 95%;
+}
+/* EMOTION FIELD SEARCH START */
+#search-emotion-entry-top-div-id {
+    grid-area: emotions-area;
+    /* display: flex;
+    align-items: center; */
+    display: grid;
+    width: 98%;
+    grid-template-columns: 3fr 3fr 8fr;
+    grid-template-areas:
+      "grid-emotion-area-1-id"
+      "grid-emotion-area-2-id"
+      "grid-emotion-area-3-id";
+    /* justify-content: center; */
+    /* background-color: #00c600; */
+}
+#grid-emotion-area-1-id {
+    grid-template-areas: grid-emotion-area-1-id;
+}
+#search-emotion-entry-button-id {
+display: inline-block;
+text-align: center;
+height: 80%;
+/* background-color: #1884ff; */
+/* border-radius: 15%; */
+padding: 5px;
+font-weight: bold;
+font-size: 2.4vmin;
+}
+#grid-emotion-area-2-id {
+    grid-template-areas: grid-emotion-area-2-id;
+}
+#search-emotion-label-and-value-entry-container-div-id {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    /* height: 100%; */
+    box-sizing: border-box;
+    padding: 0%;
+    grid-template-areas:
+      "search-emotion-label-value-textarea-entry-id"
+      "search-emotion-value-range-entry-id";
+}
+#search-emotion-label-value-textarea-entry-id {
+    grid-area: search-emotion-label-value-textarea-entry-id;
+    height: 3vmin;
+    overflow: hidden;
+    font-size: 2.8vmin;
+    border-radius: 5px;
+    white-space: nowrap;
+    display: inline-block;
+    /* width: 30%; */
+}
+#search-emotion-value-range-entry-id {
+    /* width: 20%vmin; */
+    grid-area: search-emotion-value-range-entry-id;
+    display: inline-block;
+}
+#grid-emotion-area-3-id {
+    grid-template-areas: grid-emotion-area-3-id;
+}
+#search-emotion-label-value-display-container-div-id {
+    bottom: 0;
+    padding-left: 1.5vmin;
+    padding-bottom: 2.5vmin;
+    /* margin: auto; */
+    /* max-width: 40vmin; or whatever width you want. */
+    display: inline-block;
+    width: 95%;
+    height: 90%;
+    height: 5vmin;
+    font-size: 2.75vmin;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+.search-emotion-remove-button-class {
+    height: 2.5vmin;
+}
+
+
+#facial-images-div-id {
+    grid-area: facial-images-area;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 2fr 2fr 6fr 1fr 6fr;
+    min-height: 0;
+    min-width: 0;
+    height: 100%;
+    width: 100%; 
+    overflow-y: auto;
+    box-sizing: border-box;
+    grid-template-areas:
+      "facial-row-one-area"
+      "facial-row-two-area"
+      "facial-row-three-area"
+      "facial-row-four-area"
+      "facial-row-five-area"
+      "facial-row-six-area";
+    /* background-color: violet; */
+}
+#facial-row-one-div-id {
+    grid-area: facial-row-one-area;
+    font-weight: bold;
+    font-size: 3vmin;
+    background-color: #00c600;
+    /* background-color: rgb(247, 160, 157); */
+}
+#facial-row-two-div-id {
+    grid-area: facial-row-two-area;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    /* background-color: rgb(153, 145, 28); */
+}
+.search-row-two-buttons {
+    height: 80%;
+    font-size: 3vmin;
+}
+#facial-row-three-div-id {
+    grid-area: facial-row-three-area;
+    display: flex;
+    align-items: center;
+    /* background-color: rgb(99, 99, 207); */
+}
+.search-row-three-buttons {
+    height: 100%;
+    font-size: 2.5vmin;
+    padding: 5px;
+}
+#row-three-label-id {
+    font-style: italic;
+    font-size: 1.8vmin;
+}
+
+#facial-row-four-div-id {
+    grid-area: facial-row-four-area;
+    display: flex;
+    align-content: center;
+    flex-wrap: no-wrap;
+    overflow-x: auto;
+}
+.recommended-img-div-class { 
+    position: relative;     
+    float: left; 
+    /* margin-left: 10px;  */
+}
+.recommended-img-check-box {
+    position: absolute; 
+    top: 0px; 
+    left: 0px;
+    width: 12%;
+    height: 12%;
+    cursor: pointer;
+}
+.recommended-img-check-box:hover  {
+    background-color:orange;
+}
+.recommended-search-img-class {
+    height: 99999px;
+    object-fit: contain;
+    max-height: 100%;
+    max-width: 25vw;
+    display: block;
+    margin-right: 5px;
+    margin-left: 5px; 
+    cursor: pointer;
+}
+
+#facial-row-five-div-id {
+    grid-area: facial-row-five-area;
+    display: flex;
+    align-content: flex-end;
+    font-size: 2.6vmin;
+    font-weight: bold;
+    /* background-color: #00c600; */
+}
+#facial-row-six-div-id {
+    grid-area: facial-row-six-area;
+    display: flex;
+    align-content: center;
+    flex-wrap: no-wrap;
+    overflow-x: auto;
+}
+.selected-imgs {
+    height: 99999px;
+    object-fit: contain;
+    max-height: 100%;
+    max-width: 25vw;
+    margin-right: 5px;
+    margin-left: 5px; 
+    display: block;
+    cursor: pointer;
+}
+
+
+/* where the super search results go */
+#top-results-div-id {
+    grid-area: results-area;
+    overflow-y: auto;
+    border: 3px solid #005000;
+    /* background-color: yellow; */
+}
+#results-title-label {
+    font-size: 2.5vmin;
+    font-weight: bold;
+    display: inline;
+    background-color: #00c600;
+}
+.super-search-div-class {
+    text-align: center;
+    margin-top: 2px;
+}
+.super-search-obj-class {
+    max-height: 25vh;
+    max-width: 100%;
+    cursor: pointer;
+}
+
+
+
+
+
+
+#modal-meme-clicked-grid-container-id {
+    width: 100%;
+    display: grid;
+    grid-template-rows: 1fr  9fr;
+    min-height: 0;
+    min-width: 0;
+    height: 100%;
+    width: 100%;
+    /* box-sizing: border-box; */
+    padding: 0%;
+    grid-template-areas:
+      "modal-meme-clicked-tag-list-div-container-id"
+      "modal-meme-clicked-image-gridbox-id";
+}
+
+#modal-meme-clicked-tag-list-div-container-id {
+    background-color: #00c600;
+    grid-area: modal-meme-clicked-tag-list-div-container-id;
+    font-weight: bold;
+    font-size: 3vmin;
+    color: black;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+#capture-button-id,
+#select-capture-button-id,
+#back-capture-button-id {
+    font-size: 3vmin;
+}
+
+
+
+#modal-meme-clicked-image-gridbox-id {
+    background-color: #005000;
+    grid-area: modal-meme-clicked-image-gridbox-id;
+    overflow-y: auto;
+    overflow-x: auto;
+    height: 100%;
+    display: grid;
+    grid-template-rows: 1fr  1fr;
+    min-height: 0;
+    min-width: 0;
+    height: 100%;
+    width: 100%;
+    /* box-sizing: border-box; */
+    padding: 0%;
+    grid-template-areas:
+      "video-area"
+      "canvas-area";
+}
+#canvas-webcam-id {
+    grid-area: canvas-area;
+    height: 100%;
+    width: 100%;
+    /* background-color: burlywood; */
+}
+#webcam-video-id {
+    grid-area: video-area;
+    height: 100%;
+    width: 100%;
+    /* background-color: blueviolet; */
+}
+
+/* #modal-meme-clicked-displayimg-id {
+    height: 99999px;
+    object-fit: contain;
+    max-height: 100%;
+    max-width: 100%;
+    display: block;
+    margin: auto auto;
+} */

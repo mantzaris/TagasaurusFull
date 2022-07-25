@@ -17,7 +17,8 @@ var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
                                     "taggingRawDescription": "",
                                     "taggingTags": [],
                                     "taggingEmotions": {good:"0",bad:"0"},
-                                    "taggingMemeChoices": []
+                                    "taggingMemeChoices": [],
+                                    "faceDescriptors": []
                                     }
 
 //holds current annotation obj
@@ -32,8 +33,69 @@ var search_meme_results = ''; //meme search results
 var meme_search_results = ''; //when adding a meme the images panel (left)
 var meme_search_meme_results = ''; //when adding a meme the meme panel (right)
 
+var default_auto_fill_emotions = false;
+
 
 var reg_exp_delims = /[#:,;| ]+/
+
+
+
+
+//returns the obj with the extended emotions auto filled
+//faceapi.euclideanDistance( Object.values({'1':1,'2':2,'3':2}), Object.values({'1':-1,'2':0.2,'3':15}) ) -> 13.275541
+async function Get_Face_Descriptors_Arrays(super_res) {
+    let faces_descriptors_array_tmp = []
+    if( super_res.length > 0 ) {
+        for(let face_ii=0; face_ii < super_res.length; face_ii++) {
+            //each descriptor is an 'object' not an array so that each dimension of the descriptor feature vector has a key pointing to the value but we just use the values that are needed to compute the 'distace' between descriptors later faceapi.euclideanDistance( aa[0] , aa[1] ), faceapi.euclideanDistance( JSON.parse(res5[2].faceDescriptors)[0] , JSON.parse(res5[2].faceDescriptors)[2] ) (get face descriptors string, parse and then select to compare via euclidean distances)
+            faces_descriptors_array_tmp[face_ii] = Object.values(super_res[face_ii].descriptor)
+        }
+    }
+    return faces_descriptors_array_tmp
+}
+
+//returns the obj with the extended emotions auto filled (the object is not a full annotation obj, but just the extended obj for emotions)
+async function Auto_Fill_Emotions(super_res, file_annotation_obj) {
+    let emotion_max_faces_tmp = {}
+    if( super_res.length > 0 ) {
+        for(let face_ii=0; face_ii < super_res.length; face_ii++) {
+            for (let [key, value] of Object.entries(super_res[face_ii].expressions)) {
+                if( Object.keys(file_annotation_obj["taggingEmotions"]).includes(key) == false ) { //don't alter emotions that are already there as added by the user
+                    if( emotion_max_faces_tmp[key] == undefined ) { //add emotion and value
+                        emotion_max_faces_tmp[key] = Math.round(value*100);
+                    } else { //check which emotion value should be used (take the largest value)
+                        if( emotion_max_faces_tmp[key] < (Math.round(value*100)) ) {
+                            emotion_max_faces_tmp[key] = Math.round(value*100);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return { ...file_annotation_obj["taggingEmotions"], ...emotion_max_faces_tmp }
+}
+
+//actions for the AUTO-FILL emotions button being pressed, populate 
+document.getElementById(`auto-fill-emotions-button-id`).onclick = async function() {
+    super_res = await Get_Image_Face_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation["imageFileName"]) )
+    current_image_annotation["taggingEmotions"] = await Auto_Fill_Emotions(super_res, current_image_annotation)
+    await Update_Tagging_Annotation_DB(current_image_annotation);
+    Emotion_Display_Fill();
+};
+
+
+//default_auto_fill_emotions = document.getElementById(`auto-fill-emotions-check-box-id`).checked
+document.getElementById(`auto-fill-emotions-check-box-id`).addEventListener('change', function() {
+    if (this.checked) {
+        //console.log("Checkbox is checked..");
+        default_auto_fill_emotions = true;
+    } else {
+        //console.log("Checkbox is not checked..");
+        default_auto_fill_emotions = false;
+    }
+});
+
+//console.log(`auto_fill_user_value ${auto_fill_user_value}`)
 
 
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS START>>>
@@ -333,9 +395,18 @@ async function First_Display_Init() {
     records_remaining = await Number_of_Tagging_Records();
     if(records_remaining == 0) {
         Load_Default_Taga_Image();
+    } else if( window.location.href.indexOf("imageFileName") > -1 ) {
+        tagging_name_param = window.location.search.split("=")[1]
+        // console.log('tagging_name_param = ', tagging_name_param)
+
+        current_image_annotation = await Get_Tagging_Annotation_From_DB(tagging_name_param);
+        Load_State_Of_Image_IDB();
+        
+        //window.location.href = tagging.html
+    } else {
+        await New_Image_Display(0)
+        await Load_State_Of_Image_IDB() //display the image in view currently and the annotations it has
     }
-    await New_Image_Display(0)
-    await Load_State_Of_Image_IDB() //display the image in view currently and the annotations it has
 }
 //init method to run upon loading
 First_Display_Init(); 
@@ -381,6 +452,17 @@ async function Load_Default_Taga_Image() {
     tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
     tagging_entry.imageFileName = 'Taga.png';
     tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
+    //for taga no emotion inference is needed but done for consistency
+    
+    //NO NEED WHEN THE DEFAULT IS TAGA, THERE IS NO FACE AND NO EMOTIONS
+    // if( default_auto_fill_emotions == true ) {
+    //     super_res = await Get_Image_Face_Descriptors_And_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry["imageFileName"]) )
+    //     tagging_entry["taggingEmotions"] = await Auto_Fill_Emotions(super_res, tagging_entry)
+    //     tagging_entry["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
+    // } else {
+    //     super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry["imageFileName"]) )
+    //     tagging_entry["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
+    // }
     await Insert_Record_Into_DB(tagging_entry); //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
 }
 //delete image from user choice
@@ -422,6 +504,15 @@ async function Load_New_Image() {
         tagging_entry_tmp.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${filename}`);
         hash_present = await Get_Tagging_Hash_From_DB(tagging_entry_tmp.imageFileHash);
         if(hash_present == undefined) {
+            //emotion inference upon the default selected
+            if( default_auto_fill_emotions == true ) {
+                super_res = await Get_Image_Face_Descriptors_And_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
+                tagging_entry_tmp["taggingEmotions"] = await Auto_Fill_Emotions(super_res, tagging_entry_tmp)
+                tagging_entry_tmp["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
+            } else {
+                super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
+                tagging_entry_tmp["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
+            }
             await Insert_Record_Into_DB(tagging_entry_tmp); //sqlite version
             tagging_entry = tagging_entry_tmp;
         }
@@ -606,28 +697,36 @@ async function Search_Images(){
     document.getElementById("modal-search-main-button-id").onclick = function() {
         Modal_Search_Entry()
     }
+    document.getElementById("modal-search-similar-button-id").onclick = function() {
+        Modal_Search_Similar()
+    }
 }
 //when the tagging search modal 'search' button is pressed
-async function Modal_Search_Entry() {
-    //annotation tags
-    search_tags_input = document.getElementById("modal-search-tag-textarea-entry-id").value
-    split_search_string = search_tags_input.split(reg_exp_delims)
-    search_unique_search_terms = [...new Set(split_search_string)]
-    search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
-    tagging_search_obj["searchTags"] = search_unique_search_terms
-    //meme tags now
-    search_meme_tags_input = document.getElementById("modal-search-meme-tag-textarea-entry-id").value
-    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
-    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
-    search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
-    tagging_search_obj["searchMemeTags"] = search_unique_meme_search_terms
-
+async function Modal_Search_Entry(search_similar=false, search_obj_similar_tmp={}) {
+    search_obj_tmp = tagging_search_obj
+    if(search_similar == false) {        
+        //annotation tags
+        search_tags_input = document.getElementById("modal-search-tag-textarea-entry-id").value
+        split_search_string = search_tags_input.split(reg_exp_delims)
+        search_unique_search_terms = [...new Set(split_search_string)]
+        search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
+        search_obj_tmp["searchTags"] = search_unique_search_terms
+        //meme tags now
+        search_meme_tags_input = document.getElementById("modal-search-meme-tag-textarea-entry-id").value
+        split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
+        search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+        search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
+        search_obj_tmp["searchMemeTags"] = search_unique_meme_search_terms
+    } else {
+        search_obj_tmp = search_obj_similar_tmp
+    }
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
     tagging_db_iterator = await Tagging_Image_DB_Iterator();
-    search_results = await SEARCH_MODULE.Image_Search_DB(tagging_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
+    search_results = await SEARCH_MODULE.Image_Search_DB(search_obj_tmp,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
     tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
-    search_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(tagging_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
+    search_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(search_obj_tmp,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
+    //console.log('search_meme_results = ', search_meme_results)
     //>>SHOW SEARCH RESULTS<<
     //search images results annotations
     search_image_results_output = document.getElementById("modal-search-images-results-grid-div-area-id")
@@ -673,6 +772,18 @@ async function Modal_Search_Entry() {
             };
         }
     });
+}
+
+//search similar images to the current image annotation using the face recognition api
+async function Modal_Search_Similar() {
+    //
+    //console.log("search similar!!")    
+    search_obj_similar_tmp = JSON.parse(JSON.stringify(tagging_search_obj))
+    search_obj_similar_tmp.emotions = current_image_annotation.taggingEmotions
+    search_obj_similar_tmp.searchTags = current_image_annotation.taggingTags
+    search_obj_similar_tmp.searchMemeTags = current_image_annotation.taggingMemeChoices
+    search_obj_similar_tmp.faceDescriptors = current_image_annotation.faceDescriptors
+    Modal_Search_Entry(true, search_obj_similar_tmp)
 }
 
 

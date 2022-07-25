@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Tagasaurus</title>
+
+    <!-- The general cross app style sheet for things like button design -->
+    <link rel="stylesheet" href="../AppCode/taga-CSS/general-styles.css">
+
+    <link rel="stylesheet" href="../AppCode/taga-CSS/super-search-screen-CSS/super-search-main-ui.css">
+
+    <!-- general style for the modal pop ups -->
+	<link rel="stylesheet" href="./taga-CSS/modal-general-style.css">
+
+    <meta charset="UTF-8" http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+
+
+</head>
+
+<body>
+
+
+<div id="tagging-screen-id">
+    <!-- page top area-->
+    <div id="top-div-id">
+        <label id="main-title-label" for="">SUPER SEARCH</label>
+        <button class="top-buttons fun-button-blue" type="button" id="super-search-button-id">SEARCH</button>
+        <button class="top-buttons fun-button-blue" type="button" id="return-to-main-button-id">RETURN TO MAIN</button>
+    </div>
+    
+    <!-- where the user enters the search criteria -->
+    <div id="top-search-div-id">
+        <div id="annotation-criteria-div-id">
+            <div id="descriptions-keywords-div-id">
+                <span id="search-tag-label-id">
+                    Image Tags:
+                </span>
+                <div id="search-tag-textarea-entry-div-id">
+                    <textarea id="search-tag-textarea-entry-id" placeholder="enter image #tags" style="resize: none;"
+                        name="search-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')"></textarea>
+                </div>
+            </div>
+            <div id="meme-keywords-div-id">            
+                <span id="search-meme-tag-label-id">
+                    Meme Tags:
+                </span>
+                <div id="search-meme-tag-textarea-entry-div-id">
+                    <textarea id="search-meme-tag-textarea-entry-id" placeholder="enter meme #tags" style="resize: none;"
+                        name="search-meme-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')"></textarea>
+                </div>
+            </div>
+            
+            <div id="search-emotion-entry-top-div-id">
+
+                <!-- <div id="grid-emotion-area-1-id"></div> -->
+                <button type="button" class="fun-button-blue" id="search-emotion-entry-button-id">INCLUDE EMOTION</button>
+                <!-- </div> -->
+
+                <!-- <div id="grid-emotion-area-2-id"> -->
+                <div id="search-emotion-label-and-value-entry-container-div-id">
+                    <textarea list="emotion-recommend" id="search-emotion-label-value-textarea-entry-id" placeholder="emotion label" style="resize: none;"
+                            name="search-emotion-tag-textarea" oninput="this.value = this.value.replace(/[ \n]/g,'')"></textarea>
+                    <input id="search-emotion-value-range-entry-id" type="range" min="0" max="100" value="0">
+                </div>
+                <!-- </div> -->
+
+                <div id="search-emotion-label-value-display-container-div-id">                    
+                    <!-- <span id="search-emotion-label-value-span-id-EMOTIONKEY" style="white-space:nowrap">
+                        <img class="search-emotion-remove-button-class" id="search-emotion-remove-button-id-EMOTIONKEY" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+                            onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+                        (emotion1,10)
+                    </span>
+                    <span id="search-emotion-label-value-span-id-EMOTIONKEY" style="white-space:nowrap">
+                        <img class="search-emotion-remove-button-class" id="search-emotion-remove-button-id-EMOTIONKEY" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+                            onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+                        (emotion1,10)
+                    </span>
+                    </span> -->
+                </div>
+            
+            </div>            
+
+        </div>
+
+
+
+        <div id="facial-images-div-id">
+
+            <div id="facial-row-one-div-id">
+                <label id="facial-title-label" for="">Provide Face Examples:</label>
+            </div>
+            <div id="facial-row-two-div-id">                
+                <button type="button" class="fun-button-blue search-row-two-buttons" id="use-new-image-button-id">USE NEW IMAGE(S)</button>
+                <button type="button" class="fun-button-blue search-row-two-buttons" id="use-webcam-button-id">USE WEBCAM</button>
+            </div>
+            <div id="facial-row-three-div-id">
+                <button type="button" class="fun-button-blue search-row-three-buttons" id="get-recommended-button-id">GET & SELECT RECOMMENDED</button>
+                <label id="row-three-label-id">Press to display images with -faces- using the annotation information above. Choosing images places them into the search selections.</label>
+            </div>
+
+            <div id="facial-row-four-div-id">
+
+                <!-- <div class="recommended-img-div-class" id="recommended-result-image-div-id-Taga.png" >
+                    <input type="checkbox" class="recommended-img-check-box" id="recommened-check-box-id-Taga.png" name="" value="">
+                    <img class="recommended-search-img-class" id="recommended-result-single-img-id-Taga.png" src="../Taga.png" title="select" alt="result" />
+                </div>
+
+                <div class="recommended-img-div-class" id="recommended-result-image-div-id-Taga.png" >
+                    <input type="checkbox" class="recommended-img-check-box" id="recommened-check-box-id-Taga.png" name="" value="">
+                    <img class="recommended-search-img-class" id="recommended-result-single-img-id-Taga.png" src="../beach.jpg" title="select" alt="result" />
+                </div>
+        
+                <div class="recommended-img-div-class" id="recommended-result-image-div-id-Taga.png" >
+                    <input type="checkbox" class="recommended-img-check-box" id="recommened-check-box-id-Taga.png" name="" value="">
+                    <img class="recommended-search-img-class" id="recommended-result-single-img-id-Taga.png" src="../beach.jpg" title="select" alt="result" />
+                </div>
+        
+                <div class="recommended-img-div-class" id="recommended-result-image-div-id-Taga.png" >
+                    <input type="checkbox" class="recommended-img-check-box" id="recommened-check-box-id-Taga.png" name="" value="">
+                    <img class="recommended-search-img-class" id="recommended-result-single-img-id-Taga.png" src="../tree.jpg" title="select" alt="result" />
+                </div> -->
+                
+            </div>
+
+            <div id="facial-row-five-div-id">
+                <label for="">Selected images:</label>   
+            </div>
+
+            <div id="facial-row-six-div-id">
+                
+                <!-- <div class="recommended-img-div-class" id="search-image-selected-div-id-Taga.png">
+                    <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-Taga.png" name="" value="">
+                    <img class="selected-imgs" src="../Taga.png" title="view" alt="result" />
+                </div>
+                <div class="recommended-img-div-class" id="search-image-selected-div-id-Taga.png">
+                    <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-Taga.png" name="" value="">
+                    <img class="selected-imgs" src="../beach.jpg" title="view" alt="result" />
+                </div>
+                <div class="recommended-img-div-class" id="search-image-selected-div-id-Taga.png">
+                    <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-Taga.png" name="" value="">
+                    <img class="selected-imgs" src="../tree.jpg" title="view" alt="result" />
+                </div>
+                <div class="recommended-img-div-class" id="search-image-selected-div-id-Taga.png">
+                    <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-Taga.png" name="" value="">
+                    <img class="selected-imgs" src="../tree.jpg" title="view" alt="result" />
+                </div> -->
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- place image search results here -->
+    <div id="top-results-div-id">
+        <label id="results-title-label" for="">Results (click choice):</label>
+
+        <!-- <div class="super-search-div-class" id="search-result-image-div-id-Taga.png" >
+            <img class="super-search-obj-class" id="search-result-single-img-id-Taga.png" src="../Taga.png" title="view" alt="result" />
+        </div>
+
+        <div class="super-search-div-class" id="search-result-image-div-id-Taga.png" >
+            <img class="super-search-obj-class" id="search-result-single-img-id-Taga.png" src="../beach.jpg" title="view" alt="result" />
+        </div>
+
+        <div class="super-search-div-class" id="search-result-image-div-id-Taga.png" >
+            <img class="super-search-obj-class" id="search-result-single-img-id-Taga.png" src="../tree.jpg" title="view" alt="result" />
+        </div>
+
+        <div class="super-search-div-class" id="search-result-image-div-id-Taga.png" >
+            <img class="super-search-obj-class" id="search-result-single-img-id-Taga.png" src="../Taga.png" title="view" alt="result" />
+        </div>
+
+        <div class="super-search-div-class" id="search-result-image-div-id-Taga.png" >
+            <img class="super-search-obj-class" id="search-result-single-img-id-Taga.png" src="../beach.jpg" title="view" alt="result" />
+        </div>
+
+        <div class="super-search-div-class" id="search-result-image-div-id-Taga.png" >
+            <img class="super-search-obj-class" id="search-result-single-img-id-Taga.png" src="../tree.jpg" title="view" alt="result" />
+        </div>
+
+    </div> -->
+
+
+
+</div>
+
+
+
+
+<div id="modal-meme-clicked-top-id" class="modal-top-class">
+    <!-- MEME MODAL CLOSE -->
+    <img class="modal-close-button-class" id="modal-meme-clicked-close-button-id" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+                        onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+    <!-- Modal content container -->
+    <div class="modal-content-container">
+        <div id="modal-meme-clicked-grid-container-id">
+            <div id="modal-meme-clicked-tag-list-div-container-id">
+                <!-- Tags: #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde  -->
+                <button style="display: none;" class="fun-button-blue" id="back-capture-button-id"> STREAM AGAIN </button>
+                <button class="fun-button-blue" id="capture-button-id"> CAPTURE (SPACE BAR) </button>
+                <button class="fun-button-blue" id="select-capture-button-id" style="display: none;"> SELECT IMAGE  </button>
+            </div>
+            
+            <div id="modal-meme-clicked-image-gridbox-id">
+
+                <canvas id="canvas-webcam-id">  </canvas>
+                <img style="display: none;" id="webcam-meme-clicked-displayimg-id" src="" title="" alt="" />
+
+                <video src="" id="webcam-video-id" >  </video>   
+                                        
+                                
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- <div id="modal-meme-clicked-top-id" class="webcam-top-class">
+    <img class="modal-close-button-class" id="modal-meme-clicked-close-button-id" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+                        onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+    <div class="webcam-content-container" id="webcam-inner-modal-div-id">
+        
+        <div id="webcam-buttons-div-id">           
+            <button class="fun-button-blue" id="capture-button-id"> CAPTURE (SPACE BAR) </button>
+            <button class="fun-button-blue" id="select-capture-button-id" style="display: none;"> SELECT IMAGE  </button>
+        </div>
+        
+        <div id="webcam-grid-container-id">
+            <canvas id="canvas-webcam-id">                
+            </canvas>
+
+            <img id="webcam-meme-clicked-displayimg-id" src="" title="" alt="" />
+
+            <video src="" id="webcam-video-id" >
+            </video>            
+        </div>
+
+    </div>
+
+</div> -->
+
+
+</body>
+
+
+<script src="./taga-JS/super-search/super-search.js"></script>
+
+
+</html>
