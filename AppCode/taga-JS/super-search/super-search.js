@@ -129,11 +129,12 @@ document.getElementById("return-to-main-button-id").onclick = function() {
 }
 
 
-//using the webcam
+//using the WEBCAM
 document.getElementById("use-webcam-button-id").onclick = function() {
 
     modal_meme_click_top_id_element = document.getElementById("modal-meme-clicked-top-id");
     modal_meme_click_top_id_element.style.display = "block";
+    document.getElementById("webcam-video-id").style.display = "block"
 
     var meme_modal_close_btn = document.getElementById("modal-meme-clicked-close-button-id");
     // When the user clicks on the button, close the modal
@@ -153,12 +154,14 @@ document.getElementById("use-webcam-button-id").onclick = function() {
     let canvas = document.getElementById("canvas-webcam-id")
     let photo = document.getElementById("webcam-meme-clicked-displayimg-id")
     
-
+    let display_area_element = document.getElementById("modal-meme-clicked-image-gridbox-id")
+    //console.log('display_area_element height = ', display_area_element.offsetHeight )
+    //console.log('display_area_element offsetWidth = ', display_area_element.offsetWidth )
+    
     let width
     let height
 
     let data;
-
     let stream
 
     let captured = false
@@ -195,6 +198,7 @@ document.getElementById("use-webcam-button-id").onclick = function() {
     }
 
     capture_button.onclick = function(ev) {
+        canvas.style.display = "block"
         Take_Picture(ev)
     }
 
@@ -220,6 +224,8 @@ document.getElementById("use-webcam-button-id").onclick = function() {
 
             select_capture_button.style.display = "block"
             captured = true
+            document.getElementById("webcam-video-id").style.display = "none"
+            document.getElementById("back-capture-button-id").style.display = "block"
         } else {
             clearphoto();
         }
@@ -244,6 +250,15 @@ document.getElementById("use-webcam-button-id").onclick = function() {
         select_capture_button.style.display = "none"
         modal_meme_click_top_id_element.style.display = "none";
         photo.src = ""
+        document.getElementById("back-capture-button-id").style.display = "none"
+    }
+
+    document.getElementById("back-capture-button-id").onclick = function() {
+        select_capture_button.style.display = "none"
+            captured = false
+            document.getElementById("webcam-video-id").style.display = "block"
+            document.getElementById("back-capture-button-id").style.display = "none"
+            canvas.style.display = "none"
     }
     
 }

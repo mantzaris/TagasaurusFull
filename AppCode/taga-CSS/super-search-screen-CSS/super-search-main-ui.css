@@ -353,130 +353,81 @@ font-size: 2.4vmin;
 }
 
 
-/* 
-#webcam-inner-modal-div-id {
+
+
+
+
+#modal-meme-clicked-grid-container-id {
+    width: 100%;
     display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr 9fr;
+    grid-template-rows: 1fr  9fr;
     min-height: 0;
     min-width: 0;
     height: 100%;
-    width: 100%; 
-    overflow-y: auto;
-    box-sizing: border-box;
+    width: 100%;
+    /* box-sizing: border-box; */
+    padding: 0%;
     grid-template-areas:
-      "webcam-buttons-area"
-      "webcam-view-area";
-}
-#webcam-buttons-div-id {
-    grid-area: webcam-buttons-area;
-}
-#modal-meme-clicked-grid-container-id {
-    grid-area: webcam-view-area;
-} */
-
-.webcam-top-class {
-    display: none; /* Hidden by default */
-    position: fixed;
-    z-index: 999; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100vw; /* Full width */
-    height: 100vh; /* Full height */
-    overflow: hidden; /* Enable scroll if needed */
-    background-color: rgb(128, 138, 128); /* Fallback color */
-    background-color: rgba(128, 138, 128, 0.85); /* Black w/ opacity */
-    border: 4px solid #005000;
+      "modal-meme-clicked-tag-list-div-container-id"
+      "modal-meme-clicked-image-gridbox-id";
 }
 
-/* Modal Content/Box */
-.webcam-content-container {
-background-color: #00c600;
-margin: auto;
-position: relative;
-top: 5%;
-padding: 0%;
-border: 4px solid #005000;
-width: 80%; /* Could be more or less, depending on screen size */
-/* height: 80%; */
-}
-
-.webcam-close-button-class {
-height: 5vmin;
-position: fixed;
-top: 5%;
-right: 5%;
-}
-
-#canvas-webcam-id {
-    display: none;
-}
-
-#webcam-buttons-div-id {
-    display: grid;
-    grid-template-columns: 50% 50%;
-    height: 10%;
-    font-size: 3vmin;
+#modal-meme-clicked-tag-list-div-container-id {
+    background-color: #00c600;
+    grid-area: modal-meme-clicked-tag-list-div-container-id;
     font-weight: bold;
+    font-size: 3vmin;
+    color: black;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+#capture-button-id,
+#select-capture-button-id,
+#back-capture-button-id {
+    font-size: 3vmin;
 }
 
-#webcam-meme-clicked-displayimg-id {
-    max-width: 100%;
-    object-fit: cover;
-}
-#webcam-video-id {
-    max-width: 100%;
-    object-fit: cover;
-    /* height: 45%; */
-}
+
 
 #modal-meme-clicked-image-gridbox-id {
     background-color: #005000;
     grid-area: modal-meme-clicked-image-gridbox-id;
-    overflow-y: hidden;
+    overflow-y: auto;
+    overflow-x: auto;
+    height: 100%;
+    display: grid;
+    grid-template-rows: 1fr  1fr;
+    min-height: 0;
+    min-width: 0;
+    height: 100%;
+    width: 100%;
+    /* box-sizing: border-box; */
+    padding: 0%;
+    grid-template-areas:
+      "video-area"
+      "canvas-area";
 }
-#modal-meme-clicked-displayimg-id {
+#canvas-webcam-id {
+    grid-area: canvas-area;
+    height: 100%;
+    width: 100%;
+    /* background-color: burlywood; */
+}
+#webcam-video-id {
+    grid-area: video-area;
+    height: 100%;
+    width: 100%;
+    /* background-color: blueviolet; */
+}
+
+/* #modal-meme-clicked-displayimg-id {
     height: 99999px;
     object-fit: contain;
     max-height: 100%;
     max-width: 100%;
     display: block;
     margin: auto auto;
-}
-
-
-
-
-
-
-
-
-/* 
-#tagging-screen-id {
-    display: grid;
-    grid-template-columns: 12fr 8fr;
-    grid-template-rows: 2fr 3fr 12fr 24fr;
-    min-height: 0;
-    min-width: 0;
-    height: 100%;
-    width: 100%;
-    box-sizing: border-box;
-    grid-template-areas:
-      "title-area                 results-area2"
-      "main-search-button-area    results-area2"
-      "annotation-info-area       results-area2"
-      "facial-examples-area       results-area2";
-    background-color: #808a80;
-    border-style: solid;
-    border-width: 3px;
-    border-color: #005000;
 } */
-
-
-
-
-
-
-
-
-

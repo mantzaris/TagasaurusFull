@@ -188,11 +188,39 @@
 </div>
 
 
-<div id="modal-meme-clicked-top-id" class="webcam-top-class">
+
+
+<div id="modal-meme-clicked-top-id" class="modal-top-class">
     <!-- MEME MODAL CLOSE -->
-    <img class="webcam-close-button-class" id="modal-meme-clicked-close-button-id" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+    <img class="modal-close-button-class" id="modal-meme-clicked-close-button-id" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
                         onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
     <!-- Modal content container -->
+    <div class="modal-content-container">
+        <div id="modal-meme-clicked-grid-container-id">
+            <div id="modal-meme-clicked-tag-list-div-container-id">
+                <!-- Tags: #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde  -->
+                <button style="display: none;" class="fun-button-blue" id="back-capture-button-id"> STREAM AGAIN </button>
+                <button class="fun-button-blue" id="capture-button-id"> CAPTURE (SPACE BAR) </button>
+                <button class="fun-button-blue" id="select-capture-button-id" style="display: none;"> SELECT IMAGE  </button>
+            </div>
+            
+            <div id="modal-meme-clicked-image-gridbox-id">
+
+                <canvas id="canvas-webcam-id">  </canvas>
+                <img style="display: none;" id="webcam-meme-clicked-displayimg-id" src="" title="" alt="" />
+
+                <video src="" id="webcam-video-id" >  </video>   
+                                        
+                                
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- <div id="modal-meme-clicked-top-id" class="webcam-top-class">
+    <img class="modal-close-button-class" id="modal-meme-clicked-close-button-id" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+                        onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
     <div class="webcam-content-container" id="webcam-inner-modal-div-id">
         
         <div id="webcam-buttons-div-id">           
@@ -201,22 +229,18 @@
         </div>
         
         <div id="webcam-grid-container-id">
-
-            <canvas id="canvas-webcam-id">
-                
+            <canvas id="canvas-webcam-id">                
             </canvas>
 
             <img id="webcam-meme-clicked-displayimg-id" src="" title="" alt="" />
 
             <video src="" id="webcam-video-id" >
-
-            </video>
-            <!-- <div id="modal-meme-clicked-image-gridbox-id"> -->
-            <!-- </div> -->
+            </video>            
         </div>
+
     </div>
 
-</div>
+</div> -->
 
 
 </body>
