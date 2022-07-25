@@ -6,7 +6,7 @@ const PATH = require('path');
 const FS = require('fs');
 const DATABASE = require('better-sqlite3');
 
-const DB_FILE_NAME = 'test-better3.db';
+const DB_FILE_NAME = 'mainTagasaurusDB.db';
 const TAGGING_TABLE_NAME = 'TAGGING';
 const TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
 const COLLECTIONS_TABLE_NAME = 'COLLECTIONS'

@@ -5,18 +5,29 @@ const {app, ipcMain, dialog, BrowserWindow} = require('electron');
 const PATH = require('path');
 const FS = require('fs');
 
-const TAGA_FILES_DIRECTORY = PATH.join(app.getPath('userData'),'TagasaurusFiles') //PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles')
+
+const BUILD_EXECUTABLE = false;
+
+
+let TAGA_FILES_DIRECTORY;
+if(BUILD_EXECUTABLE) {
+  TAGA_FILES_DIRECTORY = PATH.join(app.getPath('userData'),'TagasaurusFiles') //PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles')
+} else {
+  TAGA_FILES_DIRECTORY = PATH.join( __dirname, '..', '..', '..', 'TagasaurusFiles' )
+}
+
+const APP_PATH = app.getAppPath()
 const TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY,'data') //PATH.resolve(TAGA_FILES_DIRECTORY,'data') 
 
-const USER_DATA_PATH = app.getPath('userData')
-const APP_PATH = app.getAppPath()
+//const USER_DATA_PATH = app.getPath('userData')
+
 
 const MY_FILE_HELPER = require( PATH.join(__dirname,'AppCode','taga-JS','utilities','copy-new-file-helper.js')) //PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'copy-new-file-helper.js') //require('./myJS/copy-new-file-helper.js')
 
 const DATABASE = require('better-sqlite3');
 //const { build } = require('electron-builder');
 var DB;
-DB_FILE_NAME = 'test-better3.db'
+DB_FILE_NAME = 'mainTagasaurusDB.db'
 
 
 console.log(`APP_PATH = ${APP_PATH}`)

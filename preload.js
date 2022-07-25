@@ -15,8 +15,10 @@ window.addEventListener('DOMContentLoaded', () => {
 })
 
 
-function setupOSSpecificPaths() {
-  const APP_NAME = "tagasaurus";
+const APP_NAME = "tagasaurus";
+const BUILD_EXECUTABLE = false;
+
+function setupOSSpecificPaths() {  
   switch (process.platform) {
       case "linux":
           return PATH.join(process.env.HOME, ".config", APP_NAME);
@@ -29,7 +31,12 @@ function setupOSSpecificPaths() {
   }
 }
 
-window.USER_DATA_PATH = setupOSSpecificPaths();
+if(BUILD_EXECUTABLE) {
+  window.USER_DATA_PATH = setupOSSpecificPaths();
+} else {
+  window.USER_DATA_PATH = PATH.join( __dirname, '..', '..', '..' )
+}
+
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 //--------->>>>>>>>>>>>>>>

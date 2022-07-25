@@ -44,7 +44,7 @@ async function Export_User_Annotation_Data() {
                     else { console.log('data copy success!') }
                 })
                 //copy the actual DB file to the new directory as a 'snapshot' of the user state as well
-                FS.copyFileSync( TAGA_FILES_DIRECTORY + PATH.sep + 'test-better3.db', path_chosen.filePath + PATH.sep + 'IMPORT-THIS-FILE-TAGA-EXPORTED-DB.db', FS.constants.COPYFILE_EXCL)
+                FS.copyFileSync( TAGA_FILES_DIRECTORY + PATH.sep + 'mainTagasaurusDB.db', path_chosen.filePath + PATH.sep + 'IMPORT-THIS-FILE-TAGA-EXPORTED-DB.db', FS.constants.COPYFILE_EXCL)
                 //Now start to put the DB data into JSON format for the exporting
                 //export tagging data to json
                 res = FS.openSync( path_chosen.filePath + PATH.sep + 'TAGGING.data', 'w');
