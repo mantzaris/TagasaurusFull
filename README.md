@@ -14,12 +14,13 @@ A key feature is that emotions are stored by the user's explicit input over a se
 
 ## Linux
 
-- Debian/Ubuntu (.deb, run with dpkg -i):  [download](https://drive.google.com/file/d/1p2ysZDArYFttweul5wVtT3qDhNRYKPDc/view?usp=sharing)
+- Debian/Ubuntu (.deb, run with dpkg -i):  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.0.0/tagasaurus_1.0.0_amd64.deb) sha256 hash: f4a3cfa39735af281f8ef27bae7f1101471bfc403dd357142b5018ade07248dd
 
-- Fedora/RHEL (.rpm):  [download](https://drive.google.com/file/d/1p2ysZDArYFttweul5wVtT3qDhNRYKPDc/view?usp=sharing)
+- Fedora/RHEL (.rpm):  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.0.0/tagasaurus-1.0.0.x86_64.rpm) sha256 hash: 057c95a6505574c023e45af784d1e1a41a40a2ca905e34fa0c7e4ccab6bfd772
 
-- Generic Linux (.tar.gz, run the binary file 'tagasaurus'):  [download](https://drive.google.com/file/d/1p2ysZDArYFttweul5wVtT3qDhNRYKPDc/view?usp=sharing)
+- Generic Linux (.tar.gz, run the binary file 'tagasaurus'):  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.0.0/tagasaurusLINUX-TARGZ-1.0.0.tar.gz) sha256 hash: 8cfcc906adf1f139ff070fdf62e7374b089bf457d65b31b8e45e80e7ee96063a
 
+- Linux Zip: [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.0.0/tagasaurusLINUX-ZIP-1.0.0.zip) sha256 hash: 51a9621e14d6408d6938757a1a2fff0c1b2b78617af6eb6db651cbf0e4984689
 
 
 ## Using Tagasaurus
