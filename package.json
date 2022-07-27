@@ -36,9 +36,7 @@
   "dependencies": {
     "@tensorflow/tfjs-node": "^3.18.0",
     "better-sqlite3": "^7.6.2",
-    "canvas": "^2.9.3",
     "face-api.js": "^0.22.2",
-    "fs": "^0.0.1-security",
     "fs-extra": "^10.0.0",
     "install": "^0.13.0",
     "json": "^11.0.0",
