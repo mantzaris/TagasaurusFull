@@ -8,9 +8,9 @@ A key feature is that emotions are stored by the user's explicit input over a se
 
 ## Windows 
 
-- Installer:  [download](https://drive.google.com/file/d/17mSLYUA0-gMl6-M2PAOlZjGWFdROG0pJ/view?usp=sharing)
+- Installer:  [download](https://drive.google.com/file/d/17mSLYUA0-gMl6-M2PAOlZjGWFdROG0pJ/view?usp=sharing) sha256 841d62215ab2dc0340f7b96da46037cccfe7521f973a9f6c46c3de6d97836940
 
-- Zip (unzip and run the executable file):  [download](https://drive.google.com/file/d/1xEL3hmH0mzEM-WoSXu3Z4_9a2OS7HbBC/view?usp=sharing)
+- Zip (unzip and run the executable file):  [download](https://drive.google.com/file/d/1xEL3hmH0mzEM-WoSXu3Z4_9a2OS7HbBC/view?usp=sharing) sha256 8adf7fa6daf9dbf423aadd98c8874cd30bdbf398d4bc525d9f9f02be2ec887bf
 
 ## Linux
 
