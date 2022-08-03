@@ -1,6 +1,7 @@
 // All of the Node.js APIs are available in the preload process.
 // It has the same sandbox as a Chrome extension.
 const PATH = require('path');
+const FS = require('fs')
 
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -16,7 +17,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 const APP_NAME = "tagasaurus";
-const BUILD_EXECUTABLE = false;
+const BUILD_EXECUTABLE = true;
 
 function setupOSSpecificPaths() {  
   switch (process.platform) {
@@ -130,6 +131,43 @@ async function Get_Descriptors_DistanceScore(descriptors_reference, descriptors_
   return ref_faces_scores_total
 }
 window.Get_Descriptors_DistanceScore = Get_Descriptors_DistanceScore
+
+
+
+
+
+
+//
+const decodeGif = require('decode-gif');
+
+//img.src = URL.createObjectURL(new Blob(tmp1,{type: 'image/png' }))  //imagePath
+setTimeout(async ()=> {
+  console.log('time out!')
+  let {frames,width,height} = decodeGif(FS.readFileSync('/home/resort/Downloads/AHandJD.gif'));
+  console.log('/home/resort/Downloads/AHandJD.gif width',width)
+  console.log('frames ', frames[0].data)
+  let tmp1 = frames[0].data // uint8clampedarray
+  let image_tmp = await new ImageData(tmp1,width,height)
+  console.log('image_tmp',image_tmp)
+  var img = imagedata_to_image(image_tmp)
+  // var img = document.createElement('img'); // Use DOM HTMLImageElement
+  // img.src = '/home/resort/Downloads/AHandJD.gif'
+  const res = await faceapi.detectAllFaces(img).
+                                        withFaceLandmarks().
+                                        withFaceExpressions()
+  console.log('res = ', res)
+
+},4000)
+function imagedata_to_image(imagedata) {
+  var canvas = document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
+  canvas.width = imagedata.width;
+  canvas.height = imagedata.height;
+  ctx.putImageData(imagedata, 0, 0);
+  var image = new Image();
+  image.src = canvas.toDataURL();
+  return image;
+}
 
 //console.log('in preload after face set up')
 //---------<<<<<<<<<<<<<<<<<<<<<<

@@ -36,7 +36,9 @@
   "dependencies": {
     "@tensorflow/tfjs-node": "^3.18.0",
     "better-sqlite3": "^7.6.2",
+    "decode-gif": "^1.0.1",
     "face-api.js": "^0.22.2",
+    "file-type": "16.5.3",
     "fs-extra": "^10.0.0",
     "install": "^0.13.0",
     "json": "^11.0.0",

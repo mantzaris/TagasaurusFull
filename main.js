@@ -6,7 +6,7 @@ const PATH = require('path');
 const FS = require('fs');
 
 
-const BUILD_EXECUTABLE = false;
+const BUILD_EXECUTABLE = true;
 
 
 let TAGA_FILES_DIRECTORY;
@@ -107,7 +107,9 @@ if( tagging_table_exists_res["count(*)"] == 0 ){
     "faceDescriptors": []
     }
     taga_source_path = PATH.join(APP_PATH,'Taga.png') //PATH.resolve()+PATH.sep+'Taga.png';
-    FS.copyFileSync(taga_source_path, PATH.join(TAGA_DATA_DIRECTORY,'Taga.png'), FS.constants.COPYFILE_EXCL);
+    if( FS.existsSync(PATH.join(TAGA_DATA_DIRECTORY,'Taga.png')) == false ) {
+      FS.copyFileSync(taga_source_path, PATH.join(TAGA_DATA_DIRECTORY,'Taga.png'), FS.constants.COPYFILE_EXCL);
+    }
     tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
     tagging_entry.imageFileName = 'Taga.png';
     tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash( PATH.join(TAGA_DATA_DIRECTORY,'Taga.png') ) //`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
@@ -282,6 +284,37 @@ ipcMain.handle('getAppPath', () => APP_PATH )
 console.log(`__dirname = ${__dirname}`)
 console.log(`-mainjs- the app.getPath('userData') = ${app.getPath('userData')}`)
 console.log(`-mainjs- the app.getPath('appPath') = ${app.getAppPath()}`)
+
+
+
+////for the GIF image extraction
+// const gifFrames = require('gif-frames')
+
+// ipcMain.handle('extractGIFframes', async (_,gif_path) => {
+//   let frameData = await gifFrames({ url: '/home/resort/Downloads/AHandJD.gif', frames: 'all' })
+//   console.log('frameData',frameData)
+//   if( FS.existsSync(PATH.join(__dirname, 'tempFiles')) == false ) {
+//     FS.mkdirSync( PATH.join(__dirname, 'tempFiles') )
+//   }
+//   let gif_file_names = []
+//   frameData.forEach( async (image,index) => {
+    
+//     gif_file_names.push( writeFrameDataToFile(image,index) )
+//   })
+//   let gifFilenames = await Promise.all(gif_file_names)
+//   return gifFilenames
+// })
+// async function writeFrameDataToFile(image,index) {
+//   return new Promise((resolve, reject) => {
+//     let filename_tmp = PATH.join(__dirname, 'tempFiles',`tmp${index}.jpg`)
+//     const stream = FS.createWriteStream( filename_tmp )
+//     image.getImage().pipe( stream );
+//     stream.on('finish', () =>{
+//       resolve(filename_tmp)
+//     })
+//   })
+// } 
+
 
 // console.log(`__dirname = ${__dirname}`)
 // console.log(`-mainjs- the app.getPath('userData') = ${app.getPath('userData')}`)

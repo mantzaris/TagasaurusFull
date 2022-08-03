@@ -1,5 +1,6 @@
 const FS = require('fs');
 const PATH = require('path');
+const fileType = require('file-type');
 //the object for the window functionality
 const IPC_RENDERER = require('electron').ipcRenderer 
 //FSE is not being used but should be for the directory batch import
@@ -448,7 +449,9 @@ async function Load_Default_Taga_Image() {
     app_path = await IPC_RENDERER.invoke('getAppPath')
     taga_source_path = PATH.join(app_path,'Taga.png'); //PATH.resolve()+PATH.sep+'Taga.png';
 
-    FS.copyFileSync(taga_source_path, `${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL);
+    if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`) == false ) {
+        FS.copyFileSync(taga_source_path, `${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL);
+    }
     tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
     tagging_entry.imageFileName = 'Taga.png';
     tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
@@ -505,14 +508,24 @@ async function Load_New_Image() {
         hash_present = await Get_Tagging_Hash_From_DB(tagging_entry_tmp.imageFileHash);
         if(hash_present == undefined) {
             //emotion inference upon the default selected
-            if( default_auto_fill_emotions == true ) {
-                super_res = await Get_Image_Face_Descriptors_And_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
-                tagging_entry_tmp["taggingEmotions"] = await Auto_Fill_Emotions(super_res, tagging_entry_tmp)
-                tagging_entry_tmp["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
-            } else {
-                super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
-                tagging_entry_tmp["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
+
+            ft_res = await fileType.fromFile( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
+            console.log('ft_res = ', ft_res)
+            if( ft_res.mime.includes('image') == true ) {
+                if( ft_res.ext == 'gif' ) {
+                    
+                } else {
+                    if( default_auto_fill_emotions == true ) {
+                        super_res = await Get_Image_Face_Descriptors_And_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
+                        tagging_entry_tmp["taggingEmotions"] = await Auto_Fill_Emotions(super_res, tagging_entry_tmp)
+                        tagging_entry_tmp["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
+                    } else {
+                        super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
+                        tagging_entry_tmp["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
+                    }
+                }
             }
+
             await Insert_Record_Into_DB(tagging_entry_tmp); //sqlite version
             tagging_entry = tagging_entry_tmp;
         }
