@@ -150,8 +150,37 @@ async function Handle_Delete_Collection_IMAGE_references(imageFileName) {
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END>>>
 
 //DISPLAY THE MAIN IMAGE START>>>
-function Display_Image() {
-    document.getElementById('center-gallery-image-id').src = `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation["imageFileName"]}`;
+async function Display_Image() {
+
+    const parent = document.getElementById("center-gallery-area-div-id")
+    for( let ii=0; ii<parent.children.length; ii++ ) {
+        //to handle click events
+    }
+    parent.innerText = ""
+
+    const display_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation["imageFileName"]}`
+    let center_gallery_element;
+
+    ft_res = await fileType.fromFile( display_path )
+    console.log('ft_res in Display Image = ', ft_res)
+    
+
+    if( ft_res.mime.includes('image') == true ) {
+
+        center_gallery_element = document.createElement("img")        
+        
+    } else { //cannot handle this file type
+
+        center_gallery_element = document.createElement("video")  
+        center_gallery_element.autoplay = true
+        center_gallery_element.muted = true
+        center_gallery_element.controls = true
+        
+    }
+    center_gallery_element.src = display_path
+    center_gallery_element.id = 'center-gallery-image-id'
+    parent.appendChild(center_gallery_element)
+
 }
 //DISPLAY THE MAIN IMAGE END<<<
 
@@ -533,6 +562,10 @@ async function Load_New_Image() {
 
                     }
                 }
+            } else if ( ft_res.mime.includes('video') == true ) {
+
+            } else { //cannot handle this file type
+                continue
             }
 
             await Insert_Record_Into_DB(tagging_entry_tmp); //sqlite version
