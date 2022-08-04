@@ -140,22 +140,34 @@ window.Get_Descriptors_DistanceScore = Get_Descriptors_DistanceScore
 //add a new descriptor if the distance to the rest is small
 //have to get a sample rate for the frames sampled
 const DECODE_GIF = require('decode-gif');
+const MAX_FRAMES_FULL_SAMPLE_GIF = 1*(10**2) //if number of frames less than this process each frame
+const MAX_TIME_BETWEEN_SAMPLES_GIF = 2000 //maximum number of milliseconds between samples
 async function Get_Image_Face_Expresssions_From_GIF(imagePath) {
   let {frames,width,height} = await DECODE_GIF(FS.readFileSync(imagePath));
   let gif_face_descriptors = []
   console.log(`frames length = `, frames.length)
+  
+  let time_tmp_prev = 0 //init value is a flag that 
+  let timecode_diff = 0 //difference in prev and current timecodes
+
   for(let frame_ind=0; frame_ind<frames.length; frame_ind++) {
-    const frame_tmp = frames[frame_ind]
-    const time_tmp = frame_tmp.timeCode //time in milliseconds
+    let frame_tmp = frames[frame_ind]
+    let time_current = frame_tmp.timeCode //time in milliseconds
+    timecode_diff = time_current - time_tmp_prev
     console.log(`timeCode = `, frame_tmp.timeCode)
-    let image_tmp = await new ImageData(frame_tmp.data,width,height)
-    let img = Imagedata_To_Image(image_tmp)
-    const res = await faceapi.detectAllFaces(img).
-                                        withFaceLandmarks().
-                                        withFaceDescriptors()
-    let descriptors_array_tmp = await Get_Face_Descriptors_Arrays(res)
-    gif_face_descriptors = Push_New_Face_Descriptors(gif_face_descriptors, descriptors_array_tmp)
-    console.log('gif_face_descriptors length =', gif_face_descriptors.length)
+    if( frames.length <= MAX_FRAMES_FULL_SAMPLE_GIF || Math.random() < (timecode_diff / MAX_TIME_BETWEEN_SAMPLES_GIF) ) {
+      let image_tmp = await new ImageData(frame_tmp.data,width,height)
+      let img = Imagedata_To_Image(image_tmp)
+      let res = await faceapi.detectAllFaces(img).
+                                          withFaceLandmarks().
+                                          withFaceDescriptors()
+      let descriptors_array_tmp = await Get_Face_Descriptors_Arrays(res)
+      gif_face_descriptors = Push_New_Face_Descriptors(gif_face_descriptors, descriptors_array_tmp)
+      console.log('gif_face_descriptors length =', gif_face_descriptors.length)
+    }
+    time_tmp_prev = time_current
+    //if width and height are different then it is a new image and process it regardless?..
+    
   }
   return gif_face_descriptors
 }
@@ -163,7 +175,7 @@ window.Get_Image_Face_Expresssions_From_GIF = Get_Image_Face_Expresssions_From_G
 
 //provide the base set of face descriptors (already known) and the -new- set of face descriptors as a nested array
 //add them to the base set if they are different enough so we get a new array with all the novel unique faces
-const FACE_DISTANCE_VIDEO_MIN = 0.75 // not like for search, the distance must be 'greater' than this value
+const FACE_DISTANCE_VIDEO_MIN = 0.73 // not like for search, the distance must be 'greater' than this value
 function Push_New_Face_Descriptors(base_faces, descriptors_query) {
   if( base_faces.length > 0 ) {
     let new_faces = []
