@@ -385,7 +385,7 @@ input:checked + .slider:before {
 #hashtags-innerbox-label-id {
   background-color: #808a80;
   grid-area: hashtags-innerbox-label-id;
-  font-size: 3.75vmin;
+  font-size: 3.25vmin;
   overflow: hidden;
   box-sizing: border-box;
 }

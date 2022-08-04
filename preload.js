@@ -96,10 +96,12 @@ window.Get_Image_Face_Descriptors_From_File = Get_Image_Face_Descriptors_From_Fi
 
 //each descriptor is an 'object' not an array so that each dimension of the descriptor feature vector has a key pointing to the value 
 //but we just use the values that are needed to 
+//parameters are always arrays of arrays and not faceapi objects
 //compute the 'distace' between descriptors later faceapi.euclideanDistance( aa[0] , aa[1] ), 
 //faceapi.euclideanDistance( JSON.parse(res5[2].faceDescriptors)[0] , JSON.parse(res5[2].faceDescriptors)[2] ) 
 //(get face descriptors string, parse and then select to compare via euclidean distances)
 //distances are best at zero, so score on (1-dist)
+const FACE_DISTANCE_IMAGE = 0.67
 async function Get_Descriptors_DistanceScore(descriptors_reference, descriptors_query) {
   //console.log('descriptors_reference.length = ', descriptors_reference.length)
   //console.log('descriptors_query.length = ', descriptors_query.length)
@@ -110,10 +112,10 @@ async function Get_Descriptors_DistanceScore(descriptors_reference, descriptors_
       score_tmp = 0
       //console.log('descriptors_reference[ref_ii].descriptor = ', descriptors_reference[ref_ii])
       //console.log('descriptors_query[ref_ii].descriptor = ', descriptors_query[ref_ii])
-      //distance_tmp = faceapi.euclideanDistance( descriptors_reference[ref_ii].descriptor , descriptors_query[q_ii].descriptor )      
-      distance_tmp = faceapi.euclideanDistance( descriptors_reference[ref_ii] , descriptors_query[q_ii] )      
+      //distance_tmp = faceapi.euclideanDistance( descriptors_reference[ref_ii].descriptor , descriptors_query[q_ii].descriptor )
+      distance_tmp = faceapi.euclideanDistance( descriptors_reference[ref_ii] , descriptors_query[q_ii] )
       //console.log('distance_tmp = ', distance_tmp)
-      if( distance_tmp < 0.61 ) {
+      if( distance_tmp < FACE_DISTANCE_IMAGE ) {
         score_tmp = 2**( 1 - 6*distance_tmp ) + 3
         if(score_ref_face_ii < score_tmp) {
           score_ref_face_ii = score_tmp
@@ -133,32 +135,58 @@ async function Get_Descriptors_DistanceScore(descriptors_reference, descriptors_
 window.Get_Descriptors_DistanceScore = Get_Descriptors_DistanceScore
 
 
-
-
-
-
-//
-const decodeGif = require('decode-gif');
-
-//img.src = URL.createObjectURL(new Blob(tmp1,{type: 'image/png' }))  //imagePath
-setTimeout(async ()=> {
-  console.log('time out!')
-  let {frames,width,height} = decodeGif(FS.readFileSync('/home/resort/Downloads/AHandJD.gif'));
-  console.log('/home/resort/Downloads/AHandJD.gif width',width)
-  console.log('frames ', frames[0].data)
-  let tmp1 = frames[0].data // uint8clampedarray
-  let image_tmp = await new ImageData(tmp1,width,height)
-  console.log('image_tmp',image_tmp)
-  var img = imagedata_to_image(image_tmp)
-  // var img = document.createElement('img'); // Use DOM HTMLImageElement
-  // img.src = '/home/resort/Downloads/AHandJD.gif'
-  const res = await faceapi.detectAllFaces(img).
+//When the file is a GIF
+//go through each frame sequentially and include descriptors of only novel faces
+//add a new descriptor if the distance to the rest is small
+//have to get a sample rate for the frames sampled
+const DECODE_GIF = require('decode-gif');
+async function Get_Image_Face_Expresssions_From_GIF(imagePath) {
+  let {frames,width,height} = await DECODE_GIF(FS.readFileSync(imagePath));
+  let gif_face_descriptors = []
+  console.log(`frames length = `, frames.length)
+  for(let frame_ind=0; frame_ind<frames.length; frame_ind++) {
+    const frame_tmp = frames[frame_ind]
+    const time_tmp = frame_tmp.timeCode //time in milliseconds
+    console.log(`timeCode = `, frame_tmp.timeCode)
+    let image_tmp = await new ImageData(frame_tmp.data,width,height)
+    let img = Imagedata_To_Image(image_tmp)
+    const res = await faceapi.detectAllFaces(img).
                                         withFaceLandmarks().
-                                        withFaceExpressions()
-  console.log('res = ', res)
+                                        withFaceDescriptors()
+    let descriptors_array_tmp = await Get_Face_Descriptors_Arrays(res)
+    gif_face_descriptors = Push_New_Face_Descriptors(gif_face_descriptors, descriptors_array_tmp)
+    console.log('gif_face_descriptors length =', gif_face_descriptors.length)
+  }
+  return gif_face_descriptors
+}
+window.Get_Image_Face_Expresssions_From_GIF = Get_Image_Face_Expresssions_From_GIF
 
-},4000)
-function imagedata_to_image(imagedata) {
+//provide the base set of face descriptors (already known) and the -new- set of face descriptors as a nested array
+//add them to the base set if they are different enough so we get a new array with all the novel unique faces
+const FACE_DISTANCE_VIDEO_MIN = 0.75 // not like for search, the distance must be 'greater' than this value
+function Push_New_Face_Descriptors(base_faces, descriptors_query) {
+  if( base_faces.length > 0 ) {
+    let new_faces = []
+    for(let q_ii=0; q_ii<descriptors_query.length; q_ii++) {
+      for(let ref_ii=0; ref_ii<base_faces.length; ref_ii++) {      
+        distance_tmp = faceapi.euclideanDistance( base_faces[ref_ii] , descriptors_query[q_ii] )
+        if( distance_tmp > FACE_DISTANCE_VIDEO_MIN ) { //then include the new face in the base faces
+          new_faces.push(descriptors_query[q_ii])
+        }
+      }
+    }
+    new_faces.forEach( new_face_tmp => {
+      base_faces.push(new_face_tmp)
+    })
+  } else {
+    base_faces = JSON.parse(JSON.stringify(descriptors_query))
+  }
+  console.log(`base_faces length = `, base_faces.length)
+  return base_faces
+}
+
+
+function Imagedata_To_Image(imagedata) {
   var canvas = document.createElement('canvas');
   var ctx = canvas.getContext('2d');
   canvas.width = imagedata.width;
@@ -168,6 +196,25 @@ function imagedata_to_image(imagedata) {
   image.src = canvas.toDataURL();
   return image;
 }
+
+
+
+
+//returns the obj with the extended emotions auto filled
+//faceapi.euclideanDistance( Object.values({'1':1,'2':2,'3':2}), Object.values({'1':-1,'2':0.2,'3':15}) ) -> 13.275541
+async function Get_Face_Descriptors_Arrays(super_res) {
+  let faces_descriptors_array_tmp = []
+  if( super_res.length > 0 ) {
+      for(let face_ii=0; face_ii < super_res.length; face_ii++) {
+          //each descriptor is an 'object' not an array so that each dimension of the descriptor feature vector has a key pointing to the value but we just use the values that are needed to compute the 'distace' between descriptors later faceapi.euclideanDistance( aa[0] , aa[1] ), faceapi.euclideanDistance( JSON.parse(res5[2].faceDescriptors)[0] , JSON.parse(res5[2].faceDescriptors)[2] ) (get face descriptors string, parse and then select to compare via euclidean distances)
+          faces_descriptors_array_tmp[face_ii] = Object.values(super_res[face_ii].descriptor)
+      }
+  }
+  return faces_descriptors_array_tmp
+}
+window.Get_Face_Descriptors_Arrays = Get_Face_Descriptors_Arrays
+
+
 
 //console.log('in preload after face set up')
 //---------<<<<<<<<<<<<<<<<<<<<<<
@@ -187,4 +234,20 @@ function imagedata_to_image(imagedata) {
 // });
 
 
-
+//img.src = URL.createObjectURL(new Blob(tmp1,{type: 'image/png' }))  //imagePath
+// setTimeout(async ()=> {
+//   console.log('time out!')
+//   let {frames,width,height} = DECODE_GIF(FS.readFileSync('/home/resort/Downloads/AHandJD.gif'));
+//   console.log('/home/resort/Downloads/AHandJD.gif width',width)
+//   console.log('frames ', frames[0].data)
+//   let tmp1 = frames[0].data // uint8clampedarray
+//   let image_tmp = await new ImageData(tmp1,width,height)
+//   console.log('image_tmp',image_tmp)
+//   let img = Imagedata_To_Image(image_tmp)
+//   // var img = document.createElement('img'); // Use DOM HTMLImageElement
+//   // img.src = '/home/resort/Downloads/AHandJD.gif'
+//   const res = await faceapi.detectAllFaces(img).
+//                                         withFaceLandmarks().
+//                                         withFaceExpressions()
+//   console.log('res = ', res)
+// },4000)

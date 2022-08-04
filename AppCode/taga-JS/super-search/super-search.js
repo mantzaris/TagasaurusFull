@@ -457,16 +457,7 @@ function Set_Search_Obj_Tags() {
     super_search_obj["searchMemeTags"] = search_unique_meme_search_terms
 }
 
-async function Get_Face_Descriptors_Arrays(super_res) {
-    let faces_descriptors_array_tmp = []
-    if( super_res.length > 0 ) {
-        for(let face_ii=0; face_ii < super_res.length; face_ii++) {
-            //each descriptor is an 'object' not an array so that each dimension of the descriptor feature vector has a key pointing to the value but we just use the values that are needed to compute the 'distace' between descriptors later faceapi.euclideanDistance( aa[0] , aa[1] ), faceapi.euclideanDistance( JSON.parse(res5[2].faceDescriptors)[0] , JSON.parse(res5[2].faceDescriptors)[2] ) (get face descriptors string, parse and then select to compare via euclidean distances)
-            faces_descriptors_array_tmp[face_ii] = Object.values(super_res[face_ii].descriptor)
-        }
-    }
-    return faces_descriptors_array_tmp
-}
+
 
 //console.log(`howdy neighbor!`)
 

@@ -42,19 +42,6 @@ var reg_exp_delims = /[#:,;| ]+/
 
 
 
-//returns the obj with the extended emotions auto filled
-//faceapi.euclideanDistance( Object.values({'1':1,'2':2,'3':2}), Object.values({'1':-1,'2':0.2,'3':15}) ) -> 13.275541
-async function Get_Face_Descriptors_Arrays(super_res) {
-    let faces_descriptors_array_tmp = []
-    if( super_res.length > 0 ) {
-        for(let face_ii=0; face_ii < super_res.length; face_ii++) {
-            //each descriptor is an 'object' not an array so that each dimension of the descriptor feature vector has a key pointing to the value but we just use the values that are needed to compute the 'distace' between descriptors later faceapi.euclideanDistance( aa[0] , aa[1] ), faceapi.euclideanDistance( JSON.parse(res5[2].faceDescriptors)[0] , JSON.parse(res5[2].faceDescriptors)[2] ) (get face descriptors string, parse and then select to compare via euclidean distances)
-            faces_descriptors_array_tmp[face_ii] = Object.values(super_res[face_ii].descriptor)
-        }
-    }
-    return faces_descriptors_array_tmp
-}
-
 //returns the obj with the extended emotions auto filled (the object is not a full annotation obj, but just the extended obj for emotions)
 async function Auto_Fill_Emotions(super_res, file_annotation_obj) {
     let emotion_max_faces_tmp = {}
@@ -513,7 +500,9 @@ async function Load_New_Image() {
             console.log('ft_res = ', ft_res)
             if( ft_res.mime.includes('image') == true ) {
                 if( ft_res.ext == 'gif' ) {
-                    
+
+                    tagging_entry_tmp["faceDescriptors"] = await Get_Image_Face_Expresssions_From_GIF( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
+                    console.log(`tagging_entry_tmp["faceDescriptors"] = `, tagging_entry_tmp["faceDescriptors"] )
                 } else {
                     if( default_auto_fill_emotions == true ) {
                         super_res = await Get_Image_Face_Descriptors_And_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
@@ -522,6 +511,8 @@ async function Load_New_Image() {
                     } else {
                         super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
                         tagging_entry_tmp["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
+                        console.log(`tagging_entry_tmp["faceDescriptors"] = `, tagging_entry_tmp["faceDescriptors"] )
+
                     }
                 }
             }
