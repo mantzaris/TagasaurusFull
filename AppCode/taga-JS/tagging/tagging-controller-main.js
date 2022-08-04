@@ -65,10 +65,21 @@ async function Auto_Fill_Emotions(super_res, file_annotation_obj) {
 
 //actions for the AUTO-FILL emotions button being pressed, populate 
 document.getElementById(`auto-fill-emotions-button-id`).onclick = async function() {
-    super_res = await Get_Image_Face_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation["imageFileName"]) )
-    current_image_annotation["taggingEmotions"] = await Auto_Fill_Emotions(super_res, current_image_annotation)
-    await Update_Tagging_Annotation_DB(current_image_annotation);
-    Emotion_Display_Fill();
+    ft_res = await fileType.fromFile( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
+    console.log('ft_res = ', ft_res)
+    if( ft_res.mime.includes('image') == true ) {
+        if( ft_res.ext == 'gif' ) {
+            let {faceDescriptors,faceEmotions} = await Get_Image_Face_Expresssions_From_GIF( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]), true, true )
+            current_image_annotation["taggingEmotions"] = faceEmotions
+            await Update_Tagging_Annotation_DB(current_image_annotation);
+            Emotion_Display_Fill();
+        } else {
+            super_res = await Get_Image_Face_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation["imageFileName"]) )
+            current_image_annotation["taggingEmotions"] = await Auto_Fill_Emotions(super_res, current_image_annotation)
+            await Update_Tagging_Annotation_DB(current_image_annotation);
+            Emotion_Display_Fill();
+        }
+    }
 };
 
 
@@ -500,9 +511,16 @@ async function Load_New_Image() {
             console.log('ft_res = ', ft_res)
             if( ft_res.mime.includes('image') == true ) {
                 if( ft_res.ext == 'gif' ) {
-
-                    tagging_entry_tmp["faceDescriptors"] = await Get_Image_Face_Expresssions_From_GIF( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
-                    console.log(`tagging_entry_tmp["faceDescriptors"] = `, tagging_entry_tmp["faceDescriptors"] )
+                    if( default_auto_fill_emotions == true ) {
+                        let {faceDescriptors,faceEmotions} = await Get_Image_Face_Expresssions_From_GIF( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]), true )
+                        tagging_entry_tmp["faceDescriptors"] = faceDescriptors
+                        tagging_entry_tmp["taggingEmotions"] = faceEmotions 
+                        console.log('final gif emotions! = ', faceEmotions)
+                    } else {
+                        let {faceDescriptors} = await Get_Image_Face_Expresssions_From_GIF( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
+                        tagging_entry_tmp["faceDescriptors"] = faceDescriptors
+                        //console.log(`tagging_entry_tmp["faceDescriptors"] = `, tagging_entry_tmp["faceDescriptors"] )
+                    }
                 } else {
                     if( default_auto_fill_emotions == true ) {
                         super_res = await Get_Image_Face_Descriptors_And_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )

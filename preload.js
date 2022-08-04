@@ -141,59 +141,81 @@ window.Get_Descriptors_DistanceScore = Get_Descriptors_DistanceScore
 //have to get a sample rate for the frames sampled
 const DECODE_GIF = require('decode-gif');
 const MAX_FRAMES_FULL_SAMPLE_GIF = 1*(10**2) //if number of frames less than this process each frame
-const MAX_TIME_BETWEEN_SAMPLES_GIF = 2000 //maximum number of milliseconds between samples
-async function Get_Image_Face_Expresssions_From_GIF(imagePath) {
+const MAX_TIME_BETWEEN_SAMPLES_GIF = 1000 //maximum number of milliseconds between samples
+async function Get_Image_Face_Expresssions_From_GIF(imagePath, get_emotions=false, get_only_emotions=false ) {
   let {frames,width,height} = await DECODE_GIF(FS.readFileSync(imagePath));
   let gif_face_descriptors = []
-  console.log(`frames length = `, frames.length)
-  
+  let emotions_total = {}
+  //console.log(`frames length = `, frames.length)
   let time_tmp_prev = 0 //init value is a flag that 
   let timecode_diff = 0 //difference in prev and current timecodes
-
+  let res;
   for(let frame_ind=0; frame_ind<frames.length; frame_ind++) {
     let frame_tmp = frames[frame_ind]
     let time_current = frame_tmp.timeCode //time in milliseconds
     timecode_diff = time_current - time_tmp_prev
-    console.log(`timeCode = `, frame_tmp.timeCode)
+    //console.log(`timeCode = `, frame_tmp.timeCode)
     if( frames.length <= MAX_FRAMES_FULL_SAMPLE_GIF || Math.random() < (timecode_diff / MAX_TIME_BETWEEN_SAMPLES_GIF) ) {
       let image_tmp = await new ImageData(frame_tmp.data,width,height)
       let img = Imagedata_To_Image(image_tmp)
-      let res = await faceapi.detectAllFaces(img).
+      if( get_emotions == false ) {
+        res = await faceapi.detectAllFaces(img).
+                                            withFaceLandmarks().
+                                            withFaceDescriptors()
+      } else if ( get_only_emotions == false ) {
+        res = await faceapi.detectAllFaces(img).
                                           withFaceLandmarks().
+                                          withFaceExpressions().
                                           withFaceDescriptors()
-      let descriptors_array_tmp = await Get_Face_Descriptors_Arrays(res)
-      gif_face_descriptors = Push_New_Face_Descriptors(gif_face_descriptors, descriptors_array_tmp)
-      console.log('gif_face_descriptors length =', gif_face_descriptors.length)
+      } else {
+        res = await faceapi.detectAllFaces(img).
+                                          withFaceLandmarks().
+                                          withFaceExpressions()
+      }
+      if( get_only_emotions == false ) {
+        let descriptors_array_tmp = await Get_Face_Descriptors_Arrays(res)
+        gif_face_descriptors = Push_New_Face_Descriptors(gif_face_descriptors, descriptors_array_tmp)
+      }
+
+      if( get_emotions == true ) {
+        New_Face_Emotions_Gif(emotions_total, res)
+      }
+      //console.log('descriptors_array_tmp length =', descriptors_array_tmp.length)
+      //console.log('gif_face_descriptors length =', gif_face_descriptors.length)
     }
     time_tmp_prev = time_current
-    //if width and height are different then it is a new image and process it regardless?..
-    
+    //if width and height are different then it is a new image and process it regardless?..    
   }
-  return gif_face_descriptors
+  if( get_only_emotions == false ) {
+    return {faceDescriptors: gif_face_descriptors, faceEmotions: emotions_total}
+  } else {
+    return {faceDescriptors: null, faceEmotions: emotions_total}
+  }
 }
 window.Get_Image_Face_Expresssions_From_GIF = Get_Image_Face_Expresssions_From_GIF
 
 //provide the base set of face descriptors (already known) and the -new- set of face descriptors as a nested array
 //add them to the base set if they are different enough so we get a new array with all the novel unique faces
-const FACE_DISTANCE_VIDEO_MIN = 0.73 // not like for search, the distance must be 'greater' than this value
+const FACE_DISTANCE_VIDEO_MIN = 0.75 // not like for search, the distance must be 'greater' than this value
 function Push_New_Face_Descriptors(base_faces, descriptors_query) {
   if( base_faces.length > 0 ) {
     let new_faces = []
     for(let q_ii=0; q_ii<descriptors_query.length; q_ii++) {
       for(let ref_ii=0; ref_ii<base_faces.length; ref_ii++) {      
         distance_tmp = faceapi.euclideanDistance( base_faces[ref_ii] , descriptors_query[q_ii] )
-        if( distance_tmp > FACE_DISTANCE_VIDEO_MIN ) { //then include the new face in the base faces
+        //console.log('distance_tmp = ', distance_tmp)
+        if( distance_tmp >= FACE_DISTANCE_VIDEO_MIN ) { //then include the new face in the base faces
           new_faces.push(descriptors_query[q_ii])
         }
       }
     }
-    new_faces.forEach( new_face_tmp => {
-      base_faces.push(new_face_tmp)
+    new_faces.forEach( new_face => {
+      base_faces.push(new_face)
     })
   } else {
     base_faces = JSON.parse(JSON.stringify(descriptors_query))
   }
-  console.log(`base_faces length = `, base_faces.length)
+  //console.log(`base_faces length = `, base_faces.length)
   return base_faces
 }
 
@@ -227,6 +249,25 @@ async function Get_Face_Descriptors_Arrays(super_res) {
 window.Get_Face_Descriptors_Arrays = Get_Face_Descriptors_Arrays
 
 
+function New_Face_Emotions_Gif(prev_emotions, super_res) {
+  console.log('in the new face emotions!')
+  console.log('prev_emotions',prev_emotions)
+
+  for(let face_ii=0; face_ii < super_res.length; face_ii++) {
+    console.log('super_res[face_ii].expressions = ', super_res[face_ii].expressions)
+    for (let [key, value] of Object.entries(super_res[face_ii].expressions)) {          
+      if( prev_emotions[key] == undefined ) { //add emotion and value
+        prev_emotions[key] = Math.round(value*100);
+      } else { //check which emotion value should be used (take the largest value)
+          if( prev_emotions[key] < value ) {
+            console.log('less than value reset')
+            prev_emotions[key] = Math.round(value*100);
+          }
+      }
+    }
+  }
+  console.log('prev_emotions',prev_emotions)
+}
 
 //console.log('in preload after face set up')
 //---------<<<<<<<<<<<<<<<<<<<<<<
