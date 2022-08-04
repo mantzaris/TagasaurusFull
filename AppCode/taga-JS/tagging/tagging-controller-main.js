@@ -292,10 +292,7 @@ async function Meme_View_Fill() {
 //open the modal to view the meme
 //id of meme clicked is: "memes-image-img-id-${file}"
 async function Meme_Image_Clicked(meme_file_name) {
-    //pause element of meme if video
-    let clicked_meme_element = document.getElementById(`memes-image-img-id-${meme_file_name}`)
-    let node_type = clicked_meme_element.nodeName
-
+    
     modal_meme_click_top_id_element = document.getElementById("modal-meme-clicked-top-id");
     modal_meme_click_top_id_element.style.display = "block";
     // Get the button that opens the modal
@@ -314,7 +311,9 @@ async function Meme_Image_Clicked(meme_file_name) {
     meme_click_modal_div = document.getElementById("modal-meme-clicked-image-gridbox-id");
     meme_click_modal_body_html_tmp = '';
 
-
+    //pause element of meme if video
+    let clicked_meme_element = document.getElementById(`memes-image-img-id-${meme_file_name}`)
+    let node_type = clicked_meme_element.nodeName
     let content_html;
     if( node_type == 'IMG' ) {
         content_html = `<img class="memes-img-class" id="modal-meme-clicked-displayimg-id" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_file_name}" title="view" alt="meme" />`
@@ -1037,7 +1036,7 @@ async function Add_New_Meme(){
     memes_current = current_image_annotation.taggingMemeChoices
     search_meme_images_results_output = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
     search_meme_images_results_output.innerHTML = ""
-    meme_search_results.forEach(file_key => {
+    for(let file_key of meme_search_results) {
         if(memes_current.includes(file_key) == false && current_image_annotation.imageFileName != file_key){ //exclude memes already present            
             search_meme_images_results_output.insertAdjacentHTML('beforeend', `
                 <label class="add-memes-memeswitch" title="deselect / include" >   
@@ -1045,16 +1044,16 @@ async function Add_New_Meme(){
                     <span class="add-memes-slider"></span>   
                 </label>
                 <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${file_key}" >
-                    <img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-image-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="memes" />
+                ${await Create_Media_Thumbnail(file_key,'modal-image-search-add-memes-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-image-img-id-${file_key}` )}
                 </div>
                 `
             )
         }
-    })
+    }
     //search results display image memes
     search_meme_images_memes_results_output = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
     search_meme_images_memes_results_output.innerHTML = ""
-    meme_search_meme_results.forEach(file_key => {
+    for(let file_key of meme_search_meme_results) {
         if(memes_current.includes(file_key) == false && current_image_annotation.imageFileName != file_key){ //exclude memes already present
             search_meme_images_memes_results_output.insertAdjacentHTML('beforeend', `
                 <label class="add-memes-memeswitch" title="deselect / include" >   
@@ -1062,12 +1061,12 @@ async function Add_New_Meme(){
                     <span class="add-memes-slider"></span>   
                 </label>
                 <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${file_key}" >
-                    <img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="memes" />
+                ${await Create_Media_Thumbnail(file_key,'modal-image-search-add-memes-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}`)}
                 </div>
                 `
             )
         }
-    })
+    }
     
 }
 //the functionality to use the object to search the DB for relevant memes
@@ -1098,7 +1097,7 @@ async function Modal_Meme_Search_Btn(){
     //search results display images
     search_meme_images_results_output = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
     search_meme_images_results_output.innerHTML = ""
-    meme_search_results.forEach(file_key => {
+    for(let file_key of meme_search_results) {
         if(memes_current.includes(file_key) == false && current_image_annotation.imageFileName != file_key){ //exclude memes already present            
             search_meme_images_results_output.insertAdjacentHTML('beforeend', `
                 <label class="add-memes-memeswitch" title="deselect / include" >   
@@ -1106,16 +1105,17 @@ async function Modal_Meme_Search_Btn(){
                     <span class="add-memes-slider"></span>   
                 </label>
                 <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${file_key}" >
-                    <img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-image-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="memes" />
+                ${await Create_Media_Thumbnail(file_key,'modal-image-search-add-memes-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-image-img-id-${file_key}` )}
                 </div>
                 `
             )
         }
-    })
+    }
     //search results display image memes
     search_meme_images_memes_results_output = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
     search_meme_images_memes_results_output.innerHTML = ""
-    meme_search_meme_results.forEach(file_key => {
+
+    for(let file_key of meme_search_meme_results) {
         if(memes_current.includes(file_key) == false && current_image_annotation.imageFileName != file_key){ //exclude memes already present
             search_meme_images_memes_results_output.insertAdjacentHTML('beforeend', `
                 <label class="add-memes-memeswitch" title="deselect / include" >   
@@ -1123,13 +1123,23 @@ async function Modal_Meme_Search_Btn(){
                     <span class="add-memes-slider"></span>   
                 </label>
                 <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${file_key}" >
-                    <img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="memes" />
+                    ${await Create_Media_Thumbnail(file_key,'modal-image-search-add-memes-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}` )}
                 </div>
                 `
             )
         }
-    })
+    }
 }
 
-
+async function Create_Media_Thumbnail(file_key, class_name, id_tmp) {
+    //class_name = `modal-image-search-add-memes-result-single-image-img-obj-class`
+    file_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}`
+    ft_res = await fileType.fromFile( file_path )
+    type = "meme"
+    if( ft_res.mime.includes('image') == true ) {
+        return `<img class="${class_name}" id="${id_tmp}" src="${file_path}" title="view" alt="${type}" />`        
+    } else { //cannot handle this file type
+        return `<video class="${class_name}" id="${id_tmp}" src="${file_path}" controls muted alt="${type}" />`
+    }
+}
 
