@@ -151,36 +151,25 @@ async function Handle_Delete_Collection_IMAGE_references(imageFileName) {
 
 //DISPLAY THE MAIN IMAGE START>>>
 async function Display_Image() {
-
     const parent = document.getElementById("center-gallery-area-div-id")
-    for( let ii=0; ii<parent.children.length; ii++ ) {
-        //to handle click events
-    }
     parent.innerText = ""
-
     const display_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation["imageFileName"]}`
     let center_gallery_element;
-
     ft_res = await fileType.fromFile( display_path )
-    console.log('ft_res in Display Image = ', ft_res)
-    
+    console.log('ft_res in Display Image = ', ft_res)    
 
     if( ft_res.mime.includes('image') == true ) {
-
         center_gallery_element = document.createElement("img")        
         
     } else { //cannot handle this file type
-
         center_gallery_element = document.createElement("video")  
         center_gallery_element.autoplay = true
         center_gallery_element.muted = true
-        center_gallery_element.controls = true
-        
+        center_gallery_element.controls = true        
     }
     center_gallery_element.src = display_path
     center_gallery_element.id = 'center-gallery-image-id'
     parent.appendChild(center_gallery_element)
-
 }
 //DISPLAY THE MAIN IMAGE END<<<
 
@@ -261,19 +250,29 @@ async function Add_New_Emotion(){
 
 //MEME STUFF START>>>
 //populate the meme switch view with images
-function Meme_View_Fill() {
+async function Meme_View_Fill() {
     meme_box = document.getElementById("memes-innerbox-displaymemes-id");
     meme_choices = current_image_annotation["taggingMemeChoices"];
-    meme_choices.forEach(file => {
+    for( file of meme_choices ) {
         if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true ) {
+
+            let ft_res = await fileType.fromFile( `${TAGA_DATA_DIRECTORY}${PATH.sep}${file}` )
+            let type = ( ft_res.mime.includes("image") ) ? 'img' : 'video'
+            let content_html;
+            if( type == 'img' ) {
+                content_html = `<img class="memes-img-class" id="memes-image-img-id-${file}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file}" title="view" alt="meme" />`
+            } else if( type == 'video' ) {
+                content_html = `<video class="memes-img-class" id="memes-image-img-id-${file}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file}" controls muted />`
+            }
+
             meme_box.insertAdjacentHTML('beforeend',`
                                                 <label class="memeswitch" title="deselect / keep" >   <input id="meme-toggle-id-${file}" type="checkbox"> <span class="slider"></span>   </label>
                                                 <div class="memes-img-div-class" id="memes-image-div-id-${file}">
-                                                    <img class="memes-img-class" id="memes-image-img-id-${file}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file}" title="view" alt="meme" />
+                                                    ${content_html}
                                                 </div>
                                                 `);
         }
-    })
+    }
     //set default meme choice toggle button direction
     for(ii=0;ii<meme_choices.length;ii++){
         if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_choices[ii]}`) == true ) {
@@ -283,14 +282,20 @@ function Meme_View_Fill() {
     //add an event listener for when a meme image is clicked to open the modal, and send the file name of the meme
     meme_choices.forEach(file => {
         if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true ) {
-            document.getElementById(`memes-image-img-id-${file}`).onclick = function() {
+            document.getElementById(`memes-image-img-id-${file}`).onclick = function(e) {
+                e.preventDefault()
                 Meme_Image_Clicked(file);
             };
         }
     })
 }
 //open the modal to view the meme
+//id of meme clicked is: "memes-image-img-id-${file}"
 async function Meme_Image_Clicked(meme_file_name) {
+    //pause element of meme if video
+    let clicked_meme_element = document.getElementById(`memes-image-img-id-${meme_file_name}`)
+    let node_type = clicked_meme_element.nodeName
+
     modal_meme_click_top_id_element = document.getElementById("modal-meme-clicked-top-id");
     modal_meme_click_top_id_element.style.display = "block";
     // Get the button that opens the modal
@@ -308,7 +313,16 @@ async function Meme_Image_Clicked(meme_file_name) {
     document.getElementById("modal-meme-clicked-image-gridbox-id").innerHTML = "";
     meme_click_modal_div = document.getElementById("modal-meme-clicked-image-gridbox-id");
     meme_click_modal_body_html_tmp = '';
-    meme_click_modal_body_html_tmp += `<img id="modal-meme-clicked-displayimg-id" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_file_name}" title="meme" alt="meme" />`;
+
+
+    let content_html;
+    if( node_type == 'IMG' ) {
+        content_html = `<img class="memes-img-class" id="modal-meme-clicked-displayimg-id" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_file_name}" title="view" alt="meme" />`
+    } else if( node_type == 'VIDEO' ) {
+        content_html = `<video class="memes-img-class" id="modal-meme-clicked-displayimg-id" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_file_name}" controls muted />`
+        clicked_meme_element.pause()
+    }
+    meme_click_modal_body_html_tmp += content_html //`<img id="modal-meme-clicked-displayimg-id" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_file_name}" title="meme" alt="meme" />`;
     meme_click_modal_div.insertAdjacentHTML('beforeend', meme_click_modal_body_html_tmp);
     meme_image_annotations = await Get_Tagging_Annotation_From_DB( meme_file_name );
     //add emotion tuples to view
