@@ -705,25 +705,25 @@ async function Search_Images(){
     search_image_results_output = document.getElementById("modal-search-images-results-grid-div-area-id");
     search_image_results_output.innerHTML = "";
     search_display_inner_tmp = '';
-    search_results.forEach(file_key => {
+    for(let file_key of search_results) {
         search_display_inner_tmp += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${file_key}" >
-                                    <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" cursor="pointer" title="select" alt="image" />
+                                    ${await Create_Media_Thumbnail(file_key,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-result-single-image-img-id-${file_key}` )}
                                 </div>
                                 `
-    })
+    }
     search_image_results_output.innerHTML += search_display_inner_tmp;
     //search meme results
     search_meme_results_output = document.getElementById("modal-search-meme-images-results-grid-div-area-id");
     search_meme_results_output.innerHTML = "";
     search_display_inner_tmp = '';
-    search_meme_results.forEach(file_key => {
+    for(let file_key of search_meme_results) {
         search_display_inner_tmp += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${file_key}" >
-                                    <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" cursor="pointer" title="select" alt="memes" />
+                                    ${await Create_Media_Thumbnail(file_key,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-result-single-meme-image-img-id-${file_key}` )}    
                                 </div>                                
                             `
-    })
+    }
     search_meme_results_output.innerHTML += search_display_inner_tmp;
 
     //user presses an image to select it from the images section, add onclick event listener
@@ -800,25 +800,25 @@ async function Modal_Search_Entry(search_similar=false, search_obj_similar_tmp={
     search_image_results_output = document.getElementById("modal-search-images-results-grid-div-area-id")
     search_image_results_output.innerHTML = "";
     search_display_inner_tmp = '';
-    search_results.forEach(file_key => {
+    for(let file_key of search_results) {
         search_display_inner_tmp += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${file_key}" >
-                                    <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="memes" />
+                                    ${await Create_Media_Thumbnail(file_key,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-result-single-image-img-id-${file_key}` )}
                                 </div>
                                 `
-    })
+    }
     search_image_results_output.innerHTML = search_display_inner_tmp
     //search meme results
     search_meme_results_output = document.getElementById("modal-search-meme-images-results-grid-div-area-id")
     search_meme_results_output.innerHTML = "";
     search_display_inner_tmp = '';
-    search_meme_results.forEach(file_key => {
+    for(let file_key of search_meme_results) {
         search_display_inner_tmp += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${file_key}" >
-                                    <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="view" alt="memes" />
-                                </div>                                
+                                    ${await Create_Media_Thumbnail(file_key,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-result-single-meme-image-img-id-${file_key}` )}
+                                    </div>                                
                             `
-    })
+    }
     search_meme_results_output.innerHTML = search_display_inner_tmp
 
     //user presses an image to select it from the images section, add onclick event listener
