@@ -22,6 +22,10 @@ exports.DESCRIPTION_PROCESS_MODULE = DESCRIPTION_PROCESS_MODULE;
 const MY_FILE_HELPER = require(PATH.join(__dirname,'..','AppCode','taga-JS','utilities','copy-new-file-helper.js')) // require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'copy-new-file-helper.js') //require('./myJS/copy-new-file-helper.js')
 exports.MY_FILE_HELPER = MY_FILE_HELPER;
 
+//copies files and adds salt for conflicting same file names
+const GENERAL_HELPER_FNS = require(PATH.join(__dirname,'..','AppCode','taga-JS','utilities','general-helper-fns.js')) // require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'copy-new-file-helper.js') //require('./myJS/copy-new-file-helper.js')
+exports.GENERAL_HELPER_FNS = GENERAL_HELPER_FNS;
+
 //functionality to insert an element into a sorted array with binary search
 const MY_ARRAY_INSERT_HELPER = require(PATH.join(__dirname,'..','AppCode','taga-JS','utilities','utility-insert-into-sorted-array.js')) // require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'utility-insert-into-sorted-array.js') //require('./myJS/utility-insert-into-sorted-array.js')
 exports.MY_ARRAY_INSERT_HELPER = MY_ARRAY_INSERT_HELPER;

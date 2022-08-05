@@ -7,7 +7,7 @@ const IPC_RENDERER = require('electron').ipcRenderer
 //const FSE = require('fs-extra');
 
 
-const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MY_FILE_HELPER } = require(PATH.join(__dirname,'..','constants','constants-code.js')) // require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MY_FILE_HELPER, GENERAL_HELPER_FNS } = require(PATH.join(__dirname,'..','constants','constants-code.js')) // require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 const { CLOSE_ICON_RED, CLOSE_ICON_BLACK, HASHTAG_ICON } = require(PATH.join(__dirname,'..','constants','constants-icons.js')) //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 
@@ -708,7 +708,7 @@ async function Search_Images(){
     for(let file_key of search_results) {
         search_display_inner_tmp += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${file_key}" >
-                                    ${await Create_Media_Thumbnail(file_key,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-result-single-image-img-id-${file_key}` )}
+                                    ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(file_key,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-result-single-image-img-id-${file_key}` )}
                                 </div>
                                 `
     }
@@ -720,7 +720,7 @@ async function Search_Images(){
     for(let file_key of search_meme_results) {
         search_display_inner_tmp += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${file_key}" >
-                                    ${await Create_Media_Thumbnail(file_key,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-result-single-meme-image-img-id-${file_key}` )}    
+                                    ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(file_key,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-result-single-meme-image-img-id-${file_key}` )}    
                                 </div>                                
                             `
     }
@@ -803,7 +803,7 @@ async function Modal_Search_Entry(search_similar=false, search_obj_similar_tmp={
     for(let file_key of search_results) {
         search_display_inner_tmp += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${file_key}" >
-                                    ${await Create_Media_Thumbnail(file_key,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-result-single-image-img-id-${file_key}` )}
+                                    ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(file_key,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-result-single-image-img-id-${file_key}` )}
                                 </div>
                                 `
     }
@@ -815,7 +815,7 @@ async function Modal_Search_Entry(search_similar=false, search_obj_similar_tmp={
     for(let file_key of search_meme_results) {
         search_display_inner_tmp += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${file_key}" >
-                                    ${await Create_Media_Thumbnail(file_key,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-result-single-meme-image-img-id-${file_key}` )}
+                                    ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(file_key,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-result-single-meme-image-img-id-${file_key}` )}
                                     </div>                                
                             `
     }
@@ -1044,7 +1044,7 @@ async function Add_New_Meme(){
                     <span class="add-memes-slider"></span>   
                 </label>
                 <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${file_key}" >
-                ${await Create_Media_Thumbnail(file_key,'modal-image-search-add-memes-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-image-img-id-${file_key}` )}
+                ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(file_key,'modal-image-search-add-memes-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-image-img-id-${file_key}` )}
                 </div>
                 `
             )
@@ -1061,7 +1061,7 @@ async function Add_New_Meme(){
                     <span class="add-memes-slider"></span>   
                 </label>
                 <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${file_key}" >
-                ${await Create_Media_Thumbnail(file_key,'modal-image-search-add-memes-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}`)}
+                ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(file_key,'modal-image-search-add-memes-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}`)}
                 </div>
                 `
             )
@@ -1105,7 +1105,7 @@ async function Modal_Meme_Search_Btn(){
                     <span class="add-memes-slider"></span>   
                 </label>
                 <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${file_key}" >
-                ${await Create_Media_Thumbnail(file_key,'modal-image-search-add-memes-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-image-img-id-${file_key}` )}
+                ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(file_key,'modal-image-search-add-memes-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-image-img-id-${file_key}` )}
                 </div>
                 `
             )
@@ -1123,7 +1123,7 @@ async function Modal_Meme_Search_Btn(){
                     <span class="add-memes-slider"></span>   
                 </label>
                 <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${file_key}" >
-                    ${await Create_Media_Thumbnail(file_key,'modal-image-search-add-memes-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}` )}
+                    ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(file_key,'modal-image-search-add-memes-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}` )}
                 </div>
                 `
             )
@@ -1131,15 +1131,5 @@ async function Modal_Meme_Search_Btn(){
     }
 }
 
-async function Create_Media_Thumbnail(file_key, class_name, id_tmp) {
-    //class_name = `modal-image-search-add-memes-result-single-image-img-obj-class`
-    file_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}`
-    ft_res = await fileType.fromFile( file_path )
-    type = "meme"
-    if( ft_res.mime.includes('image') == true ) {
-        return `<img class="${class_name}" id="${id_tmp}" src="${file_path}" title="view" alt="${type}" />`        
-    } else { //cannot handle this file type
-        return `<video class="${class_name}" id="${id_tmp}" src="${file_path}" controls muted alt="${type}" />`
-    }
-}
+
 

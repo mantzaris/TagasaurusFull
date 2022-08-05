@@ -281,6 +281,7 @@ font-size: 2.4vmin;
     /* margin-left: 10px;  */
 }
 .recommended-img-check-box {
+    z-index: 100;
     position: absolute; 
     top: 0px; 
     left: 0px;

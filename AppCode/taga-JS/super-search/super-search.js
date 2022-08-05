@@ -4,7 +4,7 @@ const PATH = require('path');
 const IPC_RENDERER = require('electron').ipcRenderer 
 
 
-const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, MY_FILE_HELPER } = require(PATH.join(__dirname,'..','constants','constants-code.js')) // require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, MY_FILE_HELPER, GENERAL_HELPER_FNS } = require(PATH.join(__dirname,'..','constants','constants-code.js')) // require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 const { CLOSE_ICON_RED, CLOSE_ICON_BLACK, HASHTAG_ICON } = require(PATH.join(__dirname,'..','constants','constants-icons.js')) //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 
@@ -45,15 +45,18 @@ document.getElementById("get-recommended-button-id").onclick = function() {
 async function Super_Search() {
     
     Set_Search_Obj_Tags()
-    
+    console.log('set the tags! 1')
     faceDescriptors_search = []
     for( img_ind = 0; img_ind < selected_images.length; img_ind++ ) {
         //super_search_obj.faceDescriptors
         faceDescriptors_tmp = []
 
         if( selected_images_type[img_ind] == 'stored' ) {
+            console.log('stored')
             //console.log('selected_images[img_ind]', selected_images[img_ind])
+            try{
             super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, selected_images[img_ind]) )
+            } catch(err) {console.log('err',super_res)}
             //console.log('super_res', super_res)
             //console.log('super_res.length = ', super_res.length)
             if( super_res.length > 0 ) {
@@ -64,7 +67,7 @@ async function Super_Search() {
             }
 
         } else if( selected_images_type[img_ind] == 'new' ) {
-
+            console.log('new')
             super_res = await Get_Image_Face_Descriptors_From_File( selected_images[img_ind] )
             //console.log('super_res.length = ', super_res.length)
             if( super_res.length > 0 ) {
@@ -88,8 +91,9 @@ async function Super_Search() {
         }
         //console.log( 'faceDescriptors_tmp = ', faceDescriptors_tmp )
     }
-    //console.log( 'faceDescriptors_search = ', faceDescriptors_search )
+    console.log( 'faceDescriptors_search = ', faceDescriptors_search )
     //console.log('faceDescriptors_tmp = ')
+
     super_search_obj.faceDescriptors = faceDescriptors_search
     //console.log(`super_search_obj = `, super_search_obj)
 
@@ -103,13 +107,13 @@ async function Super_Search() {
     search_image_results_output.innerHTML = "";
     search_display_inner_tmp = '';
     search_display_inner_tmp += `<label id="results-title-label" for="">Results (click choice):</label>`
-    search_results.forEach(file_key => {
+    for(let file_key of search_results) {
         search_display_inner_tmp += `
                                 <div class="super-search-div-class" id="search-result-image-div-id-${file_key}" >
-                                    <img class="super-search-obj-class" id="search-result-single-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="choose" alt="result" />
+                                    ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(file_key,'super-search-obj-class', `search-result-single-img-id-${file_key}` )}
                                 </div>
                                 `
-    })
+    }
     search_image_results_output.innerHTML += search_display_inner_tmp;
 
     //user presses an image to select it from the images section, add onclick event listener
@@ -279,14 +283,14 @@ async function Get_Select_Recommended() {
     search_image_results_output = document.getElementById("facial-row-four-div-id");
     search_image_results_output.innerHTML = "";
     search_display_inner_tmp = '';
-    search_results.forEach(file_key => {
+    for(let file_key of search_results) {
         search_display_inner_tmp += `
                                 <div class="recommended-img-div-class" id="recommended-result-image-div-id-${file_key}" >
                                     <input type="checkbox" class="recommended-img-check-box" id="recommened-check-box-id-${file_key}" name="" value="">
-                                    <img class="recommended-search-img-class" id="recommended-result-single-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="select" alt="result" />
-                                </div>
+                                    ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(file_key,'recommended-search-img-class', `recommended-result-single-img-id-${file_key}` )}
+                                    </div>
                                 `
-    })
+    }
     search_image_results_output.innerHTML += search_display_inner_tmp;
 
     //console.log(`super_search_obj = `, super_search_obj)
@@ -301,7 +305,8 @@ async function Get_Select_Recommended() {
     });
 }
 
-function Handle_Get_Recommended_Image_Checked(filename) {
+async function Handle_Get_Recommended_Image_Checked(filename) {
+    console.log('clicked on image selected recommended', filename)
     let index = search_results.indexOf(filename);
     if (index > -1) { // only splice array when item is found
         search_results.splice(index, 1); // 2nd parameter means remove one item only
@@ -309,14 +314,14 @@ function Handle_Get_Recommended_Image_Checked(filename) {
     search_image_results_output = document.getElementById("facial-row-four-div-id");
     search_image_results_output.innerHTML = "";
     search_display_inner_tmp = '';
-    search_results.forEach(file_key => {
+    for(let file_key of search_results) {
         search_display_inner_tmp += `
                                 <div class="recommended-img-div-class" id="recommended-result-image-div-id-${file_key}" >
                                     <input type="checkbox" class="recommended-img-check-box" id="recommened-check-box-id-${file_key}" name="" value="">
-                                    <img class="recommended-search-img-class" id="recommended-result-single-img-id-${file_key}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}" title="select" alt="result" />
-                                </div>
+                                    ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(file_key,'recommended-search-img-class', `recommended-result-single-img-id-${file_key}` )}
+                                    </div>
                                 `
-    })
+    }
     search_image_results_output.innerHTML += search_display_inner_tmp;
     //user presses an image to select it from the images section, add onclick event listener
     search_results.forEach(file => {
@@ -332,19 +337,22 @@ function Handle_Get_Recommended_Image_Checked(filename) {
 }
 
 
-function Update_Selected_Images() {
+async function Update_Selected_Images() {
      //now put the image in the selected set
     search_image_results_output = document.getElementById("facial-row-six-div-id");
     search_image_results_output.innerHTML = "";
     search_display_inner_tmp = '';
-    selected_images.forEach( (element, index) => {
+    
+    for(let index=0; index<selected_images.length; index++) {
+        let element = selected_images[index]
+        //selected_images.forEach( (element, index) => {
 
         if( selected_images_type[index] == 'stored' ) {
             file_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + element
             search_display_inner_tmp += `
                                     <div class="recommended-img-div-class" id="search-image-selected-div-id-${index}">
                                         <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-${index}" name="" value="">
-                                        <img class="selected-imgs" src="${file_path_tmp}" title="view" alt="result" />
+                                        ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(element,'selected-imgs', `element` )}
                                     </div>
                                     `
         } else if( selected_images_type[index] == 'new' ) {
@@ -352,7 +360,7 @@ function Update_Selected_Images() {
             search_display_inner_tmp += `
                                     <div class="recommended-img-div-class" id="search-image-selected-div-id-${index}">
                                         <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-${index}" name="" value="">
-                                        <img class="selected-imgs" src="${file_path_tmp}" title="view" alt="result" />
+                                        ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(file_path_tmp,'selected-imgs', `element`, false )}
                                     </div>
                                     `
         } else if( selected_images_type[index] == 'webcam' ) {
@@ -367,7 +375,7 @@ function Update_Selected_Images() {
 
         }
 
-    })
+    }
     search_image_results_output.innerHTML += search_display_inner_tmp;
     //user presses an image to select it from the images section, add onclick event listener
     selected_images.forEach( (element, index) => {
