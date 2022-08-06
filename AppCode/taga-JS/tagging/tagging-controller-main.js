@@ -299,11 +299,15 @@ async function Meme_Image_Clicked(meme_file_name) {
     var meme_modal_close_btn = document.getElementById("modal-meme-clicked-close-button-id");
     // When the user clicks on the button, close the modal
     meme_modal_close_btn.onclick = function() {
+        name_type = document.getElementById("modal-meme-clicked-displayimg-id").nodeName
+        if( name_type == "VIDEO") { document.getElementById("modal-meme-clicked-displayimg-id").pause() }
         modal_meme_click_top_id_element.style.display = "none";
     }
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {
         if (event.target == modal_meme_click_top_id_element) {
+            name_type = document.getElementById("modal-meme-clicked-displayimg-id").nodeName
+            if( name_type == "VIDEO") { document.getElementById("modal-meme-clicked-displayimg-id").pause() }
             modal_meme_click_top_id_element.style.display = "none";
         }
     }
@@ -446,7 +450,7 @@ async function First_Display_Init() {
         //window.location.href = tagging.html
     } else {
         await New_Image_Display(0)
-        await Load_State_Of_Image_IDB() //display the image in view currently and the annotations it has
+        //await Load_State_Of_Image_IDB() //display the image in view currently and the annotations it has
     }
 }
 //init method to run upon loading
@@ -625,11 +629,19 @@ async function Search_Images(){
     let meme_modal_close_btn = document.getElementById("modal-search-close-exit-view-button-id");
     // When the user clicks on the button, close the modal
     meme_modal_close_btn.onclick = function() {
+        const search_res_children = document.getElementById("modal-search-images-results-grid-div-area-id").children
+        const search_meme_res_children = document.getElementById("modal-search-meme-images-results-grid-div-area-id").children
+        const children_tmp = [...search_res_children,...search_meme_res_children]
+        GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp)
         modal_search_click.style.display = "none";
     }
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {
         if (event.target == modal_search_click) {
+            const search_res_children = document.getElementById("modal-search-images-results-grid-div-area-id").children
+            const search_meme_res_children = document.getElementById("modal-search-meme-images-results-grid-div-area-id").children
+            const children_tmp = [...search_res_children,...search_meme_res_children]
+            GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp)
             modal_search_click.style.display = "none";
         }
     }
@@ -730,6 +742,12 @@ async function Search_Images(){
     search_results.forEach(file => {
         if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true ) {
             document.getElementById(`modal-image-search-result-single-image-img-id-${file}`).onclick = async function() {
+
+                const search_res_children = document.getElementById("modal-search-images-results-grid-div-area-id").children
+                const search_meme_res_children = document.getElementById("modal-search-meme-images-results-grid-div-area-id").children
+                const children_tmp = [...search_res_children,...search_meme_res_children]
+                GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp)
+                
                 current_image_annotation = await Get_Tagging_Annotation_From_DB(file);
                 Load_State_Of_Image_IDB();
                 document.getElementById("search-modal-click-top-id").style.display = "none";
@@ -739,6 +757,12 @@ async function Search_Images(){
     search_meme_results.forEach(file => {
         if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true ) {
             document.getElementById(`modal-image-search-result-single-meme-image-img-id-${file}`).onclick = async function() {
+
+                const search_res_children = document.getElementById("modal-search-images-results-grid-div-area-id").children
+                const search_meme_res_children = document.getElementById("modal-search-meme-images-results-grid-div-area-id").children
+                const children_tmp = [...search_res_children,...search_meme_res_children]
+                GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp)
+
                 current_image_annotation = await Get_Tagging_Annotation_From_DB(file);
                 Load_State_Of_Image_IDB();
                 document.getElementById("search-modal-click-top-id").style.display = "none";
@@ -873,11 +897,19 @@ async function Add_New_Meme(){
     var meme_modal_close_btn = document.getElementById("modal-search-add-memes-close-exit-view-button-id");
     // When the user clicks on the button, close the modal
     meme_modal_close_btn.onclick = function() {
+        const search_res_children = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id").children
+        const search_meme_res_children = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id").children
+        const children_tmp = [...search_res_children,...search_meme_res_children]
+        GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp)
         modal_add_memes_search_click.style.display = "none";
     }
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {
         if (event.target == modal_add_memes_search_click) {
+            const search_res_children = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id").children
+            const search_meme_res_children = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id").children
+            const children_tmp = [...search_res_children,...search_meme_res_children]
+            GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp)
             modal_add_memes_search_click.style.display = "none";
         }
     }
@@ -1019,6 +1051,12 @@ async function Add_New_Meme(){
         current_image_annotation.taggingMemeChoices = [...new Set(meme_switch_booleans)] //add a 'unique' set of memes as the 'new Set' has unique contents
         await Update_Tagging_Annotation_DB(current_image_annotation);
         Load_State_Of_Image_IDB()
+
+        const search_res_children = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id").children
+        const search_meme_res_children = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id").children
+        const children_tmp = [...search_res_children,...search_meme_res_children]
+        GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp)
+
         modal_add_memes_search_click = document.getElementById("search-add-memes-modal-click-top-id");
         modal_add_memes_search_click.style.display = "none";
     }

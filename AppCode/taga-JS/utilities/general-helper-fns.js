@@ -18,3 +18,14 @@ async function Create_Media_Thumbnail(file_key, class_name, id_tmp, provide_path
     }
 }
 exports.Create_Media_Thumbnail = Create_Media_Thumbnail
+
+
+function Pause_Media_From_Modals(children_tmp) {
+    for(let ind=0; ind<children_tmp.length; ind++) {
+        let element = children_tmp[ind].children[0]
+        let name_type =  element.nodeName
+        if( name_type == "VIDEO") { element.pause() }
+    }
+    
+}
+exports.Pause_Media_From_Modals = Pause_Media_From_Modals
