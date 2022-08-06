@@ -7,8 +7,10 @@ const IPC_RENDERER2 = require('electron').ipcRenderer
 
 const PATH = require('path');
 const FS = require('fs');
+const fileType = require('file-type');
 
-const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MY_FILE_HELPER, MASONRY } = require(PATH.join(__dirname,'..','constants','constants-code.js')); //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+
+const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MY_FILE_HELPER, GENERAL_HELPER_FNS, MASONRY } = require(PATH.join(__dirname,'..','constants','constants-code.js')); //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 const { CLOSE_ICON_RED, CLOSE_ICON_BLACK } = require(PATH.join(__dirname,'..','constants','constants-icons.js')) //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 
@@ -264,7 +266,7 @@ async function Add_New_Emotion() {
 
 
 //when the entity memes annotation page is select these page elements are present for the meme view
-function Collection_Memes_Page() {
+async function Collection_Memes_Page() {
     annotation_view_ind = 3
     //make only the meme view pagination button active and the rest have active removed to not be highlighted
     //colors the annotation menu buttons appropriately (highlights)
@@ -287,8 +289,9 @@ function Collection_Memes_Page() {
     document.querySelectorAll(".collection-image-annotation-memes-grid-item-class").forEach(el => el.remove());
     gallery_html = ''
     if(memes_array != "" && memes_array.length > 0) {
-        memes_array.forEach(meme_key => {
-            image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + meme_key
+        for(let meme_key of memes_array) {
+        //memes_array.forEach(meme_key => {
+            image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, meme_key)
             if(FS.existsSync(image_path_tmp) == true) {
                         gallery_html += `
                                     <div class="collection-image-annotation-memes-grid-item-class">
@@ -296,20 +299,28 @@ function Collection_Memes_Page() {
                                         <input id="meme-toggle-id-${meme_key}" type="checkbox" checked="true">
                                         <span class="slider"></span>
                                     </label>
-                                    <img src="${image_path_tmp}" id="collection-image-annotation-memes-grid-img-id-${meme_key}" class="collection-image-annotation-meme-grid-img-class"/>
+                                    ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(meme_key,'collection-image-annotation-meme-grid-img-class', `collection-image-annotation-memes-grid-img-id-${meme_key}` )}
                                     </div>
                                     `
             }
-        });
+        }
     }
     document.getElementById("collection-image-annotation-memes-images-show-div-id").innerHTML += gallery_html
     //event listener to modal focus image upon click
     if(memes_array != "" && memes_array.length > 0) {
         memes_array.forEach(function(meme_key) {
-            image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + meme_key
+            image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, meme_key)
             if(FS.existsSync(image_path_tmp) == true) {
                 document.getElementById(`collection-image-annotation-memes-grid-img-id-${meme_key}`).onclick = function (event) {
-                    Image_Clicked_Modal(meme_key)
+                    
+                    //pause element of meme if video
+                    let node_type = document.getElementById(`collection-image-annotation-memes-grid-img-id-${meme_key}`).nodeName
+                    if( node_type == 'VIDEO' ) {           
+                        event.preventDefault()         
+                        document.getElementById(`collection-image-annotation-memes-grid-img-id-${meme_key}`).pause()
+                    }                       
+
+                    Image_Clicked_Modal(meme_key,node_type)
                 }
             }
         })
@@ -351,14 +362,15 @@ async function Save_Meme_Changes(){
 
 
 //display gallery images
-function Display_Gallery_Images() {
+async function Display_Gallery_Images() {
     //clear gallery of gallery image objects
     document.querySelectorAll(".collection-images-gallery-grid-item-class").forEach(el => el.remove());
     //place the gallery images in the html and ignore the missing images (leave the lingering links)
     gallery_div = document.getElementById("collections-images-gallery-grid-images-div-id")
     gallery_html_tmp = ''
     image_set = current_collection_obj.collectionImageSet
-    image_set.forEach(function(image_filename) {
+    for(let image_filename of image_set) {
+    //image_set.forEach(function(image_filename) {
         image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             gallery_html_tmp += `
@@ -367,11 +379,11 @@ function Display_Gallery_Images() {
                                         <input id="galleryimage-toggle-id-${image_filename}" type="checkbox" checked="true">
                                         <span class="slider"></span>
                                     </label>
-                                    <img src="${image_path_tmp}" id="collection-image-annotation-memes-grid-img-id-${image_filename}" class="collection-images-gallery-grid-img-class"/>
+                                    ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'collection-images-gallery-grid-img-class', `collection-image-annotation-memes-grid-img-id-${image_filename}` )}
                                 </div>
                                 `
         }
-    })
+    }
     gallery_div.innerHTML += gallery_html_tmp //gallery_div.innerHTML = gallery_html_tmp
     //masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
     //solution from: https://stackoverflow.com/a/60949881/410975
@@ -390,7 +402,15 @@ function Display_Gallery_Images() {
         image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`collection-image-annotation-memes-grid-img-id-${image_filename}`).onclick = function (event) {
-                Image_Clicked_Modal(image_filename)    
+                
+                //pause element of meme if video
+                let node_type = document.getElementById(`collection-image-annotation-memes-grid-img-id-${image_filename}`).nodeName
+                if( node_type == 'VIDEO' ) {           
+                    event.preventDefault()         
+                    document.getElementById(`collection-image-annotation-memes-grid-img-id-${image_filename}`).pause()
+                }                        
+                
+                Image_Clicked_Modal(image_filename,node_type)    
             }
         }
     })
@@ -494,10 +514,18 @@ async function Show_Collection() {
     if(reload_bool == true) {
         current_collection_obj = await Get_Collection_Record_From_DB(current_collection_obj.collectionName)
     }
-    document.getElementById("collection-profile-image-img-id").src = TAGA_DATA_DIRECTORY + PATH.sep + current_collection_obj.collectionImage;
-    document.getElementById("collection-profile-image-img-id").onclick = function (event) {
-        Image_Clicked_Modal(current_collection_obj.collectionImage)    
-    }
+    //document.getElementById("collection-profile-image-img-id").src = 
+    await Update_Profile_Image()
+
+    // document.getElementById("collection-profile-image-img-id").onclick = function (event) {        
+    //     //pause element of meme if video
+    //     let node_type = document.getElementById(`collection-profile-image-img-id`).nodeName
+    //     if( node_type == 'VIDEO' ) {           
+    //         event.preventDefault()
+    //         document.getElementById(`collection-profile-image-img-id`).pause()
+    //     }
+    //     Image_Clicked_Modal(current_collection_obj.collectionImage,node_type)
+    // }
     //display the entity hastag 'name'
     document.getElementById("collection-name-text-label-id").textContent = current_collection_obj.collectionName;
     //display gallery images
@@ -509,6 +537,33 @@ async function Show_Collection() {
         Collection_Emotion_Page()
     } else if(annotation_view_ind == 3) {
         Collection_Memes_Page()
+    }
+}
+async function Update_Profile_Image() {
+    let file_path = PATH.join(TAGA_DATA_DIRECTORY, current_collection_obj.collectionImage);
+    console.log('file_path',file_path)
+    let ft_res = await fileType.fromFile(file_path)
+    let node_type = ( ft_res.mime.includes("image") ) ? 'IMG' : 'VIDEO'
+    console.log('node_type',node_type)
+    let content_html;
+    if( node_type == 'IMG' ) {
+        content_html = `<img id="collection-profile-image-img-id" src="${file_path}" title="view" alt="collection-profile-image"/>`
+    } else if( node_type == 'VIDEO' ) {
+        content_html = `<video class="" id="collection-profile-image-img-id" src="${file_path}" controls muted />`
+    }
+    console.log('content_html',content_html)
+    let profile_display_div = document.getElementById("collection-profile-image-display-div-id")
+    profile_display_div.innerHTML = ""
+    profile_display_div.insertAdjacentHTML('afterbegin', content_html);
+
+    document.getElementById("collection-profile-image-img-id").onclick = function (event) {        
+        //pause element of meme if video
+        let node_type = document.getElementById(`collection-profile-image-img-id`).nodeName
+        if( node_type == 'VIDEO' ) {           
+            event.preventDefault()
+            document.getElementById(`collection-profile-image-img-id`).pause()
+        }
+        Image_Clicked_Modal(current_collection_obj.collectionImage,node_type)
     }
 }
 
@@ -642,22 +697,36 @@ Initialize_Collection_Page()
 
 //whenever an image is clicked to pop up a modal to give a big display of the image
 //and list the tags and emotions
-async function Image_Clicked_Modal(filename){
-
-    document.getElementById("modal-image-clicked-displayimg-id").src = TAGA_DATA_DIRECTORY + PATH.sep + filename
+async function Image_Clicked_Modal(filename, node_type) {
+    console.log(filename)
+    //document.getElementById("modal-image-clicked-displayimg-id").src = PATH.join(TAGA_DATA_DIRECTORY,filename)
+    let modal_display_div = document.getElementById("modal-image-clicked-image-gridbox-id")
+    document.getElementById("modal-image-clicked-image-gridbox-id").innerHTML = ""
+    
+    
+    if( node_type == 'IMG') {
+        let modal_body_html_tmp = `<img class="" id="modal-image-clicked-displayimg-id" src="${PATH.join(TAGA_DATA_DIRECTORY,filename)}" title="view" alt="image" />`
+        modal_display_div.insertAdjacentHTML('afterbegin', modal_body_html_tmp);
+        //document.getElementById("modal-image-clicked-displayimg-id").src = PATH.join(TAGA_DATA_DIRECTORY,filename)
+    } else if( node_type == 'VIDEO' ) {
+        let modal_body_html_tmp = `<video class="" id="modal-image-clicked-displayimg-id" src="${PATH.join(TAGA_DATA_DIRECTORY,filename)}" controls muted />`
+        modal_display_div.insertAdjacentHTML('afterbegin', modal_body_html_tmp);
+    }
     
     // Show the modal
-    var modal_meme_click = document.getElementById("modal-image-clicked-top-id");
+    let modal_meme_click = document.getElementById("modal-image-clicked-top-id");
     modal_meme_click.style.display = "block";
     // Get the button that opens the modal
-    var meme_modal_close_btn = document.getElementById("modal-image-clicked-close-button-id");
+    let meme_modal_close_btn = document.getElementById("modal-image-clicked-close-button-id");
     // When the user clicks on the button, close the modal
     meme_modal_close_btn.onclick = function () {
+        if( node_type == 'VIDEO' ) { document.getElementById("modal-image-clicked-displayimg-id").pause() }
         modal_meme_click.style.display = "none";
     }
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function (event) {
         if (event.target == modal_meme_click) {
+            if( node_type == 'VIDEO' ) { document.getElementById("modal-image-clicked-displayimg-id").pause() }
             modal_meme_click.style.display = "none";
         }
     }  
@@ -761,7 +830,7 @@ async function Change_Profile_Image() {
     document.querySelectorAll(".modal-image-search-profileimageresult-single-image-div-class").forEach(el => el.remove());
     profile_search_display_inner_tmp = ''
     current_collection_obj.collectionImageSet.forEach( image_filename => {
-        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
+        image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true) {
             profile_search_display_inner_tmp += `
                                                 <div class="modal-image-search-profileimageresult-single-image-div-class" id="modal-image-search-profileimageresult-single-image-div-id-${image_filename}">
@@ -785,12 +854,12 @@ async function Change_Profile_Image() {
     });
     //add image event listener so that a click on it makes it a choice
     current_collection_obj.collectionImageSet.forEach( image_filename => {
-        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
+        image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).onclick = async function() {
                 current_collection_obj.collectionImage = image_filename
                 await Update_Collection_Record_In_DB(current_collection_obj)
-                document.getElementById("collection-profile-image-img-id").src = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
+                await Update_Profile_Image()//document.getElementById("collection-profile-image-img-id").src = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
                 modal_profile_img_change.style.display = "none";
             }
         }
@@ -865,13 +934,13 @@ async function Collection_Profile_Image_Search_Action() {
     });
     //add image event listener so that a click on it makes it a choice
     current_collection_obj.collectionImageSet.forEach( image_filename => {
-        image_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
+        image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY,image_filename)
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).onclick = async function() {
                 current_collection_obj.collectionImage = image_filename
                 
                 await Update_Collection_Record_In_DB(current_collection_obj)
-                document.getElementById("collection-profile-image-img-id").src = TAGA_DATA_DIRECTORY + PATH.sep + image_filename
+                await Update_Profile_Image() //document.getElementById("collection-profile-image-img-id").src = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
                 document.getElementById("search-profileimage-modal-click-top-id").style.display = "none";
             }
         }

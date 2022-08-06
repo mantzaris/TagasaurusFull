@@ -1,5 +1,7 @@
 // const FS = require('fs');
 const PATH = require('path');
+const fileType = require('file-type');
+
 //the object for the window functionality
 const IPC_RENDERER = require('electron').ipcRenderer 
 
@@ -45,7 +47,7 @@ document.getElementById("get-recommended-button-id").onclick = function() {
 async function Super_Search() {
     
     Set_Search_Obj_Tags()
-    console.log('set the tags! 1')
+    console.log('set the tags!!! 1')
     faceDescriptors_search = []
     for( img_ind = 0; img_ind < selected_images.length; img_ind++ ) {
         //super_search_obj.faceDescriptors
@@ -54,9 +56,13 @@ async function Super_Search() {
         if( selected_images_type[img_ind] == 'stored' ) {
             console.log('stored')
             //console.log('selected_images[img_ind]', selected_images[img_ind])
-            try{
+
+            let ft_res = await fileType.fromFile(  PATH.join(TAGA_DATA_DIRECTORY, selected_images[img_ind])  )
+            let type = ft_res.mime.includes("video")
+            if( type ) { console.log("skip video"); continue; }
+
             super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, selected_images[img_ind]) )
-            } catch(err) {console.log('err',super_res)}
+            
             //console.log('super_res', super_res)
             //console.log('super_res.length = ', super_res.length)
             if( super_res.length > 0 ) {
@@ -68,6 +74,11 @@ async function Super_Search() {
 
         } else if( selected_images_type[img_ind] == 'new' ) {
             console.log('new')
+
+            let ft_res = await fileType.fromFile(  selected_images[img_ind]  )
+            let type = ft_res.mime.includes("video")
+            if( type ) { console.log("skip video"); continue; }
+
             super_res = await Get_Image_Face_Descriptors_From_File( selected_images[img_ind] )
             //console.log('super_res.length = ', super_res.length)
             if( super_res.length > 0 ) {
