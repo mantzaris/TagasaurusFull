@@ -709,7 +709,7 @@ input:checked + .slider:before {
   }
 }
 
-.modal-image-search-profileimageresult-single-image-div-class img {
+.modal-image-search-profileimageresult-single-image-div-class img video {
   display: block;
   max-width: 100%;
   height: auto;
