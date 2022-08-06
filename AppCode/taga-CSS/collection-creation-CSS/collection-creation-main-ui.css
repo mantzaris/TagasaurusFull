@@ -139,7 +139,7 @@ body {
   min-height: 0;
   min-width: 0;
 }
-#profile-image-display-id {
+#profile-image-display-id, .vid1 {
   height: 99999px;
   object-fit: contain;
   max-height: 100%;
