@@ -205,6 +205,8 @@
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr 11fr;
+  min-height: 0;
+  min-width: 0;
   /* height: 100%; /
 min-height: 1px;
 / max-width: 100%; /
@@ -227,16 +229,20 @@ min-height: 1px;
   font-weight: bold;
 }
 
+
 #modal-search-profileimage-images-results-grid-div-area-id {
-  position: relative;
   background-color: #005000;
-  /* overflow-y: scroll; */
   border-top: 3px solid #005000;
-  /* max-height: 100%; /
-/ overflow-y: scroll; */
   grid-area: modal-search-profileimage-images-results-grid-div-area-id;
+  overflow-y: auto;
 }
-#modal-search-profileimage-images-results-grid-div-area-id > div {
+
+
+.profile-thumb-div {
+  max-height: 25vh;
+  max-width: 100%;
+}
+/* #modal-search-profileimage-images-results-grid-div-area-id > div {
   overflow: hidden;
   overflow-y: auto;
   position: absolute;
@@ -261,15 +267,16 @@ min-height: 1px;
   height: auto;
   margin-left: auto;
   margin-right: auto;
-}
+} */
 
-.modal-image-search-profileimage-result-single-image-div-class {
+/* .modal-image-search-profileimage-result-single-image-div-class {
   text-align: center;
 }
 .modal-image-search-profileimage-result-single-image-img-obj-class {
   max-height: 25vh;
   max-width: 100%;
-}
+} */
+
 
 /* IMAGE SEARCH RESULTS END */
 

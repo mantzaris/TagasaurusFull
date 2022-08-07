@@ -196,6 +196,7 @@ function Description_Hashtags_Display_Fill() {
 //EMOTION STUFF START>>>
 //populate the emotion value view with emotional values
 async function Emotion_Display_Fill() {
+    console.log('current_image_annotation',current_image_annotation)
     emotion_div = document.getElementById("emotion-collectionlist-div-id");
     emotion_keys = Object.keys(current_image_annotation["taggingEmotions"]);
     emotion_html_tmp = ''
@@ -442,13 +443,17 @@ async function First_Display_Init() {
         Load_Default_Taga_Image();
     } else if( window.location.href.indexOf("imageFileName") > -1 ) {
         tagging_name_param = window.location.search.split("=")[1]
-        // console.log('tagging_name_param = ', tagging_name_param)
+        console.log('tagging_name_param = ', tagging_name_param)
+        tagging_name_param = fromBinary(atob(tagging_name_param))
+        
+        console.log('tagging_name_param = ', tagging_name_param)
 
         current_image_annotation = await Get_Tagging_Annotation_From_DB(tagging_name_param);
         Load_State_Of_Image_IDB();
         
         //window.location.href = tagging.html
     } else {
+        //current_image_annotation = await Get_Tagging_Annotation_From_DB(tagging_name_param);
         await New_Image_Display(0)
         //await Load_State_Of_Image_IDB() //display the image in view currently and the annotations it has
     }
@@ -456,7 +461,21 @@ async function First_Display_Init() {
 //init method to run upon loading
 First_Display_Init(); 
 
-
+//const decoded = atob(encoded);const original = fromBinary(decoded);console.log(original);
+function fromBinary(binary) {
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < bytes.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+    const charCodes = new Uint16Array(bytes.buffer);
+    let result = '';
+    for (let i = 0; i < charCodes.length; i++) {
+        result += String.fromCharCode(charCodes[i]);
+    }
+    return result;
+}
+  
+    
 
 //SAVING, LOADING, DELETING, ETC START>>>
 //process image for saving including the text to tags (Called from the html Save button)
@@ -550,6 +569,7 @@ async function Load_New_Image() {
         tagging_entry_tmp.imageFileName = filename;
         tagging_entry_tmp.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${filename}`);
         hash_present = await Get_Tagging_Hash_From_DB(tagging_entry_tmp.imageFileHash);
+        console.log("tagging_entry_tmp",tagging_entry_tmp)
         if(hash_present == undefined) {
             //emotion inference upon the default selected
 
@@ -584,7 +604,7 @@ async function Load_New_Image() {
             } else { //cannot handle this file type
                 continue
             }
-
+            console.log("tagging_entry_tmp",tagging_entry_tmp)
             await Insert_Record_Into_DB(tagging_entry_tmp); //sqlite version
             tagging_entry = tagging_entry_tmp;
         }

@@ -549,7 +549,7 @@ async function Update_Profile_Image() {
     if( node_type == 'IMG' ) {
         content_html = `<img id="collection-profile-image-img-id" src="${file_path}" title="view" alt="collection-profile-image"/>`
     } else if( node_type == 'VIDEO' ) {
-        content_html = `<video class="" id="collection-profile-image-img-id" src="${file_path}" controls muted />`
+        content_html = `<video class="${GENERAL_HELPER_FNS.VIDEO_IDENTIFIER}" id="collection-profile-image-img-id" src="${file_path}" controls muted />`
     }
     console.log('content_html',content_html)
     let profile_display_div = document.getElementById("collection-profile-image-display-div-id")
@@ -709,7 +709,7 @@ async function Image_Clicked_Modal(filename, node_type) {
         modal_display_div.insertAdjacentHTML('afterbegin', modal_body_html_tmp);
         //document.getElementById("modal-image-clicked-displayimg-id").src = PATH.join(TAGA_DATA_DIRECTORY,filename)
     } else if( node_type == 'VIDEO' ) {
-        let modal_body_html_tmp = `<video class="" id="modal-image-clicked-displayimg-id" src="${PATH.join(TAGA_DATA_DIRECTORY,filename)}" controls muted />`
+        let modal_body_html_tmp = `<video class="${GENERAL_HELPER_FNS.VIDEO_IDENTIFIER}" id="modal-image-clicked-displayimg-id" src="${PATH.join(TAGA_DATA_DIRECTORY,filename)}" controls muted />`
         modal_display_div.insertAdjacentHTML('afterbegin', modal_body_html_tmp);
     }
     
@@ -772,11 +772,13 @@ async function Change_Profile_Image() {
     var meme_modal_close_btn = document.getElementById("modal-search-profileimage-close-exit-view-button-id");
     // When the user clicks on the button, close the modal
     meme_modal_close_btn.onclick = function () {
+        GENERAL_HELPER_FNS.Pause_Media_From_Modals()
         modal_profile_img_change.style.display = "none";
     }
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function (event) {
         if (event.target == modal_profile_img_change) {
+            GENERAL_HELPER_FNS.Pause_Media_From_Modals()
             modal_profile_img_change.style.display = "none";
         }
     }
@@ -826,33 +828,32 @@ async function Change_Profile_Image() {
         }
     }
     //present default ordering first
-    profile_search_display_div = document.getElementById("collections-profileimages-gallery-grid-images-div-id")
-    document.querySelectorAll(".modal-image-search-profileimageresult-single-image-div-class").forEach(el => el.remove());
+    profile_search_display_div = document.getElementById("modal-search-profileimage-images-results-grid-div-area-id")//("collections-profileimages-gallery-grid-images-div-id")
+    profile_search_display_div.innerHTML = ""
+    //document.querySelectorAll(".modal-image-search-profileimageresult-single-image-div-class").forEach(el => el.remove());
     profile_search_display_inner_tmp = ''
     for(let image_filename of current_collection_obj.collectionImageSet) {
     //current_collection_obj.collectionImageSet.forEach( image_filename => {
         image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true) {
             profile_search_display_inner_tmp += `
-                                                <div class="modal-image-search-profileimageresult-single-image-div-class" id="modal-image-search-profileimageresult-single-image-div-id-${image_filename}">
-                                                    ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'modal-image-search-profileimageresult-single-image-img-obj-class', `modal-image-search-profileimageresult-single-image-img-id-${image_filename}` )}    
-                                                </div>
+                                                ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'profile-thumb-div', `modal-image-search-profileimageresult-single-image-img-id-${image_filename}` )}    
                                                 `
         }
     }
     profile_search_display_div.innerHTML += profile_search_display_inner_tmp
     //masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
     //solution from: https://stackoverflow.com/a/60949881/410975
-    Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => { //!!!XXX
-        var grid_profile_img = document.querySelector("#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-grid-class");
-		var msnry = new MASONRY(grid_profile_img, {
-			columnWidth: '#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-masonry-grid-sizer',
-			itemSelector: '#modal-search-profileimage-images-results-grid-div-area-id .modal-image-search-profileimageresult-single-image-div-class',
-			percentPosition: true,
-			gutter: 5,
-			transitionDuration: 0
-		});
-    });
+    // Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => { //!!!XXX
+    //     var grid_profile_img = document.querySelector("#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-grid-class");
+	// 	var msnry = new MASONRY(grid_profile_img, {
+	// 		columnWidth: '#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-masonry-grid-sizer',
+	// 		itemSelector: '#modal-search-profileimage-images-results-grid-div-area-id .modal-image-search-profileimageresult-single-image-div-class',
+	// 		percentPosition: true,
+	// 		gutter: 5,
+	// 		transitionDuration: 0
+	// 	});
+    // });
     //add image event listener so that a click on it makes it a choice
     current_collection_obj.collectionImageSet.forEach( image_filename => {
         image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
@@ -861,6 +862,7 @@ async function Change_Profile_Image() {
                 current_collection_obj.collectionImage = image_filename
                 await Update_Collection_Record_In_DB(current_collection_obj)
                 await Update_Profile_Image()//document.getElementById("collection-profile-image-img-id").src = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+                GENERAL_HELPER_FNS.Pause_Media_From_Modals()
                 modal_profile_img_change.style.display = "none";
             }
         }
@@ -906,7 +908,7 @@ async function Collection_Profile_Image_Search_Action() {
     profile_img_sorted = await SEARCH_MODULE.Collection_Profile_Image_Search_Fn(collection_profile_search_obj,current_collection_obj.collectionImageSet,Get_Tagging_Annotation_From_DB)
 
     //present new sorted ordering now!
-    profile_search_display_div = document.getElementById("collections-profileimages-gallery-grid-images-div-id")
+    profile_search_display_div = document.getElementById("modal-search-profileimage-images-results-grid-div-area-id")//("collections-profileimages-gallery-grid-images-div-id")
     document.querySelectorAll(".modal-image-search-profileimageresult-single-image-div-class").forEach(el => el.remove());
     profile_search_display_inner_tmp = ''
     for(let image_filename of profile_img_sorted) {
@@ -924,17 +926,17 @@ async function Collection_Profile_Image_Search_Action() {
     profile_search_display_div.innerHTML += profile_search_display_inner_tmp
     //masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
     //solution from: https://stackoverflow.com/a/60949881/410975
-    Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
-        var grid_profile_img = document.querySelector("#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-grid-class");
-		var msnry = new MASONRY(grid_profile_img, {
-			columnWidth: '#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-masonry-grid-sizer',
-			itemSelector: '#modal-search-profileimage-images-results-grid-div-area-id .modal-image-search-profileimageresult-single-image-div-class',
-			percentPosition: true,
-			gutter: 5,
-			transitionDuration: 0
-		});
-    });
-    document.imag
+    // Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+    //     var grid_profile_img = document.querySelector("#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-grid-class");
+	// 	var msnry = new MASONRY(grid_profile_img, {
+	// 		columnWidth: '#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-masonry-grid-sizer',
+	// 		itemSelector: '#modal-search-profileimage-images-results-grid-div-area-id .modal-image-search-profileimageresult-single-image-div-class',
+	// 		percentPosition: true,
+	// 		gutter: 5,
+	// 		transitionDuration: 0
+	// 	});
+    // });
+    //document.imag
     //add image event listener so that a click on it makes it a choice
     current_collection_obj.collectionImageSet.forEach( image_filename => {
         image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY,image_filename)
@@ -944,6 +946,7 @@ async function Collection_Profile_Image_Search_Action() {
                 
                 await Update_Collection_Record_In_DB(current_collection_obj)
                 await Update_Profile_Image() //document.getElementById("collection-profile-image-img-id").src = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+                GENERAL_HELPER_FNS.Pause_Media_From_Modals()
                 document.getElementById("search-profileimage-modal-click-top-id").style.display = "none";
             }
         }
@@ -966,11 +969,13 @@ async function Add_Gallery_Images() {
     var modal_gallery_img_add_close_btn = document.getElementById("modal-search-close-exit-view-button-id");
     // When the user clicks on the button, close the modal
     modal_gallery_img_add_close_btn.onclick = function () {
+        GENERAL_HELPER_FNS.Pause_Media_From_Modals()
         modal_gallery_img_add.style.display = "none";
     }
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function (event) {
         if (event.target == modal_gallery_img_add) {
+            GENERAL_HELPER_FNS.Pause_Media_From_Modals()
             modal_gallery_img_add.style.display = "none";
         }
     }
@@ -1031,7 +1036,7 @@ async function Add_Gallery_Images() {
     for(let image_filename of search_image_results) {
     //search_image_results.forEach( image_filename => {
         image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
-        if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
+        if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) { //modal-image-search-result-single-image-img-obj-class
             search_display_inner_tmp += `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
@@ -1049,7 +1054,7 @@ async function Add_Gallery_Images() {
     search_meme_display_div.innerHTML = ""
     search_display_inner_tmp = ''
     for(let image_filename of search_image_meme_results) {
-    //search_image_meme_results.forEach( image_filename => {
+    //search_image_meme_results.forEach( image_filename => { //modal-image-search-result-single-meme-image-img-id-
         image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionImageSet.includes(image_filename)==false) {
             search_display_inner_tmp += `
@@ -1093,6 +1098,7 @@ async function Add_Gallery_Images() {
             //await Show_Collection()   //!!!xxx
             Display_Gallery_Images()
         }
+        GENERAL_HELPER_FNS.Pause_Media_From_Modals()
         modal_gallery_img_add.style.display = "none";
     }
     //add the event listener for the RESET BUTTON on the modal
@@ -1216,11 +1222,13 @@ async function Add_Meme_Images() {
     var modal_meme_img_add_close_btn = document.getElementById("modal-search-add-memes-close-exit-view-button-id");
     // When the user clicks on the button, close the modal
     modal_meme_img_add_close_btn.onclick = function () {
+        GENERAL_HELPER_FNS.Pause_Media_From_Modals()
         modal_meme_img_add.style.display = "none";
     }
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function (event) {
         if (event.target == modal_meme_img_add) {
+            GENERAL_HELPER_FNS.Pause_Media_From_Modals()
             modal_meme_img_add.style.display = "none";
         }
     }
@@ -1325,7 +1333,7 @@ async function Add_Meme_Images() {
                                                 <input id="add-meme-image-toggle-id-${image_filename}" type="checkbox">
                                                 <span class="add-memes-slider"></span>
                                             </label>
-                                            ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-image-img-id-${image_filename}` )}
+                                            ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'modal-image-search-add-memes-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-image-img-id-${image_filename}` )}
                                         </div>
                                         `
         }
@@ -1336,7 +1344,7 @@ async function Add_Meme_Images() {
     search_meme_display_div.innerHTML = ""
     search_display_inner_tmp = ''
     for(let image_filename of meme_search_image_meme_results) {
-    //meme_search_image_meme_results.forEach( image_filename => {
+    //meme_search_image_meme_results.forEach( image_filename => {  //
         image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionMemes.includes(image_filename)==false) {
             search_display_inner_tmp += `
@@ -1345,7 +1353,7 @@ async function Add_Meme_Images() {
                                                 <input id="add-meme-image-meme-toggle-id-${image_filename}" type="checkbox">
                                                 <span class="add-memes-slider"></span>
                                             </label>
-                                            ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-meme-image-img-id-${image_filename}` )}
+                                            ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'modal-image-search-add-memes-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-meme-image-img-id-${image_filename}` )}
                                         </div>
                                         `
         }
@@ -1379,6 +1387,7 @@ async function Add_Meme_Images() {
             //await Show_Collection()
             Collection_Memes_Page()
         }
+        GENERAL_HELPER_FNS.Pause_Media_From_Modals()
         modal_meme_img_add.style.display = "none";
     }
     //add the event listener for the RESET BUTTON on the modal
@@ -1455,7 +1464,7 @@ async function Collection_Add_Memes_Search_Action(){
                                                 <input id="add-meme-image-toggle-id-${image_filename}" type="checkbox">
                                                 <span class="add-memes-slider"></span>
                                             </label>
-                                            ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-image-img-id-${image_filename}` )}
+                                            ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'modal-image-search-add-memes-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-image-img-id-${image_filename}` )}
                                         </div>
                                         `
         }
@@ -1476,7 +1485,7 @@ async function Collection_Add_Memes_Search_Action(){
                                                 <input id="add-meme-image-meme-toggle-id-${image_filename}" type="checkbox">
                                                 <span class="add-memes-slider"></span>
                                             </label>
-                                            ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-meme-image-img-id-${image_filename}` )}
+                                            ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'modal-image-search-add-memes-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-meme-image-img-id-${image_filename}` )}
                                         </div>
                                         `
         }
@@ -1512,11 +1521,13 @@ async function Search_Collections() {
     var modal_gallery_img_add_close_btn = document.getElementById("collection-modal-search-close-exit-view-button-id");
     // When the user clicks on the button, close the modal
     modal_gallery_img_add_close_btn.onclick = function () {
+        GENERAL_HELPER_FNS.Pause_Media_From_Modals()
         modal_gallery_img_add.style.display = "none";
     }
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function (event) {
         if (event.target == modal_gallery_img_add) {
+            GENERAL_HELPER_FNS.Pause_Media_From_Modals()
             modal_gallery_img_add.style.display = "none";
         }
     }
@@ -1607,10 +1618,12 @@ async function Search_Collections() {
     search_display_div.innerHTML += search_display_inner_tmp
     //add image event listener so that a click on it makes it a choice        
     rand_collections_init.forEach( collectionName_tmp => {
-        document.getElementById(`collection-selection-option-id-${collectionName_tmp}`).onclick = async function() {
+        document.getElementById(`collection-selection-option-id-${collectionName_tmp}`).onclick = async function(event) {
+            event.preventDefault()
             collection_tmp = await Get_Collection_Record_From_DB(collectionName_tmp)
             current_collection_obj = collection_tmp
             Show_Collection()
+            GENERAL_HELPER_FNS.Pause_Media_From_Modals()
             modal_gallery_img_add.style.display = "none";
         }
     })
@@ -1696,7 +1709,8 @@ async function Search_Collections_Search_Action() {
     //add image event listener so that a click on it makes it a choice   
     modal_gallery_img_add = document.getElementById("collection-search-modal-click-top-id");     
     search_collection_results.forEach( collectionName_tmp => {
-        document.getElementById(`collection-selection-option-id-${collectionName_tmp}`).onclick = async function() {
+        document.getElementById(`collection-selection-option-id-${collectionName_tmp}`).onclick = async function(event) {
+            event.preventDefault()
             collection_tmp = await Get_Collection_Record_From_DB(collectionName_tmp)
             current_collection_obj = collection_tmp
             Show_Collection()

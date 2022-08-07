@@ -130,12 +130,29 @@ async function Super_Search() {
     //user presses an image to select it from the images section, add onclick event listener
     search_results.forEach(file => {
         document.getElementById(`search-result-single-img-id-${file}`).onclick = function() {            
-            //console.log(' result clicked! file = ', file)
-            window.location = "tagging.html" + '?' + `imageFileName=${file}`
+            console.log(' result clicked! file = ', file)
+            //console.log('btoa(file) ',btoa(file) )
+            window.location = "tagging.html" + '?' + `imageFileName=${ btoa(toBinary(file)) }`
 
         };
     });
 
+}
+// convert a Unicode string to a string in which
+// each 16-bit unit occupies only one byte
+// a string that contains characters occupying > 1 byte
+//const myString = "☸☹☺☻☼☾☿"; const converted = toBinary(myString);const encoded = btoa(converted);
+function toBinary(string) {
+    const codeUnits = new Uint16Array(string.length);
+    for (let i = 0; i < codeUnits.length; i++) {
+        codeUnits[i] = string.charCodeAt(i);
+    }
+    const charCodes = new Uint8Array(codeUnits.buffer);
+    let result = '';
+    for (let i = 0; i < charCodes.byteLength; i++) {
+      result += String.fromCharCode(charCodes[i]);
+    }
+    return result;
 }
 
 //return to main screen
