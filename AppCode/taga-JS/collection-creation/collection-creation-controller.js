@@ -581,33 +581,33 @@ async function Change_Profile_Image() {
     }
 
 
-    profile_search_display_div = document.getElementById("collections-profileimages-gallery-grid-images-div-id")
-    document.querySelectorAll(".modal-image-search-profileimageresult-single-image-div-class").forEach(el => el.remove());
+    profile_search_display_div = document.getElementById("modal-search-profileimage-images-results-grid-div-area-id")
+    profile_search_display_div.innerHTML = ''; //document.querySelectorAll(".modal-image-search-profileimageresult-single-image-div-class").forEach(el => el.remove());
     profile_search_display_inner_tmp = ''
     for(let image_filename of profile_search_image_results) {
+        console.log('image_filename', image_filename)
     //profile_search_image_results.forEach( image_filename => {
         image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true){
-            profile_search_display_inner_tmp += `
-                                                <div class="modal-image-search-profileimageresult-single-image-div-class" id="modal-image-search-profileimageresult-single-image-div-id-${image_filename}">
-                                                    ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'modal-image-search-profileimageresult-single-image-img-obj-class', `modal-image-search-profileimageresult-single-image-img-id-${image_filename}` )}        
-                                                </div>
-                                                `
+            profile_search_display_inner_tmp += ` ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'profile-thumb-div', `modal-image-search-profileimageresult-single-image-img-id-${image_filename}` )} `
         }
+        console.log('TRY!',`${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'profile-thumb-div', `modal-image-search-profileimageresult-single-image-img-id-${image_filename}` )}  `)
+        console.log('running log:', profile_search_display_inner_tmp)
     }
-    profile_search_display_div.innerHTML += profile_search_display_inner_tmp
+    profile_search_display_div.innerHTML = profile_search_display_inner_tmp
+    console.log('profile_search_display_div.innerHTML', profile_search_display_div.innerHTML)
     //masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
     //solution from: https://stackoverflow.com/a/60949881/410975
-    Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
-        var grid_profile_img = document.querySelector("#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-grid-class");
-		var msnry = new MASONRY(grid_profile_img, {
-			columnWidth: '#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-masonry-grid-sizer',
-			itemSelector: '#modal-search-profileimage-images-results-grid-div-area-id .modal-image-search-profileimageresult-single-image-div-class',
-			percentPosition: true,
-			gutter: 5,
-			transitionDuration: 0
-		});
-    });
+    // Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+    //     var grid_profile_img = document.querySelector("#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-grid-class");
+	// 	var msnry = new MASONRY(grid_profile_img, {
+	// 		columnWidth: '#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-masonry-grid-sizer',
+	// 		itemSelector: '#modal-search-profileimage-images-results-grid-div-area-id .modal-image-search-profileimageresult-single-image-div-class',
+	// 		percentPosition: true,
+	// 		gutter: 5,
+	// 		transitionDuration: 0
+	// 	});
+    // });
     //add image event listener so that a click on it makes it a choice
     profile_search_image_results.forEach( image_filename => {
         let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)

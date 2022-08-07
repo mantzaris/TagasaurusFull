@@ -708,7 +708,7 @@ input:checked + .slider:before {
     max-width: calc((100% - ((5px) * 0 + 10px)) / 1);
   }
 }
-
+/* 
 .modal-image-search-profileimageresult-single-image-div-class img video {
   display: block;
   max-width: 100%;
@@ -720,4 +720,4 @@ input:checked + .slider:before {
   max-height: 100%;
   object-fit: cover;
   object-position: center;
-}
+} */
