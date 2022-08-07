@@ -116,6 +116,7 @@ function Navbar_ViewHandle() {
     }
 }
 function Creation_Back_Btn() {
+    GENERAL_HELPER_FNS.Pause_Media_From_Modals()
     if(creation_step_num > 1) {
         creation_step_num -= 1
     }
@@ -130,6 +131,7 @@ function Creation_Back_Btn() {
     Navbar_ViewHandle()
 }
 async function Creation_Next_Btn() {
+    GENERAL_HELPER_FNS.Pause_Media_From_Modals()
     //check to see if the user has completed the required components or not, if not return
     if(creation_step_num == 1) {
         if(await Check_Collection_Name() == false) {
@@ -173,7 +175,7 @@ async function Creation_Next_Btn() {
             content_html = `<img class="" id="step2-profile-image-display-id" src="${PATH.join(TAGA_DATA_DIRECTORY, COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage)}" />`
         } else if( node_type == 'VIDEO' ) {            
             // document.getElementById(`profile-image-display-id`).pause()
-            content_html = `<video class="" id="step2-profile-image-display-id" src="${PATH.join(TAGA_DATA_DIRECTORY, COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage)}" controls muted />`
+            content_html = `<video class="${GENERAL_HELPER_FNS.VIDEO_IDENTIFIER}" id="step2-profile-image-display-id" src="${PATH.join(TAGA_DATA_DIRECTORY, COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage)}" controls muted />`
         }
         let profile_display_div = document.getElementById("step2-profileimage-div-id")
         profile_display_div.innerHTML = ""
@@ -219,7 +221,7 @@ async function Creation_Next_Btn() {
             content_html = `<img class="" id="step4-profile-image-display-id" src="${PATH.join(TAGA_DATA_DIRECTORY, COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage)}" />`
         } else if( node_type == 'VIDEO' ) {            
             // document.getElementById(`profile-image-display-id`).pause()
-            content_html = `<video class="" id="step4-profile-image-display-id" src="${PATH.join(TAGA_DATA_DIRECTORY, COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage)}" controls muted />`
+            content_html = `<video class="${GENERAL_HELPER_FNS.VIDEO_IDENTIFIER}" id="step4-profile-image-display-id" src="${PATH.join(TAGA_DATA_DIRECTORY, COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage)}" controls muted />`
         }
         let profile_display_div = document.getElementById("step4-profileimage-div-id")
         profile_display_div.innerHTML = ""
@@ -522,11 +524,17 @@ async function Change_Profile_Image() {
     var meme_modal_close_btn = document.getElementById("modal-search-profileimage-close-exit-view-button-id");
     // When the user clicks on the button, close the modal
     meme_modal_close_btn.onclick = function () {
+
+        GENERAL_HELPER_FNS.Pause_Media_From_Modals()
+
         modal_profile_img_change.style.display = "none";
     }
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function (event) {
         if (event.target == modal_profile_img_change) {
+
+            GENERAL_HELPER_FNS.Pause_Media_From_Modals()
+            
             modal_profile_img_change.style.display = "none";
         }
     }
@@ -585,17 +593,17 @@ async function Change_Profile_Image() {
     profile_search_display_div.innerHTML = ''; //document.querySelectorAll(".modal-image-search-profileimageresult-single-image-div-class").forEach(el => el.remove());
     profile_search_display_inner_tmp = ''
     for(let image_filename of profile_search_image_results) {
-        console.log('image_filename', image_filename)
     //profile_search_image_results.forEach( image_filename => {
         image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true){
-            profile_search_display_inner_tmp += ` ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'profile-thumb-div', `modal-image-search-profileimageresult-single-image-img-id-${image_filename}` )} `
-        }
-        console.log('TRY!',`${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'profile-thumb-div', `modal-image-search-profileimageresult-single-image-img-id-${image_filename}` )}  `)
-        console.log('running log:', profile_search_display_inner_tmp)
+            profile_search_display_inner_tmp += `
+                                <div>
+                                ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'profile-thumb-div', `modal-image-search-profileimageresult-single-image-img-id-${image_filename}` )} 
+                                </div>
+                                `
+        }        
     }
-    profile_search_display_div.innerHTML = profile_search_display_inner_tmp
-    console.log('profile_search_display_div.innerHTML', profile_search_display_div.innerHTML)
+    profile_search_display_div.innerHTML += profile_search_display_inner_tmp
     //masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
     //solution from: https://stackoverflow.com/a/60949881/410975
     // Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
@@ -622,14 +630,13 @@ async function Change_Profile_Image() {
                 } else if( node_type == 'VIDEO' ) {
                     event.preventDefault()
                     document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).pause()
-                    content_html = `<video class="vid1" id="profile-image-display-id" src="${PATH.join(TAGA_DATA_DIRECTORY, image_filename)}" controls muted />`
+                    content_html = `<video class="${GENERAL_HELPER_FNS.VIDEO_IDENTIFIER} vid1" id="profile-image-display-id" src="${PATH.join(TAGA_DATA_DIRECTORY, image_filename)}" controls muted />`
                 }
                 let profile_display_div = document.getElementById("profile-image-display-div-id")
                 profile_display_div.innerHTML = ""
                 profile_display_div.insertAdjacentHTML('afterbegin', content_html);
-                console.log('content_html',content_html)
                 //document.getElementById("profile-image-display-id").src = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
-
+                GENERAL_HELPER_FNS.Pause_Media_From_Modals()
                 modal_profile_img_change.style.display = "none";
             }
         }
@@ -679,8 +686,9 @@ async function Collection_Profile_Image_Search_Action() {
     profile_search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_profile_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
     
     //present new sorted ordering now!
-    profile_search_display_div = document.getElementById("collections-profileimages-gallery-grid-images-div-id")
-    document.querySelectorAll(".modal-image-search-profileimageresult-single-image-div-class").forEach(el => el.remove());
+    profile_search_display_div = document.getElementById("modal-search-profileimage-images-results-grid-div-area-id")
+    profile_search_display_div = ''
+    //document.querySelectorAll(".modal-image-search-profileimageresult-single-image-div-class").forEach(el => el.remove());
     profile_search_display_inner_tmp = ''
     for(let image_filename of profile_search_image_results) {
     //profile_search_image_results.forEach( image_filename => {
@@ -688,25 +696,25 @@ async function Collection_Profile_Image_Search_Action() {
         image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true) {
             profile_search_display_inner_tmp += `
-                                                <div class="modal-image-search-profileimageresult-single-image-div-class" id="modal-image-search-profileimageresult-single-image-div-id-${image_filename}">
-                                                    ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'modal-image-search-profileimageresult-single-image-img-obj-class', `modal-image-search-profileimageresult-single-image-img-id-${image_filename}` )}
-                                                </div>
+                                            <div>
+                                            ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'profile-thumb-div', `modal-image-search-profileimageresult-single-image-img-id-${image_filename}` )} 
+                                            </div>
                                                 `
         }
     }
     profile_search_display_div.innerHTML += profile_search_display_inner_tmp
     //masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
     //solution from: https://stackoverflow.com/a/60949881/410975
-    Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
-        var grid_profile_img = document.querySelector("#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-grid-class");
-		var msnry = new MASONRY(grid_profile_img, {
-			columnWidth: '#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-masonry-grid-sizer',
-			itemSelector: '#modal-search-profileimage-images-results-grid-div-area-id .modal-image-search-profileimageresult-single-image-div-class',
-			percentPosition: true,
-			gutter: 5,
-			transitionDuration: 0
-		});
-    });
+    // Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
+    //     var grid_profile_img = document.querySelector("#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-grid-class");
+	// 	var msnry = new MASONRY(grid_profile_img, {
+	// 		columnWidth: '#modal-search-profileimage-images-results-grid-div-area-id .modal-search-profileimage-images-results-masonry-grid-sizer',
+	// 		itemSelector: '#modal-search-profileimage-images-results-grid-div-area-id .modal-image-search-profileimageresult-single-image-div-class',
+	// 		percentPosition: true,
+	// 		gutter: 5,
+	// 		transitionDuration: 0
+	// 	});
+    // });
     //add image event listener so that a click on it makes it a choice
     profile_search_image_results.forEach( image_filename => {
         image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
@@ -721,13 +729,14 @@ async function Collection_Profile_Image_Search_Action() {
                 } else if( node_type == 'VIDEO' ) {
                     event.preventDefault()
                     document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).pause()
-                    content_html = `<video class="" id="cprofile-image-display-id" src="${PATH.join(TAGA_DATA_DIRECTORY, image_filename)}" controls muted />`
+                    content_html = `<video class="${GENERAL_HELPER_FNS.VIDEO_IDENTIFIER}" id="cprofile-image-display-id" src="${PATH.join(TAGA_DATA_DIRECTORY, image_filename)}" controls muted />`
                 }
                 let profile_display_div = document.getElementById("profile-image-display-div-id")
                 profile_display_div.innerHTML = ""
                 profile_display_div.insertAdjacentHTML('afterbegin', content_html);
                 console.log('content_html',content_html)
 
+                GENERAL_HELPER_FNS.Pause_Media_From_Modals()
                 //document.getElementById("profile-image-display-id").src = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
                 document.getElementById("search-profileimage-modal-click-top-id").style.display = "none";
             }
@@ -751,11 +760,17 @@ async function Add_Images_To_New_Collection() {
     var modal_gallery_img_add_close_btn = document.getElementById("modal-search-close-exit-view-button-id");
     // When the user clicks on the button, close the modal
     modal_gallery_img_add_close_btn.onclick = function () {
+
+        GENERAL_HELPER_FNS.Pause_Media_From_Modals()
+
         modal_gallery_img_add.style.display = "none";
     }
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function (event) {
         if (event.target == modal_gallery_img_add) {
+
+            GENERAL_HELPER_FNS.Pause_Media_From_Modals()
+
             modal_gallery_img_add.style.display = "none";
         }
     }
@@ -907,6 +922,7 @@ async function Add_Images_To_New_Collection() {
             });
 
         }
+        GENERAL_HELPER_FNS.Pause_Media_From_Modals()
         modal_gallery_img_add.style.display = "none";
     }
     //add the event listener for the RESET BUTTON on the modal
@@ -1028,11 +1044,17 @@ async function Add_Meme_Images() {
     var modal_meme_img_add_close_btn = document.getElementById("modal-search-add-memes-close-exit-view-button-id");
     // When the user clicks on the button, close the modal
     modal_meme_img_add_close_btn.onclick = function () {
+
+        GENERAL_HELPER_FNS.Pause_Media_From_Modals()
+
         modal_meme_img_add.style.display = "none";
     }
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function (event) {
         if (event.target == modal_meme_img_add) {
+
+            GENERAL_HELPER_FNS.Pause_Media_From_Modals()
+
             modal_meme_img_add.style.display = "none";
         }
     }
@@ -1220,6 +1242,7 @@ async function Add_Meme_Images() {
                 });
             });
         }
+        GENERAL_HELPER_FNS.Pause_Media_From_Modals()
         modal_meme_img_add.style.display = "none";
     }
     //add the event listener for the RESET BUTTON on the modal
