@@ -173,7 +173,7 @@ async function Get_Image_Face_Expresssions_From_GIF(imagePath, get_emotions=fals
                                           withFaceExpressions()
       }
       if( get_only_emotions == false ) {
-        let descriptors_array_tmp = await Get_Face_Descriptors_Arrays(res)
+        let descriptors_array_tmp = Get_Face_Descriptors_Arrays(res)
         gif_face_descriptors = Push_New_Face_Descriptors(gif_face_descriptors, descriptors_array_tmp)
       }
 
@@ -196,27 +196,37 @@ window.Get_Image_Face_Expresssions_From_GIF = Get_Image_Face_Expresssions_From_G
 
 //provide the base set of face descriptors (already known) and the -new- set of face descriptors as a nested array
 //add them to the base set if they are different enough so we get a new array with all the novel unique faces
-const FACE_DISTANCE_VIDEO_MIN = 0.75 // not like for search, the distance must be 'greater' than this value
+const FACE_DISTANCE_VIDEO_NOVEL_THRESHOLD = 0.75 
 function Push_New_Face_Descriptors(base_faces, descriptors_query) {
+  let total_faces = [...base_faces]
+
+  let min_dist_tmp = 10
+  let distance_tmp
+
   if( base_faces.length > 0 ) {
     let new_faces = []
     for(let q_ii=0; q_ii<descriptors_query.length; q_ii++) {
+
+      min_dist_tmp = 10
+
       for(let ref_ii=0; ref_ii<base_faces.length; ref_ii++) {      
         distance_tmp = faceapi.euclideanDistance( base_faces[ref_ii] , descriptors_query[q_ii] )
-        //console.log('distance_tmp = ', distance_tmp)
-        if( distance_tmp >= FACE_DISTANCE_VIDEO_MIN ) { //then include the new face in the base faces
-          new_faces.push(descriptors_query[q_ii])
-        }
+        if( distance_tmp <= min_dist_tmp ) { min_dist_tmp = distance_tmp }
+        
       }
+      if( min_dist_tmp >= FACE_DISTANCE_VIDEO_NOVEL_THRESHOLD ) { //then include the new face in the base faces
+        new_faces.push(descriptors_query[q_ii])
+      }
+      
     }
     new_faces.forEach( new_face => {
-      base_faces.push(new_face)
+      total_faces.push(new_face) //base_faces.push(new_face)
     })
   } else {
-    base_faces = JSON.parse(JSON.stringify(descriptors_query))
+    total_faces = JSON.parse(JSON.stringify(descriptors_query))
   }
   //console.log(`base_faces length = `, base_faces.length)
-  return base_faces
+  return total_faces
 }
 
 
@@ -236,7 +246,7 @@ function Imagedata_To_Image(imagedata) {
 
 //returns the obj with the extended emotions auto filled
 //faceapi.euclideanDistance( Object.values({'1':1,'2':2,'3':2}), Object.values({'1':-1,'2':0.2,'3':15}) ) -> 13.275541
-async function Get_Face_Descriptors_Arrays(super_res) {
+function Get_Face_Descriptors_Arrays(super_res) {
   let faces_descriptors_array_tmp = []
   if( super_res.length > 0 ) {
       for(let face_ii=0; face_ii < super_res.length; face_ii++) {
@@ -268,6 +278,151 @@ function New_Face_Emotions_Gif(prev_emotions, super_res) {
   }
   console.log('prev_emotions',prev_emotions)
 }
+
+
+
+
+
+
+//When the file is a VIDEO
+//go through each frame sequentially and include descriptors of only relatively novel faces
+//add a new descriptor if the distance to the rest is small
+//have to get a sample rate for the frames sampled
+// const MAX_FRAMES_FULL_SAMPLE_VIDEO = 1*(10**2) //if number of frames less than this process each frame
+// const MAX_TIME_BETWEEN_SAMPLES_VIDEO = 1000 //maximum number of milliseconds between samples
+async function Get_Image_Face_Expresssions_From_VIDEO(imagePath, get_emotions=false, get_only_emotions=false ) {
+  
+  console.time('start')
+  let frames = await extractFramesFromVideo(imagePath);
+  console.log('frames = ', frames)
+  console.timeEnd('start')
+
+  let video_face_descriptors = []
+  frames.forEach( frame_res => {
+    //console.log('1')
+    let descriptors_array_tmp = Get_Face_Descriptors_Arrays(frame_res)
+    video_face_descriptors = Push_New_Face_Descriptors(video_face_descriptors, descriptors_array_tmp)
+    //console.log('3')
+  })
+  console.log('video_face_descriptors', video_face_descriptors)
+
+  return true
+  // let {frames,width,height} = await DECODE_VIDEO(FS.readFileSync(imagePath));
+  // let gif_face_descriptors = []
+  // let emotions_total = {}
+  // //console.log(`frames length = `, frames.length)
+  // let time_tmp_prev = 0 //init value is a flag that 
+  // let timecode_diff = 0 //difference in prev and current timecodes
+  // let res;
+  // for(let frame_ind=0; frame_ind<frames.length; frame_ind++) {
+  //   let frame_tmp = frames[frame_ind]
+  //   let time_current = frame_tmp.timeCode //time in milliseconds
+  //   timecode_diff = time_current - time_tmp_prev
+  //   //console.log(`timeCode = `, frame_tmp.timeCode)
+  //   if( frames.length <= MAX_FRAMES_FULL_SAMPLE_VIDEO || Math.random() < (timecode_diff / MAX_TIME_BETWEEN_SAMPLES_VIDEO) ) {
+  //     let image_tmp = await new ImageData(frame_tmp.data,width,height)
+  //     let img = Imagedata_To_Image(image_tmp)
+  //     if( get_emotions == false ) {
+  //       res = await faceapi.detectAllFaces(img).
+  //                                           withFaceLandmarks().
+  //                                           withFaceDescriptors()
+  //     } else if ( get_only_emotions == false ) {
+  //       res = await faceapi.detectAllFaces(img).
+  //                                         withFaceLandmarks().
+  //                                         withFaceExpressions().
+  //                                         withFaceDescriptors()
+  //     } else {
+  //       res = await faceapi.detectAllFaces(img).
+  //                                         withFaceLandmarks().
+  //                                         withFaceExpressions()
+  //     }
+  //     if( get_only_emotions == false ) {
+  //       let descriptors_array_tmp = Get_Face_Descriptors_Arrays(res)
+  //       gif_face_descriptors = Push_New_Face_Descriptors(gif_face_descriptors, descriptors_array_tmp)
+  //     }
+
+  //     if( get_emotions == true ) {
+  //       New_Face_Emotions_Gif(emotions_total, res)
+  //     }
+  //     //console.log('descriptors_array_tmp length =', descriptors_array_tmp.length)
+  //     //console.log('gif_face_descriptors length =', gif_face_descriptors.length)
+  //   }
+  //   time_tmp_prev = time_current
+    //if width and height are different then it is a new image and process it regardless?..    
+  // }
+  // if( get_only_emotions == false ) {
+  //   return {faceDescriptors: gif_face_descriptors, faceEmotions: emotions_total}
+  // } else {
+  //   return {faceDescriptors: null, faceEmotions: emotions_total}
+  // }
+}
+window.Get_Image_Face_Expresssions_From_VIDEO = Get_Image_Face_Expresssions_From_VIDEO
+
+let interval = 1 // 1 / 1 //fps;
+async function extractFramesFromVideo(videoUrl, fps=25) {
+  return new Promise(async (resolve) => {
+
+    // fully download it first (no buffering):
+    let videoBlob = await fetch(videoUrl).then(r => r.blob());
+    let videoObjectUrl = URL.createObjectURL(videoBlob);
+    let video = document.createElement("video");
+    let seekResolve;
+    video.addEventListener('seeked', async function() {
+      if(seekResolve) seekResolve();
+    });
+
+    video.addEventListener('loadeddata', async function() {
+      //console.log('in loaded data')
+      let canvas = document.createElement('canvas');
+      let context = canvas.getContext('2d');
+      let [w, h] = [video.videoWidth, video.videoHeight]
+      canvas.width =  w;
+      canvas.height = h;
+
+      let frames = [];
+      
+      let currentTime = 0;
+      let duration = video.duration;
+
+      while(currentTime < duration) {
+        video.currentTime = currentTime;
+        console.log('video.currentTime', video.currentTime)
+        await new Promise(r => seekResolve=r);
+
+        context.drawImage(video, 0, 0, w, h);
+        let base64ImageData = canvas.toDataURL();
+        // frames.push(base64ImageData);
+
+        let data = canvas.toDataURL('image/png');
+        let photo = new Image(w, h)
+        photo.setAttribute('src', data);
+
+        let res = faceapi.detectAllFaces(photo).
+                                            withFaceLandmarks().
+                                            withFaceDescriptors()
+        //console.log('res frame = ', res)
+        frames.push(res);
+
+        currentTime += interval;
+      }
+      const result = await Promise.all( frames )
+      resolve(result);
+    });
+
+    // set video src *after* listening to events in case it loads so fast
+    // that the events occur before we were listening.
+    video.src = videoObjectUrl; 
+
+  });
+}
+
+
+
+
+
+
+
+
 
 //console.log('in preload after face set up')
 //---------<<<<<<<<<<<<<<<<<<<<<<

@@ -61,6 +61,7 @@ async function Super_Search() {
             let type = ft_res.mime.includes("video")
             if( type ) { console.log("skip video"); continue; }
 
+            //GET FROM DB NOT NEW PROCESS!!!
             super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, selected_images[img_ind]) )
             
             //console.log('super_res', super_res)

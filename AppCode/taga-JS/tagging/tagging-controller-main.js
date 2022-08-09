@@ -519,16 +519,7 @@ async function Load_Default_Taga_Image() {
     tagging_entry.imageFileName = 'Taga.png';
     tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
     //for taga no emotion inference is needed but done for consistency
-    
-    //NO NEED WHEN THE DEFAULT IS TAGA, THERE IS NO FACE AND NO EMOTIONS
-    // if( default_auto_fill_emotions == true ) {
-    //     super_res = await Get_Image_Face_Descriptors_And_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry["imageFileName"]) )
-    //     tagging_entry["taggingEmotions"] = await Auto_Fill_Emotions(super_res, tagging_entry)
-    //     tagging_entry["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
-    // } else {
-    //     super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry["imageFileName"]) )
-    //     tagging_entry["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
-    // }
+        
     await Insert_Record_Into_DB(tagging_entry); //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
 }
 //delete image from user choice
@@ -600,6 +591,9 @@ async function Load_New_Image() {
                     }
                 }
             } else if ( ft_res.mime.includes('video') == true ) {
+                console.log("video type mime",tagging_entry_tmp)
+
+                await Get_Image_Face_Expresssions_From_VIDEO( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) , false, false ) 
 
             } else { //cannot handle this file type
                 continue
