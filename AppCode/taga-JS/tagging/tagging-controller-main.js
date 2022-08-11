@@ -79,7 +79,12 @@ document.getElementById(`auto-fill-emotions-button-id`).onclick = async function
             await Update_Tagging_Annotation_DB(current_image_annotation);
             Emotion_Display_Fill();
         }
+    } else if( ft_res.mime.includes('video') == true ) {
+        let { emotions_total} = await Get_Image_FaceApi_From_VIDEO( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) , true, true ) 
+        tagging_entry_tmp["taggingEmotions"] = emotions_total
+        Emotion_Display_Fill();
     }
+
 };
 
 
@@ -593,7 +598,16 @@ async function Load_New_Image() {
             } else if ( ft_res.mime.includes('video') == true ) {
                 console.log("video type mime",tagging_entry_tmp)
 
-                await Get_Image_Face_Expresssions_From_VIDEO( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) , false, false ) 
+                if( default_auto_fill_emotions == true ) {
+                    let { video_face_descriptors, emotions_total} = await Get_Image_FaceApi_From_VIDEO( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) , true, false ) 
+                    tagging_entry_tmp["faceDescriptors"] = video_face_descriptors
+                    tagging_entry_tmp["taggingEmotions"] = emotions_total
+
+                } else { //only face descriptors and not emotions
+                    let { video_face_descriptors, emotions_total} = await Get_Image_FaceApi_From_VIDEO( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) , false, false ) 
+                    tagging_entry_tmp["faceDescriptors"] = video_face_descriptors
+                    tagging_entry_tmp["taggingEmotions"] = emotions_total
+                }
 
             } else { //cannot handle this file type
                 continue
