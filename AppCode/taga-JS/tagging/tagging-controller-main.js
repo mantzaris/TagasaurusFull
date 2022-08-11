@@ -577,7 +577,6 @@ async function Load_New_Image() {
                         let {faceDescriptors,faceEmotions} = await Get_Image_Face_Expresssions_From_GIF( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]), true )
                         tagging_entry_tmp["faceDescriptors"] = faceDescriptors
                         tagging_entry_tmp["taggingEmotions"] = faceEmotions 
-                        console.log('final gif emotions! = ', faceEmotions)
                     } else {
                         let {faceDescriptors} = await Get_Image_Face_Expresssions_From_GIF( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
                         tagging_entry_tmp["faceDescriptors"] = faceDescriptors
@@ -591,8 +590,7 @@ async function Load_New_Image() {
                     } else {
                         super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
                         tagging_entry_tmp["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
-                        console.log(`tagging_entry_tmp["faceDescriptors"] = `, tagging_entry_tmp["faceDescriptors"] )
-
+                        //console.log(`tagging_entry_tmp["faceDescriptors"] = `, tagging_entry_tmp["faceDescriptors"] )
                     }
                 }
             } else if ( ft_res.mime.includes('video') == true ) {
@@ -604,9 +602,8 @@ async function Load_New_Image() {
                     tagging_entry_tmp["taggingEmotions"] = emotions_total
 
                 } else { //only face descriptors and not emotions
-                    let { video_face_descriptors, emotions_total} = await Get_Image_FaceApi_From_VIDEO( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) , false, false ) 
+                    let { video_face_descriptors } = await Get_Image_FaceApi_From_VIDEO( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) , false, false ) 
                     tagging_entry_tmp["faceDescriptors"] = video_face_descriptors
-                    tagging_entry_tmp["taggingEmotions"] = emotions_total
                 }
 
             } else { //cannot handle this file type

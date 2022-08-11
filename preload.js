@@ -278,7 +278,7 @@ function Face_Emotion_Aggregator(prev_emotions, super_res) {
   }
   //console.log('prev_emotions',prev_emotions)
 }
-
+window.Face_Emotion_Aggregator = Face_Emotion_Aggregator
 
 
 

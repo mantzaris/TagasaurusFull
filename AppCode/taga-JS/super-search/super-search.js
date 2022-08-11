@@ -19,9 +19,9 @@ async function Get_Tagging_Annotation_From_DB(image_name) { //
 
 var reg_exp_delims = /[#:,;| ]+/
 
-search_results = '';
-selected_images = []; 
-selected_images_type = []; // 'stored' / 'new' / 'webcam'
+let search_results = '';
+let selected_images = []; 
+let selected_images_type = []; // 'stored' / 'new' / 'webcam'
 
 var last_user_image_directory_chosen = '';
 
@@ -55,55 +55,53 @@ async function Super_Search() {
 
         if( selected_images_type[img_ind] == 'stored' ) {
             console.log('stored')
-            //console.log('selected_images[img_ind]', selected_images[img_ind])
 
-            let ft_res = await fileType.fromFile(  PATH.join(TAGA_DATA_DIRECTORY, selected_images[img_ind])  )
-            let type = ft_res.mime.includes("video")
-            if( type ) { console.log("skip video"); continue; }
-
-            //GET FROM DB NOT NEW PROCESS!!!
-            super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, selected_images[img_ind]) )
-            
-            //console.log('super_res', super_res)
-            //console.log('super_res.length = ', super_res.length)
-            if( super_res.length > 0 ) {
-                faceDescriptors_tmp = await Get_Face_Descriptors_Arrays(super_res)
-                for( let ind = 0; ind < faceDescriptors_tmp.length; ind++ ) {
-                    faceDescriptors_search.push(faceDescriptors_tmp[ind])
-                }
+            console.log('selected_images_type[img_ind]',selected_images[img_ind])
+            let annotation_tmp = await Get_Tagging_Annotation_From_DB( selected_images[img_ind] )
+            console.log('annotation_tmp', annotation_tmp)
+            for( let ind = 0; ind < annotation_tmp.faceDescriptors.length; ind++ ) {
+                faceDescriptors_search.push(annotation_tmp.faceDescriptors[ind])
             }
+            //faceDescriptors_search.push( ...annotation_tmp.faceDescriptors )
 
         } else if( selected_images_type[img_ind] == 'new' ) {
             console.log('new')
 
             let ft_res = await fileType.fromFile(  selected_images[img_ind]  )
-            let type = ft_res.mime.includes("video")
-            if( type ) { console.log("skip video"); continue; }
-
-            super_res = await Get_Image_Face_Descriptors_From_File( selected_images[img_ind] )
-            //console.log('super_res.length = ', super_res.length)
-            if( super_res.length > 0 ) {
-                faceDescriptors_tmp = await Get_Face_Descriptors_Arrays(super_res)
-                for( let ind = 0; ind < faceDescriptors_tmp.length; ind++ ) {
-                    faceDescriptors_search.push(faceDescriptors_tmp[ind])
+            if( ft_res.mime.includes('image') == true ) {
+                if( ft_res.ext == 'gif' ) {
+                    let {faceDescriptors} = await Get_Image_Face_Expresssions_From_GIF( selected_images[img_ind] )
+                    for( let ind = 0; ind < faceDescriptors.length; ind++ ) {
+                        faceDescriptors_search.push(faceDescriptors[ind])
+                    }
+                } else {
+                    super_res = await Get_Image_Face_Descriptors_From_File( selected_images[img_ind] )
+                    if( super_res.length > 0 ) {
+                        faceDescriptors_tmp = await Get_Face_Descriptors_Arrays(super_res)
+                        for( let ind = 0; ind < faceDescriptors_tmp.length; ind++ ) {
+                            faceDescriptors_search.push(faceDescriptors_tmp[ind])
+                        }
+                    }
+                }         
+            } else if( ft_res.mime.includes('video') == true ) {
+                let { video_face_descriptors } = await Get_Image_FaceApi_From_VIDEO( selected_images[img_ind], false, false ) 
+                for( let ind = 0; ind < video_face_descriptors.length; ind++ ) {
+                    faceDescriptors_search.push(video_face_descriptors[ind])
                 }
             }
 
         } else if( selected_images_type[img_ind] == 'webcam' ) {
 
             super_res = await Get_Image_Face_Descriptors_From_File( selected_images[img_ind] )
-            //console.log('super_res.length = ', super_res.length)
             if( super_res.length > 0 ) {
                 faceDescriptors_tmp = await Get_Face_Descriptors_Arrays(super_res)
                 for( let ind = 0; ind < faceDescriptors_tmp.length; ind++ ) {
                     faceDescriptors_search.push(faceDescriptors_tmp[ind])
                 }
             }
-
         }
         //console.log( 'faceDescriptors_tmp = ', faceDescriptors_tmp )
     }
-    console.log( 'faceDescriptors_search = ', faceDescriptors_search )
     //console.log('faceDescriptors_tmp = ')
 
     super_search_obj.faceDescriptors = faceDescriptors_search
@@ -151,7 +149,7 @@ function toBinary(string) {
     const charCodes = new Uint8Array(codeUnits.buffer);
     let result = '';
     for (let i = 0; i < charCodes.byteLength; i++) {
-      result += String.fromCharCode(charCodes[i]);
+        result += String.fromCharCode(charCodes[i]);
     }
     return result;
 }
@@ -301,18 +299,26 @@ document.getElementById("use-webcam-button-id").onclick = function() {
 
 //don't block cause the user can import a new image and use webcam
 //call without waiting
+let search_results_recommended
 async function Get_Select_Recommended() {
 
     Set_Search_Obj_Tags()
 
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     tagging_db_iterator = await Tagging_Image_DB_Iterator();
-    search_results = await SEARCH_MODULE.Image_Search_DB(super_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
+    search_results_recommended = await SEARCH_MODULE.Image_Search_DB(super_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
 
     search_image_results_output = document.getElementById("facial-row-four-div-id");
     search_image_results_output.innerHTML = "";
     search_display_inner_tmp = '';
-    for(let file_key of search_results) {
+    let search_results_faces = []
+    for(let file_key of search_results_recommended) {        
+        let annotation_tmp = await Get_Tagging_Annotation_From_DB( file_key )
+        if (annotation_tmp.faceDescriptors.length > 0) { search_results_faces.push(file_key) }
+    }
+    search_results_recommended = search_results_faces
+
+    for(let file_key of search_results_faces) {
         search_display_inner_tmp += `
                                 <div class="recommended-img-div-class" id="recommended-result-image-div-id-${file_key}" >
                                     <input type="checkbox" class="recommended-img-check-box" id="recommened-check-box-id-${file_key}" name="" value="">
@@ -322,11 +328,8 @@ async function Get_Select_Recommended() {
     }
     search_image_results_output.innerHTML += search_display_inner_tmp;
 
-    //console.log(`super_search_obj = `, super_search_obj)
-    //console.log(`search_results = `, search_results)
-
     //user presses an image to select it from the images section, add onclick event listener
-    search_results.forEach(file => {
+    search_results_faces.forEach(file => {
         document.getElementById(`recommened-check-box-id-${file}`).onclick = function() {            
             //console.log('check box clicked! file = ', file)
             Handle_Get_Recommended_Image_Checked(file)
@@ -336,14 +339,20 @@ async function Get_Select_Recommended() {
 
 async function Handle_Get_Recommended_Image_Checked(filename) {
     console.log('clicked on image selected recommended', filename)
-    let index = search_results.indexOf(filename);
+    let index = search_results_recommended.indexOf(filename);
     if (index > -1) { // only splice array when item is found
-        search_results.splice(index, 1); // 2nd parameter means remove one item only
+        search_results_recommended.splice(index, 1); // 2nd parameter means remove one item only
     }
     search_image_results_output = document.getElementById("facial-row-four-div-id");
     search_image_results_output.innerHTML = "";
     search_display_inner_tmp = '';
-    for(let file_key of search_results) {
+    let search_results_faces = []
+    for(let file_key of search_results_recommended) {        
+        let annotation_tmp = await Get_Tagging_Annotation_From_DB( file_key )
+        if (annotation_tmp.faceDescriptors.length > 0) { search_results_faces.push(file_key) }
+    }
+
+    for(let file_key of search_results_faces) {
         search_display_inner_tmp += `
                                 <div class="recommended-img-div-class" id="recommended-result-image-div-id-${file_key}" >
                                     <input type="checkbox" class="recommended-img-check-box" id="recommened-check-box-id-${file_key}" name="" value="">
@@ -353,7 +362,7 @@ async function Handle_Get_Recommended_Image_Checked(filename) {
     }
     search_image_results_output.innerHTML += search_display_inner_tmp;
     //user presses an image to select it from the images section, add onclick event listener
-    search_results.forEach(file => {
+    search_results_recommended.forEach(file => {
         document.getElementById(`recommened-check-box-id-${file}`).onclick = function() {            
             //console.log('check box clicked! file = ', file)
             Handle_Get_Recommended_Image_Checked(file)
@@ -428,9 +437,9 @@ document.getElementById("use-new-image-button-id").onclick = async function() {
     result.filePaths.forEach( (element, index) => {
         selected_images_type.unshift('new')
         selected_images.unshift(element) //add to the start of the array
-        selected_images = [... new Set(selected_images)]
-        Update_Selected_Images()
     })
+    selected_images = [... new Set(selected_images)]
+    Update_Selected_Images()
 }
 
 
