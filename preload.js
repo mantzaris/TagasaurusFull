@@ -317,12 +317,19 @@ async function extractFramesFromVideo(videoUrl, get_emotions=false, get_only_emo
     let videoBlob = await fetch(videoUrl).then(r => r.blob());
     let videoObjectUrl = URL.createObjectURL(videoBlob);
     let video = document.createElement("video");
+    console.log('video',video)
+    video.addEventListener('error', function(error) { //!!!!
+      alert('problem loading this video')
+      window.location.reload()
+      console.error(error)
+    })
     let seekResolve;
     video.addEventListener('seeked', async function() {
       if(seekResolve) seekResolve();
     });
 
     video.addEventListener('loadeddata', async function() {
+      console.log('video',video)
       //console.log('in loaded data')
       let canvas = document.createElement('canvas');
       let context = canvas.getContext('2d');

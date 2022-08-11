@@ -606,6 +606,8 @@ async function Load_New_Image() {
                     tagging_entry_tmp["faceDescriptors"] = video_face_descriptors
                 }
 
+            } else if ( ft_res.mime.includes('audio') == true ) {
+                
             } else { //cannot handle this file type
                 continue
             }
