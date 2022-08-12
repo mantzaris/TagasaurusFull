@@ -543,13 +543,15 @@ async function Update_Profile_Image() {
     let file_path = PATH.join(TAGA_DATA_DIRECTORY, current_collection_obj.collectionImage);
     console.log('file_path',file_path)
     let ft_res = await fileType.fromFile(file_path)
-    let node_type = ( ft_res.mime.includes("image") ) ? 'IMG' : 'VIDEO'
-    console.log('node_type',node_type)
+    //let node_type = ( ft_res.mime.includes("image") ) ? 'IMG' : 'VIDEO'
+    //console.log('node_type',node_type)
     let content_html;
-    if( node_type == 'IMG' ) {
+    if( ft_res.mime.includes("image") ) {
         content_html = `<img id="collection-profile-image-img-id" src="${file_path}" title="view" alt="collection-profile-image"/>`
-    } else if( node_type == 'VIDEO' ) {
+    } else if( ft_res.mime.includes("video") ) {
         content_html = `<video class="${GENERAL_HELPER_FNS.VIDEO_IDENTIFIER}" id="collection-profile-image-img-id" src="${file_path}" controls muted />`
+    } else if( ft_res.mime.includes("pdf") ) {
+        content_html = `<div id="collection-profile-image-img-id" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${current_collection_obj.collectionImage}</div>   </div>` 
     }
     console.log('content_html',content_html)
     let profile_display_div = document.getElementById("collection-profile-image-display-div-id")
@@ -710,6 +712,9 @@ async function Image_Clicked_Modal(filename, node_type) {
         //document.getElementById("modal-image-clicked-displayimg-id").src = PATH.join(TAGA_DATA_DIRECTORY,filename)
     } else if( node_type == 'VIDEO' ) {
         let modal_body_html_tmp = `<video class="${GENERAL_HELPER_FNS.VIDEO_IDENTIFIER}" id="modal-image-clicked-displayimg-id" src="${PATH.join(TAGA_DATA_DIRECTORY,filename)}" controls muted />`
+        modal_display_div.insertAdjacentHTML('afterbegin', modal_body_html_tmp);
+    } else if( node_type == 'DIV' ) {
+        let modal_body_html_tmp = `<div id="modal-image-clicked-displayimg-id" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${filename}</div>   </div>` 
         modal_display_div.insertAdjacentHTML('afterbegin', modal_body_html_tmp);
     }
     

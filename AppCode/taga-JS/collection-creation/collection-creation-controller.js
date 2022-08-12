@@ -176,6 +176,8 @@ async function Creation_Next_Btn() {
         } else if( node_type == 'VIDEO' ) {            
             // document.getElementById(`profile-image-display-id`).pause()
             content_html = `<video class="${GENERAL_HELPER_FNS.VIDEO_IDENTIFIER}" id="step2-profile-image-display-id" src="${PATH.join(TAGA_DATA_DIRECTORY, COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage)}" controls muted />`
+        } else if( node_type == 'DIV' ) {
+            content_html = `<div id="step2-profile-image-display-id" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="memes-img-class" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${ COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage}</div>   </div>`   
         }
         let profile_display_div = document.getElementById("step2-profileimage-div-id")
         profile_display_div.innerHTML = ""
@@ -197,6 +199,8 @@ async function Creation_Next_Btn() {
         } else if( node_type == 'VIDEO' ) {            
             // document.getElementById(`profile-image-display-id`).pause()
             content_html = `<video class="" id="step3-profile-image-display-id" src="${PATH.join(TAGA_DATA_DIRECTORY, COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage)}" controls muted />`
+        } else if( node_type == 'DIV' ) {
+            content_html = `<div id="step3-profile-image-display-id" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="memes-img-class" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${ COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage}</div>   </div>`   
         }
         let profile_display_div = document.getElementById("step3-profileimage-div-id")
         profile_display_div.innerHTML = ""
@@ -222,6 +226,8 @@ async function Creation_Next_Btn() {
         } else if( node_type == 'VIDEO' ) {            
             // document.getElementById(`profile-image-display-id`).pause()
             content_html = `<video class="${GENERAL_HELPER_FNS.VIDEO_IDENTIFIER}" id="step4-profile-image-display-id" src="${PATH.join(TAGA_DATA_DIRECTORY, COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage)}" controls muted />`
+        } else if( node_type == 'DIV' ) {
+            content_html = `<div id="step4-profile-image-display-id" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="memes-img-class" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${ COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage}</div>   </div>`   
         }
         let profile_display_div = document.getElementById("step4-profileimage-div-id")
         profile_display_div.innerHTML = ""
@@ -246,6 +252,8 @@ async function Creation_Next_Btn() {
         } else if( node_type == 'VIDEO' ) {            
             // document.getElementById(`profile-image-display-id`).pause()
             content_html = `<video class="" id="step5-profile-image-display-id" src="${PATH.join(TAGA_DATA_DIRECTORY, COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage)}" controls muted />`
+        } else if( node_type == 'DIV' ) {
+            content_html = `<div id="step5-profile-image-display-id" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="memes-img-class" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${ COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage}</div>   </div>`   
         }
         let profile_display_div = document.getElementById("step5-profileimage-div-id")
         profile_display_div.innerHTML = ""
@@ -631,6 +639,8 @@ async function Change_Profile_Image() {
                     event.preventDefault()
                     document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).pause()
                     content_html = `<video class="${GENERAL_HELPER_FNS.VIDEO_IDENTIFIER} vid1" id="profile-image-display-id" src="${PATH.join(TAGA_DATA_DIRECTORY, image_filename)}" controls muted />`
+                } else if( node_type == 'DIV' ) {
+                    content_html = `<div id="profile-image-display-id" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="memes-img-class" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${image_filename}</div>   </div>`   
                 }
                 let profile_display_div = document.getElementById("profile-image-display-div-id")
                 profile_display_div.innerHTML = ""
@@ -730,6 +740,8 @@ async function Collection_Profile_Image_Search_Action() {
                     event.preventDefault()
                     document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).pause()
                     content_html = `<video class="${GENERAL_HELPER_FNS.VIDEO_IDENTIFIER}" id="cprofile-image-display-id" src="${PATH.join(TAGA_DATA_DIRECTORY, image_filename)}" controls muted />`
+                } else if( node_type == 'DIV' ) {
+                    content_html = `<div id="profile-image-display-id" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="memes-img-class" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${image_filename}</div>   </div>`   
                 }
                 let profile_display_div = document.getElementById("profile-image-display-div-id")
                 profile_display_div.innerHTML = ""

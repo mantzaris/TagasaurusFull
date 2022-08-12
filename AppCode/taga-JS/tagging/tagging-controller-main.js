@@ -168,27 +168,25 @@ async function Display_Image() {
     
 
     if( ft_res.mime.includes('image') == true ) {
-        center_gallery_element = document.createElement("img")
-        
-        center_gallery_element.src = display_path
-        center_gallery_element.id = 'center-gallery-image-id'
-        parent.appendChild(center_gallery_element)          
+        center_gallery_element = document.createElement("img")        
+        center_gallery_element.src = display_path        
         
     } else if( ft_res.mime.includes('pdf') == true ) {
-        
-        IPC_RENDERER.send('displayPDF',display_path)        
+        center_gallery_element = document.createElement("img")
+        center_gallery_element.src = "../build/icons/PDFicon.png"
+        IPC_RENDERER.send('displayPDF',display_path)
 
     } else { //cannot handle this file type
         center_gallery_element = document.createElement("video")  
         center_gallery_element.autoplay = true
         center_gallery_element.muted = true
         center_gallery_element.controls = true  
-
         center_gallery_element.src = display_path
-        center_gallery_element.id = 'center-gallery-image-id'
-        parent.appendChild(center_gallery_element)  
+        
     }
-    
+
+    center_gallery_element.id = 'center-gallery-image-id'
+    parent.appendChild(center_gallery_element) 
 }
 //DISPLAY THE MAIN IMAGE END<<<
 
