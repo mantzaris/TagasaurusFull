@@ -161,20 +161,34 @@ async function Display_Image() {
     const display_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation["imageFileName"]}`
     let center_gallery_element;
     ft_res = await fileType.fromFile( display_path )
-    console.log('ft_res in Display Image = ', ft_res)    
+    console.log('ft_res in Display Image = ', ft_res) 
+    if( ft_res.mime.includes('pdf') == false ) {
+        IPC_RENDERER.send('closePDF')
+    }
+    
 
     if( ft_res.mime.includes('image') == true ) {
-        center_gallery_element = document.createElement("img")        
+        center_gallery_element = document.createElement("img")
         
+        center_gallery_element.src = display_path
+        center_gallery_element.id = 'center-gallery-image-id'
+        parent.appendChild(center_gallery_element)          
+        
+    } else if( ft_res.mime.includes('pdf') == true ) {
+        
+        IPC_RENDERER.send('displayPDF',display_path)        
+
     } else { //cannot handle this file type
         center_gallery_element = document.createElement("video")  
         center_gallery_element.autoplay = true
         center_gallery_element.muted = true
-        center_gallery_element.controls = true        
+        center_gallery_element.controls = true  
+
+        center_gallery_element.src = display_path
+        center_gallery_element.id = 'center-gallery-image-id'
+        parent.appendChild(center_gallery_element)  
     }
-    center_gallery_element.src = display_path
-    center_gallery_element.id = 'center-gallery-image-id'
-    parent.appendChild(center_gallery_element)
+    
 }
 //DISPLAY THE MAIN IMAGE END<<<
 
@@ -263,13 +277,17 @@ async function Meme_View_Fill() {
         if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true ) {
 
             let ft_res = await fileType.fromFile( `${TAGA_DATA_DIRECTORY}${PATH.sep}${file}` )
-            let type = ( ft_res.mime.includes("image") ) ? 'img' : 'video'
+            //let type = ( ft_res.mime.includes("image") ) ? 'img' : 'video'
             let content_html;
-            if( type == 'img' ) {
+            if(ft_res.mime.includes("image") == true ) {
                 content_html = `<img class="memes-img-class" id="memes-image-img-id-${file}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file}" title="view" alt="meme" />`
-            } else if( type == 'video' ) {
+            } else if( ft_res.mime.includes("video") == true ) {
                 content_html = `<video class="memes-img-class" id="memes-image-img-id-${file}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file}" controls muted />`
+            } else if( ft_res.mime.includes("pdf") == true ) {
+                content_html = `<div id="memes-image-img-id-${file}" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="memes-img-class" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${file}</div>   </div>`     
+                console.log('pdf view content', content_html)
             }
+
 
             meme_box.insertAdjacentHTML('beforeend',`
                                                 <label class="memeswitch" title="deselect / keep" >   <input id="meme-toggle-id-${file}" type="checkbox"> <span class="slider"></span>   </label>
@@ -330,6 +348,10 @@ async function Meme_Image_Clicked(meme_file_name) {
     } else if( node_type == 'VIDEO' ) {
         content_html = `<video class="memes-img-class" id="modal-meme-clicked-displayimg-id" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_file_name}" controls muted />`
         clicked_meme_element.pause()
+    } else if( node_type == "DIV" ) {
+        console.log()
+        content_html = `<div id="modal-meme-clicked-displayimg-id" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="memes-img-class" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${meme_file_name}</div>   </div>`     
+
     }
     meme_click_modal_body_html_tmp += content_html //`<img id="modal-meme-clicked-displayimg-id" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_file_name}" title="meme" alt="meme" />`;
     meme_click_modal_div.insertAdjacentHTML('beforeend', meme_click_modal_body_html_tmp);
@@ -607,6 +629,8 @@ async function Load_New_Image() {
                 }
 
             } else if ( ft_res.mime.includes('audio') == true ) {
+                
+            } else if ( ft_res.mime.includes('pdf') == true ) {
                 
             } else { //cannot handle this file type
                 continue

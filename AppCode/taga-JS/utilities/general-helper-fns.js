@@ -15,6 +15,10 @@ async function Create_Media_Thumbnail(file_key, class_name, id_tmp, provide_path
     type = "meme"
     if( ft_res.mime.includes('image') == true ) {
         return `<img class="${class_name}" id="${id_tmp}" src="${file_path}" title="view" alt="${type}" />`        
+    } else if( ft_res.mime.includes('pdf') == true ) {
+
+        return `<div id="${id_tmp}" style="display:flex;align-items:center" >  <img class="${class_name}" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${file_key}</div>   </div>`        
+
     } else { //cannot handle this file type
         return `<video class="${class_name} ${VIDEO_IDENTIFIER}" id="${id_tmp}" src="${file_path}" controls muted alt="${type}" />`
     }

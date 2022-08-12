@@ -47,6 +47,7 @@ function createWindow () {
     icon: tmp_icon_dir,
     autoHideMenuBar: true,
     webPreferences: {
+      plugins: true,
       preload: PATH.join(__dirname, 'preload.js'),
       nodeIntegration: true,
       contextIsolation: false,
@@ -60,6 +61,28 @@ function createWindow () {
   //mainWindow.setIcon(tmp_icon_dir)
   // mainWindow.webContents.openDevTools()
 }
+
+const PDFWindow = require('electron-pdf-window')
+let pdf_window = null
+ipcMain.on('displayPDF', (_,pdfPath) => {
+  if(pdf_window == null) {
+    pdf_window = new PDFWindow({
+      width: 800,
+      height: 600
+    })
+    pdf_window.on('close', () => pdf_window = null )
+  }
+  pdf_window.loadURL(pdfPath)
+  pdf_window.show()
+})
+ipcMain.on('closePDF', (_) => {
+  if( pdf_window ) {
+    pdf_window.hide()
+    //pdf_window = null
+  }
+})
+
+
 
 //DB SET UP START>>>
 //create folders for data and db -> check if db tables exist -> create indexes on tables
