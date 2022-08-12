@@ -746,7 +746,7 @@ async function Collection_Profile_Image_Search_Action() {
                 let profile_display_div = document.getElementById("profile-image-display-div-id")
                 profile_display_div.innerHTML = ""
                 profile_display_div.insertAdjacentHTML('afterbegin', content_html);
-                console.log('content_html',content_html)
+                //console.log('content_html',content_html)
 
                 GENERAL_HELPER_FNS.Pause_Media_From_Modals()
                 //document.getElementById("profile-image-display-id").src = PATH.join(TAGA_DATA_DIRECTORY, image_filename)

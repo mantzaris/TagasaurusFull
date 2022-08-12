@@ -66,7 +66,7 @@ async function Auto_Fill_Emotions(super_res, file_annotation_obj) {
 //actions for the AUTO-FILL emotions button being pressed, populate 
 document.getElementById(`auto-fill-emotions-button-id`).onclick = async function() {
     ft_res = await fileType.fromFile( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
-    console.log('ft_res = ', ft_res)
+    //console.log('ft_res = ', ft_res)
     if( ft_res.mime.includes('image') == true ) {
         if( ft_res.ext == 'gif' ) {
             let {faceDescriptors,faceEmotions} = await Get_Image_Face_Expresssions_From_GIF( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]), true, true )
@@ -161,7 +161,7 @@ async function Display_Image() {
     const display_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation["imageFileName"]}`
     let center_gallery_element;
     ft_res = await fileType.fromFile( display_path )
-    console.log('ft_res in Display Image = ', ft_res) 
+    //console.log('ft_res in Display Image = ', ft_res) 
     if( ft_res.mime.includes('pdf') == false ) {
         IPC_RENDERER.send('closePDF')
     }
@@ -213,7 +213,7 @@ function Description_Hashtags_Display_Fill() {
 //EMOTION STUFF START>>>
 //populate the emotion value view with emotional values
 async function Emotion_Display_Fill() {
-    console.log('current_image_annotation',current_image_annotation)
+    //console.log('current_image_annotation',current_image_annotation)
     emotion_div = document.getElementById("emotion-collectionlist-div-id");
     emotion_keys = Object.keys(current_image_annotation["taggingEmotions"]);
     emotion_html_tmp = ''
@@ -283,7 +283,7 @@ async function Meme_View_Fill() {
                 content_html = `<video class="memes-img-class" id="memes-image-img-id-${file}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file}" controls muted />`
             } else if( ft_res.mime.includes("pdf") == true ) {
                 content_html = `<div id="memes-image-img-id-${file}" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="memes-img-class" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${file}</div>   </div>`     
-                console.log('pdf view content', content_html)
+                //console.log('pdf view content', content_html)
             }
 
 
@@ -347,7 +347,7 @@ async function Meme_Image_Clicked(meme_file_name) {
         content_html = `<video class="memes-img-class" id="modal-meme-clicked-displayimg-id" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_file_name}" controls muted />`
         clicked_meme_element.pause()
     } else if( node_type == "DIV" ) {
-        console.log()
+        //console.log()
         content_html = `<div id="modal-meme-clicked-displayimg-id" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="memes-img-class" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${meme_file_name}</div>   </div>`     
 
     }
@@ -468,11 +468,10 @@ async function First_Display_Init() {
         Load_Default_Taga_Image();
     } else if( window.location.href.indexOf("imageFileName") > -1 ) {
         tagging_name_param = window.location.search.split("=")[1]
-        console.log('tagging_name_param = ', tagging_name_param)
+        //console.log('tagging_name_param = ', tagging_name_param)
         tagging_name_param = fromBinary(atob(tagging_name_param))
         
-        console.log('tagging_name_param = ', tagging_name_param)
-
+        //console.log('tagging_name_param = ', tagging_name_param)
         current_image_annotation = await Get_Tagging_Annotation_From_DB(tagging_name_param);
         Load_State_Of_Image_IDB();
         
@@ -585,12 +584,12 @@ async function Load_New_Image() {
         tagging_entry_tmp.imageFileName = filename;
         tagging_entry_tmp.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${filename}`);
         hash_present = await Get_Tagging_Hash_From_DB(tagging_entry_tmp.imageFileHash);
-        console.log("tagging_entry_tmp",tagging_entry_tmp)
+        //console.log("tagging_entry_tmp",tagging_entry_tmp)
         if(hash_present == undefined) {
             //emotion inference upon the default selected
 
             ft_res = await fileType.fromFile( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
-            console.log('ft_res = ', ft_res)
+            //console.log('ft_res = ', ft_res)
             if( ft_res.mime.includes('image') == true ) {
                 if( ft_res.ext == 'gif' ) {
                     if( default_auto_fill_emotions == true ) {
@@ -614,7 +613,7 @@ async function Load_New_Image() {
                     }
                 }
             } else if ( ft_res.mime.includes('video') == true ) {
-                console.log("video type mime",tagging_entry_tmp)
+                //console.log("video type mime",tagging_entry_tmp)
 
                 if( default_auto_fill_emotions == true ) {
                     let { video_face_descriptors, emotions_total} = await Get_Image_FaceApi_From_VIDEO( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) , true, false ) 
@@ -633,7 +632,7 @@ async function Load_New_Image() {
             } else { //cannot handle this file type
                 continue
             }
-            console.log("tagging_entry_tmp",tagging_entry_tmp)
+            //console.log("tagging_entry_tmp",tagging_entry_tmp)
             await Insert_Record_Into_DB(tagging_entry_tmp); //sqlite version
             tagging_entry = tagging_entry_tmp;
         }

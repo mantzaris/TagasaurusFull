@@ -541,7 +541,7 @@ async function Show_Collection() {
 }
 async function Update_Profile_Image() {
     let file_path = PATH.join(TAGA_DATA_DIRECTORY, current_collection_obj.collectionImage);
-    console.log('file_path',file_path)
+    //console.log('file_path',file_path)
     let ft_res = await fileType.fromFile(file_path)
     //let node_type = ( ft_res.mime.includes("image") ) ? 'IMG' : 'VIDEO'
     //console.log('node_type',node_type)
@@ -553,7 +553,7 @@ async function Update_Profile_Image() {
     } else if( ft_res.mime.includes("pdf") ) {
         content_html = `<div id="collection-profile-image-img-id" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${current_collection_obj.collectionImage}</div>   </div>` 
     }
-    console.log('content_html',content_html)
+    //console.log('content_html',content_html)
     let profile_display_div = document.getElementById("collection-profile-image-display-div-id")
     profile_display_div.innerHTML = ""
     profile_display_div.insertAdjacentHTML('afterbegin', content_html);
@@ -700,7 +700,7 @@ Initialize_Collection_Page()
 //whenever an image is clicked to pop up a modal to give a big display of the image
 //and list the tags and emotions
 async function Image_Clicked_Modal(filename, node_type) {
-    console.log(filename)
+    //console.log(filename)
     //document.getElementById("modal-image-clicked-displayimg-id").src = PATH.join(TAGA_DATA_DIRECTORY,filename)
     let modal_display_div = document.getElementById("modal-image-clicked-image-gridbox-id")
     document.getElementById("modal-image-clicked-image-gridbox-id").innerHTML = ""
