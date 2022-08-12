@@ -17,7 +17,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 const APP_NAME = "tagasaurus";
-const BUILD_EXECUTABLE = true;
+const BUILD_EXECUTABLE = false;
 
 function setupOSSpecificPaths() {  
   switch (process.platform) {

@@ -6,7 +6,7 @@ const PATH = require('path');
 const FS = require('fs');
 
 
-const BUILD_EXECUTABLE = true;
+const BUILD_EXECUTABLE = false;
 
 
 let TAGA_FILES_DIRECTORY;

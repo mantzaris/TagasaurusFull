@@ -55,8 +55,7 @@
     ],
     "linux": {
       "target": [
-        "deb",
-        "rpm"
+        "zip"
       ],
       "icon": "taga-icon/TagaIcon512x512.png",
       "maintainer": "mantzaris",
