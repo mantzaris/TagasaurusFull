@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,10 +7,13 @@
 	<link rel="stylesheet" href="./index.css">
 
     <link rel="stylesheet" href="../AppCode/taga-CSS/general-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js" integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe" crossorigin="anonymous"></script>
     
 </head>
 <body>
@@ -20,42 +22,41 @@
 
 
         <div id="title-div-id">
-            <div id="left-taga-icon-div-id">
-                <img src="https://github.com/mantzaris/Tagasaurus/raw/main/Taga.png" alt="Taga Icon">
-            </div>
             <div id="middle-title-zone-div-id">
                 <div id="main-title-text-div-id">
                     Tagasaurus
                 </div>
                 <div id="subtitle-text-div-id">
-                    tag your planet..!
+                    Tag your planet..!
                 </div>
             </div>
 
             <div id="right-taga-icon-div-id">
-                <img src="https://github.com/mantzaris/Tagasaurus/raw/main/Taga.png" alt="Taga Icon">
+                <img src="https://github.com/mantzaris/Tagasaurus/raw/main/Taga.png" alt="Taga Icon" width="70">
             </div>
         </div>
 
+        <section class="home">
+           <div class="slider">
+              <div class="slide active" style="background-image: url('https://github.com/mantzaris/Tagasaurus/raw/main/TagasaurusReflections/screenshot1.png')">
+              </div>
+              <div class="slide" style="background-image: url('https://github.com/mantzaris/Tagasaurus/raw/main/TagasaurusReflections/screenshot2.png')">
+              </div>
+              <div class="slide" style="background-image: url('https://github.com/mantzaris/Tagasaurus/raw/main/TagasaurusReflections/screenshot3.png')">
+              </div>
+           </div>
+         
+          <!-- controls  -->
+          <div class="controls">
+              <div class="prev"><</div>
+              <div class="next">></div>
+          </div>
 
-        <div id="installation-div-id">
-            <span class="subsection-label-header-class">Windows OS Installation</span>
-            <ul>
-                <li>'.exe' Installer: <a href="https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus.Setup.1.1.0.exe">[download from github]</a>  sha256 hash: 41028d87b371cad39980421bc1785e39e34d7c5bebb383a31346e76b3d64346f</li>
-                <li>'.zip' Executable: <a href="https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus-1.1.0-win.zip">[download from github]</a>  sha256 hash: 9bcd6fcb3fc980966161e632fea5df4ce2dcf666e2b95b6841d6d828f92d0107</li>
-                The zip executable allows the user to run the application tagasaurus.exe from the unzipped folder.
-                All the data is held in a new folder created next to the unzipped folder.
-                This is especially useful if you want to put Tagasaurus on a USB (or external disk), and run it from 
-                directly off the external space keeping all the Taga data there to transport & store. 
-            </ul>
-            <span class="subsection-label-header-class">Linux Installation</span>
-            <ul>
-                <li>'.deb' Debian/Ubuntu: <a href="https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus_1.1.0_amd64.deb">[download from github]</a>  sha256 hash: 51c3b92236ee36af47e3b0c3cc69508c67250faa3b97af0ea85608229ee37f8b   </li>
-                <li>'.rpm' Fedora/CentOS: <a href="https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus-1.1.0.x86_64.rpm">[download from github]</a>  sha256 hash: 1a63aaa1fdce8021b864220485f9af4d951408f8eab3cbc617a4270846ea3511 </li>
-                <li>'.zip' Generic Linux: <a href="https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus-1.1.0.zip">[download from github]</a>  sha256 hash: fdff120c0fc752a6f970289f3cc1e5d7dd0841daa2e99a3dc00a989aed263520 </li>
-            </ul>
-        </div>
+          <!-- indicators -->
+          <div class="indicator">
+          </div>
 
+        </section>
 
         <div id="what-the-app-does-div-id">
             <div id="usage-description-div-id"> 
@@ -64,38 +65,57 @@
                     <li>Annotate Images with 'Descriptions', 'Emotion values', and 'Memes'</li>
                     <li>Search for images and memes based upon Annotations or use facial recognition to find similar faces using
                         the button 'Similar Search'
-                    </li>
                     <li>Create Collections of images and add Annotations to the collections to later search for them</li>
                     <li>Use the Super Search tool to search based upon Annotations or even webcam images using facial recognition</li>
                     <li>Maintain privacy as the app does not access the internet in any way</li>
                     <li>Apply machine learning to search for images and videos based on the people in the images/videos</li>
                 </ul>
             </div>
-            <div id="screen-shots-div-id">
-                <img class="screenshots" src="https://github.com/mantzaris/Tagasaurus/raw/main/TagasaurusReflections/screenshot1.png" alt="taga screen shot">
-                <img class="screenshots" src="https://github.com/mantzaris/Tagasaurus/raw/main/TagasaurusReflections/screenshot2.png" alt="taga screen shot">
-                <img class="screenshots" src="https://github.com/mantzaris/Tagasaurus/raw/main/TagasaurusReflections/screenshot3.png" alt="taga screen shot">
+            <div id="usage-video">
+                <!-- <iframe src="https://youtube.com/embed/MYkFmmxN2YY"></iframe> -->
+                <iframe  src="https://www.youtube.com/embed/MYkFmmxN2YY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
 
         </div>
 
-        <div id="links-div-id">
-            <span class="subsection-label-header-class">LINKS:</span>
+        <div id="installation-div-id">
+            <span class="subsection-label-header-class">Windows OS Installation</span>
             <ul>
-                <li class="links">
-                    code repository: https://github.com/mantzaris/Tagasaurus
-                </li>
-                <li class="links">
-                    Facebook: https://www.facebook.com/TagasaurusApp
-                </li>
-                <li class="links">
-                    Twitter: https://twitter.com/Tagasaurus_app
-                </li>
+                <li>'.exe' Installer: <a  style="font-size:1.5rem;color:#a03366;font-weight:bold;" href="https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus.Setup.1.1.0.exe">Download from Github</a>  <br> (sha256 hash: 41028d87b371cad39980421bc1785e39e34d7c5bebb383a31346e76b3d64346f) </li>
+                <li>'.zip' Executable: <a style="font-size:1.5rem;color:#a03366;font-weight:bold;"  href="https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus-1.1.0-win.zip">Download from Github</a> <br> (sha256 hash: 9bcd6fcb3fc980966161e632fea5df4ce2dcf666e2b95b6841d6d828f92d0107) </li>
+            </ul>
+            <p class="zip-download-text">The zip executable allows the user to run the application tagasaurus.exe from the unzipped folder.
+                All the data is held in a new folder created next to the unzipped folder.
+                This is especially useful if you want to put Tagasaurus on a USB (or external disk), and run it from 
+                directly off the external space keeping all the Taga data there to transport & store. </p>
+            <br />
+            <span class="subsection-label-header-class">Linux Installation</span>
+            <ul>
+                <li>'.deb' Debian/Ubuntu: <a style="font-size:1.5rem;color:#a03366;font-weight:bold;"  href="https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus_1.1.0_amd64.deb">Download from Github</a>  <br> (sha256 hash: 51c3b92236ee36af47e3b0c3cc69508c67250faa3b97af0ea85608229ee37f8b)   </li>
+                <li>'.rpm' Fedora/CentOS: <a  style="font-size:1.5rem;color:#a03366;font-weight:bold;" href="https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus-1.1.0.x86_64.rpm">Download from Github</a>  <br> (sha256 hash: 1a63aaa1fdce8021b864220485f9af4d951408f8eab3cbc617a4270846ea3511) </li>
+                <li>'.zip' Generic Linux: <a  style="font-size:1.5rem;color:#a03366;font-weight:bold;"  href="https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus-1.1.0.zip">Download from Github</a> <br> (sha256 hash: fdff120c0fc752a6f970289f3cc1e5d7dd0841daa2e99a3dc00a989aed263520) </li>
             </ul>
         </div>
 
-
     </div>  
 
+    <footer>
+      <div class="footer-heading">Links</div>  
+      <div class="rounded-social-buttons">
+        <a class="social-button facebook" href="https://www.facebook.com/TagasaurusApp" target="_blank"><i class="fab fa-facebook-f"></i></a>
+        <a class="social-button twitter" href="https://twitter.com/Tagasaurus_app" target="_blank"><i class="fab fa-twitter"></i></a>
+        <a class="social-button linkedin" href="https://github.com/mantzaris/Tagasaurus" target="_blank"><i class="fab fa-github"></i></a>
+    </div>
+    </footer>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="./script.js"></script>
+    <script>
+        window.onload = function(){
+            setTimeout(function() {
+                window.location.replace("#usage-description-div-id");
+            }, 1800);
+        };
+    </script>
 </body>
 </html>
