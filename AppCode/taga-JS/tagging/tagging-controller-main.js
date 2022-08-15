@@ -463,7 +463,7 @@ async function First_Display_Init() {
         Search_Images();
     }, false);
 
-    records_remaining = await Number_of_Tagging_Records();
+    let records_remaining = await Number_of_Tagging_Records();
     if(records_remaining == 0) {
         Load_Default_Taga_Image();
     } else if( window.location.href.indexOf("imageFileName") > -1 ) {
@@ -558,11 +558,16 @@ async function Delete_Image() {
     await Handle_Delete_Collection_IMAGE_references(current_image_annotation.imageFileName)
     await Handle_Delete_Collection_MEME_references(current_image_annotation.imageFileName)
 
-    records_remaining = await Delete_Tagging_Annotation_DB( current_image_annotation.imageFileName );
-    if(records_remaining == 0) {
+    let records_remaining = await Number_of_Tagging_Records();
+    if(records_remaining == 1) {
+        await Delete_Tagging_Annotation_DB( current_image_annotation.imageFileName );
         await Load_Default_Taga_Image();
+        New_Image_Display( 0 )
+    } else {
+        let prev_tmp = current_image_annotation.imageFileName
+        New_Image_Display( 1 );
+        await Delete_Tagging_Annotation_DB( prev_tmp );
     }
-    New_Image_Display( 0 ); //pass zero to display current and not forward or backward
 }
 //dialog window explorer to select new images to import, and calls the functions to update the view
 //checks whether the directory of the images is the taga image folder and if so returns

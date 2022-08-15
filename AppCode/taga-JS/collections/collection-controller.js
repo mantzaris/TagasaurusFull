@@ -132,12 +132,19 @@ function addMouseOverIconSwitch_Collection(emotion_div,child_num=1) {
 async function Delete_Collection() {
     await Update_Collection_MEME_Connections(current_collection_obj.collectionName,current_collection_obj.collectionMemes,[])
     await Update_Collection_IMAGE_Connections(current_collection_obj.collectionName,current_collection_obj.collectionImageSet,[])
-    collections_remaining = await Delete_Collection_Record_In_DB(current_collection_obj.collectionName)
-    if(collections_remaining == 0) {
-        await Handle_Empty_DB();
-    }
     
-    New_Collection_Display( 0 )
+    let collections_remaining = await Number_of_Collection_Records()
+
+    if(collections_remaining == 1) {
+        await Delete_Collection_Record_In_DB(current_collection_obj.collectionName)
+        await Handle_Empty_DB();
+        New_Collection_Display( 0 )
+    } else {
+        let prev_tmp = current_collection_obj.collectionName
+        New_Collection_Display( 1 )
+        await Delete_Collection_Record_In_DB( prev_tmp );
+    }
+
 }
 
 
@@ -675,7 +682,7 @@ async function Initialize_Collection_Page(){
         Search_Collections()
     })
     
-    record_num_tmp = await Number_of_Collection_Records()
+    let record_num_tmp = await Number_of_Collection_Records()
     if( record_num_tmp == 0) {
         await Handle_Empty_DB()
     }
