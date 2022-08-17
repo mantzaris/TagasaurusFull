@@ -86,6 +86,8 @@ async function Init_Analytics() {
     sample_num = number_of_records < MAX_SAMPLE_COUNT_RECORDS ? number_of_records : MAX_SAMPLE_COUNT_RECORDS
     if( sample_num < 100 ) {
         sample_num = 100
+    } else if( sample_num > 500 ) {
+        sample_num = 500
     }
     Display_Skill_Levels()
 }

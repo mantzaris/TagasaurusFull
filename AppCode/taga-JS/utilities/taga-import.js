@@ -18,19 +18,19 @@ const TAGA_DATA_destination = PATH.join(USER_DATA_PATH,'TagasaurusFiles','data')
 
 
 //db path that holds the import db
-DB_import_path = ''
+let DB_import_path = ''
 //db path that holds the data for the import db
-DB_import_data = ''
+let DB_import_data = ''
 
-DB_import = ''
+let DB_import = ''
 
-TAGGING_TABLE_NAME = 'TAGGING';
-TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
-COLLECTIONS_TABLE_NAME = 'COLLECTIONS';
-COLLECTION_MEME_TABLE_NAME = 'COLLECTIONMEMES';
-COLLECTION_IMAGESET_TABLE_NAME = 'COLLECTIONIMAGESET'
+let TAGGING_TABLE_NAME = 'TAGGING';
+let TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
+let COLLECTIONS_TABLE_NAME = 'COLLECTIONS';
+let COLLECTION_MEME_TABLE_NAME = 'COLLECTIONMEMES';
+let COLLECTION_IMAGESET_TABLE_NAME = 'COLLECTIONIMAGESET'
 //table to hold the intermediate filename changes for the merge so that the importing file names get changed if needed
-IMPORT_TABLE_NAME_CHANGES = 'NAMECHANGES'
+let IMPORT_TABLE_NAME_CHANGES = 'NAMECHANGES'
 
 
 
@@ -44,10 +44,10 @@ async function Import_User_Annotation_Data() {
         if(path_chosen.canceled == false) {
             
             DB_import_path = path_chosen.filePaths[0]
-            DB_import_data = PATH.join( DB_import_path + PATH.sep + '..' + PATH.sep + 'data' + PATH.sep )
+            DB_import_data = PATH.join( DB_import_path, '..', 'data', PATH.sep )
             DB_import = await new DATABASE3(DB_import_path, { }) //verbose: console.log }); //open db in that directory
             //begin to ingest the data from the db into the user's directory and DB
-            res = await Start_Check_DB_Tables()
+            let res = await Start_Check_DB_Tables()
             if( res == -1 ) {
                 console.log(`problem after checking import tables so interrupting`)
                 return
@@ -79,25 +79,25 @@ async function Import_User_Annotation_Data() {
 async function Import_Collections_Records_Info_Migrate() {
     GET_NAME_CHANGE_STMT = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} WHERE imageFileNameOrig=?;`);
 
-    iter_collection_import = await Import_Collections_Image_DB_Iterator()
-    record_collection_import_tmp = await iter_collection_import()
+    let iter_collection_import = await Import_Collections_Image_DB_Iterator()
+    let record_collection_import_tmp = await iter_collection_import()
     while( record_collection_import_tmp != undefined ) {
         //console.log(`record_collection_import_tmp = ${JSON.stringify(record_collection_import_tmp)}`)
-        collection_dest_record_tmp = await DB_destination.Get_Collection_Record_From_DB(record_collection_import_tmp.collectionName)
+        let collection_dest_record_tmp = await DB_destination.Get_Collection_Record_From_DB(record_collection_import_tmp.collectionName)
         if( collection_dest_record_tmp == undefined ) { //collection is not in the destination db so 'insert'
             //translate the file names for the destination file namespace created
-            new_collection_image_names_tmp = []
-            for( image_name_tmp of record_collection_import_tmp.collectionImageSet ) {
+            let new_collection_image_names_tmp = []
+            for( let image_name_tmp of record_collection_import_tmp.collectionImageSet ) {
             //record_collection_import_tmp.collectionImageSet.forEach(async image_name_tmp => {
-                tmp_change = await GET_NAME_CHANGE_STMT.get(image_name_tmp)
+                let tmp_change = await GET_NAME_CHANGE_STMT.get(image_name_tmp)
                 new_collection_image_names_tmp.push(tmp_change.imageFileNameNew)
             }//)
             record_collection_import_tmp.collectionImageSet = new_collection_image_names_tmp
 
-            new_meme_image_names_tmp = []
-            for( image_name_tmp of record_collection_import_tmp.collectionMemes ) {
+            let new_meme_image_names_tmp = []
+            for( let image_name_tmp of record_collection_import_tmp.collectionMemes ) {
             //record_collection_import_tmp.collectionMemes.forEach(async image_name_tmp => {
-                tmp_change = await GET_NAME_CHANGE_STMT.get(image_name_tmp)
+                let tmp_change = await GET_NAME_CHANGE_STMT.get(image_name_tmp)
                 new_meme_image_names_tmp.push(tmp_change.imageFileNameNew)
             }//)
             record_collection_import_tmp.collectionMemes = new_meme_image_names_tmp
@@ -111,20 +111,20 @@ async function Import_Collections_Records_Info_Migrate() {
             await DB_destination.Update_Collection_IMAGE_Connections(record_collection_import_tmp.collectionName, [], record_collection_import_tmp.collectionImageSet)
 
         } else { //collection is present so perform a 'merge' of the annotation information
-            collection_dest_images_original_tmp = JSON.parse(JSON.stringify(collection_dest_record_tmp.collectionImageSet))
-            new_collection_image_names_tmp = []
-            for( image_name_tmp of record_collection_import_tmp.collectionImageSet ) {
+            let collection_dest_images_original_tmp = JSON.parse(JSON.stringify(collection_dest_record_tmp.collectionImageSet))
+            let new_collection_image_names_tmp = []
+            for( let image_name_tmp of record_collection_import_tmp.collectionImageSet ) {
             //record_collection_import_tmp.collectionImageSet.forEach(async image_name_tmp => {
-                tmp_change = await GET_NAME_CHANGE_STMT.get(image_name_tmp)
+                let tmp_change = await GET_NAME_CHANGE_STMT.get(image_name_tmp)
                 new_collection_image_names_tmp.push(tmp_change.imageFileNameNew)
             }//)
             collection_dest_record_tmp.collectionImageSet =  [... new Set( collection_dest_record_tmp["collectionImageSet"].concat(new_collection_image_names_tmp) ) ]
 
-            collection_dest_memes_original_tmp = JSON.parse(JSON.stringify(collection_dest_record_tmp.collectionMemes))
-            new_meme_image_names_tmp = []
-            for( image_name_tmp of record_collection_import_tmp.collectionMemes ) {
+            let collection_dest_memes_original_tmp = JSON.parse(JSON.stringify(collection_dest_record_tmp.collectionMemes))
+            let new_meme_image_names_tmp = []
+            for( let image_name_tmp of record_collection_import_tmp.collectionMemes ) {
             //record_collection_import_tmp.collectionMemes.forEach(async image_name_tmp => {
-                tmp_change = await GET_NAME_CHANGE_STMT.get(image_name_tmp)
+                let tmp_change = await GET_NAME_CHANGE_STMT.get(image_name_tmp)
                 new_meme_image_names_tmp.push(tmp_change.imageFileNameNew)
             }//)
             collection_dest_record_tmp.collectionMemes =   [... new Set( collection_dest_record_tmp["collectionMemes"].concat(new_meme_image_names_tmp) ) ]
@@ -135,12 +135,12 @@ async function Import_Collections_Records_Info_Migrate() {
                 collection_dest_record_tmp.collectionDescription = collection_dest_record_tmp.collectionDescription
             }
             //now concatenate the tagging Tags
-            diff_tags = record_collection_import_tmp["collectionDescriptionTags"].filter(x => !collection_dest_record_tmp["collectionDescriptionTags"].includes(x));
+            let diff_tags = record_collection_import_tmp["collectionDescriptionTags"].filter(x => !collection_dest_record_tmp["collectionDescriptionTags"].includes(x));
             collection_dest_record_tmp["collectionDescriptionTags"] = collection_dest_record_tmp["collectionDescriptionTags"].concat(diff_tags)
 
             //go through the emotion key -overlaps- and merge values
-            dest_tmp_emotion_keys = Object.keys(collection_dest_record_tmp["collectionEmotions"])
-            import_emotions_keys = Object.keys(record_collection_import_tmp["collectionEmotions"])
+            let dest_tmp_emotion_keys = Object.keys(collection_dest_record_tmp["collectionEmotions"])
+            let import_emotions_keys = Object.keys(record_collection_import_tmp["collectionEmotions"])
             import_emotions_keys.forEach(import_key_emotion_label => {
                 dest_tmp_emotion_keys.forEach(dest_emotion_key_label => {
                     //emotion label overlap found
@@ -151,7 +151,7 @@ async function Import_Collections_Records_Info_Migrate() {
                 })
             })
             //array difference, those on the import to copy over
-            diff_emotion_keys = import_emotions_keys.filter(x => !dest_tmp_emotion_keys.includes(x));
+            let diff_emotion_keys = import_emotions_keys.filter(x => !dest_tmp_emotion_keys.includes(x));
             diff_emotion_keys.forEach(new_emotion_tmp => {
                 collection_dest_record_tmp["collectionEmotions"][new_emotion_tmp] = record_collection_import_tmp["collectionEmotions"][new_emotion_tmp]
             })
@@ -177,19 +177,19 @@ async function Import_Records_DB_Info_Migrate() {
     GET_NAME_CHANGE_STMT = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} WHERE imageFileNameOrig=?;`);
 
     //iterate through all the to be imported tagging records to get the name changes and action type
-    iter_import = await Import_Tagging_Image_DB_Iterator()
-    record_import_tmp = await iter_import()
+    let iter_import = await Import_Tagging_Image_DB_Iterator()
+    let record_import_tmp = await iter_import()
     while( record_import_tmp != undefined ) {
         //console.log(`record_import_tmp = ${JSON.stringify(record_import_tmp)}`)
         //get the record filename and handle data on insert or merge based upon new name changes table
-        filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_import_tmp.imageFileName)
+        let filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_import_tmp.imageFileName)
 
         if( filename_change_record_tmp.actionType == 'insert' ) {
             record_import_tmp.imageFileName = filename_change_record_tmp.imageFileNameNew
-            tmp_meme_filenames = []
-            for( meme_filename_tmp of record_import_tmp["taggingMemeChoices"] ) {
+            let tmp_meme_filenames = []
+            for( let meme_filename_tmp of record_import_tmp["taggingMemeChoices"] ) {
             //record_import_tmp["taggingMemeChoices"].forEach(async meme_filename_tmp => {
-                meme_filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(meme_filename_tmp)
+                let meme_filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(meme_filename_tmp)
                 //console.log(`meme_filename_change_record_tmp = ${JSON.stringify(meme_filename_change_record_tmp)}`)
                 tmp_meme_filenames.push(meme_filename_change_record_tmp.imageFileNameNew)
             }//)
@@ -202,11 +202,11 @@ async function Import_Records_DB_Info_Migrate() {
         } else if( filename_change_record_tmp.actionType == 'merge' ) {
 
             //alert('in the tagging merge')
-            record_dest_tmp = await DB_destination.Get_Tagging_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
+            let record_dest_tmp = await DB_destination.Get_Tagging_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
             record_dest_tmp.taggingRawDescription = record_dest_tmp.taggingRawDescription + ' imported : ' + record_import_tmp.taggingRawDescription
             //go through the emotion key -overlaps- and merge values
-            dest_tmp_emotion_keys = Object.keys(record_dest_tmp["taggingEmotions"])
-            import_emotions_keys = Object.keys(record_import_tmp["taggingEmotions"])
+            let dest_tmp_emotion_keys = Object.keys(record_dest_tmp["taggingEmotions"])
+            let import_emotions_keys = Object.keys(record_import_tmp["taggingEmotions"])
             import_emotions_keys.forEach(import_key_emotion_label => {
                 dest_tmp_emotion_keys.forEach(dest_emotion_key_label => {
                     //emotion label overlap found
@@ -217,21 +217,21 @@ async function Import_Records_DB_Info_Migrate() {
                 })
             })
             //array difference, those on the import to copy over
-            diff_emotion_keys = import_emotions_keys.filter(x => !dest_tmp_emotion_keys.includes(x));
+            let diff_emotion_keys = import_emotions_keys.filter(x => !dest_tmp_emotion_keys.includes(x));
             diff_emotion_keys.forEach(new_emotion_tmp => {
                 record_dest_tmp["taggingEmotions"][new_emotion_tmp] = record_import_tmp["taggingEmotions"][new_emotion_tmp]
             })
             //now concatenate the tagging Tags
-            diff_tags = record_import_tmp["taggingTags"].filter(x => !record_dest_tmp["taggingTags"].includes(x));
+            let diff_tags = record_import_tmp["taggingTags"].filter(x => !record_dest_tmp["taggingTags"].includes(x));
             record_dest_tmp["taggingTags"] = record_dest_tmp["taggingTags"].concat(diff_tags)
             //now the meme choices to be concatenated, each file name of the meme list
             //loop through each meme to be imported get the new name and add to the list
 
-            record_original_memes_tmp = JSON.parse(JSON.stringify(record_dest_tmp["taggingMemeChoices"]))
-            tmp_meme_filenames = []
-            for( meme_filename_orig_tmp of record_import_tmp["taggingMemeChoices"] ) {
+            let record_original_memes_tmp = JSON.parse(JSON.stringify(record_dest_tmp["taggingMemeChoices"]))
+            let tmp_meme_filenames = []
+            for( let meme_filename_orig_tmp of record_import_tmp["taggingMemeChoices"] ) {
             //record_import_tmp["taggingMemeChoices"].forEach(async meme_filename_orig_tmp => {
-                meme_filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(meme_filename_orig_tmp)
+                let meme_filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(meme_filename_orig_tmp)
                 //console.log(`meme_filename_change_record_tmp = ${JSON.stringify(meme_filename_change_record_tmp)}`)
                 tmp_meme_filenames.push(meme_filename_change_record_tmp.imageFileNameNew)
             }//)
@@ -254,17 +254,17 @@ async function Import_Records_DB_Info_Migrate() {
 async function Import_FileName_Changes_Table_Fill() {
     INSERT_NAME_CHANGE_STMT = DB_import.prepare(`INSERT INTO ${IMPORT_TABLE_NAME_CHANGES} (imageFileNameOrig, imageFileNameNew, actionType) VALUES (?, ?, ?)`);
     //iterate through all the to be imported tagging records to get the name changes and action type
-    iter_import = await Import_Tagging_Image_DB_Iterator()
-    record_import_tmp = await iter_import()
+    let iter_import = await Import_Tagging_Image_DB_Iterator()
+    let record_import_tmp = await iter_import()
     while( record_import_tmp != undefined ) {
         //console.log(`record_import_tmp = ${JSON.stringify(record_import_tmp)}`)
         //get the record filename and hash to check if present or not
-        filename_tmp_import = record_import_tmp.imageFileName
-        filehash_tmp_import = record_import_tmp.imageFileHash
+        let filename_tmp_import = record_import_tmp.imageFileName
+        let filehash_tmp_import = record_import_tmp.imageFileHash
 
-        destination_filename_record_tmp = await DB_destination.Get_Tagging_Record_From_DB(filename_tmp_import)
-        destination_hash_record_tmp = await DB_destination.Get_Record_With_Tagging_Hash_From_DB(filehash_tmp_import)
-        filename_eql = false
+        let destination_filename_record_tmp = await DB_destination.Get_Tagging_Record_From_DB(filename_tmp_import)
+        let destination_hash_record_tmp = await DB_destination.Get_Record_With_Tagging_Hash_From_DB(filehash_tmp_import)
+        let filename_eql = false
         if( destination_hash_record_tmp != undefined ) {
             filename_eql = destination_hash_record_tmp.imageFileName == filename_tmp_import
         }
@@ -273,7 +273,7 @@ async function Import_FileName_Changes_Table_Fill() {
         if( destination_filename_record_tmp == undefined && destination_hash_record_tmp == undefined ) {
             await INSERT_NAME_CHANGE_STMT.run( filename_tmp_import, filename_tmp_import, 'insert' );
             try{
-                FS.copyFileSync(DB_import_data+filename_tmp_import, TAGA_DATA_destination+PATH.sep+filename_tmp_import, FS.constants.COPYFILE_EXCL)
+                FS.copyFileSync(DB_import_data+filename_tmp_import, PATH.join(TAGA_DATA_destination,filename_tmp_import), FS.constants.COPYFILE_EXCL)
             } catch(error) {
                 console.log(error)
             }
@@ -284,10 +284,10 @@ async function Import_FileName_Changes_Table_Fill() {
         }
         //file contents unique but filename is present conflicting with content: change name to unique name and insert records-copy file over
         if( destination_filename_record_tmp != undefined && destination_hash_record_tmp == undefined ) {
-            salt_tmp = MY_FILE_HELPER.Make_Salt()
-            new_filename_tmp = PATH.parse(filename_tmp_import).name + salt_tmp + PATH.parse(filename_tmp_import).ext
+            let salt_tmp = MY_FILE_HELPER.Make_Salt()
+            let new_filename_tmp = PATH.parse(filename_tmp_import).name + salt_tmp + PATH.parse(filename_tmp_import).ext
             await INSERT_NAME_CHANGE_STMT.run( filename_tmp_import, new_filename_tmp, 'insert' );
-            FS.copyFileSync(DB_import_data+filename_tmp_import, TAGA_DATA_destination+PATH.sep+new_filename_tmp, FS.constants.COPYFILE_EXCL)
+            FS.copyFileSync(DB_import_data+filename_tmp_import, PATH.join(TAGA_DATA_destination,new_filename_tmp), FS.constants.COPYFILE_EXCL)
         }
         //filename and contents present and the contents under same name: no name change and merge records-no copy needed
         if( destination_filename_record_tmp != undefined && destination_hash_record_tmp != undefined && filename_eql == true ) {
@@ -312,20 +312,20 @@ async function Import_FileName_Changes_Table_Fill() {
 //(imageFileNameOrig TEXT, imageFileNameNew TEXT, actionType TEXT)`)
 //the filename in the importing db, the filename to copy over to the destination db, and if the operation for tagging movement is a 'merge' or an 'insert'
 async function Import_Filename_Change_Table_SetUp() {
-    res = -1
-    import_table_name_changes_stmt = DB_import.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${IMPORT_TABLE_NAME_CHANGES}'; `);
-    import_table_name_changes_res = await import_table_name_changes_stmt.get();
+    let res = -1
+    let import_table_name_changes_stmt = DB_import.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${IMPORT_TABLE_NAME_CHANGES}'; `);
+    let import_table_name_changes_res = await import_table_name_changes_stmt.get();
     if( import_table_name_changes_res["count(*)"] == 0 ) {
         console.log(`no ${IMPORT_TABLE_NAME_CHANGES} table found`)
     } else {
         console.log(`yes ${IMPORT_TABLE_NAME_CHANGES} table found`)
         console.log(`about to delete/drop this table to start fresh`) 
-        STMT = DB_import.prepare(` DROP TABLE IF EXISTS ${IMPORT_TABLE_NAME_CHANGES}; `)
+        let STMT = DB_import.prepare(` DROP TABLE IF EXISTS ${IMPORT_TABLE_NAME_CHANGES}; `)
         await STMT.run();
         console.log(`finished delete/drop this table to start fresh`) 
     }
     console.log(` about to make the table that holds the name changes `)
-    STMT = DB_import.prepare(`CREATE TABLE IF NOT EXISTS ${IMPORT_TABLE_NAME_CHANGES}
+    let STMT = DB_import.prepare(`CREATE TABLE IF NOT EXISTS ${IMPORT_TABLE_NAME_CHANGES}
                     (imageFileNameOrig TEXT, imageFileNameNew TEXT, actionType TEXT)`);
     await STMT.run();
     import_table_name_changes_stmt = DB_import.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${IMPORT_TABLE_NAME_CHANGES}'; `);
@@ -343,7 +343,7 @@ async function Import_Filename_Change_Table_SetUp() {
 //this function will take the importing DB and perform checks before imports and copies
 async function Start_Check_DB_Tables() {
     //make sure the file which is a db has the tables required
-    res = await Check_DB_Tables()
+    let res = await Check_DB_Tables()
     if(res != 1) {
         console.log(`something wrong with the tables in the db file`)
         return -1;
@@ -353,33 +353,33 @@ async function Start_Check_DB_Tables() {
     }
 }
 async function Check_DB_Tables() {
-    tagging_table_exists_stmt = DB_import.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${TAGGING_TABLE_NAME}'; `);
-    tagging_table_exists_res = await tagging_table_exists_stmt.get();
+    let tagging_table_exists_stmt = DB_import.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${TAGGING_TABLE_NAME}'; `);
+    let tagging_table_exists_res = await tagging_table_exists_stmt.get();
     if( tagging_table_exists_res["count(*)"] == 0 ) {
         console.log(`no ${TAGGING_TABLE_NAME}`)
         return -1
     }
-    tagging_meme_table_exists_stmt = DB_import.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${TAGGING_MEME_TABLE_NAME}'; `);
-    tagging_meme_table_exists_res = await tagging_meme_table_exists_stmt.get();
+    let tagging_meme_table_exists_stmt = DB_import.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${TAGGING_MEME_TABLE_NAME}'; `);
+    let tagging_meme_table_exists_res = await tagging_meme_table_exists_stmt.get();
     //if tagging table does not exit, so create it
     if( tagging_meme_table_exists_res["count(*)"] == 0 ) {
         console.log(`no ${TAGGING_MEME_TABLE_NAME}`)
         return -1
     }
-    collection_table_exists_stmt = DB_import.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTIONS_TABLE_NAME}'; `);
-    collection_table_exists_res = await collection_table_exists_stmt.get();
+    let collection_table_exists_stmt = DB_import.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTIONS_TABLE_NAME}'; `);
+    let collection_table_exists_res = await collection_table_exists_stmt.get();
     if( collection_table_exists_res["count(*)"] == 0 ){
         console.log(`no ${COLLECTIONS_TABLE_NAME}`)
         return -1
     }
-    collection_meme_table_exists_stmt = DB_import.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTION_MEME_TABLE_NAME}'; `);
-    collection_meme_table_exists_res = await collection_meme_table_exists_stmt.get();
+    let collection_meme_table_exists_stmt = DB_import.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTION_MEME_TABLE_NAME}'; `);
+    let collection_meme_table_exists_res = await collection_meme_table_exists_stmt.get();
     if( collection_meme_table_exists_res["count(*)"] == 0 ) {
         console.log(`no ${COLLECTION_MEME_TABLE_NAME}`)
         return -1
     }
-    collection_imageset_table_exists_stmt = DB_import.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTION_IMAGESET_TABLE_NAME}'; `);
-    collection_imageset_table_exists_res = await collection_imageset_table_exists_stmt.get();
+    let collection_imageset_table_exists_stmt = DB_import.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTION_IMAGESET_TABLE_NAME}'; `);
+    let collection_imageset_table_exists_res = await collection_imageset_table_exists_stmt.get();
     if( collection_imageset_table_exists_res["count(*)"] == 0 ) {
         console.log(`no ${COLLECTION_IMAGESET_TABLE_NAME}`)
         return -1
@@ -394,18 +394,18 @@ async function Check_DB_Tables() {
 //after all rows complete 'undefined' is returned
 //(imageFileName TEXT, imageFileHash TEXT, taggingRawDescription TEXT, taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT, faceDescriptors TEXT)`)
 async function Import_Tagging_Image_DB_Iterator() {
-    IMPORT_GET_MIN_ROWID_STMT = DB_import.prepare(`SELECT MIN(ROWID) AS rowid FROM ${TAGGING_TABLE_NAME}`);
-    IMPORT_GET_RECORD_FROM_ROWID_TAGGING_STMT = DB_import.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE ROWID=?`);
-    IMPORT_GET_NEXT_ROWID_STMT = DB_import.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
+    let IMPORT_GET_MIN_ROWID_STMT = DB_import.prepare(`SELECT MIN(ROWID) AS rowid FROM ${TAGGING_TABLE_NAME}`);
+    let IMPORT_GET_RECORD_FROM_ROWID_TAGGING_STMT = DB_import.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE ROWID=?`);
+    let IMPORT_GET_NEXT_ROWID_STMT = DB_import.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
 
-    iter_current_rowid = await IMPORT_GET_MIN_ROWID_STMT.get().rowid;
+    let iter_current_rowid = await IMPORT_GET_MIN_ROWID_STMT.get().rowid;
     //inner function for closure
     async function Import_Tagging_Iterator_Next() {
         if(iter_current_rowid == undefined) {
         return undefined;
         }
-        current_record = Get_Obj_Fields_From_Record(await IMPORT_GET_RECORD_FROM_ROWID_TAGGING_STMT.get(iter_current_rowid));
-        tmp_rowid = await IMPORT_GET_NEXT_ROWID_STMT.get(iter_current_rowid);
+        let current_record = Get_Obj_Fields_From_Record(await IMPORT_GET_RECORD_FROM_ROWID_TAGGING_STMT.get(iter_current_rowid));
+        let tmp_rowid = await IMPORT_GET_NEXT_ROWID_STMT.get(iter_current_rowid);
         if( tmp_rowid != undefined ) {
         iter_current_rowid = tmp_rowid.rowid;
         } else {
@@ -428,18 +428,18 @@ function Get_Obj_Fields_From_Record(record) {
 //after all rows complete 'undefined' is returned
 //(collectionName TEXT, collectionImage TEXT, collectionImageSet TEXT, collectionDescription TEXT, collectionDescriptionTags TEXT, collectionEmotions TEXT, collectionMemes TEXT)`)
 async function Import_Collections_Image_DB_Iterator() {
-    IMPORT_GET_COLLECTIONS_MIN_ROWID_STMT = DB_import.prepare(`SELECT MIN(ROWID) AS rowid FROM ${COLLECTIONS_TABLE_NAME}`);
-    IMPORT_GET_COLLECTIONS_RECORD_FROM_ROWID_TAGGING_STMT = DB_import.prepare(`SELECT * FROM ${COLLECTIONS_TABLE_NAME} WHERE ROWID=?`);
-    IMPORT_GET_COLLECTIONS_NEXT_ROWID_STMT = DB_import.prepare(`SELECT ROWID FROM ${COLLECTIONS_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
+    let IMPORT_GET_COLLECTIONS_MIN_ROWID_STMT = DB_import.prepare(`SELECT MIN(ROWID) AS rowid FROM ${COLLECTIONS_TABLE_NAME}`);
+    let IMPORT_GET_COLLECTIONS_RECORD_FROM_ROWID_TAGGING_STMT = DB_import.prepare(`SELECT * FROM ${COLLECTIONS_TABLE_NAME} WHERE ROWID=?`);
+    let IMPORT_GET_COLLECTIONS_NEXT_ROWID_STMT = DB_import.prepare(`SELECT ROWID FROM ${COLLECTIONS_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
 
-    iter_current_rowid = await IMPORT_GET_COLLECTIONS_MIN_ROWID_STMT.get().rowid;
+    let iter_current_rowid = await IMPORT_GET_COLLECTIONS_MIN_ROWID_STMT.get().rowid;
     //inner function for closure
     async function Import_Tagging_Collections_Iterator_Next() {
         if(iter_current_rowid == undefined) {
         return undefined;
         }
-        current_record = Get_Obj_Collections_Fields_From_Record(await IMPORT_GET_COLLECTIONS_RECORD_FROM_ROWID_TAGGING_STMT.get(iter_current_rowid));
-        tmp_rowid = await IMPORT_GET_COLLECTIONS_NEXT_ROWID_STMT.get(iter_current_rowid);
+        let current_record = Get_Obj_Collections_Fields_From_Record(await IMPORT_GET_COLLECTIONS_RECORD_FROM_ROWID_TAGGING_STMT.get(iter_current_rowid));
+        let tmp_rowid = await IMPORT_GET_COLLECTIONS_NEXT_ROWID_STMT.get(iter_current_rowid);
         if( tmp_rowid != undefined ) {
         iter_current_rowid = tmp_rowid.rowid;
         } else {
