@@ -17,15 +17,15 @@ async function Get_Tagging_Annotation_From_DB(image_name) { //
     return await DB_MODULE.Get_Tagging_Record_From_DB(image_name);
 }
 
-var reg_exp_delims = /[#:,;| ]+/
+let reg_exp_delims = /[#:,;| ]+/
 
 let search_results = '';
 let selected_images = []; 
 let selected_images_type = []; // 'stored' / 'new' / 'webcam'
 
-var last_user_image_directory_chosen = '';
+let last_user_image_directory_chosen = '';
 
-super_search_obj = {
+let super_search_obj = {
     searchTags:[],
     searchMemeTags:[],
     emotions:{},
@@ -47,25 +47,25 @@ document.getElementById("get-recommended-button-id").onclick = function() {
 async function Super_Search() {
     
     Set_Search_Obj_Tags()
-    console.log('set the tags!!! 1')
-    faceDescriptors_search = []
-    for( img_ind = 0; img_ind < selected_images.length; img_ind++ ) {
+    //console.log('set the tags!!! 1')
+    let faceDescriptors_search = []
+    for( let img_ind = 0; img_ind < selected_images.length; img_ind++ ) {
         //super_search_obj.faceDescriptors
-        faceDescriptors_tmp = []
+        let faceDescriptors_tmp = []
 
         if( selected_images_type[img_ind] == 'stored' ) {
-            console.log('stored')
+            //console.log('stored')
 
-            console.log('selected_images_type[img_ind]',selected_images[img_ind])
+            //console.log('selected_images_type[img_ind]',selected_images[img_ind])
             let annotation_tmp = await Get_Tagging_Annotation_From_DB( selected_images[img_ind] )
-            console.log('annotation_tmp', annotation_tmp)
+            //console.log('annotation_tmp', annotation_tmp)
             for( let ind = 0; ind < annotation_tmp.faceDescriptors.length; ind++ ) {
                 faceDescriptors_search.push(annotation_tmp.faceDescriptors[ind])
             }
             //faceDescriptors_search.push( ...annotation_tmp.faceDescriptors )
 
         } else if( selected_images_type[img_ind] == 'new' ) {
-            console.log('new')
+            //console.log('new')
 
             let ft_res = await fileType.fromFile(  selected_images[img_ind]  )
             if( ft_res.mime.includes('image') == true ) {
@@ -75,7 +75,7 @@ async function Super_Search() {
                         faceDescriptors_search.push(faceDescriptors[ind])
                     }
                 } else {
-                    super_res = await Get_Image_Face_Descriptors_From_File( selected_images[img_ind] )
+                    let super_res = await Get_Image_Face_Descriptors_From_File( selected_images[img_ind] )
                     if( super_res.length > 0 ) {
                         faceDescriptors_tmp = await Get_Face_Descriptors_Arrays(super_res)
                         for( let ind = 0; ind < faceDescriptors_tmp.length; ind++ ) {
@@ -92,9 +92,9 @@ async function Super_Search() {
 
         } else if( selected_images_type[img_ind] == 'webcam' ) {
 
-            super_res = await Get_Image_Face_Descriptors_From_File( selected_images[img_ind] )
+            let super_res = await Get_Image_Face_Descriptors_From_File( selected_images[img_ind] )
             if( super_res.length > 0 ) {
-                faceDescriptors_tmp = await Get_Face_Descriptors_Arrays(super_res)
+                let faceDescriptors_tmp = await Get_Face_Descriptors_Arrays(super_res)
                 for( let ind = 0; ind < faceDescriptors_tmp.length; ind++ ) {
                     faceDescriptors_search.push(faceDescriptors_tmp[ind])
                 }
@@ -108,14 +108,14 @@ async function Super_Search() {
     //console.log(`super_search_obj = `, super_search_obj)
 
     //perform the search
-    tagging_db_iterator = await Tagging_Image_DB_Iterator();
+    let tagging_db_iterator = await Tagging_Image_DB_Iterator();
     search_results = await SEARCH_MODULE.Image_Search_DB(super_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
 
     //console.log('search_results = ', search_results)
 
-    search_image_results_output = document.getElementById("top-results-div-id");
+    let search_image_results_output = document.getElementById("top-results-div-id");
     search_image_results_output.innerHTML = "";
-    search_display_inner_tmp = '';
+    let search_display_inner_tmp = '';
     search_display_inner_tmp += `<label id="results-title-label" for="">Results (click choice):</label>`
     for(let file_key of search_results) {
         search_display_inner_tmp += `
@@ -129,10 +129,8 @@ async function Super_Search() {
     //user presses an image to select it from the images section, add onclick event listener
     search_results.forEach(file => {
         document.getElementById(`search-result-single-img-id-${file}`).onclick = function() {            
-            console.log(' result clicked! file = ', file)
             //console.log('btoa(file) ',btoa(file) )
             window.location = "tagging.html" + '?' + `imageFileName=${ btoa(toBinary(file)) }`
-
         };
     });
 
@@ -163,11 +161,11 @@ document.getElementById("return-to-main-button-id").onclick = function() {
 //using the WEBCAM
 document.getElementById("use-webcam-button-id").onclick = function() {
 
-    modal_meme_click_top_id_element = document.getElementById("modal-meme-clicked-top-id");
+    let modal_meme_click_top_id_element = document.getElementById("modal-meme-clicked-top-id");
     modal_meme_click_top_id_element.style.display = "block";
     document.getElementById("webcam-video-id").style.display = "block"
 
-    var meme_modal_close_btn = document.getElementById("modal-meme-clicked-close-button-id");
+    let meme_modal_close_btn = document.getElementById("modal-meme-clicked-close-button-id");
     // When the user clicks on the button, close the modal
     meme_modal_close_btn.onclick = function() {
         Close_Modal()
@@ -305,12 +303,12 @@ async function Get_Select_Recommended() {
     Set_Search_Obj_Tags()
 
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
-    tagging_db_iterator = await Tagging_Image_DB_Iterator();
+    let tagging_db_iterator = await Tagging_Image_DB_Iterator();
     search_results_recommended = await SEARCH_MODULE.Image_Search_DB(super_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
 
-    search_image_results_output = document.getElementById("facial-row-four-div-id");
+    let search_image_results_output = document.getElementById("facial-row-four-div-id");
     search_image_results_output.innerHTML = "";
-    search_display_inner_tmp = '';
+    let search_display_inner_tmp = '';
     let search_results_faces = []
     for(let file_key of search_results_recommended) {        
         let annotation_tmp = await Get_Tagging_Annotation_From_DB( file_key )
@@ -318,7 +316,7 @@ async function Get_Select_Recommended() {
     }
     search_results_recommended = search_results_faces
 
-    for(let file_key of search_results_faces) {
+    for( let file_key of search_results_faces ) {
         search_display_inner_tmp += `
                                 <div class="recommended-img-div-class" id="recommended-result-image-div-id-${file_key}" >
                                     <input type="checkbox" class="recommended-img-check-box" id="recommened-check-box-id-${file_key}" name="" value="">
@@ -338,14 +336,14 @@ async function Get_Select_Recommended() {
 }
 
 async function Handle_Get_Recommended_Image_Checked(filename) {
-    console.log('clicked on image selected recommended', filename)
+    //console.log('clicked on image selected recommended', filename)
     let index = search_results_recommended.indexOf(filename);
     if (index > -1) { // only splice array when item is found
         search_results_recommended.splice(index, 1); // 2nd parameter means remove one item only
     }
-    search_image_results_output = document.getElementById("facial-row-four-div-id");
+    let search_image_results_output = document.getElementById("facial-row-four-div-id");
     search_image_results_output.innerHTML = "";
-    search_display_inner_tmp = '';
+    let search_display_inner_tmp = '';
     let search_results_faces = []
     for(let file_key of search_results_recommended) {        
         let annotation_tmp = await Get_Tagging_Annotation_From_DB( file_key )
@@ -377,16 +375,16 @@ async function Handle_Get_Recommended_Image_Checked(filename) {
 
 async function Update_Selected_Images() {
      //now put the image in the selected set
-    search_image_results_output = document.getElementById("facial-row-six-div-id");
+    let search_image_results_output = document.getElementById("facial-row-six-div-id");
     search_image_results_output.innerHTML = "";
-    search_display_inner_tmp = '';
+    let search_display_inner_tmp = '';
     
     for(let index=0; index<selected_images.length; index++) {
         let element = selected_images[index]
         //selected_images.forEach( (element, index) => {
 
         if( selected_images_type[index] == 'stored' ) {
-            file_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + element
+            let file_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + element
             search_display_inner_tmp += `
                                     <div class="recommended-img-div-class" id="search-image-selected-div-id-${index}">
                                         <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-${index}" name="" value="">
@@ -394,7 +392,7 @@ async function Update_Selected_Images() {
                                     </div>
                                     `
         } else if( selected_images_type[index] == 'new' ) {
-            file_path_tmp = element //TAGA_DATA_DIRECTORY + PATH.sep + element
+            let file_path_tmp = element //TAGA_DATA_DIRECTORY + PATH.sep + element
             search_display_inner_tmp += `
                                     <div class="recommended-img-div-class" id="search-image-selected-div-id-${index}">
                                         <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-${index}" name="" value="">
@@ -403,7 +401,7 @@ async function Update_Selected_Images() {
                                     `
         } else if( selected_images_type[index] == 'webcam' ) {
 
-            file_path_tmp = element //TAGA_DATA_DIRECTORY + PATH.sep + element
+            let file_path_tmp = element //TAGA_DATA_DIRECTORY + PATH.sep + element
             search_display_inner_tmp += `
                                     <div class="recommended-img-div-class" id="search-image-selected-div-id-${index}">
                                         <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-${index}" name="" value="">
@@ -447,14 +445,14 @@ document.getElementById("use-new-image-button-id").onclick = async function() {
 
 //handler for the emotion label and value entry additions and then the deletion handling, all emotions are added by default and handled 
 document.getElementById("search-emotion-entry-button-id").onclick = function() {
-    entered_emotion_label = document.getElementById("search-emotion-label-value-textarea-entry-id").value
-    emotion_search_entry_value = document.getElementById("search-emotion-value-range-entry-id").value
+    let entered_emotion_label = document.getElementById("search-emotion-label-value-textarea-entry-id").value
+    let emotion_search_entry_value = document.getElementById("search-emotion-value-range-entry-id").value
     if( entered_emotion_label != "" ) {
         super_search_obj["emotions"][entered_emotion_label] = emotion_search_entry_value
     }
     document.getElementById("search-emotion-label-value-textarea-entry-id").value = ""
     document.getElementById("search-emotion-value-range-entry-id").value = "0"
-    image_emotions_div_id = document.getElementById("search-emotion-label-value-display-container-div-id")
+    let image_emotions_div_id = document.getElementById("search-emotion-label-value-display-container-div-id")
     image_emotions_div_id.innerHTML = ""
     //Populate for the emotions of the images
     Object.keys(super_search_obj["emotions"]).forEach(emotion_key => {
@@ -471,7 +469,7 @@ document.getElementById("search-emotion-entry-button-id").onclick = function() {
     //action listener for the removal of emotions populated from user entry
     Object.keys(super_search_obj["emotions"]).forEach(emotion_key => {
         document.getElementById(`search-emotion-remove-button-id-${emotion_key}`).addEventListener("click", function() {
-            search_emotion_search_span_html_obj = document.getElementById(`search-emotion-label-value-span-id-${emotion_key}`);
+            let search_emotion_search_span_html_obj = document.getElementById(`search-emotion-label-value-span-id-${emotion_key}`);
             search_emotion_search_span_html_obj.remove();
             delete super_search_obj["emotions"][emotion_key]
         })
@@ -490,15 +488,15 @@ function addMouseOverIconSwitch(emotion_div) {
 }
 
 function Set_Search_Obj_Tags() {
-    search_tags_input = document.getElementById("search-tag-textarea-entry-id").value
-    split_search_string = search_tags_input.split(reg_exp_delims)
-    search_unique_search_terms = [...new Set(split_search_string)]
+    let search_tags_input = document.getElementById("search-tag-textarea-entry-id").value
+    let split_search_string = search_tags_input.split(reg_exp_delims)
+    let search_unique_search_terms = [...new Set(split_search_string)]
     search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
     super_search_obj["searchTags"] = search_unique_search_terms
     //meme tags now
-    search_meme_tags_input = document.getElementById("search-meme-tag-textarea-entry-id").value
-    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
-    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+    let search_meme_tags_input = document.getElementById("search-meme-tag-textarea-entry-id").value
+    let split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
+    let search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
     search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
     super_search_obj["searchMemeTags"] = search_unique_meme_search_terms
 }

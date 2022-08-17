@@ -9,9 +9,9 @@ const { CLOSE_ICON_RED, CLOSE_ICON_BLACK } = require(PATH.join(__dirname,'..','c
 
 
 //for filtering out chars in the search modals
-reg_exp_delims = /[#:,;| ]+/
+let reg_exp_delims = /[#:,;| ]+/
 
-COLLECTION_DEFAULT_EMPTY_OBJECT = {
+let COLLECTION_DEFAULT_EMPTY_OBJECT = {
     "collectionName": '',
     "collectionImage": '',
     "collectionDescription": '',
@@ -22,14 +22,14 @@ COLLECTION_DEFAULT_EMPTY_OBJECT = {
 }
 
 
-var creation_step_num = 1 //of all the creation steps which one is the current one
-var profile_search_image_results = '';
+let creation_step_num = 1 //of all the creation steps which one is the current one
+let profile_search_image_results = '';
 
-var search_image_results = '';
-var search_image_meme_results = '';
+let search_image_results = '';
+let search_image_meme_results = '';
 
-var meme_search_image_results = '';
-var meme_search_image_meme_results = '';
+let meme_search_image_results = '';
+let meme_search_image_meme_results = '';
 
 
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS START>>>
@@ -71,26 +71,26 @@ async function Update_Collection_IMAGE_Connections(collectionName,current_collec
 
 
 function Navbar_ViewHandle() {
-    step1_id = document.getElementById("creation-step1-div-id")
+    let step1_id = document.getElementById("creation-step1-div-id")
     step1_id.style.display = "none"
-    step2_id = document.getElementById("creation-step2-div-id")
+    let step2_id = document.getElementById("creation-step2-div-id")
     step2_id.style.display = "none"
-    step3_id = document.getElementById("creation-step3-div-id")
+    let step3_id = document.getElementById("creation-step3-div-id")
     step3_id.style.display = "none"
-    step4_id = document.getElementById("creation-step4-div-id")
+    let step4_id = document.getElementById("creation-step4-div-id")
     step4_id.style.display = "none"
-    step5_id = document.getElementById("creation-step5-div-id")
+    let step5_id = document.getElementById("creation-step5-div-id")
     step5_id.style.display = "none"
 
-    nav_btn1 = document.getElementById("navbar-button1-id")
+    let nav_btn1 = document.getElementById("navbar-button1-id")
     nav_btn1.classList.add('nav-bar-off')
-    nav_btn2 = document.getElementById("navbar-button2-id")
+    let nav_btn2 = document.getElementById("navbar-button2-id")
     nav_btn2.classList.add('nav-bar-off')
-    nav_btn3 = document.getElementById("navbar-button3-id")
+    let nav_btn3 = document.getElementById("navbar-button3-id")
     nav_btn3.classList.add('nav-bar-off')
-    nav_btn4 = document.getElementById("navbar-button4-id")
+    let nav_btn4 = document.getElementById("navbar-button4-id")
     nav_btn4.classList.add('nav-bar-off')
-    nav_btn5 = document.getElementById("navbar-button5-id")
+    let nav_btn5 = document.getElementById("navbar-button5-id")
     nav_btn5.classList.add('nav-bar-off')
 
     if(creation_step_num == 1) {
@@ -165,7 +165,7 @@ async function Creation_Next_Btn() {
     
     //the invisible back button make visible cause now it is possible to go back from step 2
     if(creation_step_num == 2) {
-        button_back = document.getElementById("creation-back-button-id")
+        let button_back = document.getElementById("creation-back-button-id")
         button_back.style.display = "block"
         document.getElementById("step2-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName
         
@@ -241,7 +241,7 @@ async function Creation_Next_Btn() {
         let node_type = document.getElementById("step4-profile-image-display-id").nodeName
         if( node_type == 'VIDEO' ) { document.getElementById("step4-profile-image-display-id").pause() }
 
-        button_back = document.getElementById("creation-next-button-id")
+        let button_back = document.getElementById("creation-next-button-id")
         button_back.innerHTML = "COMPLETE"
         document.getElementById("step5-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName
 
@@ -323,8 +323,8 @@ Initialize_Collection_Creation_Page()
 
 //handle the activity for the step4 of the emotion entry and display
 function New_Collection_Emotions_Handle() {
-    emotions_collection = COLLECTION_DEFAULT_EMPTY_OBJECT["collectionEmotions"]
-    emotion_HTML = ''
+    let emotions_collection = COLLECTION_DEFAULT_EMPTY_OBJECT["collectionEmotions"]
+    let emotion_HTML = ''
     for( let key in emotions_collection ){        
         emotion_HTML += `
                         <div class="emotion-list-class" id="emotion-entry-div-id-${key}">
@@ -336,7 +336,7 @@ function New_Collection_Emotions_Handle() {
                         </div>
                         `
     }
-    emotions_show_div = document.getElementById("collection-image-annotation-emotions-labels-show-div-id")
+    let emotions_show_div = document.getElementById("collection-image-annotation-emotions-labels-show-div-id")
     emotions_show_div.innerHTML = emotion_HTML
     
     // Add button hover event listeners to each inage tag.!!!
@@ -352,7 +352,7 @@ function New_Collection_Emotions_Handle() {
 }
 //delete an emotion from the emotion set
 async function Delete_Emotion(emotion_key){
-    element_emotion_entry_div = document.getElementById('emotion-entry-div-id-'+emotion_key);
+    let element_emotion_entry_div = document.getElementById('emotion-entry-div-id-'+emotion_key);
     element_emotion_entry_div.remove();
     delete COLLECTION_DEFAULT_EMPTY_OBJECT["collectionEmotions"][emotion_key];
 }
@@ -365,12 +365,12 @@ function Save_Collection_Emotions() {
 }
 //add a new emotion to the emotion set
 async function Add_New_Emotion() {
-    new_emotion_text = document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value
+    let new_emotion_text = document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value
     if(new_emotion_text){
-        keys_tmp = Object.keys(COLLECTION_DEFAULT_EMPTY_OBJECT["collectionEmotions"])
-        boolean_included = keys_tmp.includes(new_emotion_text)
+        let keys_tmp = Object.keys(COLLECTION_DEFAULT_EMPTY_OBJECT["collectionEmotions"])
+        let boolean_included = keys_tmp.includes(new_emotion_text)
         if(boolean_included == false){            
-            new_emotion_value = document.getElementById("collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id").value
+            let new_emotion_value = document.getElementById("collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id").value
             COLLECTION_DEFAULT_EMPTY_OBJECT["collectionEmotions"][new_emotion_text] = new_emotion_value
             //do not save upon addition of a new emotion, the save button is necessary
             document.getElementById("collection-image-annotation-emotions-new-entry-emotion-textarea-id").value = ""
@@ -385,13 +385,13 @@ async function Add_New_Emotion() {
 
 //to save the edits to the memes which is the deletions
 async function Save_Meme_Changes(){
-    current_memes = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes //get the memes of the current object
-    length_original = current_memes.length
-    gallery_switch_booleans = []
-    for (var ii = 0; ii < current_memes.length; ii++) {
-        image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, current_memes[ii])
+    let current_memes = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes //get the memes of the current object
+    let length_original = current_memes.length
+    let gallery_switch_booleans = []
+    for (let ii = 0; ii < current_memes.length; ii++) {
+        let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, current_memes[ii])
         if(FS.existsSync(image_path_tmp) == true){
-            image_boolean_tmp = document.getElementById(`meme-toggle-id-${current_memes[ii]}`).checked
+            let image_boolean_tmp = document.getElementById(`meme-toggle-id-${current_memes[ii]}`).checked
             if(image_boolean_tmp == true){
                 gallery_switch_booleans.push(current_memes[ii])
             }
@@ -399,20 +399,20 @@ async function Save_Meme_Changes(){
             gallery_switch_booleans.push(current_memes[ii])
         }
     }
-    length_new = gallery_switch_booleans.length
+    let length_new = gallery_switch_booleans.length
     if(length_new < length_original) {
         COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes = gallery_switch_booleans        
        //clear gallery of gallery image objects
         document.querySelectorAll(".collection-image-annotation-memes-grid-item-class").forEach(el => el.remove());
         //place the gallery images in the html and ignore the missing images (leave the lingering links)
-        gallery_div = document.getElementById("collections-images-gallery-grid-images-div-id")
-            //place the gallery images in the html and ignore the missing images (leave the lingering links)
-        gallery_div = document.getElementById("collection-image-annotation-memes-images-show-div-id")
-        gallery_html_tmp = ''
-        image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes
+        //let gallery_div = document.getElementById("collections-images-gallery-grid-images-div-id")
+        //place the gallery images in the html and ignore the missing images (leave the lingering links)
+        let gallery_div = document.getElementById("collection-image-annotation-memes-images-show-div-id")
+        let gallery_html_tmp = ''
+        let image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes
         for(let image_filename of image_set) {
         //image_set.forEach(function(image_filename) {
-            image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+            let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
             if(FS.existsSync(image_path_tmp) == true){
                 gallery_html_tmp += `
                                     <div class="collection-image-annotation-memes-grid-item-class">
@@ -444,13 +444,13 @@ async function Save_Meme_Changes(){
 
 //to save the edits to the gallery images which is the deletions
 async function Save_Gallery_Changes(){ //!!
-    current_images = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet //get the memes of the current object
-    length_original = current_images.length
-    gallery_switch_booleans = []
-    for (var ii = 0; ii < current_images.length; ii++) {
-        image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, current_images[ii])
+    let current_images = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet //get the memes of the current object
+    let length_original = current_images.length
+    let gallery_switch_booleans = []
+    for (let ii = 0; ii < current_images.length; ii++) {
+        let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, current_images[ii])
         if(FS.existsSync(image_path_tmp) == true){
-            image_boolean_tmp = document.getElementById(`galleryimage-toggle-id-${current_images[ii]}`).checked
+            let image_boolean_tmp = document.getElementById(`galleryimage-toggle-id-${current_images[ii]}`).checked
             if(image_boolean_tmp == true){
                 gallery_switch_booleans.push(current_images[ii])
             }
@@ -458,19 +458,19 @@ async function Save_Gallery_Changes(){ //!!
             gallery_switch_booleans.push(current_images[ii])
         }
     }
-    length_new = gallery_switch_booleans.length
+    let length_new = gallery_switch_booleans.length
     if(length_new < length_original){
         COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet = gallery_switch_booleans
         
        //clear gallery of gallery image objects
         document.querySelectorAll(".collection-images-gallery-grid-item-class").forEach(el => el.remove());
         //place the gallery images in the html and ignore the missing images (leave the lingering links)
-        gallery_div = document.getElementById("collections-images-gallery-grid-images-div-id")
-        gallery_html_tmp = ''
-        image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet
+        let gallery_div = document.getElementById("collections-images-gallery-grid-images-div-id")
+        let gallery_html_tmp = ''
+        let image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet
         for(let image_filename of image_set) {
         //image_set.forEach(function(image_filename) {
-            image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+            let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
             if(FS.existsSync(image_path_tmp) == true){
                 gallery_html_tmp += `
                                     <div class="collection-images-gallery-grid-item-class">
@@ -503,12 +503,12 @@ async function Save_Gallery_Changes(){ //!!
 //STEP1 CODE START
 //part of step1, make sure the collection name is valid or not
 async function Check_Collection_Name() {
-    collection_name_text_area = document.getElementById("collection-name-textarea-id").value
+    let collection_name_text_area = document.getElementById("collection-name-textarea-id").value
     if(collection_name_text_area == "") {
         return false
     }
     
-    collection_obj = await Get_Collection_Record_From_DB(collection_name_text_area)
+    let collection_obj = await Get_Collection_Record_From_DB(collection_name_text_area)
     if(collection_obj != undefined) {
         return false//exit without proceeding until unique name supplied
     }
@@ -518,7 +518,7 @@ async function Check_Collection_Name() {
 }
 //step1 of the user selecting the profile image
 //Change the collection profile image which allows for a search order as well to order the image according to features
-collection_profile_search_obj = {
+let collection_profile_search_obj = {
     emotions:{},
     searchTags:[],
     searchMemeTags:[]
@@ -526,10 +526,10 @@ collection_profile_search_obj = {
 //the collection profile image gets changed
 async function Change_Profile_Image() {
     // Show the modal
-    var modal_profile_img_change = document.getElementById("search-profileimage-modal-click-top-id");
+    let modal_profile_img_change = document.getElementById("search-profileimage-modal-click-top-id");
     modal_profile_img_change.style.display = "block";
     // Get the button that opens the modal
-    var meme_modal_close_btn = document.getElementById("modal-search-profileimage-close-exit-view-button-id");
+    let meme_modal_close_btn = document.getElementById("modal-search-profileimage-close-exit-view-button-id");
     // When the user clicks on the button, close the modal
     meme_modal_close_btn.onclick = function () {
 
@@ -560,12 +560,12 @@ async function Change_Profile_Image() {
 
     //handler for the emotion label and value entry additions and then the deletion handling, all emotions are added by default and handled 
     document.getElementById("modal-search-profileimage-emotion-entry-button-id").onclick = function (event) {    
-        emotion_key_tmp = document.getElementById("modal-search-profileimage-emotion-label-value-textarea-entry-id").value
+        let emotion_key_tmp = document.getElementById("modal-search-profileimage-emotion-label-value-textarea-entry-id").value
         if(emotion_key_tmp != "") { 
-            emotion_value_tmp = document.getElementById("modal-search-profileimage-emotion-value-range-entry-id").value
+            let emotion_value_tmp = document.getElementById("modal-search-profileimage-emotion-value-range-entry-id").value
             collection_profile_search_obj["emotions"][emotion_key_tmp] = emotion_value_tmp //update the global profile image search object with the new key value
-            emotion_div_id = document.getElementById("modal-search-profileimage-emotion-label-value-display-container-div-id")
-            emotions_html_tmp = ""
+            let emotion_div_id = document.getElementById("modal-search-profileimage-emotion-label-value-display-container-div-id")
+            let emotions_html_tmp = ""
             Object.keys(collection_profile_search_obj["emotions"]).forEach(emotion_key => {
                         emotions_html_tmp += `
                                             <span id="modal-search-profileimage-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
@@ -597,12 +597,12 @@ async function Change_Profile_Image() {
     }
 
 
-    profile_search_display_div = document.getElementById("modal-search-profileimage-images-results-grid-div-area-id")
+    let profile_search_display_div = document.getElementById("modal-search-profileimage-images-results-grid-div-area-id")
     profile_search_display_div.innerHTML = ''; //document.querySelectorAll(".modal-image-search-profileimageresult-single-image-div-class").forEach(el => el.remove());
-    profile_search_display_inner_tmp = ''
+    let profile_search_display_inner_tmp = ''
     for(let image_filename of profile_search_image_results) {
     //profile_search_image_results.forEach( image_filename => {
-        image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+        let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true){
             profile_search_display_inner_tmp += `
                                 <div>
@@ -673,15 +673,15 @@ async function Change_Profile_Image() {
 //the event function for the search function on the profile image search button press
 async function Collection_Profile_Image_Search_Action() {    
     //get the tags input and get rid of nuissance chars
-    search_tags_input = document.getElementById("modal-search-profileimage-tag-textarea-entry-id").value
-    split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
-    search_unique_search_terms = [...new Set(split_search_string)]
+    let search_tags_input = document.getElementById("modal-search-profileimage-tag-textarea-entry-id").value
+    let split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
+    let search_unique_search_terms = [...new Set(split_search_string)]
     search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
     collection_profile_search_obj["searchTags"] = search_unique_search_terms
     //meme tags now    
-    search_meme_tags_input = document.getElementById("modal-search-profileimage-meme-tag-textarea-entry-id").value
-    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
-    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+    let search_meme_tags_input = document.getElementById("modal-search-profileimage-meme-tag-textarea-entry-id").value
+    let split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
+    let search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
     search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
     collection_profile_search_obj["searchMemeTags"] = search_unique_meme_search_terms
     //emotion key value already is in: collection_profile_search_obj
@@ -692,18 +692,18 @@ async function Collection_Profile_Image_Search_Action() {
     //    profile_search_image_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
     //}
     //img_indices_sorted = await SEARCH_MODULE.Collection_Profile_Image_Search_Fn(collection_profile_search_obj,all_image_keys,Get_Tagging_Annotation_From_DB)
-    tagging_db_iterator = await Tagging_Image_DB_Iterator();
+    let tagging_db_iterator = await Tagging_Image_DB_Iterator();
     profile_search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_profile_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
-    
+    console.log('profile_search_image_results',profile_search_image_results)
     //present new sorted ordering now!
-    profile_search_display_div = document.getElementById("modal-search-profileimage-images-results-grid-div-area-id")
-    profile_search_display_div = ''
+    let profile_search_display_div = document.getElementById("modal-search-profileimage-images-results-grid-div-area-id")
+    profile_search_display_div.innerHTML = ''
     //document.querySelectorAll(".modal-image-search-profileimageresult-single-image-div-class").forEach(el => el.remove());
-    profile_search_display_inner_tmp = ''
+    let profile_search_display_inner_tmp = ''
     for(let image_filename of profile_search_image_results) {
     //profile_search_image_results.forEach( image_filename => {
         //image_filename = all_image_keys[index]
-        image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+        let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true) {
             profile_search_display_inner_tmp += `
                                             <div>
@@ -727,7 +727,7 @@ async function Collection_Profile_Image_Search_Action() {
     // });
     //add image event listener so that a click on it makes it a choice
     profile_search_image_results.forEach( image_filename => {
-        image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+        let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).onclick = async function(event) {
                 COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage = image_filename
@@ -757,7 +757,7 @@ async function Collection_Profile_Image_Search_Action() {
 }
 
 //GALLERY IMAGE ADDITION
-collection_gallery_search_obj = {
+let collection_gallery_search_obj = {
     emotions:{},
     searchTags:[],
     searchMemeTags:[]
@@ -766,10 +766,10 @@ collection_gallery_search_obj = {
 //called when the user want to add more images to the collections gallery
 async function Add_Images_To_New_Collection() {
     // Show the modal
-    var modal_gallery_img_add = document.getElementById("search-modal-click-top-id");
+    let modal_gallery_img_add = document.getElementById("search-modal-click-top-id");
     modal_gallery_img_add.style.display = "block";
     // Get the button that opens the modal
-    var modal_gallery_img_add_close_btn = document.getElementById("modal-search-close-exit-view-button-id");
+    let modal_gallery_img_add_close_btn = document.getElementById("modal-search-close-exit-view-button-id");
     // When the user clicks on the button, close the modal
     modal_gallery_img_add_close_btn.onclick = function () {
 
@@ -800,12 +800,12 @@ async function Add_Images_To_New_Collection() {
 
     //handler for the emotion label and value entry additions and then the deletion handling, all emotions are added by default and handled
     document.getElementById("modal-search-emotion-entry-button-id").onclick = function (event) {
-        emotion_key_tmp = document.getElementById("modal-search-emotion-label-value-textarea-entry-id").value
+        let emotion_key_tmp = document.getElementById("modal-search-emotion-label-value-textarea-entry-id").value
         if(emotion_key_tmp != "") {
-            emotion_value_tmp = document.getElementById("modal-search-emotion-value-range-entry-id").value
+            let emotion_value_tmp = document.getElementById("modal-search-emotion-value-range-entry-id").value
             collection_gallery_search_obj["emotions"][emotion_key_tmp] = emotion_value_tmp //update the global profile image search object with the new key value
-            emotion_div_id = document.getElementById("modal-search-emotion-label-value-display-container-div-id")
-            emotions_html_tmp = ""
+            let emotion_div_id = document.getElementById("modal-search-emotion-label-value-display-container-div-id")
+            let emotions_html_tmp = ""
             Object.keys(collection_gallery_search_obj["emotions"]).forEach(emotion_key => {
                         emotions_html_tmp += `
                                             <span id="modal-search-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
@@ -837,12 +837,12 @@ async function Add_Images_To_New_Collection() {
         search_image_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
     }
 
-    search_display_div = document.getElementById("modal-search-images-results-grid-div-area-id")
+    let search_display_div = document.getElementById("modal-search-images-results-grid-div-area-id")
     search_display_div.innerHTML = ""
-    search_display_inner_tmp = ''
+    let search_display_inner_tmp = ''
     for(let image_filename of search_image_results) {
     //search_image_results.forEach( image_filename => {
-        image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+        let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${image_filename}">
@@ -857,12 +857,12 @@ async function Add_Images_To_New_Collection() {
     }
     search_display_div.innerHTML += search_display_inner_tmp
     //memes section
-    search_meme_display_div = document.getElementById("modal-search-meme-images-results-grid-div-area-id")
+    let search_meme_display_div = document.getElementById("modal-search-meme-images-results-grid-div-area-id")
     search_meme_display_div.innerHTML = ""
     search_display_inner_tmp = ''
     for(let image_filename of search_image_meme_results) {
     //search_image_meme_results.forEach( image_filename => {
-        image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+        let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${image_filename}">
@@ -878,9 +878,9 @@ async function Add_Images_To_New_Collection() {
     search_meme_display_div.innerHTML += search_display_inner_tmp
     //add an event listener to the images to select them to be added to the gallery and the current obj and the collection DB updated
     document.getElementById("modal-search-images-results-select-images-order-button-id").onclick = async function() {
-        update = false
+        let update = false
         search_image_results.forEach( image_filename => {
-            image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+            let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
             if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
                 if(document.getElementById(`add-image-toggle-id-${image_filename}`).checked){
                     COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.push(image_filename)
@@ -889,7 +889,7 @@ async function Add_Images_To_New_Collection() {
             }
         })
         search_image_meme_results.forEach( image_filename => {
-            image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+            let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
             if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
                 if(document.getElementById(`add-memes-meme-toggle-id-${image_filename}`).checked) {
                     COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.push(image_filename)
@@ -901,12 +901,12 @@ async function Add_Images_To_New_Collection() {
             //clear gallery of gallery image objects
             document.querySelectorAll(".collection-images-gallery-grid-item-class").forEach(el => el.remove());
             //place the gallery images in the html and ignore the missing images (leave the lingering links)
-            gallery_div = document.getElementById("collections-images-gallery-grid-images-div-id")
-            gallery_html_tmp = ''
-            image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet
+            let gallery_div = document.getElementById("collections-images-gallery-grid-images-div-id")
+            let gallery_html_tmp = ''
+            let image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet
             for(let image_filename of image_set) {
             //image_set.forEach(function(image_filename) {
-                image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+                let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
                 if(FS.existsSync(image_path_tmp) == true){ 
                     gallery_html_tmp += `
                                         <div class="collection-images-gallery-grid-item-class">
@@ -951,7 +951,7 @@ async function Add_Images_To_New_Collection() {
         }
         //reset toggles to default false
         all_image_keys.forEach( image_filename => {
-            image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+            let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
             if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
                 if(document.getElementById(`add-image-toggle-id-${image_filename}`).checked){
                     document.getElementById(`add-image-toggle-id-${image_filename}`).checked = false
@@ -970,15 +970,15 @@ async function Add_Images_To_New_Collection() {
 //the search for the add images modal of the gallery of the collections
 async function Collection_Add_Image_Search_Action() {
     //get the tags input and get rid of nuissance chars
-    search_tags_input = document.getElementById("modal-search-tag-textarea-entry-id").value
-    split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
-    search_unique_search_terms = [...new Set(split_search_string)]
+    let search_tags_input = document.getElementById("modal-search-tag-textarea-entry-id").value
+    let split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
+    let search_unique_search_terms = [...new Set(split_search_string)]
     search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
     collection_gallery_search_obj["searchTags"] = search_unique_search_terms
     //meme tags now    
-    search_meme_tags_input = document.getElementById("modal-search-meme-tag-textarea-entry-id").value
-    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
-    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+    let search_meme_tags_input = document.getElementById("modal-search-meme-tag-textarea-entry-id").value
+    let split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
+    let search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
     search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
     collection_gallery_search_obj["searchMemeTags"] = search_unique_meme_search_terms
     //emotion key value already is in: collection_gallery_search_obj
@@ -989,19 +989,19 @@ async function Collection_Add_Image_Search_Action() {
     //img_indices_sorted = image_search_result_obj.imgInds //!!! indexeddb !!!
     //meme_img_indices_sorted = image_search_result_obj.memeInds //!!! indexeddb !!!
 
-    tagging_db_iterator = await Tagging_Image_DB_Iterator();
+    let tagging_db_iterator = await Tagging_Image_DB_Iterator();
     search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_gallery_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
-    tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
+    let tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
     search_image_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(collection_gallery_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
 
     //display the search order with the image order first and then the memes that are relevant
-    search_display_div = document.getElementById("modal-search-images-results-grid-div-area-id")
+    let search_display_div = document.getElementById("modal-search-images-results-grid-div-area-id")
     search_display_div.innerHTML = ""
-    search_display_inner_tmp = ''
-    for(let search_image_results of image_filename) {
+    let search_display_inner_tmp = ''
+    for( let image_filename of search_image_results ) {
     //search_image_results.forEach( image_filename => {
         //image_filename = all_image_keys[index] //!!! indexeddb !!!
-        image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+        let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${image_filename}">
@@ -1016,13 +1016,13 @@ async function Collection_Add_Image_Search_Action() {
     }
     search_display_div.innerHTML += search_display_inner_tmp
     //memes section
-    search_meme_display_div = document.getElementById("modal-search-meme-images-results-grid-div-area-id")
+    let search_meme_display_div = document.getElementById("modal-search-meme-images-results-grid-div-area-id")
     search_meme_display_div.innerHTML = ""
     search_display_inner_tmp = ''
     for(let image_filename of search_image_meme_results) {
     //search_image_meme_results.forEach( image_filename => {
         //image_filename = all_image_keys[index] //!!! indexeddb !!!
-        image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+        let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${image_filename}">
@@ -1042,7 +1042,7 @@ async function Collection_Add_Image_Search_Action() {
 
 //step5 add new memes
 //now when the user wants to add more images to the meme set of the collection
-collection_meme_search_obj = {
+let collection_meme_search_obj = {
     emotions:{},
     meme_emotions:{},
     searchTags:[],
@@ -1050,10 +1050,10 @@ collection_meme_search_obj = {
 }
 async function Add_Meme_Images() {
     // Show the modal
-    var modal_meme_img_add = document.getElementById("search-add-memes-modal-click-top-id");
+    let modal_meme_img_add = document.getElementById("search-add-memes-modal-click-top-id");
     modal_meme_img_add.style.display = "block";
     // Get the button that opens the modal
-    var modal_meme_img_add_close_btn = document.getElementById("modal-search-add-memes-close-exit-view-button-id");
+    let modal_meme_img_add_close_btn = document.getElementById("modal-search-add-memes-close-exit-view-button-id");
     // When the user clicks on the button, close the modal
     modal_meme_img_add_close_btn.onclick = function () {
 
@@ -1088,12 +1088,12 @@ async function Add_Meme_Images() {
 
     //handler for the image tag emotion labels and value entry additions and then the deletion handling, all emotions are added by default and handled 
     document.getElementById("modal-search-add-memes-emotion-entry-button-id").onclick = function (event) {        
-        emotion_key_tmp = document.getElementById("modal-search-add-memes-emotion-label-value-textarea-entry-id").value
+        let emotion_key_tmp = document.getElementById("modal-search-add-memes-emotion-label-value-textarea-entry-id").value
         if(emotion_key_tmp != "") { 
-            emotion_value_tmp = document.getElementById("modal-search-add-memes-emotion-value-range-entry-id").value
+            let emotion_value_tmp = document.getElementById("modal-search-add-memes-emotion-value-range-entry-id").value
             collection_meme_search_obj["emotions"][emotion_key_tmp] = emotion_value_tmp //update the global profile image search object with the new key value
-            emotion_div_id = document.getElementById("modal-search-add-memes-emotion-label-value-display-container-div-id")
-            emotions_html_tmp = ""
+            let emotion_div_id = document.getElementById("modal-search-add-memes-emotion-label-value-display-container-div-id")
+            let emotions_html_tmp = ""
             Object.keys(collection_meme_search_obj["emotions"]).forEach(emotion_key => {
                         emotions_html_tmp += `
                                             <span id="modal-search-add-memes-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
@@ -1121,12 +1121,12 @@ async function Add_Meme_Images() {
     }
     //handler for the 'meme' tag emotion labels and value entry additions and then the deletion handling, all meme_emotions are added by default and handled 
     document.getElementById("modal-search-add-memes-emotion-meme-entry-button-id").onclick = function (event) {        
-        emotion_key_tmp = document.getElementById("modal-search-add-memes-emotion-meme-label-value-textarea-entry-id").value
+        let emotion_key_tmp = document.getElementById("modal-search-add-memes-emotion-meme-label-value-textarea-entry-id").value
         if(emotion_key_tmp != "") { 
-            emotion_value_tmp = document.getElementById("modal-search-add-memes-emotion-meme-value-range-entry-id").value
+            let emotion_value_tmp = document.getElementById("modal-search-add-memes-emotion-meme-value-range-entry-id").value
             collection_meme_search_obj["meme_emotions"][emotion_key_tmp] = emotion_value_tmp //update the global profile image search object with the new key value
-            emotion_div_id = document.getElementById("modal-search-add-memes-emotion-meme-label-value-display-container-div-id")
-            emotions_html_tmp = ""
+            let emotion_div_id = document.getElementById("modal-search-add-memes-emotion-meme-label-value-display-container-div-id")
+            let emotions_html_tmp = ""
             Object.keys(collection_meme_search_obj["meme_emotions"]).forEach(emotion_key => {
                         emotions_html_tmp += `
                                             <span id="modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}" style="white-space:nowrap">
@@ -1158,12 +1158,12 @@ async function Add_Meme_Images() {
         meme_search_image_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
     }
 
-    search_display_div = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
+    let search_display_div = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
     search_display_div.innerHTML = ""
-    search_display_inner_tmp = ''
+    let search_display_inner_tmp = ''
     for(let image_filename of meme_search_image_results) {
     //meme_search_image_results.forEach( image_filename => {
-        image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+        let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${image_filename}">
@@ -1178,12 +1178,12 @@ async function Add_Meme_Images() {
     }
     search_display_div.innerHTML += search_display_inner_tmp
     //memes section
-    search_meme_display_div = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
+    let search_meme_display_div = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
     search_meme_display_div.innerHTML = ""
     search_display_inner_tmp = ''
     for(let image_filename of meme_search_image_meme_results) {
     //meme_search_image_meme_results.forEach( image_filename => {
-        image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+        let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${image_filename}">
@@ -1199,9 +1199,9 @@ async function Add_Meme_Images() {
     search_meme_display_div.innerHTML += search_display_inner_tmp
     //add an event listener to the images to select them to be added to the gallery and the current obj and the collection DB updated
     document.getElementById("modal-search-add-memes-images-results-select-images-order-button-id").onclick = async function() {
-        update = false
+        let update = false
         meme_search_image_results.forEach( image_filename => {
-            image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+            let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
             if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.includes(image_filename)==false) {
                 if(document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked){
                     COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.push(image_filename)
@@ -1210,7 +1210,7 @@ async function Add_Meme_Images() {
             }
         })
         meme_search_image_meme_results.forEach( image_filename => {
-            image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+            let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
             if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.includes(image_filename)==false) {
                 if(document.getElementById(`add-meme-image-meme-toggle-id-${image_filename}`).checked){
                     COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.push(image_filename)
@@ -1222,12 +1222,12 @@ async function Add_Meme_Images() {
             //clear gallery of gallery image objects
             document.querySelectorAll(".collection-image-annotation-memes-grid-item-class").forEach(el => el.remove());
             //place the gallery images in the html and ignore the missing images (leave the lingering links)
-            gallery_div = document.getElementById("collection-image-annotation-memes-images-show-div-id")
-            gallery_html_tmp = ''
-            image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes
+            let gallery_div = document.getElementById("collection-image-annotation-memes-images-show-div-id")
+            let gallery_html_tmp = ''
+            let image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes
             for(let image_filename of image_set) {
             //image_set.forEach(function(image_filename) {
-                image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+                let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
                 if(FS.existsSync(image_path_tmp) == true){ 
                     gallery_html_tmp += `
                                         <div class="collection-image-annotation-memes-grid-item-class">
@@ -1275,7 +1275,7 @@ async function Add_Meme_Images() {
         }
         //reset toggles to default false
         meme_search_image_results.forEach( image_filename => {
-            image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+            let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
             if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.includes(image_filename)==false) {
                 if(document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked){
                     document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked = false
@@ -1283,7 +1283,7 @@ async function Add_Meme_Images() {
             }
         })
         meme_search_image_meme_results.forEach( image_filename => {
-            image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+            let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
             if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.includes(image_filename)==false) {                
                 if(document.getElementById(`add-meme-image-meme-toggle-id-${image_filename}`).checked){
                     document.getElementById(`add-meme-image-meme-toggle-id-${image_filename}`).checked = false
@@ -1298,15 +1298,15 @@ async function Add_Meme_Images() {
 }
 async function Collection_Add_Memes_Search_Action(){
     //get the tags input and get rid of nuissance chars
-    search_tags_input = document.getElementById("modal-search-add-memes-tag-textarea-entry-id").value
-    split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
-    search_unique_search_terms = [...new Set(split_search_string)]
+    let search_tags_input = document.getElementById("modal-search-add-memes-tag-textarea-entry-id").value
+    let split_search_string = search_tags_input.split(reg_exp_delims) //get rid of nuissance chars
+    let search_unique_search_terms = [...new Set(split_search_string)]
     search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
     collection_meme_search_obj["searchTags"] = search_unique_search_terms
     //meme tags now    
-    search_meme_tags_input = document.getElementById("modal-search-add-memes-tag-textarea-memes-entry-id").value
-    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
-    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+    let search_meme_tags_input = document.getElementById("modal-search-add-memes-tag-textarea-memes-entry-id").value
+    let split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
+    let search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
     search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
     collection_meme_search_obj["searchMemeTags"] = search_unique_meme_search_terms
     //emotion keys-values for tags and memes should already be in: collection_meme_search_obj
@@ -1317,19 +1317,19 @@ async function Collection_Add_Memes_Search_Action(){
     // img_indices_sorted = meme_search_result_obj.imgInds //!!!indexeddb !!!
     // meme_img_indices_sorted = meme_search_result_obj.memeInds //!!!indexeddb !!!
 
-    tagging_db_iterator = await Tagging_Image_DB_Iterator();
+    let tagging_db_iterator = await Tagging_Image_DB_Iterator();
     meme_search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_meme_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
-    tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
+    let tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
     meme_search_image_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(collection_meme_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
 
     //display the search order with the image order first and then the memes that are relevant
-    search_display_div = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
+    let search_display_div = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
     search_display_div.innerHTML = ""
-    search_display_inner_tmp = ''
+    let search_display_inner_tmp = ''
     for(let image_filename of meme_search_image_results) {
     //meme_search_image_results.forEach( image_filename => {
         //image_filename = all_image_keys[index] //!!!indexeddb !!!
-        image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+        let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${image_filename}">
@@ -1344,13 +1344,13 @@ async function Collection_Add_Memes_Search_Action(){
     }
     search_display_div.innerHTML += search_display_inner_tmp
     //memes section
-    search_meme_display_div = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
+    let search_meme_display_div = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
     search_meme_display_div.innerHTML = ""
     search_display_inner_tmp = ''
     for(let image_filename of meme_search_image_meme_results) {
     //meme_search_image_meme_results.forEach( image_filename => {
         //image_filename = all_image_keys[index] //!!!indexeddb !!!
-        image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+        let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${image_filename}">
