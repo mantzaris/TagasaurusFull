@@ -12,7 +12,7 @@ const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE,
 const { CLOSE_ICON_RED, CLOSE_ICON_BLACK, HASHTAG_ICON } = require(PATH.join(__dirname,'..','constants','constants-icons.js')) //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 
 
-var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
+let TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
                                     "imageFileName": '',
                                     "imageFileHash": '',
                                     "taggingRawDescription": "",
@@ -23,21 +23,21 @@ var TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
                                     }
 
 //holds current annotation obj
-var current_image_annotation;
+let current_image_annotation;
 
 //holds the last directory the user imported images from
-var last_user_image_directory_chosen = '';
+let last_user_image_directory_chosen = '';
 
-var search_results = ''; //For the search results of image searchees
-var search_meme_results = ''; //meme search results
+let search_results = ''; //For the search results of image searchees
+let search_meme_results = ''; //meme search results
 
-var meme_search_results = ''; //when adding a meme the images panel (left)
-var meme_search_meme_results = ''; //when adding a meme the meme panel (right)
+let meme_search_results = ''; //when adding a meme the images panel (left)
+let meme_search_meme_results = ''; //when adding a meme the meme panel (right)
 
-var default_auto_fill_emotions = false;
+let default_auto_fill_emotions = false;
 
 
-var reg_exp_delims = /[#:,;| ]+/
+let reg_exp_delims = /[#:,;| ]+/
 
 
 
@@ -65,11 +65,11 @@ async function Auto_Fill_Emotions(super_res, file_annotation_obj) {
 
 //actions for the AUTO-FILL emotions button being pressed, populate 
 document.getElementById(`auto-fill-emotions-button-id`).onclick = async function() {
-    ft_res = await fileType.fromFile( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
+    let ft_res = await fileType.fromFile( PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation["imageFileName"]) )
     //console.log('ft_res = ', ft_res)
     if( ft_res.mime.includes('image') == true ) {
         if( ft_res.ext == 'gif' ) {
-            let {faceDescriptors,faceEmotions} = await Get_Image_Face_Expresssions_From_GIF( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]), true, true )
+            let {faceDescriptors,faceEmotions} = await Get_Image_Face_Expresssions_From_GIF( PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation["imageFileName"]), true, true )
             current_image_annotation["taggingEmotions"] = faceEmotions
             await Update_Tagging_Annotation_DB(current_image_annotation);
             Emotion_Display_Fill();
@@ -80,8 +80,8 @@ document.getElementById(`auto-fill-emotions-button-id`).onclick = async function
             Emotion_Display_Fill();
         }
     } else if( ft_res.mime.includes('video') == true ) {
-        let { emotions_total} = await Get_Image_FaceApi_From_VIDEO( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) , true, true ) 
-        tagging_entry_tmp["taggingEmotions"] = emotions_total
+        let { emotions_total} = await Get_Image_FaceApi_From_VIDEO( PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation["imageFileName"]) , true, true ) 
+        current_image_annotation["taggingEmotions"] = emotions_total
         Emotion_Display_Fill();
     }
 
@@ -160,7 +160,7 @@ async function Display_Image() {
     parent.innerText = ""
     const display_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation["imageFileName"]}`
     let center_gallery_element;
-    ft_res = await fileType.fromFile( display_path )
+    let ft_res = await fileType.fromFile( display_path )
     //console.log('ft_res in Display Image = ', ft_res) 
     if( ft_res.mime.includes('pdf') == false ) {
         IPC_RENDERER.send('closePDF')
@@ -193,13 +193,13 @@ async function Display_Image() {
 //DESCRIPTION AND HASHTAGS POPULATE START>>>
 function Description_Hashtags_Display_Fill() {
     document.getElementById('description-textarea-id').value = current_image_annotation["taggingRawDescription"];
-    tag_array = current_image_annotation["taggingTags"];
+    let tag_array = current_image_annotation["taggingTags"];
     //Create the tag unordered list
-    list = document.createElement('ul');
+    let list = document.createElement('ul');
     list.setAttribute("id", "hashtag-list-id");
     for(let i=0; i<tag_array.length; i++) {
-        item = document.createElement('li');
-        image_el = document.createElement("img");
+        let item = document.createElement('li');
+        let image_el = document.createElement("img");
         image_el.setAttribute("id", "hashtags-icon-id");
         image_el.setAttribute("src", `${HASHTAG_ICON}`);
         item.appendChild(image_el);
@@ -214,9 +214,9 @@ function Description_Hashtags_Display_Fill() {
 //populate the emotion value view with emotional values
 async function Emotion_Display_Fill() {
     //console.log('current_image_annotation',current_image_annotation)
-    emotion_div = document.getElementById("emotion-collectionlist-div-id");
-    emotion_keys = Object.keys(current_image_annotation["taggingEmotions"]);
-    emotion_html_tmp = ''
+    let emotion_div = document.getElementById("emotion-collectionlist-div-id");
+    let emotion_keys = Object.keys(current_image_annotation["taggingEmotions"]);
+    let emotion_html_tmp = ''
     for( var key of emotion_keys ) {
         emotion_html_tmp += `<div class="emotion-list-class" id="emotion-entry-div-id-${key}">
                                 <img class="emotion-delete-icon-class" id="emotion-delete-button-id-${key}" 
@@ -249,11 +249,11 @@ async function Delete_Emotion(emotion_key) {
 }
 //add a new emotion to the emotion set
 async function Add_New_Emotion(){
-    new_emotion_text = document.getElementById("emotions-new-emotion-textarea-id").value;
-    new_emotion_value = document.getElementById("new-emotion-range-id").value;
+    let new_emotion_text = document.getElementById("emotions-new-emotion-textarea-id").value;
+    let new_emotion_value = document.getElementById("new-emotion-range-id").value;
     if(new_emotion_text){
-        keys_tmp = Object.keys(current_image_annotation["taggingEmotions"]);
-        boolean_included = keys_tmp.includes(new_emotion_text);
+        let keys_tmp = Object.keys(current_image_annotation["taggingEmotions"]);
+        let boolean_included = keys_tmp.includes(new_emotion_text);
         if(boolean_included == false){
             current_image_annotation["taggingEmotions"][new_emotion_text] = new_emotion_value;
             await Update_Tagging_Annotation_DB(current_image_annotation);
@@ -269,8 +269,8 @@ async function Add_New_Emotion(){
 //MEME STUFF START>>>
 //populate the meme switch view with images
 async function Meme_View_Fill() {
-    meme_box = document.getElementById("memes-innerbox-displaymemes-id");
-    meme_choices = current_image_annotation["taggingMemeChoices"];
+    let meme_box = document.getElementById("memes-innerbox-displaymemes-id");
+    let meme_choices = current_image_annotation["taggingMemeChoices"];
     for( file of meme_choices ) {
         if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true ) {
 
@@ -315,27 +315,27 @@ async function Meme_View_Fill() {
 //id of meme clicked is: "memes-image-img-id-${file}"
 async function Meme_Image_Clicked(meme_file_name) {
     
-    modal_meme_click_top_id_element = document.getElementById("modal-meme-clicked-top-id");
+    let modal_meme_click_top_id_element = document.getElementById("modal-meme-clicked-top-id");
     modal_meme_click_top_id_element.style.display = "block";
     // Get the button that opens the modal
-    var meme_modal_close_btn = document.getElementById("modal-meme-clicked-close-button-id");
+    let meme_modal_close_btn = document.getElementById("modal-meme-clicked-close-button-id");
     // When the user clicks on the button, close the modal
     meme_modal_close_btn.onclick = function() {
-        name_type = document.getElementById("modal-meme-clicked-displayimg-id").nodeName
+        let name_type = document.getElementById("modal-meme-clicked-displayimg-id").nodeName
         if( name_type == "VIDEO") { document.getElementById("modal-meme-clicked-displayimg-id").pause() }
         modal_meme_click_top_id_element.style.display = "none";
     }
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {
         if (event.target == modal_meme_click_top_id_element) {
-            name_type = document.getElementById("modal-meme-clicked-displayimg-id").nodeName
+            let name_type = document.getElementById("modal-meme-clicked-displayimg-id").nodeName
             if( name_type == "VIDEO") { document.getElementById("modal-meme-clicked-displayimg-id").pause() }
             modal_meme_click_top_id_element.style.display = "none";
         }
     }
     document.getElementById("modal-meme-clicked-image-gridbox-id").innerHTML = "";
-    meme_click_modal_div = document.getElementById("modal-meme-clicked-image-gridbox-id");
-    meme_click_modal_body_html_tmp = '';
+    let meme_click_modal_div = document.getElementById("modal-meme-clicked-image-gridbox-id");
+    let meme_click_modal_body_html_tmp = '';
 
     //pause element of meme if video
     let clicked_meme_element = document.getElementById(`memes-image-img-id-${meme_file_name}`)
@@ -353,13 +353,13 @@ async function Meme_Image_Clicked(meme_file_name) {
     }
     meme_click_modal_body_html_tmp += content_html //`<img id="modal-meme-clicked-displayimg-id" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_file_name}" title="meme" alt="meme" />`;
     meme_click_modal_div.insertAdjacentHTML('beforeend', meme_click_modal_body_html_tmp);
-    meme_image_annotations = await Get_Tagging_Annotation_From_DB( meme_file_name );
+    let meme_image_annotations = await Get_Tagging_Annotation_From_DB( meme_file_name );
     //add emotion tuples to view
-    modal_emotions_html_tmp = `Emotions: `
-    emotion_keys = Object.keys(meme_image_annotations["taggingEmotions"])
+    let modal_emotions_html_tmp = `Emotions: `
+    let emotion_keys = Object.keys(meme_image_annotations["taggingEmotions"])
     if( emotion_keys.length > 0 ){
         emotion_keys.forEach(function(key_tmp, index){
-            emotion_value = meme_image_annotations["taggingEmotions"][key_tmp]
+            let emotion_value = meme_image_annotations["taggingEmotions"][key_tmp]
             if( index < emotion_keys.length-1 ) {
                 modal_emotions_html_tmp += `(${key_tmp}:${emotion_value}), `
             } else {
@@ -370,8 +370,8 @@ async function Meme_Image_Clicked(meme_file_name) {
         modal_emotions_html_tmp += `no emotions added`
     }
     document.getElementById("modal-meme-clicked-emotion-list-div-container-id").innerHTML = modal_emotions_html_tmp;
-    tag_array = meme_image_annotations["taggingTags"];
-    modal_tags_html_tmp = `Tags: `;
+    let tag_array = meme_image_annotations["taggingTags"];
+    let modal_tags_html_tmp = `Tags: `;
     if( tag_array.length > 0 ){
         tag_array.forEach(function(tag){
             modal_tags_html_tmp += `#${tag} `;
@@ -403,7 +403,7 @@ async function Reset_Image_Annotations(){
     document.getElementById('description-textarea-id').value = '';
     document.getElementById('hashtags-innerbox-displayhashtags-id').innerHTML = '';
     //reset the meme toggles to be the checked true which is the default here
-    meme_choices = current_image_annotation["taggingMemeChoices"];
+    let meme_choices = current_image_annotation["taggingMemeChoices"];
     for(ii=0;ii<meme_choices.length;ii++){
         document.getElementById(`meme-toggle-id-${meme_choices[ii]}`).checked = false;
     }
@@ -467,7 +467,7 @@ async function First_Display_Init() {
     if(records_remaining == 0) {
         Load_Default_Taga_Image();
     } else if( window.location.href.indexOf("imageFileName") > -1 ) {
-        tagging_name_param = window.location.search.split("=")[1]
+        let tagging_name_param = window.location.search.split("=")[1]
         //console.log('tagging_name_param = ', tagging_name_param)
         tagging_name_param = fromBinary(atob(tagging_name_param))
         
@@ -498,26 +498,25 @@ function fromBinary(binary) {
     }
     return result;
 }
-  
     
 
 //SAVING, LOADING, DELETING, ETC START>>>
 //process image for saving including the text to tags (Called from the html Save button)
 async function Save_Image_Annotation_Changes() {
     //save meme changes
-    current_memes = current_image_annotation.taggingMemeChoices;
-    meme_switch_booleans = [] //meme selection toggle switch check boxes
+    let current_memes = current_image_annotation.taggingMemeChoices;
+    let meme_switch_booleans = [] //meme selection toggle switch check boxes
     for (var ii = 0; ii < current_memes.length; ii++) {
         if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${current_memes[ii]}`) == true ) {
-            meme_boolean_tmp = document.getElementById(`meme-toggle-id-${current_memes[ii]}`).checked;
+            let meme_boolean_tmp = document.getElementById(`meme-toggle-id-${current_memes[ii]}`).checked;
             if(meme_boolean_tmp == true) {
                 meme_switch_booleans.push(current_memes[ii]);
             }
         }
     }
     //handle textual description, process for tag words
-    rawDescription = document.getElementById('description-textarea-id').value;
-    processed_tag_word_list = DESCRIPTION_PROCESS_MODULE.process_description(rawDescription);
+    let rawDescription = document.getElementById('description-textarea-id').value;
+    let processed_tag_word_list = DESCRIPTION_PROCESS_MODULE.process_description(rawDescription);
     //change the object fields accordingly
     //new_record.imageFileName = image_name;
     current_image_annotation.taggingMemeChoices = meme_switch_booleans;
@@ -533,13 +532,13 @@ async function Save_Image_Annotation_Changes() {
 //load the default image, typically called to avoid having nothing in the DB but can be deleted later on
 async function Load_Default_Taga_Image() {
 
-    app_path = await IPC_RENDERER.invoke('getAppPath')
-    taga_source_path = PATH.join(app_path,'Taga.png'); //PATH.resolve()+PATH.sep+'Taga.png';
+    let app_path = await IPC_RENDERER.invoke('getAppPath')
+    let taga_source_path = PATH.join(app_path,'Taga.png'); //PATH.resolve()+PATH.sep+'Taga.png';
 
     if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`) == false ) {
         FS.copyFileSync(taga_source_path, `${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL);
     }
-    tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
+    let tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
     tagging_entry.imageFileName = 'Taga.png';
     tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
     //for taga no emotion inference is needed but done for consistency
@@ -578,22 +577,22 @@ async function Load_New_Image() {
         return
     }
     last_user_image_directory_chosen = PATH.dirname(result.filePaths[0]);
-    filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY,Get_Tagging_Hash_From_DB);
+    let filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY,Get_Tagging_Hash_From_DB);
     if(filenames.length == 0){
         return
     }
     let tagging_entry = null;
     for(filename of filenames) {
     //filenames.forEach( async filename => {
-        tagging_entry_tmp = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //cloning obj
+        let tagging_entry_tmp = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //cloning obj
         tagging_entry_tmp.imageFileName = filename;
         tagging_entry_tmp.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${filename}`);
-        hash_present = await Get_Tagging_Hash_From_DB(tagging_entry_tmp.imageFileHash);
+        let hash_present = await Get_Tagging_Hash_From_DB(tagging_entry_tmp.imageFileHash);
         //console.log("tagging_entry_tmp",tagging_entry_tmp)
         if(hash_present == undefined) {
             //emotion inference upon the default selected
 
-            ft_res = await fileType.fromFile( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
+            let ft_res = await fileType.fromFile( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
             //console.log('ft_res = ', ft_res)
             if( ft_res.mime.includes('image') == true ) {
                 if( ft_res.ext == 'gif' ) {
@@ -608,11 +607,11 @@ async function Load_New_Image() {
                     }
                 } else {
                     if( default_auto_fill_emotions == true ) {
-                        super_res = await Get_Image_Face_Descriptors_And_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
+                        let super_res = await Get_Image_Face_Descriptors_And_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
                         tagging_entry_tmp["taggingEmotions"] = await Auto_Fill_Emotions(super_res, tagging_entry_tmp)
                         tagging_entry_tmp["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
                     } else {
-                        super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
+                        let super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
                         tagging_entry_tmp["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
                         //console.log(`tagging_entry_tmp["faceDescriptors"] = `, tagging_entry_tmp["faceDescriptors"] )
                     }
@@ -621,7 +620,7 @@ async function Load_New_Image() {
                 //console.log("video type mime",tagging_entry_tmp)
 
                 if( default_auto_fill_emotions == true ) {
-                    let { video_face_descriptors, emotions_total} = await Get_Image_FaceApi_From_VIDEO( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) , true, false ) 
+                    let { video_face_descriptors, emotions_total} = await Get_Image_FaceApi_From_VIDEO( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) , true, false )
                     tagging_entry_tmp["faceDescriptors"] = video_face_descriptors
                     tagging_entry_tmp["taggingEmotions"] = emotions_total
 
@@ -631,9 +630,9 @@ async function Load_New_Image() {
                 }
 
             } else if ( ft_res.mime.includes('audio') == true ) {
-                
+                //nothing special like for images and video
             } else if ( ft_res.mime.includes('pdf') == true ) {
-                
+                //nothing special like for images and video
             } else { //cannot handle this file type
                 continue
             }
@@ -668,7 +667,7 @@ function addMouseOverIconSwitch(emotion_div) {
 /*
 MODAL SEARCH STUFF
 */
-tagging_search_obj = {
+let tagging_search_obj = {
                         emotions:{},
                         searchTags:[],
                         searchMemeTags:[]
@@ -729,14 +728,14 @@ async function Search_Images(){
     
     //handler for the emotion label and value entry additions and then the deletion handling, all emotions are added by default and handled 
     document.getElementById("modal-search-emotion-entry-button-id").onclick = function() {
-        entered_emotion_label = document.getElementById("modal-search-emotion-label-value-textarea-entry-id").value
-        emotion_search_entry_value = document.getElementById("modal-search-emotion-value-range-entry-id").value
+        let entered_emotion_label = document.getElementById("modal-search-emotion-label-value-textarea-entry-id").value
+        let emotion_search_entry_value = document.getElementById("modal-search-emotion-value-range-entry-id").value
         if( entered_emotion_label != "" ) {
             tagging_search_obj["emotions"][entered_emotion_label] = emotion_search_entry_value
         }
         document.getElementById("modal-search-emotion-label-value-textarea-entry-id").value = ""
         document.getElementById("modal-search-emotion-value-range-entry-id").value = "0"
-        image_emotions_div_id = document.getElementById("modal-search-emotion-label-value-display-container-div-id")
+        let image_emotions_div_id = document.getElementById("modal-search-emotion-label-value-display-container-div-id")
         image_emotions_div_id.innerHTML = ""
         //Populate for the emotions of the images
         Object.keys(tagging_search_obj["emotions"]).forEach(emotion_key => {
@@ -755,7 +754,7 @@ async function Search_Images(){
         //action listener for the removal of emotions populated from user entry
         Object.keys(tagging_search_obj["emotions"]).forEach(emotion_key => {
             document.getElementById(`modal-search-emotion-remove-button-id-${emotion_key}`).addEventListener("click", function() {
-                search_emotion_search_span_html_obj = document.getElementById(`modal-search-emotion-label-value-span-id-${emotion_key}`);
+                let search_emotion_search_span_html_obj = document.getElementById(`modal-search-emotion-label-value-span-id-${emotion_key}`);
                 search_emotion_search_span_html_obj.remove();
                 delete tagging_search_obj["emotions"][emotion_key]
             })
@@ -767,9 +766,9 @@ async function Search_Images(){
         search_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
     }
     //display default ordering first
-    search_image_results_output = document.getElementById("modal-search-images-results-grid-div-area-id");
+    let search_image_results_output = document.getElementById("modal-search-images-results-grid-div-area-id");
     search_image_results_output.innerHTML = "";
-    search_display_inner_tmp = '';
+    let search_display_inner_tmp = '';
     for(let file_key of search_results) {
         search_display_inner_tmp += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${file_key}" >
@@ -779,7 +778,7 @@ async function Search_Images(){
     }
     search_image_results_output.innerHTML += search_display_inner_tmp;
     //search meme results
-    search_meme_results_output = document.getElementById("modal-search-meme-images-results-grid-div-area-id");
+    let search_meme_results_output = document.getElementById("modal-search-meme-images-results-grid-div-area-id");
     search_meme_results_output.innerHTML = "";
     search_display_inner_tmp = '';
     for(let file_key of search_meme_results) {
@@ -851,15 +850,15 @@ async function Modal_Search_Entry(search_similar=false, search_obj_similar_tmp={
     search_obj_tmp = tagging_search_obj
     if(search_similar == false) {        
         //annotation tags
-        search_tags_input = document.getElementById("modal-search-tag-textarea-entry-id").value
-        split_search_string = search_tags_input.split(reg_exp_delims)
-        search_unique_search_terms = [...new Set(split_search_string)]
+        let search_tags_input = document.getElementById("modal-search-tag-textarea-entry-id").value
+        let split_search_string = search_tags_input.split(reg_exp_delims)
+        let search_unique_search_terms = [...new Set(split_search_string)]
         search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
         search_obj_tmp["searchTags"] = search_unique_search_terms
         //meme tags now
-        search_meme_tags_input = document.getElementById("modal-search-meme-tag-textarea-entry-id").value
-        split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
-        search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+        let search_meme_tags_input = document.getElementById("modal-search-meme-tag-textarea-entry-id").value
+        let split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
+        let search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
         search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
         search_obj_tmp["searchMemeTags"] = search_unique_meme_search_terms
     } else {
@@ -867,16 +866,16 @@ async function Modal_Search_Entry(search_similar=false, search_obj_similar_tmp={
     }
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
-    tagging_db_iterator = await Tagging_Image_DB_Iterator();
+    let tagging_db_iterator = await Tagging_Image_DB_Iterator();
     search_results = await SEARCH_MODULE.Image_Search_DB(search_obj_tmp,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
-    tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
+    let tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
     search_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(search_obj_tmp,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
     //console.log('search_meme_results = ', search_meme_results)
     //>>SHOW SEARCH RESULTS<<
     //search images results annotations
-    search_image_results_output = document.getElementById("modal-search-images-results-grid-div-area-id")
+    let search_image_results_output = document.getElementById("modal-search-images-results-grid-div-area-id")
     search_image_results_output.innerHTML = "";
-    search_display_inner_tmp = '';
+    let search_display_inner_tmp = '';
     for(let file_key of search_results) {
         search_display_inner_tmp += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${file_key}" >
@@ -923,7 +922,7 @@ async function Modal_Search_Entry(search_similar=false, search_obj_similar_tmp={
 async function Modal_Search_Similar() {
     //
     //console.log("search similar!!")    
-    search_obj_similar_tmp = JSON.parse(JSON.stringify(tagging_search_obj))
+    let search_obj_similar_tmp = JSON.parse(JSON.stringify(tagging_search_obj))
     search_obj_similar_tmp.emotions = current_image_annotation.taggingEmotions
     search_obj_similar_tmp.searchTags = current_image_annotation.taggingTags
     search_obj_similar_tmp.searchMemeTags = current_image_annotation.taggingMemeChoices
@@ -935,7 +934,7 @@ async function Modal_Search_Similar() {
 /******************************
 MEME SEARCH STUFF SEARCH FOR MEMES TO ADD THEM AS AN ANNOTATION
 ******************************/
-meme_tagging_search_obj = {
+let meme_tagging_search_obj = {
     meme_emotions:{},
     emotions:{},
     searchTags:[],
@@ -944,10 +943,10 @@ meme_tagging_search_obj = {
 //called from the HTML button onclik, add a new meme which is searched for by the user
 async function Add_New_Meme(){    
     // Show the modal
-    var modal_add_memes_search_click = document.getElementById("search-add-memes-modal-click-top-id");
+    let modal_add_memes_search_click = document.getElementById("search-add-memes-modal-click-top-id");
     modal_add_memes_search_click.style.display = "block";
     // Get the button that opens the modal
-    var meme_modal_close_btn = document.getElementById("modal-search-add-memes-close-exit-view-button-id");
+    let meme_modal_close_btn = document.getElementById("modal-search-add-memes-close-exit-view-button-id");
     // When the user clicks on the button, close the modal
     meme_modal_close_btn.onclick = function() {
         const search_res_children = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id").children
@@ -1006,11 +1005,11 @@ async function Add_New_Meme(){
 
     //user adds emotions for the 'images' of the search criteria (not meme images)
     document.getElementById("modal-search-add-memes-emotion-entry-button-id").onclick = function() {
-        entered_emotion_label = document.getElementById("modal-search-add-memes-emotion-label-value-textarea-entry-id").value
-        emotion_search_entry_value = document.getElementById("modal-search-add-memes-emotion-value-range-entry-id").value
+        let entered_emotion_label = document.getElementById("modal-search-add-memes-emotion-label-value-textarea-entry-id").value
+        let emotion_search_entry_value = document.getElementById("modal-search-add-memes-emotion-value-range-entry-id").value
         if( entered_emotion_label != "" ) {
             meme_tagging_search_obj["emotions"][entered_emotion_label] = emotion_search_entry_value
-            image_emotions_div_id = document.getElementById("modal-search-add-memes-emotion-label-value-display-container-div-id")
+            let image_emotions_div_id = document.getElementById("modal-search-add-memes-emotion-label-value-display-container-div-id")
             image_emotions_div_id.innerHTML = ""
             //Populate for the emotions of the images
             Object.keys(meme_tagging_search_obj["emotions"]).forEach(emotion_key => {
@@ -1030,7 +1029,7 @@ async function Add_New_Meme(){
             //action listener for the removal of emotions populated from user entry
             Object.keys(meme_tagging_search_obj["emotions"]).forEach(emotion_key => {
                 document.getElementById(`modal-search-add-memes-emotion-remove-button-id-${emotion_key}`).onclick = function() {
-                    search_emotion_search_span_html_obj = document.getElementById(`modal-search-add-memes-emotion-label-value-span-id-${emotion_key}`);
+                    let search_emotion_search_span_html_obj = document.getElementById(`modal-search-add-memes-emotion-label-value-span-id-${emotion_key}`);
                     search_emotion_search_span_html_obj.remove();
                     delete meme_tagging_search_obj["emotions"][emotion_key]                    
                 }
@@ -1041,11 +1040,11 @@ async function Add_New_Meme(){
     }
     //user adds emotions of the 'memes' of the search criteria
     document.getElementById("modal-search-add-memes-emotion-meme-entry-button-id").onclick = function() {
-        entered_emotion_label = document.getElementById("modal-search-add-memes-emotion-meme-label-value-textarea-entry-id").value
-        emotion_search_entry_value = document.getElementById("modal-search-add-memes-emotion-meme-value-range-entry-id").value
+        let entered_emotion_label = document.getElementById("modal-search-add-memes-emotion-meme-label-value-textarea-entry-id").value
+        let emotion_search_entry_value = document.getElementById("modal-search-add-memes-emotion-meme-value-range-entry-id").value
         if( entered_emotion_label != "" ) {
             meme_tagging_search_obj["meme_emotions"][entered_emotion_label] = emotion_search_entry_value
-            image_memes_emotions_div_id = document.getElementById("modal-search-add-memes-emotion-meme-label-value-display-container-div-id")
+            let image_memes_emotions_div_id = document.getElementById("modal-search-add-memes-emotion-meme-label-value-display-container-div-id")
             image_memes_emotions_div_id.innerHTML = ""
             //Populate for the emotions of the memes of the images
             Object.keys(meme_tagging_search_obj["meme_emotions"]).forEach(emotion_key => {
@@ -1065,7 +1064,7 @@ async function Add_New_Meme(){
             //action listener for the removal of meme emotions populated from user entry
             Object.keys(meme_tagging_search_obj["meme_emotions"]).forEach(emotion_key => {
                 document.getElementById(`modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}`).addEventListener("click", function() {
-                    search_meme_emotion_search_span_html_obj = document.getElementById(`modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}`);
+                    let search_meme_emotion_search_span_html_obj = document.getElementById(`modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}`);
                     search_meme_emotion_search_span_html_obj.remove();
                     delete meme_tagging_search_obj["meme_emotions"][emotion_key]
                 })
@@ -1078,22 +1077,22 @@ async function Add_New_Meme(){
     //user presses it after the fields have been entered to search the images to then add memes
     //after the search is done and user has made the meme selection (or not) and they are to be added to the current annotation object
     document.getElementById("modal-search-add-memes-images-results-select-images-order-button-id").onclick = async function() {
-        memes_current = current_image_annotation.taggingMemeChoices
+        let memes_current = current_image_annotation.taggingMemeChoices
         //meme selection switch check boxes
         //!!!simplify by getting the checked meme list and then append and get unique array
         // the list will be from the 
-        meme_switch_booleans = []
-        for (var ii = 0; ii < meme_search_results.length; ii++) {
+        let meme_switch_booleans = []
+        for (let ii = 0; ii < meme_search_results.length; ii++) {
             if(memes_current.includes(meme_search_results[ii]) == false && current_image_annotation.imageFileName != meme_search_results[ii]){  //exclude memes already present
-                    meme_boolean_tmp1 = document.getElementById(`add-memes-images-toggle-id-${meme_search_results[ii]}`).checked
+                    let meme_boolean_tmp1 = document.getElementById(`add-memes-images-toggle-id-${meme_search_results[ii]}`).checked
                     if(meme_boolean_tmp1 == true){
                         meme_switch_booleans.push(meme_search_results[ii])
                     }
             }
         }
-        for (var ii = 0; ii < meme_search_meme_results.length; ii++) {
+        for (let ii = 0; ii < meme_search_meme_results.length; ii++) {
             if(memes_current.includes(meme_search_meme_results[ii]) == false && current_image_annotation.imageFileName != meme_search_meme_results[ii]){  //exclude memes already present
-                    meme_boolean_tmp2 = document.getElementById(`add-memes-meme-toggle-id-${meme_search_meme_results[ii]}`).checked
+                    let meme_boolean_tmp2 = document.getElementById(`add-memes-meme-toggle-id-${meme_search_meme_results[ii]}`).checked
                     if(meme_boolean_tmp2 == true){
                         meme_switch_booleans.push(meme_search_meme_results[ii])
                     }
@@ -1124,8 +1123,8 @@ async function Add_New_Meme(){
         meme_search_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
     }
     //display meme candidates
-    memes_current = current_image_annotation.taggingMemeChoices
-    search_meme_images_results_output = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
+    let memes_current = current_image_annotation.taggingMemeChoices
+    let search_meme_images_results_output = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
     search_meme_images_results_output.innerHTML = ""
     for(let file_key of meme_search_results) {
         if(memes_current.includes(file_key) == false && current_image_annotation.imageFileName != file_key){ //exclude memes already present            
@@ -1142,7 +1141,7 @@ async function Add_New_Meme(){
         }
     }
     //search results display image memes
-    search_meme_images_memes_results_output = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
+    let search_meme_images_memes_results_output = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
     search_meme_images_memes_results_output.innerHTML = ""
     for(let file_key of meme_search_meme_results) {
         if(memes_current.includes(file_key) == false && current_image_annotation.imageFileName != file_key){ //exclude memes already present
@@ -1163,30 +1162,30 @@ async function Add_New_Meme(){
 //the functionality to use the object to search the DB for relevant memes
 async function Modal_Meme_Search_Btn(){
     //image annotation tags
-    search_tags_input = document.getElementById("modal-search-add-memes-tag-textarea-entry-id").value
-    split_search_string = search_tags_input.split(reg_exp_delims)
-    search_unique_search_terms = [...new Set(split_search_string)]
+    let search_tags_input = document.getElementById("modal-search-add-memes-tag-textarea-entry-id").value
+    let split_search_string = search_tags_input.split(reg_exp_delims)
+    let search_unique_search_terms = [...new Set(split_search_string)]
     search_unique_search_terms = search_unique_search_terms.filter(tag => tag !== "")
     meme_tagging_search_obj["searchTags"] = search_unique_search_terms
     //meme tags now
-    search_meme_tags_input = document.getElementById("modal-search-add-memes-tag-textarea-memes-entry-id").value
-    split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
-    search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
+    let search_meme_tags_input = document.getElementById("modal-search-add-memes-tag-textarea-memes-entry-id").value
+    let split_meme_search_string = search_meme_tags_input.split(reg_exp_delims)
+    let search_unique_meme_search_terms = [...new Set(split_meme_search_string)]
     search_unique_meme_search_terms = search_unique_meme_search_terms.filter(tag => tag !== "")
     meme_tagging_search_obj["searchMemeTags"] = search_unique_meme_search_terms
 
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
-    tagging_db_iterator = await Tagging_Image_DB_Iterator();
+    let tagging_db_iterator = await Tagging_Image_DB_Iterator();
     meme_search_results = await SEARCH_MODULE.Meme_Addition_Image_Search_DB(meme_tagging_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
-    tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
+    let tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
     meme_search_meme_results = await SEARCH_MODULE.Meme_Addition_Image_Meme_Search_DB(meme_tagging_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
 
     //get the record to know the memes that are present to not present any redundancy
-    memes_current = current_image_annotation.taggingMemeChoices
+    let memes_current = current_image_annotation.taggingMemeChoices
 
     //search results display images
-    search_meme_images_results_output = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
+    let search_meme_images_results_output = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
     search_meme_images_results_output.innerHTML = ""
     for(let file_key of meme_search_results) {
         if(memes_current.includes(file_key) == false && current_image_annotation.imageFileName != file_key){ //exclude memes already present            
@@ -1203,7 +1202,7 @@ async function Modal_Meme_Search_Btn(){
         }
     }
     //search results display image memes
-    search_meme_images_memes_results_output = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
+    let search_meme_images_memes_results_output = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
     search_meme_images_memes_results_output.innerHTML = ""
 
     for(let file_key of meme_search_meme_results) {
