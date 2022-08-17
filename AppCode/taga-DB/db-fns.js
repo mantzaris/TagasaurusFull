@@ -41,14 +41,14 @@ const GET_MIN_ROWID_STMT = DB.prepare(`SELECT MIN(ROWID) AS rowid FROM ${TAGGING
 
 const GET_TAGGING_ROW_COUNT = DB.prepare(`SELECT COUNT(*) AS rownum FROM ${TAGGING_TABLE_NAME}`)
 //TAGGING END<<<
-var rowid_current;
-var rowid_max;
-var rowid_min;
-var record_num_tagging;
+let rowid_current;
+let rowid_max;
+let rowid_min;
+let record_num_tagging;
 
 //get the number of records in the DB
 async function Number_of_Tagging_Records() {
-  res = GET_TAGGING_ROW_COUNT.get();
+  let res = GET_TAGGING_ROW_COUNT.get();
   record_num_tagging = res.rownum;
   return res.rownum;
 }
@@ -57,7 +57,7 @@ Number_of_Tagging_Records();
 
 //set the maximum and minimum rowid to provide bounds for the rowid usage when user iterates through images
 async function Set_Max_Min_Rowid() {
-  res = GET_MAX_ROWID_STMT.get();
+  let res = GET_MAX_ROWID_STMT.get();
   rowid_max = res.rowid;
   res = GET_MIN_ROWID_STMT.get();
   rowid_min = res.rowid;
@@ -67,7 +67,7 @@ Set_Max_Min_Rowid();
 
 
 async function Get_ROWID_From_Filename(filename) {
-  res = await GET_TAGGING_ROWID_FROM_FILENAME_STMT.get(filename);  
+  let res = await GET_TAGGING_ROWID_FROM_FILENAME_STMT.get(filename);  
   return res.rowid;
 }
 exports.Get_ROWID_From_Filename = Get_ROWID_From_Filename;
@@ -75,7 +75,7 @@ exports.Get_ROWID_From_Filename = Get_ROWID_From_Filename;
 //the function expects a +1,-1,0 for movement about the current rowid
 async function Step_Get_Annotation(filename,step) {
   if( step == 0 && filename == '' ) {
-    record = await GET_RECORD_FROM_ROWID_TAGGING_STMT.get(rowid_current);
+    let record = await GET_RECORD_FROM_ROWID_TAGGING_STMT.get(rowid_current);
     return Get_Obj_Fields_From_Record(record);
   }
   rowid_current = await Get_ROWID_From_Filename(filename);
@@ -87,21 +87,21 @@ async function Step_Get_Annotation(filename,step) {
       rowid_current = rowid_res.rowid;
     }
   } else if(step == -1) {
-    rowid_res = await GET_PREV_ROWID_STMT.get(rowid_current);
+    let rowid_res = await GET_PREV_ROWID_STMT.get(rowid_current);
     if(rowid_res == undefined) {
       rowid_current = rowid_max; //rowid_res.rowid;
     } else {
       rowid_current = rowid_res.rowid;
     }
   }
-  record = await GET_RECORD_FROM_ROWID_TAGGING_STMT.get(rowid_current);
+  let record = await GET_RECORD_FROM_ROWID_TAGGING_STMT.get(rowid_current);
   return Get_Obj_Fields_From_Record(record);
 }
 exports.Step_Get_Annotation = Step_Get_Annotation;
 
 //fn to get the annotation record for an image by key_type of rowid or filename
 async function Get_Tagging_Record_From_DB(filename) {
-  row_obj = await GET_FILENAME_TAGGING_STMT.get(filename);
+  let row_obj = await GET_FILENAME_TAGGING_STMT.get(filename);
   if( row_obj != undefined ) {
     return Get_Obj_Fields_From_Record(row_obj);
   } else {
@@ -112,7 +112,7 @@ exports.Get_Tagging_Record_From_DB = Get_Tagging_Record_From_DB;
 
 //fn to get the annotation record for an image by key_type of rowid or filename
 async function Get_Record_With_Tagging_Hash_From_DB(hash) {
-  row_obj = await GET_RECORD_FROM_HASH_TAGGING_STMT.get(hash);
+  let row_obj = await GET_RECORD_FROM_HASH_TAGGING_STMT.get(hash);
   if( row_obj != undefined ) {
     return Get_Obj_Fields_From_Record(row_obj);
   } else {
@@ -123,7 +123,7 @@ exports.Get_Record_With_Tagging_Hash_From_DB = Get_Record_With_Tagging_Hash_From
 
 //fn to check the presence of a hash in the DB
 async function Get_Tagging_Hash_From_DB(hash) {
-  hash_res = await GET_HASH_TAGGING_STMT.get(hash)
+  let hash_res = await GET_HASH_TAGGING_STMT.get(hash)
   if(hash_res != undefined) {
     return hash_res.imageFileHash
   } else {
@@ -144,21 +144,21 @@ function Get_Obj_Fields_From_Record(record) {
 //fn to insert into the DB the record of the 
 //column template: (imageFileName TEXT, imageFileHash TEXT, taggingRawDescription TEXT, taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT, faceDescriptors TEXT)
 async function Insert_Record_Into_DB(tagging_obj) {
-  info = await INSERT_TAGGING_STMT.run(tagging_obj.imageFileName,tagging_obj.imageFileHash,tagging_obj.taggingRawDescription,JSON.stringify(tagging_obj.taggingTags),JSON.stringify(tagging_obj.taggingEmotions),JSON.stringify(tagging_obj.taggingMemeChoices),JSON.stringify(tagging_obj.faceDescriptors));
+  let info = await INSERT_TAGGING_STMT.run(tagging_obj.imageFileName,tagging_obj.imageFileHash,tagging_obj.taggingRawDescription,JSON.stringify(tagging_obj.taggingTags),JSON.stringify(tagging_obj.taggingEmotions),JSON.stringify(tagging_obj.taggingMemeChoices),JSON.stringify(tagging_obj.faceDescriptors));
   await Set_Max_Min_Rowid();
 }
 exports.Insert_Record_Into_DB = Insert_Record_Into_DB;
 
 //update the tagging annotation object in the DB
 async function Update_Tagging_Annotation_DB(tagging_obj) {
-  info = await UPDATE_FILENAME_TAGGING_STMT.run(tagging_obj.imageFileName,tagging_obj.imageFileHash,tagging_obj.taggingRawDescription,JSON.stringify(tagging_obj.taggingTags),JSON.stringify(tagging_obj.taggingEmotions),JSON.stringify(tagging_obj.taggingMemeChoices),JSON.stringify(tagging_obj.faceDescriptors),tagging_obj.imageFileName);
+  let info = await UPDATE_FILENAME_TAGGING_STMT.run(tagging_obj.imageFileName,tagging_obj.imageFileHash,tagging_obj.taggingRawDescription,JSON.stringify(tagging_obj.taggingTags),JSON.stringify(tagging_obj.taggingEmotions),JSON.stringify(tagging_obj.taggingMemeChoices),JSON.stringify(tagging_obj.faceDescriptors),tagging_obj.imageFileName);
 }
 exports.Update_Tagging_Annotation_DB = Update_Tagging_Annotation_DB
 
 async function Delete_Tagging_Annotation_DB(filename) {
-  info = await DELETE_FILENAME_TAGGING_STMT.run(filename);
+  let info = await DELETE_FILENAME_TAGGING_STMT.run(filename);
   await Set_Max_Min_Rowid();
-  records_remaining = await Number_of_Tagging_Records();
+  let records_remaining = await Number_of_Tagging_Records();
   return records_remaining; //0 is the indicator that loading a default is necessary
 }
 exports.Delete_Tagging_Annotation_DB = Delete_Tagging_Annotation_DB
@@ -168,9 +168,9 @@ exports.Delete_Tagging_Annotation_DB = Delete_Tagging_Annotation_DB
 //`SELECT * FROM table WHERE rowid > (ABS(RANDOM()) % (SELECT max(rowid) FROM table)) LIMIT 1;` OR select * from quest order by RANDOM() LIMIT 1;
 const GET_N_RAND_TAGGING_FILENAMES_STMT = DB.prepare(`SELECT imageFileName FROM ${TAGGING_TABLE_NAME} WHERE rowid > (ABS(RANDOM()) % (SELECT max(rowid) FROM ${TAGGING_TABLE_NAME})) LIMIT ?;`)
 async function Tagging_Random_DB_Images(num_of_records) {
-  filenames = []
+  let filenames = []
   for(let ii=0;ii<num_of_records;ii++) {
-    filename_tmp = await GET_N_RAND_TAGGING_FILENAMES_STMT.all(1)
+    let filename_tmp = await GET_N_RAND_TAGGING_FILENAMES_STMT.all(1)
     filenames.push(filename_tmp[0].imageFileName)
   }
   filenames = [...new Set(filenames)];
@@ -182,14 +182,14 @@ exports.Tagging_Random_DB_Images = Tagging_Random_DB_Images
 //use via 'iter = await Tagging_Image_DB_Iterator()' and 'rr = await iter()'
 //after all rows complete 'undefined' is returned
 async function Tagging_Image_DB_Iterator() {
-  iter_current_rowid = await GET_MIN_ROWID_STMT.get().rowid;
+  let iter_current_rowid = await GET_MIN_ROWID_STMT.get().rowid;
   //inner function for closure
   async function Tagging_Iterator_Next() {
     if(iter_current_rowid == undefined) {
       return undefined;
     }
-    current_record = Get_Obj_Fields_From_Record(await GET_RECORD_FROM_ROWID_TAGGING_STMT.get(iter_current_rowid));
-    tmp_rowid = await GET_NEXT_ROWID_STMT.get(iter_current_rowid);
+    let current_record = Get_Obj_Fields_From_Record(await GET_RECORD_FROM_ROWID_TAGGING_STMT.get(iter_current_rowid));
+    let tmp_rowid = await GET_NEXT_ROWID_STMT.get(iter_current_rowid);
     if( tmp_rowid != undefined ) {
       iter_current_rowid = tmp_rowid.rowid;
     } else {
@@ -223,7 +223,7 @@ function Get_Obj_Fields_From_MEME_Record(record) {
   return record;
 }
 async function Get_Tagging_MEME_Record_From_DB(filename) {
-  row_obj = await GET_FILENAME_TAGGING_MEME_STMT.get(filename);
+  let row_obj = await GET_FILENAME_TAGGING_MEME_STMT.get(filename);
   if(row_obj == undefined) { //record non-existant so make one
     INSERT_MEME_TABLE_TAGGING_STMT.run( filename, JSON.stringify( [] ) );
     row_obj = await GET_FILENAME_TAGGING_MEME_STMT.get(filename);
@@ -235,17 +235,17 @@ exports.Get_Tagging_MEME_Record_From_DB = Get_Tagging_MEME_Record_From_DB;
 // provide the image being tagged and the before and after meme array and there will be an update to the meme table
 async function Update_Tagging_MEME_Connections(imageFileName,current_image_memes,new_image_memes) {
   // get the right difference ([1,2,3] diff -> [1,3,4] => [4]) and from [4] include/add this imagefilename in the array: diff2 = b.filter(x => !a.includes(x));
-  add_as_memes_filenames = new_image_memes.filter(x => !current_image_memes.includes(x)); //new meme connections to record
-  for(meme_filename of add_as_memes_filenames) {
-    meme_table_record = await Get_Tagging_MEME_Record_From_DB(meme_filename);
+  let add_as_memes_filenames = new_image_memes.filter(x => !current_image_memes.includes(x)); //new meme connections to record
+  for(let meme_filename of add_as_memes_filenames) {
+    let meme_table_record = await Get_Tagging_MEME_Record_From_DB(meme_filename);
     meme_table_record["imageFileNames"].push( imageFileName )
     await UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT.run( JSON.stringify(meme_table_record["imageFileNames"]) , meme_filename )
   }
   // get the memes which no longer include this file (left difference [1,2,3] diff-> [1,3,4] => [2]) and from [2] remove/subtract the image filename from the array: difference = arr1.filter(x => !arr2.includes(x));
-  remove_as_memes_filenames = current_image_memes.filter(x => !new_image_memes.includes(x)); //remove from meme connection
-  for(meme_filename of remove_as_memes_filenames) {
-    meme_table_record = await Get_Tagging_MEME_Record_From_DB(meme_filename);
-    new_array_tmp = meme_table_record.imageFileNames.filter(item => item !== imageFileName)
+  let remove_as_memes_filenames = current_image_memes.filter(x => !new_image_memes.includes(x)); //remove from meme connection
+  for(let meme_filename of remove_as_memes_filenames) {
+    let meme_table_record = await Get_Tagging_MEME_Record_From_DB(meme_filename);
+    let new_array_tmp = meme_table_record.imageFileNames.filter(item => item !== imageFileName)
     if( new_array_tmp.length == 0) {
       await DELETE_MEME_TABLE_ENTRY_STMT.run( meme_filename )
     } else {
@@ -258,15 +258,15 @@ exports.Update_Tagging_MEME_Connections = Update_Tagging_MEME_Connections;
 //1 those images cannot reference it any more (got through each image and remove this filename) 2 remove it from teh table of meme to files 
 async function Handle_Delete_Image_MEME_references(imageFileName) {
   //this image may be a meme, get the meme links and from those images remove the refs to this imageFileName
-  meme_row_obj = await GET_FILENAME_TAGGING_MEME_STMT.get(imageFileName);
+  let meme_row_obj = await GET_FILENAME_TAGGING_MEME_STMT.get(imageFileName);
   if(meme_row_obj == undefined) { //is not listed as a meme for any other image
     return
   }
   meme_row_obj = Get_Obj_Fields_From_MEME_Record(meme_row_obj);
-  for(filename of meme_row_obj["imageFileNames"]) {
-    record_tmp = await Get_Tagging_Record_From_DB(filename);
+  for(let filename of meme_row_obj["imageFileNames"]) {
+    let record_tmp = await Get_Tagging_Record_From_DB(filename);
     if(record_tmp == undefined) { continue }
-    new_meme_choices_tmp = record_tmp.taggingMemeChoices.filter(item => item !== imageFileName)
+    let new_meme_choices_tmp = record_tmp.taggingMemeChoices.filter(item => item !== imageFileName)
     if( new_meme_choices_tmp.length != record_tmp.taggingMemeChoices.length ) {
       record_tmp.taggingMemeChoices = new_meme_choices_tmp
       await Update_Tagging_Annotation_DB(record_tmp);
@@ -281,8 +281,8 @@ exports.Handle_Delete_Image_MEME_references = Handle_Delete_Image_MEME_reference
 //`SELECT * FROM table WHERE rowid > (ABS(RANDOM()) % (SELECT max(rowid) FROM table)) LIMIT 1;` OR select * from quest order by RANDOM() LIMIT 1;
 const GET_N_RAND_MEME_TAGGING_FILENAMES_STMT = DB.prepare(`SELECT imageMemeFileName FROM ${TAGGING_MEME_TABLE_NAME} WHERE rowid > (ABS(RANDOM()) % (SELECT max(rowid) FROM ${TAGGING_MEME_TABLE_NAME})) LIMIT ?;`)
 async function Meme_Tagging_Random_DB_Images(num_of_records) {
-  filenames = []
-  for(ii=0;ii<num_of_records;ii++) {
+  let filenames = []
+  for(let ii=0;ii<num_of_records;ii++) {
     filename_tmp = await GET_N_RAND_MEME_TAGGING_FILENAMES_STMT.all(1)
     if(filename_tmp[0] == undefined) {
       continue;
@@ -302,14 +302,14 @@ exports.Meme_Tagging_Random_DB_Images = Meme_Tagging_Random_DB_Images
 //use via 'iter = await Tagging_Image_DB_Iterator()' and 'rr = await iter()'
 //after all rows complete 'undefined' is returned
 async function Tagging_MEME_Image_DB_Iterator() {
-  iter_current_meme_rowid = await GET_MIN_MEME_ROWID_STMT.get().rowid;
+  let iter_current_meme_rowid = await GET_MIN_MEME_ROWID_STMT.get().rowid;
   //inner function for closure
   async function Tagging_MEME_Iterator_Next() {
     if(iter_current_meme_rowid == undefined) {
       return undefined;
     }
-    current_record = Get_Obj_Fields_From_MEME_Record(await GET_RECORD_FROM_ROWID_TAGGING_MEME_STMT.get(iter_current_meme_rowid));
-    tmp_rowid = await GET_NEXT_MEME_ROWID_STMT.get(iter_current_meme_rowid);
+    let current_record = Get_Obj_Fields_From_MEME_Record(await GET_RECORD_FROM_ROWID_TAGGING_MEME_STMT.get(iter_current_meme_rowid));
+    let tmp_rowid = await GET_NEXT_MEME_ROWID_STMT.get(iter_current_meme_rowid);
     if( tmp_rowid != undefined ) {
       iter_current_meme_rowid = tmp_rowid.rowid;
     } else {
@@ -342,14 +342,14 @@ const GET_MIN_ROWID_STMT_COLLECTION = DB.prepare(`SELECT MIN(ROWID) AS rowid FRO
 const GET_COLLECTION_ROW_COUNT = DB.prepare(`SELECT COUNT(*) AS rownum FROM ${COLLECTIONS_TABLE_NAME}`)
 
 
-var rowid_current_collection;
-var rowid_max_collection;
-var rowid_min_collection;
-var record_num_collection;
+let rowid_current_collection;
+let rowid_max_collection;
+let rowid_min_collection;
+let record_num_collection;
 
 //get the number of records in the collections DB table
 async function Number_of_Collection_Records() {
-  res = GET_COLLECTION_ROW_COUNT.get();
+  let res = GET_COLLECTION_ROW_COUNT.get();
   record_num_collection = res.rownum;
   return res.rownum;
 }
@@ -358,7 +358,7 @@ Number_of_Collection_Records();
 
 //set the maximum and minimum rowid to provide bounds for the rowid usage when user iterates through images
 async function Set_Max_Min_Rowid_Collection() {
-  res = GET_MAX_ROWID_STMT_COLLECTION.get();
+  let res = GET_MAX_ROWID_STMT_COLLECTION.get();
   rowid_max_collection = res.rowid;
   res = GET_MIN_ROWID_STMT_COLLECTION.get();
   rowid_min_collection = res.rowid;
@@ -367,7 +367,7 @@ async function Set_Max_Min_Rowid_Collection() {
 Set_Max_Min_Rowid_Collection();
 
 async function Get_ROWID_From_CollectionName(CollectionName) {
-  res = await GET_COLLECTION_ROWID_FROM_COLLECTION_NAME_STMT.get(CollectionName);  
+  let res = await GET_COLLECTION_ROWID_FROM_COLLECTION_NAME_STMT.get(CollectionName);  
   return res.rowid;
 }
 exports.Get_ROWID_From_CollectionName = Get_ROWID_From_CollectionName;
@@ -380,33 +380,33 @@ exports.Set_ROWID_From_ROWID = Set_ROWID_From_ROWID
 //the function expects a +1,-1,0 for movement about the current rowid
 async function Step_Get_Collection_Annotation(collectionName,step) {
   if( step == 0 && collectionName == '' ) {
-    record = await GET_RECORD_FROM_ROWID_COLLECTION_STMT.get(rowid_current_collection);
+    let record = await GET_RECORD_FROM_ROWID_COLLECTION_STMT.get(rowid_current_collection);
     return Get_Collection_Obj_Fields_From_Record(record);
   }
   rowid_current_collection = await Get_ROWID_From_CollectionName(collectionName);
   if(step == 1) {
-    rowid_res = await GET_NEXT_COLLECTION_ROWID_STMT.get(rowid_current_collection);
+    let rowid_res = await GET_NEXT_COLLECTION_ROWID_STMT.get(rowid_current_collection);
     if(rowid_res == undefined) {
       rowid_current_collection = rowid_min_collection;
     } else {
       rowid_current_collection = rowid_res.rowid;
     }
   } else if(step == -1) {
-    rowid_res = await GET_PREV_COLLECTION_ROWID_STMT.get(rowid_current_collection);
+    let rowid_res = await GET_PREV_COLLECTION_ROWID_STMT.get(rowid_current_collection);
     if(rowid_res == undefined) {
       rowid_current_collection = rowid_max_collection; //rowid_res.rowid;
     } else {
       rowid_current_collection = rowid_res.rowid;
     }
   }
-  record = await GET_RECORD_FROM_ROWID_COLLECTION_STMT.get(rowid_current_collection);
+  let record = await GET_RECORD_FROM_ROWID_COLLECTION_STMT.get(rowid_current_collection);
   return Get_Collection_Obj_Fields_From_Record(record);
 }
 exports.Step_Get_Collection_Annotation = Step_Get_Collection_Annotation;
 
 
 async function Get_Collection_Record_From_DB(collectionname) {
-  row_obj = await GET_COLLECTION_FROM_NAME_STMT.get(collectionname);
+  let row_obj = await GET_COLLECTION_FROM_NAME_STMT.get(collectionname);
   if(row_obj == undefined) {
     return undefined;
   } else {
@@ -427,7 +427,7 @@ function Get_Collection_Obj_Fields_From_Record(record) {
 //fn to insert into the collection DB the collection record of the 
 //column template: (collectionName TEXT, collectionImage TEXT, collectionDescription TEXT, collectionImageSet TEXT, collectionEmotions TEXT, collectionMemes TEXT)
 async function Insert_Collection_Record_Into_DB(collection_obj) {
-  info = await INSERT_COLLECTION_STMT.run( collection_obj.collectionName, collection_obj.collectionImage, JSON.stringify(collection_obj.collectionImageSet),
+  let info = await INSERT_COLLECTION_STMT.run( collection_obj.collectionName, collection_obj.collectionImage, JSON.stringify(collection_obj.collectionImageSet),
                             collection_obj.collectionDescription, JSON.stringify(collection_obj.collectionDescriptionTags), JSON.stringify(collection_obj.collectionEmotions), JSON.stringify(collection_obj.collectionMemes) );
   await Set_Max_Min_Rowid_Collection();
 }
@@ -435,15 +435,15 @@ exports.Insert_Collection_Record_Into_DB = Insert_Collection_Record_Into_DB;
 
 //update the tagging annotation object in the DB
 async function Update_Collection_Record_In_DB(collection_obj) {
-  info = await UPDATE_FILENAME_COLLECTION_STMT.run(collection_obj.collectionName, collection_obj.collectionImage, JSON.stringify(collection_obj.collectionImageSet),
+  let info = await UPDATE_FILENAME_COLLECTION_STMT.run(collection_obj.collectionName, collection_obj.collectionImage, JSON.stringify(collection_obj.collectionImageSet),
   collection_obj.collectionDescription, JSON.stringify(collection_obj.collectionDescriptionTags), JSON.stringify(collection_obj.collectionEmotions), JSON.stringify(collection_obj.collectionMemes), collection_obj.collectionName );
 }
 exports.Update_Collection_Record_In_DB = Update_Collection_Record_In_DB
 
 async function Delete_Collection_Record_In_DB(collectioname) {
-  info = await DELETE_COLLECTION_STMT.run(collectioname);
+  let info = await DELETE_COLLECTION_STMT.run(collectioname);
   await Set_Max_Min_Rowid_Collection();
-  records_remaining = await Number_of_Collection_Records();
+  let records_remaining = await Number_of_Collection_Records();
   //now update the collection references, that is: there will be references of memes to collections they are no longer members of once the collection is gone
   return records_remaining; //0 is the indicator that loading a default is necessary
 }
@@ -468,17 +468,17 @@ exports.Insert_Collection_MEME_Record_From_DB = Insert_Collection_MEME_Record_Fr
 async function Update_Collection_MEME_Connections(collectionName,current_collection_memes,new_collection_memes) {
   //alter the left diff in the meme set and then alter the right diff in the meme set
   // get the right difference ([1,2,3] diff -> [1,3,4] => [4]) and from [4] include/add this imagefilename in the array: diff2 = b.filter(x => !a.includes(x));
-  add_as_memes_filenames = new_collection_memes.filter(x => !current_collection_memes.includes(x)); //new meme connections to record
-  for(meme_filename of add_as_memes_filenames) {
-    meme_table_record = await Get_Collection_MEME_Record_From_DB(meme_filename);
+  let add_as_memes_filenames = new_collection_memes.filter(x => !current_collection_memes.includes(x)); //new meme connections to record
+  for(let meme_filename of add_as_memes_filenames) {
+    let meme_table_record = await Get_Collection_MEME_Record_From_DB(meme_filename);
     meme_table_record["collectionNames"].push( collectionName )
     await UPDATE_FILENAME_MEME_TABLE_COLLECTION_STMT.run( JSON.stringify(meme_table_record["collectionNames"]) , meme_filename )
   }
   // get the memes which no longer include this file (left difference [1,2,3] diff-> [1,3,4] => [2]) and from [2] remove/subtract the image filename from the array: difference = arr1.filter(x => !arr2.includes(x));
-  remove_as_memes_filenames = current_collection_memes.filter(x => !new_collection_memes.includes(x)); //remove from meme connection
-  for(meme_filename of remove_as_memes_filenames) {
-    meme_table_record = await Get_Collection_MEME_Record_From_DB(meme_filename);
-    new_array_tmp = meme_table_record.collectionNames.filter(item => item !== collectionName)
+  let remove_as_memes_filenames = current_collection_memes.filter(x => !new_collection_memes.includes(x)); //remove from meme connection
+  for(let meme_filename of remove_as_memes_filenames) {
+    let meme_table_record = await Get_Collection_MEME_Record_From_DB(meme_filename);
+    let new_array_tmp = meme_table_record.collectionNames.filter(item => item !== collectionName)
     if( new_array_tmp.length == 0) {
       await DELETE_COLLECTION_MEME_TABLE_ENTRY_STMT.run( meme_filename )
     } else {
@@ -491,7 +491,7 @@ exports.Update_Collection_MEME_Connections = Update_Collection_MEME_Connections;
 
 //never returns undefined, if it is not present, it is inserted by default
 async function Get_Collection_MEME_Record_From_DB(memeFileName) {
-  row_obj = await GET_MEME_COLLECTION_TABLE_STMT.get(memeFileName);
+  let row_obj = await GET_MEME_COLLECTION_TABLE_STMT.get(memeFileName);
   if(row_obj == undefined) { //record non-existant so make one
     await INSERT_MEME_TABLE_COLLECTION_STMT.run( memeFileName, JSON.stringify( [] ) );
     row_obj = await GET_MEME_COLLECTION_TABLE_STMT.get(memeFileName);
@@ -510,15 +510,15 @@ function Get_Obj_Fields_From_Collection_MEME_Record(record) {
 //when an image is deleted its ability to serve as a meme is removed and it must be removed from collection meme sets
 async function Handle_Delete_Collection_MEME_references(imageFileName) {
   //this image may be a meme, get the meme links and from those images remove the refs to this imageFileName
-  meme_row_obj = await GET_MEME_COLLECTION_TABLE_STMT.get(imageFileName);
+  let meme_row_obj = await GET_MEME_COLLECTION_TABLE_STMT.get(imageFileName);
   if(meme_row_obj == undefined) { //is not listed as a meme for any other image
     return
   }
   meme_row_obj = Get_Obj_Fields_From_Collection_MEME_Record(meme_row_obj);
-  for(collectionName of meme_row_obj["collectionNames"]) {
-    record_tmp = await Get_Collection_Record_From_DB(collectionName);
+  for(let collectionName of meme_row_obj["collectionNames"]) {
+    let record_tmp = await Get_Collection_Record_From_DB(collectionName);
     if(record_tmp == undefined) { continue }
-    new_meme_choices_tmp = record_tmp.collectionMemes.filter(item => item !== imageFileName)
+    let new_meme_choices_tmp = record_tmp.collectionMemes.filter(item => item !== imageFileName)
     if( new_meme_choices_tmp.length != record_tmp.collectionMemes.length ) {
       record_tmp.collectionMemes = new_meme_choices_tmp
       await Update_Collection_Record_In_DB(record_tmp);
@@ -546,7 +546,7 @@ exports.Insert_Collection_IMAGE_Record_From_DB = Insert_Collection_IMAGE_Record_
 
 
 async function Get_Collection_IMAGE_Record_From_DB(imageName) {
-  row_obj = await GET_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.get(imageName);
+  let row_obj = await GET_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.get(imageName);
   if(row_obj == undefined) { //record non-existant so make one
     INSERT_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.run( imageName, JSON.stringify( [] ) );
     row_obj = await GET_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.get(imageName);
@@ -563,19 +563,19 @@ function Get_Obj_Fields_From_Collection_IMAGE_Record(record) {
 
 async function Update_Collection_IMAGE_Connections(collectionName,current_collection_images,new_collection_images) {
   // get the right difference ([1,2,3] diff -> [1,3,4] => [4]) and from [4] include/add this imagefilename in the array: diff2 = b.filter(x => !a.includes(x));
-  add_as_images_filenames = new_collection_images.filter(x => !current_collection_images.includes(x)); //new meme connections to record
-  for(image_filename of add_as_images_filenames) {
-    image_table_record = await Get_Collection_IMAGE_Record_From_DB(image_filename);
+  let add_as_images_filenames = new_collection_images.filter(x => !current_collection_images.includes(x)); //new meme connections to record
+  for(let image_filename of add_as_images_filenames) {
+    let image_table_record = await Get_Collection_IMAGE_Record_From_DB(image_filename);
     if( !image_table_record["collectionNames"].includes(collectionName) ) {
       image_table_record["collectionNames"].push( collectionName )
       UPDATE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.run( JSON.stringify(image_table_record["collectionNames"]) , image_filename )
     }
   }
   // get the memes which no longer include this file (left difference [1,2,3] diff-> [1,3,4] => [2]) and from [2] remove/subtract the image filename from the array: difference = arr1.filter(x => !arr2.includes(x));
-  remove_as_images_filenames = current_collection_images.filter(x => !new_collection_images.includes(x)); //remove from meme connection
-  for(image_filename of remove_as_images_filenames) {
-    image_table_record = await Get_Collection_IMAGE_Record_From_DB(image_filename);
-    new_array_tmp = image_table_record.collectionNames.filter(item => item !== collectionName)
+  let remove_as_images_filenames = current_collection_images.filter(x => !new_collection_images.includes(x)); //remove from meme connection
+  for(let image_filename of remove_as_images_filenames) {
+    let image_table_record = await Get_Collection_IMAGE_Record_From_DB(image_filename);
+    let new_array_tmp = image_table_record.collectionNames.filter(item => item !== collectionName)
     if( new_array_tmp.length == 0) {
       DELETE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.run( image_filename )
     } else {
@@ -590,14 +590,14 @@ exports.Update_Collection_IMAGE_Connections = Update_Collection_IMAGE_Connection
 //when an image is deleted its ability to serve as a collection image is removed and it must be removed from collection image sets
 async function Handle_Delete_Collection_IMAGE_references(imageFileName) {
   //this image may be a meme, get the meme links and from those images remove the refs to this imageFileName
-  image_row_obj = await GET_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.get(imageFileName);
+  let image_row_obj = await GET_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.get(imageFileName);
   if(image_row_obj == undefined) { //is not listed as a meme for any other image
     return
   }
   image_row_obj = Get_Obj_Fields_From_Collection_MEME_Record(image_row_obj);
-  for(collection_name of image_row_obj["collectionNames"]) {
+  for(let collection_name of image_row_obj["collectionNames"]) {
   //image_row_obj["collectionNames"].forEach( async name => {
-    collection_tmp = await Get_Collection_Record_From_DB(collection_name);
+    let collection_tmp = await Get_Collection_Record_From_DB(collection_name);
     if(collection_tmp == undefined) { continue }
     new_image_choices_tmp = collection_tmp.collectionImageSet.filter(item => item !== imageFileName)
     if( new_image_choices_tmp.length != collection_tmp.collectionImageSet.length ) {
@@ -612,7 +612,7 @@ async function Handle_Delete_Collection_IMAGE_references(imageFileName) {
         await Update_Collection_Record_In_DB(collection_tmp);
       } else if( collection_tmp.collectionImageSet.length > 0 && collection_tmp.collectionImage == '' ) {
         //replace the profile image since it was removed and we can sample from the set
-        rand_ind = Math.floor(Math.random() * collection_tmp.collectionImageSet.length)
+        let rand_ind = Math.floor(Math.random() * collection_tmp.collectionImageSet.length)
         collection_tmp.collectionImage = collection_tmp.collectionImageSet[rand_ind]
         await Update_Collection_Record_In_DB(collection_tmp);
       } else if( collection_tmp.collectionImageSet.length == 0 ) {
@@ -634,9 +634,9 @@ exports.Handle_Delete_Collection_IMAGE_references = Handle_Delete_Collection_IMA
 //`SELECT * FROM table WHERE rowid > (ABS(RANDOM()) % (SELECT max(rowid) FROM table)) LIMIT 1;` OR select * from quest order by RANDOM() LIMIT 1;
 const GET_N_RAND_COLLECTION_NAMES_STMT = DB.prepare(`SELECT collectionName FROM ${COLLECTIONS_TABLE_NAME} WHERE rowid > (ABS(RANDOM()) % (SELECT max(rowid) FROM ${COLLECTIONS_TABLE_NAME})) LIMIT ?;`)
 async function Random_DB_Collections(num_of_records) {
-  collectionNames = []
+  let collectionNames = []
   for(let ii=0;ii<num_of_records;ii++) {
-    collectionNames_tmp = await GET_N_RAND_COLLECTION_NAMES_STMT.all(1)
+    let collectionNames_tmp = await GET_N_RAND_COLLECTION_NAMES_STMT.all(1)
     collectionNames.push(collectionNames_tmp[0].collectionName)
   }
   collectionNames = [...new Set(collectionNames)];
@@ -648,14 +648,14 @@ exports.Random_DB_Collections = Random_DB_Collections
 //use via 'iter = await Collection_DB_Iterator()' and 'rr = await iter()'
 //after all collections complete 'undefined' is returned
 async function Collection_DB_Iterator() {
-  iter_current_rowid = await GET_MIN_ROWID_STMT_COLLECTION.get().rowid;
+  let iter_current_rowid = await GET_MIN_ROWID_STMT_COLLECTION.get().rowid;
   //inner function for closure
   async function Collection_Iterator_Next() {
     if(iter_current_rowid == undefined) {
       return undefined;
     }
-    current_record = Get_Collection_Obj_Fields_From_Record(await GET_RECORD_FROM_ROWID_COLLECTION_STMT.get(iter_current_rowid));
-    tmp_rowid = await GET_NEXT_COLLECTION_ROWID_STMT.get(iter_current_rowid);
+    let current_record = Get_Collection_Obj_Fields_From_Record(await GET_RECORD_FROM_ROWID_COLLECTION_STMT.get(iter_current_rowid));
+    let tmp_rowid = await GET_NEXT_COLLECTION_ROWID_STMT.get(iter_current_rowid);
     if( tmp_rowid != undefined ) {
       iter_current_rowid = tmp_rowid.rowid;
     } else {
@@ -675,14 +675,14 @@ const GET_RECORD_FROM_ROWID_IMAGE_COLLECTION_STMT = DB.prepare(`SELECT * FROM ${
 const GET_MIN_ROWID_STMT_IMAGE_COLLECTION = DB.prepare(`SELECT MIN(ROWID) AS rowid FROM ${COLLECTION_IMAGESET_TABLE_NAME}`);
 
 async function Collection_IMAGE_DB_Iterator() {
-  iter_current_rowid = await GET_MIN_ROWID_STMT_IMAGE_COLLECTION.get().rowid;
+  let iter_current_rowid = await GET_MIN_ROWID_STMT_IMAGE_COLLECTION.get().rowid;
   //inner function for closure
   async function Collection_IMAGE_Iterator_Next() {
     if(iter_current_rowid == undefined) {
       return undefined;
     }
-    current_record = Get_IMAGE_Collection_Obj_Fields_From_Record(await GET_RECORD_FROM_ROWID_IMAGE_COLLECTION_STMT.get(iter_current_rowid));
-    tmp_rowid = await GET_NEXT_IMAGE_COLLECTION_ROWID_STMT.get(iter_current_rowid);
+    let current_record = Get_IMAGE_Collection_Obj_Fields_From_Record(await GET_RECORD_FROM_ROWID_IMAGE_COLLECTION_STMT.get(iter_current_rowid));
+    let tmp_rowid = await GET_NEXT_IMAGE_COLLECTION_ROWID_STMT.get(iter_current_rowid);
     if( tmp_rowid != undefined ) {
       iter_current_rowid = tmp_rowid.rowid;
     } else {
@@ -706,14 +706,14 @@ const GET_RECORD_FROM_ROWID_MEME_COLLECTION_STMT = DB.prepare(`SELECT * FROM ${C
 const GET_MIN_ROWID_STMT_MEME_COLLECTION = DB.prepare(`SELECT MIN(ROWID) AS rowid FROM ${COLLECTION_MEME_TABLE_NAME}`);
 
 async function Collection_MEME_DB_Iterator() {
-  iter_current_rowid = await GET_MIN_ROWID_STMT_MEME_COLLECTION.get().rowid;
+  let iter_current_rowid = await GET_MIN_ROWID_STMT_MEME_COLLECTION.get().rowid;
   //inner function for closure
   async function Collection_MEME_Iterator_Next() {
     if(iter_current_rowid == undefined) {
       return undefined;
     }
-    current_record = Get_MEME_Collection_Obj_Fields_From_Record(await GET_RECORD_FROM_ROWID_MEME_COLLECTION_STMT.get(iter_current_rowid));
-    tmp_rowid = await GET_NEXT_MEME_COLLECTION_ROWID_STMT.get(iter_current_rowid);
+    let current_record = Get_MEME_Collection_Obj_Fields_From_Record(await GET_RECORD_FROM_ROWID_MEME_COLLECTION_STMT.get(iter_current_rowid));
+    let tmp_rowid = await GET_NEXT_MEME_COLLECTION_ROWID_STMT.get(iter_current_rowid);
     if( tmp_rowid != undefined ) {
       iter_current_rowid = tmp_rowid.rowid;
     } else {
