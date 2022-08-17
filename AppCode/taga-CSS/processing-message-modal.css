@@ -1,0 +1,37 @@
+.processing-notice-modal-top-div-class {
+    display:none; 
+    position: fixed;
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: hidden; /* Enable scroll if needed */
+    background-color: rgba(128, 138, 128, 0.65); /* Black w/ opacity */
+    /* display: flex; */
+    align-items: center;
+    justify-content: center;
+}
+
+.processing-notice-modal-content-div-class {
+    font-size: 3rem;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner {
+    animation: spinner 1s linear infinite;
+    border: 20px solid rgb(5, 58, 33);
+    border-top: 20px solid rgb(77, 255, 71);
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+}
+
+@keyframes spinner {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }

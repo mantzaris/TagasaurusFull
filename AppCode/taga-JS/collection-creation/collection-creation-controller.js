@@ -692,9 +692,15 @@ async function Collection_Profile_Image_Search_Action() {
     //    profile_search_image_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
     //}
     //img_indices_sorted = await SEARCH_MODULE.Collection_Profile_Image_Search_Fn(collection_profile_search_obj,all_image_keys,Get_Tagging_Annotation_From_DB)
+    
+    let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+    processing_modal.style.display = "flex"
+
     let tagging_db_iterator = await Tagging_Image_DB_Iterator();
     profile_search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_profile_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
-    console.log('profile_search_image_results',profile_search_image_results)
+    
+    processing_modal.style.display = "none"
+
     //present new sorted ordering now!
     let profile_search_display_div = document.getElementById("modal-search-profileimage-images-results-grid-div-area-id")
     profile_search_display_div.innerHTML = ''
@@ -989,10 +995,15 @@ async function Collection_Add_Image_Search_Action() {
     //img_indices_sorted = image_search_result_obj.imgInds //!!! indexeddb !!!
     //meme_img_indices_sorted = image_search_result_obj.memeInds //!!! indexeddb !!!
 
+    let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+    processing_modal.style.display = "flex"
+
     let tagging_db_iterator = await Tagging_Image_DB_Iterator();
     search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_gallery_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
     let tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
     search_image_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(collection_gallery_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
+
+    processing_modal.style.display = "none"
 
     //display the search order with the image order first and then the memes that are relevant
     let search_display_div = document.getElementById("modal-search-images-results-grid-div-area-id")
@@ -1317,10 +1328,15 @@ async function Collection_Add_Memes_Search_Action(){
     // img_indices_sorted = meme_search_result_obj.imgInds //!!!indexeddb !!!
     // meme_img_indices_sorted = meme_search_result_obj.memeInds //!!!indexeddb !!!
 
+    let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+    processing_modal.style.display = "flex"
+
     let tagging_db_iterator = await Tagging_Image_DB_Iterator();
     meme_search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_meme_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
     let tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
     meme_search_image_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(collection_meme_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
+
+    processing_modal.style.display = "none"
 
     //display the search order with the image order first and then the memes that are relevant
     let search_display_div = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")

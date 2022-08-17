@@ -47,6 +47,9 @@ document.getElementById("get-recommended-button-id").onclick = function() {
 async function Super_Search() {
     
     Set_Search_Obj_Tags()
+
+    let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+    processing_modal.style.display = "flex"
     //console.log('set the tags!!! 1')
     let faceDescriptors_search = []
     for( let img_ind = 0; img_ind < selected_images.length; img_ind++ ) {
@@ -133,7 +136,8 @@ async function Super_Search() {
             window.location = "tagging.html" + '?' + `imageFileName=${ btoa(toBinary(file)) }`
         };
     });
-
+    
+    processing_modal.style.display = "none"
 }
 // convert a Unicode string to a string in which
 // each 16-bit unit occupies only one byte

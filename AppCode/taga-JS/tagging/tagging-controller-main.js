@@ -457,7 +457,10 @@ async function First_Display_Init() {
         Load_New_Image();
     }, false);
     document.getElementById(`delete-image-button-id`).addEventListener("click", function() {
-        Delete_Image();
+        let res = confirm("Sure you want to Delete?")
+        if( res ) {
+            Delete_Image();
+        }
     }, false);
     document.getElementById(`search-images-button-id`).addEventListener("click", function() {
         Search_Images();
@@ -581,8 +584,13 @@ async function Load_New_Image() {
     if(filenames.length == 0){
         return
     }
+
+    //show loading modal and disallow user input !!!
+    let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+    processing_modal.style.display = "flex"
+
     let tagging_entry = null;
-    for(filename of filenames) {
+    for(let filename of filenames) {
     //filenames.forEach( async filename => {
         let tagging_entry_tmp = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //cloning obj
         tagging_entry_tmp.imageFileName = filename;
@@ -641,6 +649,7 @@ async function Load_New_Image() {
             tagging_entry = tagging_entry_tmp;
         }
     }//);
+    processing_modal.style.display = "none"
     if(tagging_entry != null) {
         current_image_annotation = tagging_entry;
         Load_State_Of_Image_IDB();
@@ -762,8 +771,14 @@ async function Search_Images(){
     }
     //default search results are the order the user has them now
     if(search_results == '' && search_meme_results == '') {
+        
+        let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+        processing_modal.style.display = "flex"
+
         search_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
         search_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
+
+        processing_modal.style.display = "none"
     }
     //display default ordering first
     let search_image_results_output = document.getElementById("modal-search-images-results-grid-div-area-id");
@@ -866,11 +881,17 @@ async function Modal_Search_Entry(search_similar=false, search_obj_similar_tmp={
     }
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
+    
+    let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+    processing_modal.style.display = "flex"
+
     let tagging_db_iterator = await Tagging_Image_DB_Iterator();
     search_results = await SEARCH_MODULE.Image_Search_DB(search_obj_tmp,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
     let tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
     search_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(search_obj_tmp,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
-    //console.log('search_meme_results = ', search_meme_results)
+    
+    processing_modal.style.display = "none"
+
     //>>SHOW SEARCH RESULTS<<
     //search images results annotations
     let search_image_results_output = document.getElementById("modal-search-images-results-grid-div-area-id")
@@ -1118,9 +1139,14 @@ async function Add_New_Meme(){
     }
 
     //default search results are the order the user has them now
-    if(meme_search_results == '' && meme_search_meme_results == '') {
+    if(meme_search_results == '' && meme_search_meme_results == '') {        
+        let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+        processing_modal.style.display = "flex"
+
         meme_search_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
         meme_search_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
+    
+        processing_modal.style.display = "none"
     }
     //display meme candidates
     let memes_current = current_image_annotation.taggingMemeChoices
@@ -1176,11 +1202,15 @@ async function Modal_Meme_Search_Btn(){
 
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
+    let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+    processing_modal.style.display = "flex"
+
     let tagging_db_iterator = await Tagging_Image_DB_Iterator();
     meme_search_results = await SEARCH_MODULE.Meme_Addition_Image_Search_DB(meme_tagging_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
     let tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
     meme_search_meme_results = await SEARCH_MODULE.Meme_Addition_Image_Meme_Search_DB(meme_tagging_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
 
+    processing_modal.style.display = "none"
     //get the record to know the memes that are present to not present any redundancy
     let memes_current = current_image_annotation.taggingMemeChoices
 

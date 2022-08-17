@@ -32,9 +32,14 @@ async function Collection_MEME_DB_Iterator() {
 async function Export_User_Annotation_Data() {
     
     const save_promise = IPC_Renderer.invoke('dialog:export')
+
     save_promise.then( async function(path_chosen) {
         //get ready to export data
         if(path_chosen.canceled == false) {
+
+            let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+            processing_modal.style.display = "flex"
+
             if (!FS.existsSync(path_chosen.filePath)) {
                 FS.mkdirSync(path_chosen.filePath);
                 //now copy the files as well to a new 'images' directory
@@ -109,6 +114,9 @@ async function Export_User_Annotation_Data() {
                 }
 
             } 
+            
+            processing_modal.style.display = "none"
+            alert("successfully exported")
         }
     })    
 

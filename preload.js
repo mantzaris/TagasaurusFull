@@ -66,7 +66,7 @@ async function Load_Face_Api_Model() {
 Load_Face_Api_Model()
 
 async function Get_Image_Face_Descriptors_And_Expresssions_From_File(imagePath) {
-  var img = document.createElement('img'); // Use DOM HTMLImageElement
+  let img = document.createElement('img'); // Use DOM HTMLImageElement
   img.src = imagePath
   return await faceapi.detectAllFaces(img).
                                           withFaceLandmarks().
@@ -76,7 +76,7 @@ async function Get_Image_Face_Descriptors_And_Expresssions_From_File(imagePath) 
 window.Get_Image_Face_Descriptors_And_Expresssions_From_File = Get_Image_Face_Descriptors_And_Expresssions_From_File;
 
 async function Get_Image_Face_Expresssions_From_File(imagePath) {
-  var img = document.createElement('img'); // Use DOM HTMLImageElement
+  let img = document.createElement('img'); // Use DOM HTMLImageElement
   img.src = imagePath
   return await faceapi.detectAllFaces(img).
                                           withFaceLandmarks().
@@ -85,7 +85,7 @@ async function Get_Image_Face_Expresssions_From_File(imagePath) {
 window.Get_Image_Face_Expresssions_From_File = Get_Image_Face_Expresssions_From_File;
 
 async function Get_Image_Face_Descriptors_From_File(imagePath) {
-  var img = document.createElement('img'); // Use DOM HTMLImageElement
+  let img = document.createElement('img'); // Use DOM HTMLImageElement
   img.src = imagePath
   return await faceapi.detectAllFaces(img).
                                           withFaceLandmarks().
@@ -105,15 +105,15 @@ const FACE_DISTANCE_IMAGE = 0.67
 async function Get_Descriptors_DistanceScore(descriptors_reference, descriptors_query) {
   //console.log('descriptors_reference.length = ', descriptors_reference.length)
   //console.log('descriptors_query.length = ', descriptors_query.length)
-  ref_faces_scores_array = new Array(descriptors_reference.length)
-  for(ref_ii=0;ref_ii < descriptors_reference.length; ref_ii++) {
-    score_ref_face_ii = 0
-    for(q_ii=0;q_ii < descriptors_query.length; q_ii++) {
-      score_tmp = 0
+  let ref_faces_scores_array = new Array(descriptors_reference.length)
+  for(let ref_ii=0;ref_ii < descriptors_reference.length; ref_ii++) {
+    let score_ref_face_ii = 0
+    for(let q_ii=0;q_ii < descriptors_query.length; q_ii++) {
+      let score_tmp = 0
       //console.log('descriptors_reference[ref_ii].descriptor = ', descriptors_reference[ref_ii])
       //console.log('descriptors_query[ref_ii].descriptor = ', descriptors_query[ref_ii])
       //distance_tmp = faceapi.euclideanDistance( descriptors_reference[ref_ii].descriptor , descriptors_query[q_ii].descriptor )
-      distance_tmp = faceapi.euclideanDistance( descriptors_reference[ref_ii] , descriptors_query[q_ii] )
+      let distance_tmp = faceapi.euclideanDistance( descriptors_reference[ref_ii] , descriptors_query[q_ii] )
       //console.log('distance_tmp = ', distance_tmp)
       if( distance_tmp < FACE_DISTANCE_IMAGE ) {
         score_tmp = 2**( 1 - 6*distance_tmp ) + 3
@@ -125,9 +125,9 @@ async function Get_Descriptors_DistanceScore(descriptors_reference, descriptors_
     ref_faces_scores_array[ref_ii] = score_ref_face_ii    
   }
   //console.log('ref_faces_scores_array= ',ref_faces_scores_array)
-  ref_faces_scores_total = ref_faces_scores_array.reduce( (p,c) => p+c, 0)
-  nonzeros_total = ref_faces_scores_array.filter(el => el != 0).length
-  full_set_bonus = (nonzeros_total / descriptors_reference.length) * ref_faces_scores_total
+  let ref_faces_scores_total = ref_faces_scores_array.reduce( (p,c) => p+c, 0)
+  let nonzeros_total = ref_faces_scores_array.filter(el => el != 0).length
+  let full_set_bonus = (nonzeros_total / descriptors_reference.length) * ref_faces_scores_total
   ref_faces_scores_total += full_set_bonus
   //console.log('full_set_bonus = ', full_set_bonus)
   return ref_faces_scores_total
@@ -231,12 +231,12 @@ function Push_New_Face_Descriptors(base_faces, descriptors_query) {
 
 
 function Imagedata_To_Image(imagedata) {
-  var canvas = document.createElement('canvas');
-  var ctx = canvas.getContext('2d');
+  let canvas = document.createElement('canvas');
+  let ctx = canvas.getContext('2d');
   canvas.width = imagedata.width;
   canvas.height = imagedata.height;
   ctx.putImageData(imagedata, 0, 0);
-  var image = new Image();
+  let image = new Image();
   image.src = canvas.toDataURL();
   return image;
 }

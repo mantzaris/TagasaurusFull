@@ -661,7 +661,10 @@ async function Initialize_Collection_Page(){
         Add_New_Emotion()
     })
     document.getElementById("collection-control-button-delete-id").addEventListener("click", function (event) {
-        Delete_Collection()
+        let res = confirm("Sure you want to Delete?")
+        if( res ) {
+            Delete_Collection()
+        }
     })
     document.getElementById("collection-image-annotation-memes-save-changes-button-id").addEventListener("click", function (event) {
         Save_Meme_Changes()
@@ -1038,8 +1041,13 @@ async function Add_Gallery_Images() {
     }
     //display default random ordering first
     if(search_image_results == '' && search_image_meme_results == '') {
+        let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+        processing_modal.style.display = "flex"
+
         search_image_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
         search_image_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
+
+        processing_modal.style.display = "none"
     }
 
     let search_display_div = document.getElementById("modal-search-images-results-grid-div-area-id")
@@ -1167,10 +1175,15 @@ async function Collection_Add_Image_Search_Action() {
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
 
+    let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+    processing_modal.style.display = "flex"
+
     let tagging_db_iterator = await Tagging_Image_DB_Iterator();
     search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_gallery_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
     let tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
     search_image_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(collection_gallery_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
+
+    processing_modal.style.display = "none"
 
     //display the search order with the image order first and then the memes that are relevant
     let search_display_div = document.getElementById("modal-search-images-results-grid-div-area-id")
@@ -1328,8 +1341,14 @@ async function Add_Meme_Images() {
     }
     //display default ordering first
     if(meme_search_image_results == '' && meme_search_image_meme_results == '') {
+
+        let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+        processing_modal.style.display = "flex"
+
         meme_search_image_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
         meme_search_image_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
+    
+        processing_modal.style.display = "none"
     }
 
     let search_display_div = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
@@ -1456,10 +1475,15 @@ async function Collection_Add_Memes_Search_Action(){
     collection_meme_search_obj["searchMemeTags"] = search_unique_meme_search_terms
     //emotion keys-values for tags and memes should already be in: collection_meme_search_obj
 
+    let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+    processing_modal.style.display = "flex"
+
     let tagging_db_iterator = await Tagging_Image_DB_Iterator();
     meme_search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_meme_search_obj,tagging_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
     let tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
     meme_search_image_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(collection_meme_search_obj,tagging_meme_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS);
+
+    processing_modal.style.display = "none"
 
     //display the search order with the image order first and then the memes that are relevant
     let search_display_div = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
@@ -1677,9 +1701,13 @@ async function Search_Collections_Search_Action() {
     //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
     //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
 
+    let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+    processing_modal.style.display = "flex"
+
     let collection_db_iterator = await Collection_DB_Iterator();
     search_collection_results = await SEARCH_MODULE.Collection_Search_DB(collection_search_obj,collection_db_iterator,Get_Tagging_Annotation_From_DB,MAX_COUNT_SEARCH_RESULTS); 
     
+    processing_modal.style.display = "none"
     
     let search_display_div = document.getElementById("collections-modal-search-images-results-grid-div-area-id")
     search_display_div.innerHTML = ""

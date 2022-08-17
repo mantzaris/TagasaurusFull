@@ -26,14 +26,14 @@ const MY_FILE_HELPER = require( PATH.join(__dirname,'AppCode','taga-JS','utiliti
 
 const DATABASE = require('better-sqlite3');
 //const { build } = require('electron-builder');
-var DB;
+let DB;
 DB_FILE_NAME = 'mainTagasaurusDB.db'
 
 
 console.log(`APP_PATH = ${APP_PATH}`)
-tmp_icon_dir = PATH.join(APP_PATH,'taga-icon','TagaIcon512x512.png')
+let tmp_icon_dir = PATH.join(APP_PATH,'taga-icon','TagaIcon512x512.png')
 console.log('icon path = ',  tmp_icon_dir   )
-exists = FS.existsSync( tmp_icon_dir  )
+let exists = FS.existsSync( tmp_icon_dir  )
 console.log(`exists = `, exists)
 
 
@@ -87,11 +87,11 @@ ipcMain.on('closePDF', (_) => {
 //DB SET UP START>>>
 //create folders for data and db -> check if db tables exist -> create indexes on tables
 //is taga data directory and DB set up
-TAGGING_TABLE_NAME = 'TAGGING';
-TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
-COLLECTIONS_TABLE_NAME = 'COLLECTIONS';
-COLLECTION_MEME_TABLE_NAME = 'COLLECTIONMEMES';
-COLLECTION_IMAGESET_TABLE_NAME = 'COLLECTIONIMAGESET'
+const TAGGING_TABLE_NAME = 'TAGGING';
+const TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
+const COLLECTIONS_TABLE_NAME = 'COLLECTIONS';
+const COLLECTION_MEME_TABLE_NAME = 'COLLECTIONMEMES';
+const COLLECTION_IMAGESET_TABLE_NAME = 'COLLECTIONIMAGESET'
 
 console.log(`about to make directory or not of ${TAGA_FILES_DIRECTORY}`)
 if( FS.existsSync(TAGA_FILES_DIRECTORY) == false ) { //directory for files exists?
@@ -104,8 +104,8 @@ if( FS.existsSync(TAGA_FILES_DIRECTORY) == true && FS.existsSync(TAGA_DATA_DIREC
   FS.mkdirSync(TAGA_DATA_DIRECTORY);
 }
 //check to see if the TAGGING table exists
-tagging_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${TAGGING_TABLE_NAME}'; `);
-tagging_table_exists_res = tagging_table_exists_stmt.get();
+let tagging_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${TAGGING_TABLE_NAME}'; `);
+let tagging_table_exists_res = tagging_table_exists_stmt.get();
 //if tagging table does not exit, so create it
 if( tagging_table_exists_res["count(*)"] == 0 ){
   STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${TAGGING_TABLE_NAME}
@@ -114,9 +114,9 @@ if( tagging_table_exists_res["count(*)"] == 0 ){
                             faceDescriptors TEXT)`);
   STMT.run();
   //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
-  STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX imageFileName_index ON ${TAGGING_TABLE_NAME} (imageFileName); `);
+  let STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX imageFileName_index ON ${TAGGING_TABLE_NAME} (imageFileName); `);
   STMT_index1.run();
-  STMT_index2 = DB.prepare(` CREATE UNIQUE INDEX imageFileHash_index ON ${TAGGING_TABLE_NAME} (imageFileHash); `);
+  let STMT_index2 = DB.prepare(` CREATE UNIQUE INDEX imageFileHash_index ON ${TAGGING_TABLE_NAME} (imageFileHash); `);
   STMT_index2.run();
 
   //also add a default tagging object to avoid errors at start up
@@ -129,16 +129,16 @@ if( tagging_table_exists_res["count(*)"] == 0 ){
     "taggingMemeChoices": [],
     "faceDescriptors": []
     }
-    taga_source_path = PATH.join(APP_PATH,'Taga.png') //PATH.resolve()+PATH.sep+'Taga.png';
+    let taga_source_path = PATH.join(APP_PATH,'Taga.png') //PATH.resolve()+PATH.sep+'Taga.png';
     if( FS.existsSync(PATH.join(TAGA_DATA_DIRECTORY,'Taga.png')) == false ) {
       FS.copyFileSync(taga_source_path, PATH.join(TAGA_DATA_DIRECTORY,'Taga.png'), FS.constants.COPYFILE_EXCL);
     }
-    tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
+    let tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
     tagging_entry.imageFileName = 'Taga.png';
     tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash( PATH.join(TAGA_DATA_DIRECTORY,'Taga.png') ) //`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
 
     INSERT_TAGGING_STMT = DB.prepare(`INSERT INTO ${TAGGING_TABLE_NAME} (imageFileName, imageFileHash, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors) VALUES (?, ?, ?, ?, ?, ?, ?)`);
-    info = INSERT_TAGGING_STMT.run(tagging_entry.imageFileName,tagging_entry.imageFileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices),JSON.stringify(tagging_entry.faceDescriptors));
+    let info = INSERT_TAGGING_STMT.run(tagging_entry.imageFileName,tagging_entry.imageFileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices),JSON.stringify(tagging_entry.faceDescriptors));
     //console.log(`loging in the main js line 86`)
 
     //extra images
@@ -161,8 +161,8 @@ if( tagging_table_exists_res["count(*)"] == 0 ){
     }
     for( let [f_name, description_tmp] of Object.entries(file_names_description_obj) ) {
 
-      new_filename = f_name
-      tmp_path = PATH.join(APP_PATH, 'zExtraPics', new_filename) 
+      let new_filename = f_name
+      let tmp_path = PATH.join(APP_PATH, 'zExtraPics', new_filename) 
       FS.copyFileSync(tmp_path, PATH.join(TAGA_DATA_DIRECTORY, new_filename), FS.constants.COPYFILE_EXCL);
       tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
       tagging_entry.imageFileName = new_filename;
@@ -185,27 +185,27 @@ if( tagging_table_exists_res["count(*)"] == 0 ){
 
 }
 //check to see if the TAGGING MEME table exists
-tagging_meme_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${TAGGING_MEME_TABLE_NAME}'; `);
-tagging_meme_table_exists_res = tagging_meme_table_exists_stmt.get();
+let tagging_meme_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${TAGGING_MEME_TABLE_NAME}'; `);
+let tagging_meme_table_exists_res = tagging_meme_table_exists_stmt.get();
 //if tagging table does not exit, so create it
 if( tagging_meme_table_exists_res["count(*)"] == 0 ){
-  STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${TAGGING_MEME_TABLE_NAME} (imageMemeFileName TEXT, imageFileNames TEXT)`);
+  let STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${TAGGING_MEME_TABLE_NAME} (imageMemeFileName TEXT, imageFileNames TEXT)`);
   STMT.run();
   //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
-  STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX imageMemeFileNameIndex ON ${TAGGING_MEME_TABLE_NAME} (imageMemeFileName); `);
+  let STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX imageMemeFileNameIndex ON ${TAGGING_MEME_TABLE_NAME} (imageMemeFileName); `);
   STMT_index1.run();
 }
 //check to see if the COLLECTIONS table exists
-collection_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTIONS_TABLE_NAME}'; `);
-collection_table_exists_res = collection_table_exists_stmt.get();
+let collection_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTIONS_TABLE_NAME}'; `);
+let collection_table_exists_res = collection_table_exists_stmt.get();
 //if collection table does not exit, so create it
 if( collection_table_exists_res["count(*)"] == 0 ){
-  STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTIONS_TABLE_NAME} (collectionName TEXT, collectionImage TEXT, collectionImageSet TEXT, 
+  let STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTIONS_TABLE_NAME} (collectionName TEXT, collectionImage TEXT, collectionImageSet TEXT, 
                       collectionDescription TEXT, collectionDescriptionTags TEXT,
                       collectionEmotions TEXT, collectionMemes TEXT)`);
   STMT.run();
   //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
-  STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX collectionNameIndex ON ${COLLECTIONS_TABLE_NAME} (collectionName); `);
+  let STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX collectionNameIndex ON ${COLLECTIONS_TABLE_NAME} (collectionName); `);
   STMT_index1.run();
 }
 //The collections also each have a meme set, and this is dependent upon the tagging DB as well, since when an image from the tagging view
@@ -216,21 +216,21 @@ collection_meme_table_exists_res = collection_meme_table_exists_stmt.get();
 if( collection_meme_table_exists_res["count(*)"] == 0 ) {
   STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTION_MEME_TABLE_NAME} (collectionMemeFileName TEXT, collectionNames TEXT)`);
   STMT.run(); //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
-  STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX collectionMemeFileNameIndex ON ${COLLECTION_MEME_TABLE_NAME} (collectionMemeFileName); `);
+  let STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX collectionMemeFileNameIndex ON ${COLLECTION_MEME_TABLE_NAME} (collectionMemeFileName); `);
   STMT_index1.run();
 } else {
   //console.log('line 105 ')
 }
 //The collections also have an 'imageSet' as a gallery for the images associated with the collection name
 //this needs to be updated so that when an image in the tagging phase is deleted, that there is an efficient look up to remove stale/lingering links
-collection_imageset_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTION_IMAGESET_TABLE_NAME}'; `);
-collection_imageset_table_exists_res = collection_imageset_table_exists_stmt.get();
+let collection_imageset_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTION_IMAGESET_TABLE_NAME}'; `);
+let collection_imageset_table_exists_res = collection_imageset_table_exists_stmt.get();
 //if collection table does not exit, so create it
 if( collection_imageset_table_exists_res["count(*)"] == 0 ) {
   //console.log(`line 111 in main js about to create the COLLECTION_IMAGESET_TABLE_NAME again`)
-  STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTION_IMAGESET_TABLE_NAME} (collectionImageFileName TEXT, collectionNames TEXT)`);
+  let STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTION_IMAGESET_TABLE_NAME} (collectionImageFileName TEXT, collectionNames TEXT)`);
   STMT.run(); //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
-  STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX collectionImageFileNameIndex ON ${COLLECTION_IMAGESET_TABLE_NAME} (collectionImageFileName); `);
+  let STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX collectionImageFileNameIndex ON ${COLLECTION_IMAGESET_TABLE_NAME} (collectionImageFileName); `);
   STMT_index1.run();
 } else {
   //console.log(`not creating table in main js 117: collection_imageset_table_exists_res["count(*)"] = ${collection_imageset_table_exists_res["count(*)"]}`)
@@ -242,11 +242,11 @@ if( collection_imageset_table_exists_res["count(*)"] == 0 ) {
 //FILE SELECTION DIALOGUE WINDOWS START>>>
 //for the ability to load a dialog window in selecting images/files
 ipcMain.handle('dialog:tagging-new-file-select', async (event, args) => {
-  directory_default = app.getPath('pictures')
+  let directory_default = app.getPath('pictures')
   if(args.directory != ''){
     directory_default = args.directory
   }
-  result = await dialog.showOpenDialog({ properties: ['openFile', 'multiSelections' ], 
+  let result = await dialog.showOpenDialog({ properties: ['openFile', 'multiSelections' ], 
               defaultPath: directory_default })
   return result
 })

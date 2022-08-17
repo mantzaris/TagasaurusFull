@@ -42,6 +42,9 @@ async function Import_User_Annotation_Data() {
     save_promise.then( async function(path_chosen) {
         //create a db from the import path
         if(path_chosen.canceled == false) {
+
+            let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+            processing_modal.style.display = "flex"
             
             DB_import_path = path_chosen.filePaths[0]
             DB_import_data = PATH.join( DB_import_path, '..', 'data', PATH.sep )
@@ -67,6 +70,7 @@ async function Import_User_Annotation_Data() {
             //now migrate the collections list from the import db to the destination DB 
             await Import_Collections_Records_Info_Migrate()            
             
+            processing_modal.style.display = "none"
         }
     })
 }
