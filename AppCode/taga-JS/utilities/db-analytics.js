@@ -1,11 +1,12 @@
-PATH = require('path');
+
+const PATH = require('path');
 
 const { DB_MODULE, MAX_SAMPLE_COUNT_RECORDS } = require(PATH.join(__dirname,'..','constants','constants-code.js')); //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 
 
-var number_of_records;
-var sample_num;
+//let number_of_records;
+let sample_num;
 
 async function Number_of_Tagging_Records() {
     return await DB_MODULE.Number_of_Tagging_Records();
@@ -30,7 +31,7 @@ function Harmonic_Mean(arr) {
             sum_reciprocal_nonzero = sum_reciprocal_nonzero + (1 / arr[i]);
         }
     }
-    mu_H = (1 / (sum_reciprocal_nonzero / (n_T - n_0))) * ((n_T - n_0) / n_T)
+    let mu_H = (1 / (sum_reciprocal_nonzero / (n_T - n_0))) * ((n_T - n_0) / n_T)
     if( isNaN(mu_H) == true || isFinite(mu_H) == false ){
         mu_H = 0
     }
@@ -39,32 +40,32 @@ function Harmonic_Mean(arr) {
 
 async function Display_Skill_Levels() {
 
-    random_filenames = await Tagging_Random_DB_Images(sample_num)
-    total_tagged_images = 0
-    meme_connected_images = 0
-    emotion_stamped_images = 0
-    images_scores_array = []
-    for(filename of random_filenames) {    
-        record_tmp = await Get_Tagging_Annotation_From_DB(filename);
+    let random_filenames = await Tagging_Random_DB_Images(sample_num)
+    let total_tagged_images = 0
+    let meme_connected_images = 0
+    let emotion_stamped_images = 0
+    let images_scores_array = []
+    for(let filename of random_filenames) {    
+        let record_tmp = await Get_Tagging_Annotation_From_DB(filename);
 
         try{ non_empty_entry = (record_tmp.taggingTags).find(element => element != "") 
         } catch { non_empty_entry = undefined }
         if (non_empty_entry != undefined) { total_tagged_images = 1 + total_tagged_images }
-        meme_counts = (Object.values(record_tmp["taggingMemeChoices"])).length//Object.keys(JSON.parse(value["taggingMemeChoices"])).length
+        let meme_counts = (Object.values(record_tmp["taggingMemeChoices"])).length//Object.keys(JSON.parse(value["taggingMemeChoices"])).length
         if (meme_counts > 0) { meme_connected_images = 1 + meme_connected_images }
-        non_empty_emotion = (Object.values(record_tmp["taggingEmotions"])).find(element => element != "0")
+        let non_empty_emotion = (Object.values(record_tmp["taggingEmotions"])).find(element => element != "0")
         if (non_empty_emotion != undefined) { emotion_stamped_images = 1 + emotion_stamped_images }
 
-        tagged_bool_num = + (non_empty_entry != undefined)
-        memes_bool_num = + (meme_counts > 0)
-        emotion_bool_num = + (non_empty_emotion != undefined)
+        let tagged_bool_num = + (non_empty_entry != undefined)
+        let memes_bool_num = + (meme_counts > 0)
+        let emotion_bool_num = + (non_empty_emotion != undefined)
         images_scores_array.push((tagged_bool_num + memes_bool_num + emotion_bool_num) / 3)
     }
 
-    tagged_percentage = 100 * (total_tagged_images / sample_num)
-    meme_connected_percentage = 100 * (meme_connected_images / sample_num)
-    emotion_stamped_images_percentage = 100 * (emotion_stamped_images / sample_num)
-    scores_harmonic_mean = 100 * Harmonic_Mean(images_scores_array)
+    let tagged_percentage = 100 * (total_tagged_images / sample_num)
+    let meme_connected_percentage = 100 * (meme_connected_images / sample_num)
+    let emotion_stamped_images_percentage = 100 * (emotion_stamped_images / sample_num)
+    let scores_harmonic_mean = 100 * Harmonic_Mean(images_scores_array)
 
     document.getElementById("tagging-score-id").innerHTML = `${Math.round(tagged_percentage)}%`
     document.getElementById("tagging-score-id").style.width = `${Math.round(tagged_percentage)}%`;
@@ -81,8 +82,11 @@ async function Display_Skill_Levels() {
 }
 
 async function Init_Analytics() {
-    number_of_records = await Number_of_Tagging_Records();
+    let number_of_records = await Number_of_Tagging_Records();
     sample_num = number_of_records < MAX_SAMPLE_COUNT_RECORDS ? number_of_records : MAX_SAMPLE_COUNT_RECORDS
+    if( sample_num < 100 ) {
+        sample_num = 100
+    }
     Display_Skill_Levels()
 }
 

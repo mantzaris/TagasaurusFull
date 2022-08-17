@@ -25,7 +25,7 @@ exports.Binary_Search = Binary_Search
 
 //use binary search to find the index of the lower bound for the element and insert it in that position
 function Insert_Into_Sorted_Array(sortedArray,new_filename){
-    index_tmp = Binary_Search(sortedArray, new_filename)
+    let index_tmp = Binary_Search(sortedArray, new_filename)
 
     sortedArray.splice(index_tmp,0,new_filename)
 

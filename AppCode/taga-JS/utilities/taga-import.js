@@ -6,7 +6,7 @@
 const IPC_Renderer3 = require('electron').ipcRenderer
 
 const FS3 = require('fs');
-PATH3 = require('path');
+const PATH3 = require('path');
 const DATABASE3 = require('better-sqlite3');
 
 //console.log(`${PATH.join(USER_DATA_PATH,'TagasaurusFiles','data')}`)
