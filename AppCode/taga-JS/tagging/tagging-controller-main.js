@@ -2,7 +2,8 @@ const FS = require('fs');
 const PATH = require('path');
 const fileType = require('file-type');
 //the object for the window functionality
-const IPC_RENDERER = require('electron').ipcRenderer 
+const IPC_RENDERER = require('electron').ipcRenderer; 
+const { ipcRenderer } = require('electron');
 //FSE is not being used but should be for the directory batch import
 //const FSE = require('fs-extra');
 
@@ -626,6 +627,17 @@ async function Load_New_Image() {
                 }
             } else if ( ft_res.mime.includes('video') == true ) {
                 //console.log("video type mime",tagging_entry_tmp)
+                
+                if( !( ft_res.mime.includes('mp4') || ft_res.mime.includes('mkv') || ft_res.mime.includes('mov') ) ) {
+                    // 'ffmpegDecode'
+                    let base_name = PATH.parse(tagging_entry_tmp["imageFileName"]).name
+                    let output_name = base_name + '.mp4'
+                    await ipcRenderer.invoke('ffmpegDecode', {base_dir:TAGA_DATA_DIRECTORY, file_in:tagging_entry_tmp["imageFileName"], file_out:output_name} )
+                                    
+                    FS.unlink( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]), (err) => {console.log('problem deleting video copied after ffmpeg',err)} )
+                    tagging_entry_tmp["imageFileName"] = output_name
+                }
+                
 
                 if( default_auto_fill_emotions == true ) {
                     let { video_face_descriptors, emotions_total} = await Get_Image_FaceApi_From_VIDEO( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) , true, false )

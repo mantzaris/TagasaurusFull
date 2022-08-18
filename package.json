@@ -23,7 +23,7 @@
   ],
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
+    "start": "electron  .  ",
     "build": "electron-builder"
   },
   "devDependencies": {
@@ -34,6 +34,8 @@
     "electron-reloader": "^1.2.0"
   },
   "dependencies": {
+    "@ffmpeg/core": "^0.11.0",
+    "@ffmpeg/ffmpeg": "^0.11.1",
     "@tensorflow/tfjs-node": "^3.18.0",
     "better-sqlite3": "^7.6.2",
     "decode-gif": "^1.0.1",

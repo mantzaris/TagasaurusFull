@@ -5,6 +5,7 @@ const {app, ipcMain, dialog, BrowserWindow} = require('electron');
 const PATH = require('path');
 const FS = require('fs');
 
+app.commandLine.appendSwitch('enable-features','SharedArrayBuffer')
 
 const BUILD_EXECUTABLE = false;
 
@@ -308,6 +309,28 @@ console.log(`__dirname = ${__dirname}`)
 console.log(`-mainjs- the app.getPath('userData') = ${app.getPath('userData')}`)
 console.log(`-mainjs- the app.getPath('appPath') = ${app.getAppPath()}`)
 
+
+
+
+
+
+
+ipcMain.handle('ffmpegDecode', async (_, options) => {
+  
+  const { createFFmpeg, fetchFile } = require('@ffmpeg/ffmpeg');
+  const ffmpeg = createFFmpeg({ log: false });
+  
+  const { base_dir, file_in, file_out } = options
+  await ffmpeg.load();
+  ffmpeg.FS('writeFile', file_in, await fetchFile( PATH.join(base_dir,file_in) ));
+  await ffmpeg.run('-i', file_in, file_out);
+  await FS.promises.writeFile( PATH.join(base_dir,file_out), ffmpeg.FS('readFile', file_out));
+  
+  /* Delete file in MEMFS */
+  ffmpeg.FS('unlink', file_in);
+
+  return PATH.join(base_dir,file_out)
+})
 
 
 ////for the GIF image extraction

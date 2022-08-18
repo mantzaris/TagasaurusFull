@@ -318,7 +318,7 @@ async function extractFramesFromVideo(videoUrl, get_emotions=false, get_only_emo
     let videoObjectUrl = URL.createObjectURL(videoBlob);
     let video = document.createElement("video");
     //console.log('video',video)
-    video.addEventListener('error', function(error) { //!!!!
+    video.addEventListener('error', async function(error) {
       alert('problem loading this video')
       window.location.reload()
       console.error(error)

@@ -45,7 +45,7 @@ document.getElementById("get-recommended-button-id").onclick = function() {
 
 //only here is the face descriptors populated
 async function Super_Search() {
-    
+    //console.log('in super search now')
     Set_Search_Obj_Tags()
 
     let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
@@ -68,8 +68,7 @@ async function Super_Search() {
             //faceDescriptors_search.push( ...annotation_tmp.faceDescriptors )
 
         } else if( selected_images_type[img_ind] == 'new' ) {
-            //console.log('new')
-
+            
             let ft_res = await fileType.fromFile(  selected_images[img_ind]  )
             if( ft_res.mime.includes('image') == true ) {
                 if( ft_res.ext == 'gif' ) {
@@ -87,6 +86,8 @@ async function Super_Search() {
                     }
                 }         
             } else if( ft_res.mime.includes('video') == true ) {
+                //console.log('video is true')
+                
                 let { video_face_descriptors } = await Get_Image_FaceApi_From_VIDEO( selected_images[img_ind], false, false ) 
                 for( let ind = 0; ind < video_face_descriptors.length; ind++ ) {
                     faceDescriptors_search.push(video_face_descriptors[ind])
@@ -436,15 +437,47 @@ document.getElementById("use-new-image-button-id").onclick = async function() {
     }
     last_user_image_directory_chosen = PATH.dirname(result.filePaths[0]);
 
-    result.filePaths.forEach( (element, index) => {
+    //show loading modal and disallow user input !!!
+    let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+    processing_modal.style.display = "flex"
+    
+    for(let element of result.filePaths) {
+    //result.filePaths.forEach( (element, index) => {
         selected_images_type.unshift('new')
+
+        let ft_res = await fileType.fromFile(  element  )
+        if( ft_res.mime.includes('video') == true ) {
+            console.log(ft_res)
+            if( !( ft_res.mime.includes('mp4') || ft_res.mime.includes('mkv') || ft_res.mime.includes('mov') ) ) {
+                element = await Handle_Unsupported_Video_Format(element)                
+            }
+        }
         selected_images.unshift(element) //add to the start of the array
-    })
+    }
     selected_images = [... new Set(selected_images)]
     Update_Selected_Images()
+    processing_modal.style.display = "none"
 }
 
+async function Handle_Unsupported_Video_Format(path_tmp) {
+    // if( !( ft_res.mime.includes('mp4') || ft_res.mime.includes('mkv') || ft_res.mime.includes('mov') ) ) {
+        // 'ffmpegDecode'
+        console.log('non supported video format without ffmpeg')
+        let base_name = PATH.parse(path_tmp).name
+        let base_ext = PATH.parse(path_tmp).ext
+        let output_name = base_name + '.mp4'
+        console.log('base_name',base_name)
+        console.log('base_ext',base_ext)
+        console.log('output name',output_name)
+        console.log('base_name+base_ext',base_name+base_ext)
+        console.log('path_tmp',path_tmp)
 
+        await IPC_RENDERER.invoke('ffmpegDecode', {base_dir: PATH.dirname(path_tmp), file_in:base_name+base_ext, file_out:output_name} )
+        path_tmp_new = PATH.join( PATH.dirname(path_tmp), output_name )
+        return path_tmp_new
+    // }
+
+}
 
 
 //handler for the emotion label and value entry additions and then the deletion handling, all emotions are added by default and handled 
