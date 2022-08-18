@@ -634,7 +634,7 @@ async function Load_New_Image() {
                     let output_name = base_name + '.mp4'
                     await ipcRenderer.invoke('ffmpegDecode', {base_dir:TAGA_DATA_DIRECTORY, file_in:tagging_entry_tmp["imageFileName"], file_out:output_name} )
                                     
-                    FS.unlink( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]), (err) => {console.log('problem deleting video copied after ffmpeg',err)} )
+                    FS.unlink( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]), (err) => {if(err) console.log('problem deleting video copied after ffmpeg',err)} )
                     tagging_entry_tmp["imageFileName"] = output_name
                 }
                 
@@ -650,6 +650,15 @@ async function Load_New_Image() {
                 }
 
             } else if ( ft_res.mime.includes('audio') == true ) {
+                
+                if( !( ft_res.mime.includes('mp3') || ft_res.mime.includes('wav') ) ) {
+                    let base_name = PATH.parse(tagging_entry_tmp["imageFileName"]).name
+                    let output_name = base_name + '.mp3'
+                    await ipcRenderer.invoke('ffmpegDecode', {base_dir:TAGA_DATA_DIRECTORY, file_in:tagging_entry_tmp["imageFileName"], file_out:output_name} )
+                    FS.unlink( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]), (err) => { if(err) console.log('problem deleting video copied after ffmpeg',err)} )
+                    tagging_entry_tmp["imageFileName"] = output_name
+                }
+            
                 //nothing special like for images and video
             } else if ( ft_res.mime.includes('pdf') == true ) {
                 //nothing special like for images and video

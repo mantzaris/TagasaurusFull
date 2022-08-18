@@ -447,9 +447,13 @@ document.getElementById("use-new-image-button-id").onclick = async function() {
 
         let ft_res = await fileType.fromFile(  element  )
         if( ft_res.mime.includes('video') == true ) {
-            console.log(ft_res)
+            //console.log(ft_res)
             if( !( ft_res.mime.includes('mp4') || ft_res.mime.includes('mkv') || ft_res.mime.includes('mov') ) ) {
                 element = await Handle_Unsupported_Video_Format(element)                
+            }
+        } else if( ft_res.mime.includes('audio') == true ) {
+            if( !( ft_res.mime.includes('mp3') || ft_res.mime.includes('wav') ) ) {
+                element = await Handle_Unsupported_Video_Format(element,'.mp3')                
             }
         }
         selected_images.unshift(element) //add to the start of the array
@@ -459,19 +463,14 @@ document.getElementById("use-new-image-button-id").onclick = async function() {
     processing_modal.style.display = "none"
 }
 
-async function Handle_Unsupported_Video_Format(path_tmp) {
+async function Handle_Unsupported_Video_Format(path_tmp, ext_tmp='.mp4') {
     // if( !( ft_res.mime.includes('mp4') || ft_res.mime.includes('mkv') || ft_res.mime.includes('mov') ) ) {
         // 'ffmpegDecode'
-        console.log('non supported video format without ffmpeg')
+        
         let base_name = PATH.parse(path_tmp).name
         let base_ext = PATH.parse(path_tmp).ext
-        let output_name = base_name + '.mp4'
-        console.log('base_name',base_name)
-        console.log('base_ext',base_ext)
-        console.log('output name',output_name)
-        console.log('base_name+base_ext',base_name+base_ext)
-        console.log('path_tmp',path_tmp)
-
+        let output_name = base_name + ext_tmp
+        
         await IPC_RENDERER.invoke('ffmpegDecode', {base_dir: PATH.dirname(path_tmp), file_in:base_name+base_ext, file_out:output_name} )
         path_tmp_new = PATH.join( PATH.dirname(path_tmp), output_name )
         return path_tmp_new
