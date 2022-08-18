@@ -41,7 +41,7 @@
     "decode-gif": "^1.0.1",
     "electron-pdf-window": "^1.0.12",
     "face-api.js": "^0.22.2",
-    "file-type": "16.5.3",
+    "file-type": "17.1.6",
     "fs-extra": "^10.0.0",
     "json": "^11.0.0",
     "masonry-layout": "^4.2.2",
