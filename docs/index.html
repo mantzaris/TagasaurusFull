@@ -1,120 +1,336 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
+    <!-- META TAGS-->
+    <meta charset="utf-8">
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta http-equiv="Content-Script-Type" content="text/javascript">
+    <meta name="format-detection" content="telephone=yes">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=0">
+    <meta name="author" content="">
+    <meta name="designer" content="">
+    <meta name="publisher" content="">
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <meta name="robots" content="index,follow">
+    <meta name="distribution" content="web">
+    <meta name="robots" content="noodp">
+    <!-- TITLE-->
     <title>Tagasaurus</title>
-
-	<!-- The general cross app style sheet for things like button design -->
-	<link rel="stylesheet" href="./index.css">
-
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js" integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe" crossorigin="anonymous"></script>
-    
-</head>
-<body>
-    
-    <div id="main-div-id">
-
-
-        <div id="title-div-id">
-            <div id="middle-title-zone-div-id">
-                <div id="main-title-text-div-id">
-                    Tagasaurus
-                </div>
-                <div id="subtitle-text-div-id">
-                    Tag your planet..!
-                </div>
-            </div>
-
-            <div id="right-taga-icon-div-id">
-                <img src="https://github.com/mantzaris/Tagasaurus/raw/main/Taga.png" alt="Taga Icon" width="70">
-            </div>
+    <!-- FAVICON-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Aboreto&amp;family=Open+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css" integrity="sha512-NmLkDIU1C/C88wi324HBc+S2kLhi08PN5GDeUVVVC/BVt/9Izdsc9SVeVfA1UZbY3sHUlDSyRXhCzHfr6hmPPw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <!-- STYLE :: START-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css" integrity="sha512-+EoPw+Fiwh6eSeRK7zwIKG2MA8i3rV/DGa3tdttQGgWyatG/SkncT53KHQaS5Jh9MNOT3dmFL0FjTY08And/Cw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/8.3.2/swiper-bundle.min.css" integrity="sha512-T3xwtELy3dqQUajk2sl4V6x/VnT+WbXgAKIu/Go7L6oDDWf4A5dJbG49vKn0am3dTNh/KHAbU2+4Ih2vVioxSg==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="css/vendor.css">
+    <link rel="stylesheet" href="css/app.css">
+    <!-- STYLE :: END-->
+  </head>
+  <body>
+    <!-- HEADER :: START-->
+    <nav class="header" id="header">
+      <div class="c-grid">
+        <div class="header__wrapper">
+          <nav class="header__nav"><a href="#heading" anchor-js>Home</a><a href="#feature" anchor-js>Feature</a><a href="#usage" anchor-js>Usage</a><a href="#demos" anchor-js>Demos</a><a href="#downloads" anchor-js>Downloads</a></nav>
+          <div class="footer__social">
+            <nav><a href="#"><i class="icon-font icon-facebook"></i></a><a href="#"><i class="icon-font icon-twitter"></i></a><a href="#"><i class="icon-font icon-github"></i></a></nav>
+          </div>
         </div>
-
-        <section class="home">
-           <div class="slider">
-              <div class="slide active" style="background-image: url('https://github.com/mantzaris/Tagasaurus/raw/main/TagasaurusReflections/screenshot1.png')">
+      </div>
+    </nav>
+    <!-- HEADER :: END-->
+    <main class="main main--start p-home">
+      <section class="line">
+        <div class="line__wrapper"><span></span><span></span><span></span><span></span><span></span></div>
+        <!-- SECTION :: START-->
+        <section class="heading" id="heading">
+          <div class="heading__bg">
+            <div class="heading__carousel">
+              <div class="swiper">
+                <div class="swiper-wrapper">
+                  <div class="swiper-slide"><img src="img/img-demos-1.png" alt=""></div>
+                  <div class="swiper-slide"><img src="img/img-demos-2.png" alt=""></div>
+                  <div class="swiper-slide"><img src="img/img-demos-3.png" alt=""></div>
+                  <div class="swiper-slide"><img src="img/img-demos-1.png" alt=""></div>
+                  <div class="swiper-slide"><img src="img/img-demos-2.png" alt=""></div>
+                  <div class="swiper-slide"><img src="img/img-demos-3.png" alt=""></div>
+                </div>
               </div>
-              <div class="slide" style="background-image: url('https://github.com/mantzaris/Tagasaurus/raw/main/TagasaurusReflections/screenshot2.png')">
-              </div>
-              <div class="slide" style="background-image: url('https://github.com/mantzaris/Tagasaurus/raw/main/TagasaurusReflections/screenshot3.png')">
-              </div>
-           </div>
-         
-          <!-- controls  -->
-          <div class="controls">
-              <div class="prev"><</div>
-              <div class="next">></div>
+            </div>
           </div>
-
-          <!-- indicators -->
-          <div class="indicator">
+          <div class="c-grid">
+            <div class="heading__wrapper">
+              <div class="heading__content">
+                <div>
+                  <p class="heading__subtitle">Tag your planet..!</p>
+                  <h1 class="heading__title">Tagasaurus</h1>
+                  <p class="heading__desc">Premium application. The best option to present your images or services online.</p>
+                  <div class="heading__btn c-btn__wrapper"><a class="c-btn" href="#downloads" anchor-js><i class="icon-font icon-download"></i><span>Download Now</span></a></div>
+                </div>
+              </div>
+            </div>
           </div>
-
         </section>
-
-        <div id="what-the-app-does-div-id">
-            <div id="usage-description-div-id"> 
-                <span class="subsection-label-header-class">USAGE:</span>
-                <ul>
-                    <li>Annotate Images with 'Descriptions', 'Emotion values', and 'Memes'</li>
-                    <li>Search for images and memes based upon Annotations or use facial recognition to find similar faces using
-                        the button 'Similar Search'
-                    <li>Create Collections of images and add Annotations to the collections to later search for them</li>
-                    <li>Use the Super Search tool to search based upon Annotations or even webcam images using facial recognition</li>
-                    <li>Maintain privacy as the app does not access the internet in any way</li>
-                    <li>Apply machine learning to search for images and videos based on the people in the images/videos</li>
-                </ul>
+        <!-- SECTION :: END-->
+        <!-- SECTION :: START-->
+        <section class="feature" id="feature">
+          <div class="c-grid">
+            <div class="feature__wrapper">
+              <p class="feature__label c-label c-label--center">potential users need to be aware</p>
+              <h2 class="feature__title c-title c-title--center">features of the application</h2>
+              <div class="feature__box-wrapper">
+                <div class="feature__box">
+                  <div class="feature__box-desc">
+                    <div>
+                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium alias aliquam dolores nihil officia porro quaerat vitae! Fuga, magnam, quae! Ad amet assumenda at consequatur deleniti distinctio dolor dolorem eius eligendi ex expedita explicabo, illo qui quibusdam velit. Ad aperiam architecto facere quasi sunt. Maiores nulla tempore voluptatum? Aliquid aut consequuntur dignissimos esse et labore laboriosam laudantium, maiores maxime, minima, nam nobis perferendis quam quas quia quod rerum. Accusantium ad animi assumenda commodi dolor dolorem dolores explicabo harum hic illo itaque iusto libero nemo nisi numquam odit optio pariatur, provident tenetur unde? Deserunt dolore fugiat, molestiae nam rem repellendus vitae!</p>
+                    </div>
+                  </div>
+                  <div><i class="icon-font icon-media"></i></div>
+                  <div>
+                    <p>Media</p><span>they can store all their photos / videos / audio to view them and search for them easily</span>
+                  </div>
+                </div>
+                <div class="feature__box">
+                  <div class="feature__box-desc">
+                    <div>
+                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. A ab ad aspernatur, atque aut consequatur cumque cupiditate dignissimos earum eius est excepturi incidunt, inventore iure laboriosam libero magni molestias mollitia necessitatibus nostrum nulla officia officiis omnis porro quae quasi quisquam quod ratione reprehenderit saepe sapiente tempora, unde velit. Architecto asperiores aspernatur assumenda blanditiis debitis, deserunt eos eveniet explicabo hic iste minus modi mollitia nemo numquam obcaecati officia possimus quae quam quibusdam quisquam recusandae rerum saepe soluta unde velit vero voluptatem voluptates? Aliquam aliquid cum cumque dolorem exercitationem hic in inventore ipsum iure laborum natus optio, quam quas quia quibusdam voluptatum.</p>
+                    </div>
+                  </div>
+                  <div><i class="icon-font icon-database"></i></div>
+                  <div>
+                    <p>Database</p><span>they have their own database</span>
+                  </div>
+                </div>
+                <div class="feature__box">
+                  <div class="feature__box-desc">
+                    <div>
+                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet, commodi cum dicta ipsa nihil nobis sit tenetur! Error, natus neque. Accusamus asperiores delectus dolore eaque earum, illum, maiores modi mollitia natus nisi odio odit perspiciatis porro praesentium quaerat quam quisquam saepe! Assumenda atque aut beatae cum dignissimos, eos fugit hic molestiae nemo omnis, perspiciatis possimus quidem, quos recusandae rem ut voluptas! Accusantium asperiores atque autem, beatae ducimus, eaque error explicabo facilis fugit ipsum natus nisi, recusandae rem sapiente sunt velit voluptatem? Corporis dolorum earum error eveniet, laboriosam laudantium natus nesciunt nostrum quis quo. Accusantium cumque itaque magnam maiores quis. Voluptates?</p>
+                    </div>
+                  </div>
+                  <div><i class="icon-font icon-search"></i></div>
+                  <div>
+                    <p>Search</p><span>they can use memes to define an image and search in a memetic fashion</span>
+                  </div>
+                </div>
+                <div class="feature__box">
+                  <div class="feature__box-desc">
+                    <div>
+                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cumque et fuga harum in iste neque nisi nostrum reiciendis! Animi at autem commodi culpa delectus doloribus ducimus iste labore natus numquam quas, quasi quia, quos recusandae, saepe vel vitae voluptatibus? Aliquam beatae dicta distinctio dolorem eaque explicabo illo in, ipsam iure iusto libero necessitatibus nesciunt nisi nobis optio quae qui quia quibusdam quis quod rem sint suscipit tempore temporibus, ut. Ab consequatur cupiditate distinctio, dolores ducimus eligendi enim eveniet exercitationem facilis ipsum iusto maiores minus pariatur quaerat, quas quisquam rem repudiandae sed? Dolor doloribus obcaecati totam? Excepturi, ipsam molestiae? Accusantium, architecto.</p>
+                    </div>
+                  </div>
+                  <div><i class="icon-font icon-layout"></i></div>
+                  <div>
+                    <p>Collections</p><span>they can make collections to search for the images on their own computer</span>
+                  </div>
+                </div>
+                <div class="feature__box">
+                  <div class="feature__box-desc">
+                    <div>
+                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam beatae consectetur excepturi exercitationem in inventore ipsum molestias natus neque obcaecati! Autem et explicabo nisi quod. Ad architecto assumenda at atque debitis deserunt eum exercitationem hic ipsum natus porro sed, sequi sint tenetur vitae, voluptatem voluptatibus! Ad aperiam at aut corporis culpa delectus, deleniti deserunt dignissimos dolore dolorem eaque earum excepturi facere hic itaque maiores minus mollitia nemo nihil nostrum officiis placeat provident quae qui quia, quis quisquam quod quos recusandae rem repellendus reprehenderit sed sint tempora temporibus vel voluptate. Autem dicta expedita harum magnam molestias nobis, optio pariatur quae voluptate?</p>
+                    </div>
+                  </div>
+                  <div><i class="icon-font icon-machine-learning"></i></div>
+                  <div>
+                    <p>Machine Learning</p><span>users can use machine learning to place emotions on images automatically</span>
+                  </div>
+                </div>
+                <div class="feature__box">
+                  <div class="feature__box-desc">
+                    <div>
+                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Alias ea, eaque esse itaque neque tempora. Accusamus architecto at commodi error et ipsa iste, magnam, minima non numquam optio perferendis quaerat suscipit tempore vel! Aut earum esse eveniet in iure nisi placeat vel voluptatibus. A accusamus autem cumque deleniti ducimus et hic incidunt iure labore laudantium molestiae natus odit, officia officiis porro quasi quia quo reiciendis sed unde vitae voluptatem voluptatum! A alias aliquid autem commodi culpa, cum dolore dolorem dolores eius est facere facilis ipsam itaque nemo nobis omnis provident quia quibusdam quisquam rem reprehenderit suscipit, vel velit veniam vitae?</p>
+                    </div>
+                  </div>
+                  <div><i class="icon-font icon-face-recognition"></i></div>
+                  <div>
+                    <p>Facial Recognition</p><span>users can use facial recognition to search for images</span>
+                  </div>
+                </div>
+                <div class="feature__box">
+                  <div class="feature__box-desc">
+                    <div>
+                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. At dicta est, ex hic impedit iusto maxime nemo quo sapiente similique? Asperiores aut corporis cumque cupiditate debitis deleniti dolorem dolores eius eligendi explicabo ipsam itaque natus necessitatibus nemo nobis nostrum numquam odit perspiciatis quae qui ratione recusandae repellat repellendus soluta tempora temporibus unde, voluptates? Aliquid amet asperiores beatae consequatur cum ducimus, eaque eius enim error est facere hic minus natus nesciunt nisi numquam odio odit placeat quia quibusdam quos ratione recusandae rem sed sequi sunt temporibus! Ea eaque excepturi iure minima tempora tempore! Asperiores atque cumque dolorem officia suscipit tempore voluptatem.</p>
+                    </div>
+                  </div>
+                  <div><i class="icon-font icon-install"></i></div>
+                  <div>
+                    <p>Install</p><span>install on a computer or just run without installation</span>
+                  </div>
+                </div>
+                <div class="feature__box">
+                  <div class="feature__box-desc">
+                    <div>
+                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Alias et facere, fugiat illo ipsam iure magni mollitia officiis optio quo reiciendis repellat repellendus voluptatibus? Accusamus aut distinctio facilis id illo impedit, modi officiis provident, quia quidem rem sapiente soluta tempora totam, veniam voluptates voluptatibus? Adipisci amet asperiores aspernatur dignissimos distinctio ea nesciunt nihil quam quibusdam repellendus. A animi at blanditiis earum eius fugiat iusto nam necessitatibus quod, repudiandae saepe vel velit voluptates? Adipisci animi at consectetur cupiditate ea eaque eos fuga incidunt iusto libero quaerat tenetur, unde ut. Eius esse, ex impedit in libero necessitatibus nihil porro repellat voluptate voluptates?</p>
+                    </div>
+                  </div>
+                  <div><i class="icon-font icon-copy"></i></div>
+                  <div>
+                    <p>Copy Database</p><span>copy the Database and files together to place on another computer</span>
+                  </div>
+                </div>
+                <div class="feature__box">
+                  <div class="feature__box-desc">
+                    <div>
+                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab aliquid animi consectetur culpa deleniti eius, est eveniet illo iure laborum modi nisi nulla quibusdam, quisquam voluptatum. A adipisci alias amet aperiam, architecto asperiores aspernatur beatae blanditiis commodi culpa cum delectus dicta doloremque dolores eius et eveniet exercitationem, explicabo fugit ipsa ipsam iure iusto labore libero neque, nobis numquam odio omnis praesentium qui quis quod repellat repudiandae saepe tempora vel velit! Atque beatae consequuntur culpa, cumque debitis dolorum eligendi enim eveniet ex fuga fugiat in ipsum mollitia omnis perspiciatis placeat quidem, quisquam quo, rerum saepe tempore temporibus tenetur vel. Quas, similique?</p>
+                    </div>
+                  </div>
+                  <div><i class="icon-font icon-cloud-check"></i></div>
+                  <div>
+                    <p>Back Up</p><span>back up your data by exporting to re import later</span>
+                  </div>
+                </div>
+                <div class="feature__box">
+                  <div class="feature__box-desc">
+                    <div>
+                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam architecto asperiores commodi consequuntur corporis cum, deserunt dolores eius et facilis hic in laudantium maxime nam neque nihil nisi nulla odio optio perferendis placeat possimus quas quibusdam quos sit soluta tempore unde ut vitae voluptas. Accusamus eius error impedit maxime officia quae qui quibusdam soluta totam voluptate. Commodi ea incidunt rerum similique suscipit voluptates. Ab alias architecto, at beatae commodi consequatur corporis deleniti deserunt dignissimos dolor doloribus ducimus eligendi error facere hic iure mollitia nihil, nisi nobis odio pariatur porro quia repudiandae sapiente similique ullam voluptatem voluptatum. Cupiditate iste odio odit?</p>
+                    </div>
+                  </div>
+                  <div><i class="icon-font icon-usb"></i></div>
+                  <div>
+                    <p>USB</p><span>run on a usb or external hard drive</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div id="usage-video">
-                <!-- <iframe src="https://youtube.com/embed/MYkFmmxN2YY"></iframe> -->
-                <iframe  src="https://www.youtube.com/embed/MYkFmmxN2YY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        </section>
+        <!-- SECTION :: END-->
+        <!-- SECTION :: START-->
+        <section class="usage" id="usage">
+          <div class="c-grid">
+            <div class="usage__wrapper">
+              <p class="usage__label c-label c-label--center">How to</p>
+              <h2 class="usage__title c-title c-title--center">Usage</h2>
+              <div class="usage__road-wrapper">
+                <div>
+                  <ul class="usage__list">
+                    <li>
+                      <p>The main menu lists the main actions to take and some scores to track the % of the images have been tagged or not.</p>
+                    </li>
+                    <li>
+                      <p>New images can be loaded into the app when you go into the tagging page.</p>
+                    </li>
+                    <li>
+                      <p>The tagging phase allows you to add text, emotions and memes (which are other images and any image can become a meme for another image).</p>
+                    </li>
+                    <li>
+                      <p>Collection can be produced but in this page new images cannot be imported; only during tagging. A collection creation wizard helps a user produce a collection.</p>
+                    </li>
+                    <li>
+                      <p>Searching allows you to find a rank of relevant images based upon the overlap of the annotations with the search criteria.</p>
+                    </li>
+                  </ul>
+                </div>
+                <div>
+                  <div class="usage__box-wrapper"><a class="usage__box" href="https://www.youtube.com/watch?v=MYkFmmxN2YY&amp;t=9s&amp;ab_channel=tagasaurus" style="background-image:url(&quot;img/img-demos-1.png&quot;)">
+                      <h3 class="usage__subtitle c-title c-title--small c-title--center">Tutorial Part 1</h3><i class="icon-font icon-youtube"></i></a><a class="usage__box" href="https://www.youtube.com/watch?v=6tHiW8WMo6w&amp;ab_channel=tagasaurus" style="background-image:url(&quot;img/img-demos-2.png&quot;)">
+                      <h3 class="usage__subtitle c-title c-title--small c-title--center">Tutorial Part 2</h3><i class="icon-font icon-youtube"></i></a><a class="usage__box" href="https://www.youtube.com/watch?v=bB84MJZubmo" style="background-image:url(&quot;img/img-demos-3.png&quot;)">
+                      <h3 class="usage__subtitle c-title c-title--small c-title--center">Tutorial Part 3</h3><i class="icon-font icon-youtube"></i></a><a class="usage__box" href="https://www.youtube.com/watch?v=TCQvmAdQf6I&amp;ab_channel=tagasaurus" style="background-image:url(&quot;img/img-demos-1.png&quot;)">
+                      <h3 class="usage__subtitle c-title c-title--small c-title--center">Tutorial Part 4</h3><i class="icon-font icon-youtube"></i></a></div>
+                </div>
+              </div>
             </div>
-
+          </div>
+        </section>
+        <!-- SECTION :: END-->
+        <!-- SECTION :: START-->
+        <section class="demos" id="demos">
+          <div class="c-grid">
+            <div class="demos__wrapper">
+              <p class="demos__label c-label c-label--center">Prebuilt Demos Ready to Use</p>
+              <h2 class="demos__title c-title c-title--center">Our Demos</h2>
+              <div class="demos__carousel">
+                <div class="swiper">
+                  <div class="swiper-wrapper">
+                    <div class="swiper-slide"><img src="img/img-demos-1.png" alt=""></div>
+                    <div class="swiper-slide"><img src="img/img-demos-2.png" alt=""></div>
+                    <div class="swiper-slide"><img src="img/img-demos-3.png" alt=""></div>
+                    <div class="swiper-slide"><img src="img/img-demos-1.png" alt=""></div>
+                    <div class="swiper-slide"><img src="img/img-demos-2.png" alt=""></div>
+                    <div class="swiper-slide"><img src="img/img-demos-3.png" alt=""></div>
+                    <div class="swiper-slide"><img src="img/img-demos-1.png" alt=""></div>
+                    <div class="swiper-slide"><img src="img/img-demos-2.png" alt=""></div>
+                    <div class="swiper-slide"><img src="img/img-demos-3.png" alt=""></div>
+                  </div>
+                  <div class="swiper-pagination"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- SECTION :: END-->
+        <!-- SECTION :: START-->
+        <section class="downloads" id="downloads">
+          <div class="c-grid">
+            <div class="downloads__wrapper">
+              <p class="downloads__label c-label c-label--center">Lorem Ipsum dolor</p>
+              <h2 class="downloads__title c-title c-title--center">Downloads</h2>
+              <div class="downloads__box-wrapper">
+                <div class="downloads__box">
+                  <div><i class="icon-font icon-windows"></i></div>
+                  <div>
+                    <ul>
+                      <li><a href="#"><i class="icon-font icon-zip-file"></i>
+                          <p><strong>.exe</strong> - Installer</p><span>sha256 hash: 41028d87b371cad39980421bc1785e39e34d7c5bebb383a31346e76b3d64346f</span></a></li>
+                      <li><a href="#"><i class="icon-font icon-zip-file"></i>
+                          <p><strong>.zip</strong> - Executable *</p><span>sha256 hash: 9bcd6fcb3fc980966161e632fea5df4ce2dcf666e2b95b6841d6d828f92d0107</span></a></li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="downloads__box">
+                  <div><i class="icon-font icon-linux"></i></div>
+                  <div>
+                    <ul>
+                      <li><a href="#"><i class="icon-font icon-zip-file"></i>
+                          <p><strong>.deb</strong> - Debian/Ubuntu</p><span>sha256 hash: 51c3b92236ee36af47e3b0c3cc69508c67250faa3b97af0ea85608229ee37f8b</span></a></li>
+                      <li><a href="#"><i class="icon-font icon-zip-file"></i>
+                          <p><strong>.rpm</strong> - Fedora/CentOS</p><span>sha256 hash: 1a63aaa1fdce8021b864220485f9af4d951408f8eab3cbc617a4270846ea3511</span></a></li>
+                      <li><a href="#"><i class="icon-font icon-zip-file"></i>
+                          <p><strong>.zip</strong> - Generic Linux</p><span>sha256 hash: fdff120c0fc752a6f970289f3cc1e5d7dd0841daa2e99a3dc00a989aed263520</span></a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <p class="downloads__info">* The zip executable allows the user to run the application tagasaurus.exe from the unzipped folder. All the data is held in a new folder created next to the unzipped folder. This is especially useful if you want to put Tagasaurus on a USB (or external disk), and run it from directly off the external space keeping all the Taga data there to transport & store.</p>
+            </div>
+          </div>
+        </section>
+        <!-- SECTION :: END-->
+      </section>
+    </main>
+    <!-- FOOTER :: START-->
+    <footer class="footer" id="footer">
+      <div class="footer__container footer__container-1">
+        <div class="c-grid">
+          <div class="footer__wrapper footer__wrapper-1">
+            <div class="footer__social">
+              <p>Follow Us:</p>
+              <nav><a href="#"><i class="icon-font icon-facebook"></i></a><a href="#"><i class="icon-font icon-twitter"></i></a><a href="#"><i class="icon-font icon-github"></i></a></nav>
+            </div>
+          </div>
         </div>
-
-        <div id="installation-div-id">
-            <span class="subsection-label-header-class">Windows OS Installation</span>
-            <ul>
-                <li>'.exe' Installer: <a  style="font-size:1.5rem;color:#a03366;font-weight:bold;" href="https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus.Setup.1.1.0.exe">Download from Github</a>  <br> (sha256 hash: 41028d87b371cad39980421bc1785e39e34d7c5bebb383a31346e76b3d64346f) </li>
-                <li>'.zip' Executable: <a style="font-size:1.5rem;color:#a03366;font-weight:bold;"  href="https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus-1.1.0-win.zip">Download from Github</a> <br> (sha256 hash: 9bcd6fcb3fc980966161e632fea5df4ce2dcf666e2b95b6841d6d828f92d0107) </li>
-            </ul>
-            <p class="zip-download-text">The zip executable allows the user to run the application tagasaurus.exe from the unzipped folder.
-                All the data is held in a new folder created next to the unzipped folder.
-                This is especially useful if you want to put Tagasaurus on a USB (or external disk), and run it from 
-                directly off the external space keeping all the Taga data there to transport & store. </p>
-            <br />
-            <span class="subsection-label-header-class">Linux Installation</span>
-            <ul>
-                <li>'.deb' Debian/Ubuntu: <a style="font-size:1.5rem;color:#a03366;font-weight:bold;"  href="https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus_1.1.0_amd64.deb">Download from Github</a>  <br> (sha256 hash: 51c3b92236ee36af47e3b0c3cc69508c67250faa3b97af0ea85608229ee37f8b)   </li>
-                <li>'.rpm' Fedora/CentOS: <a  style="font-size:1.5rem;color:#a03366;font-weight:bold;" href="https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus-1.1.0.x86_64.rpm">Download from Github</a>  <br> (sha256 hash: 1a63aaa1fdce8021b864220485f9af4d951408f8eab3cbc617a4270846ea3511) </li>
-                <li>'.zip' Generic Linux: <a  style="font-size:1.5rem;color:#a03366;font-weight:bold;"  href="https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus-1.1.0.zip">Download from Github</a> <br> (sha256 hash: fdff120c0fc752a6f970289f3cc1e5d7dd0841daa2e99a3dc00a989aed263520) </li>
-            </ul>
+      </div>
+      <div class="footer__container footer__container-2">
+        <div class="c-grid">
+          <div class="footer__wrapper footer__wrapper-2">
+            <div class="copyright">© Copyright 2022 - All rights reserved</div>
+          </div>
         </div>
-
-    </div>  
-
-    <footer>
-      <div class="footer-heading">Links</div>  
-      <div class="rounded-social-buttons">
-        <a class="social-button facebook" href="https://www.facebook.com/TagasaurusApp" target="_blank"><i class="fab fa-facebook-f"></i></a>
-        <a class="social-button twitter" href="https://twitter.com/Tagasaurus_app" target="_blank"><i class="fab fa-twitter"></i></a>
-        <a class="social-button linkedin" href="https://github.com/mantzaris/Tagasaurus" target="_blank"><i class="fab fa-github"></i></a>
-    </div>
+      </div>
     </footer>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="./script.js"></script>
-    <script>
-        window.onload = function(){
-            setTimeout(function() {
-                window.location.replace("#usage-description-div-id");
-            }, 1800);
-        };
-    </script>
-</body>
+    <!-- FOOTER :: END-->
+  </body>
+  <!-- SCRIPT :: START-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js" integrity="sha512-IsNh5E3eYy3tr/JiX2Yx4vsCujtkhwl7SLqgnwLNgf04Hrt9BT9SXlLlZlWx+OK4ndzAoALhsMNcCmkggjZB1w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/8.3.2/swiper-bundle.min.js" integrity="sha512-V1mUBtsuFY9SNr+ptlCQAlPkhsH0RGLcazvOCFt415od2Bf9/YkdjXxZCdhrP/TVYsPeAWuHa+KYLbjNbeEnWg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!--script(src="js/vendor.js")-->
+  <script src="js/app.js"></script>
+  <!-- SCRIPT :: END-->
 </html>
