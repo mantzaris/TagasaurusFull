@@ -4,6 +4,8 @@ const fileType = require('file-type');
 //the object for the window functionality
 const IPC_RENDERER = require('electron').ipcRenderer; 
 const { ipcRenderer } = require('electron');
+const { domainToUnicode } = require('url');
+const { parse } = require('path/posix');
 //FSE is not being used but should be for the directory batch import
 //const FSE = require('fs-extra');
 
@@ -163,31 +165,75 @@ async function Display_Image() {
     let center_gallery_element;
     let ft_res = await fileType.fromFile( display_path )
     //console.log('ft_res in Display Image = ', ft_res) 
-    if( ft_res.mime.includes('pdf') == false ) {
-        IPC_RENDERER.send('closePDF')
-    }
+    // if( ft_res.mime.includes('pdf') == false ) {
+    //     //IPC_RENDERER.send('closePDF')
+    // }
     
 
     if( ft_res.mime.includes('image') == true ) {
         center_gallery_element = document.createElement("img")        
-        center_gallery_element.src = display_path        
+        center_gallery_element.src = display_path      
+        parent.appendChild(center_gallery_element)   
         
     } else if( ft_res.mime.includes('pdf') == true ) {
-        center_gallery_element = document.createElement("img")
-        center_gallery_element.src = "../build/icons/PDFicon.png"
-        IPC_RENDERER.send('displayPDF',display_path)
+        
+        const pdf = await pdfjsLib.getDocument(display_path).promise
+        const total_pages = pdf.numPages
+        let page_num = 1
+        const imageURL = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf,page_num)
+        center_gallery_element = document.createElement("img")        
+        center_gallery_element.src = imageURL      
+        parent.appendChild(center_gallery_element) 
 
-    } else { //cannot handle this file type
+        const btn_div = document.createElement('div')
+        btn_div.id = "pdf-btns-div-id"
+        let btn_next = document.createElement('button')
+        btn_next.innerText = "NEXT PAGE"
+        btn_next.onclick = async () => {
+            if(page_num < total_pages) {
+                page_num += 1
+                pdf_page_num.value = page_num
+                center_gallery_element.src = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf,page_num)
+            }
+        }
+        let btn_prev = document.createElement('button')
+        btn_prev.innerText = "PREV PAGE"
+        btn_prev.onclick = async () => {
+            if(page_num > 1) {
+                page_num -= 1
+                pdf_page_num.value = page_num
+                center_gallery_element.src = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf,page_num)
+            }
+        }
+
+        let pdf_page_num = document.createElement('input')
+        pdf_page_num.type = "number"
+        pdf_page_num.min = 1
+        pdf_page_num.max = total_pages
+        pdf_page_num.onkeyup = async () => {
+            page_num = parseInt(pdf_page_num.value) || page_num   
+            page_num = Math.max(1, Math.min(page_num, total_pages))
+            pdf_page_num.value = page_num
+            center_gallery_element.src = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf,page_num)
+        }
+
+        btn_div.appendChild(btn_next)
+        btn_div.appendChild(btn_prev)
+        btn_div.appendChild(pdf_page_num)
+
+        parent.appendChild(btn_div)
+        
+    } else { 
         center_gallery_element = document.createElement("video")  
         center_gallery_element.autoplay = true
         center_gallery_element.muted = true
         center_gallery_element.controls = true  
         center_gallery_element.src = display_path
-        
+        parent.appendChild(center_gallery_element) 
     }
 
     center_gallery_element.id = 'center-gallery-image-id'
-    parent.appendChild(center_gallery_element) 
+    //parent.appendChild(center_gallery_element) 
 }
 //DISPLAY THE MAIN IMAGE END<<<
 

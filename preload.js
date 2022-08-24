@@ -4,6 +4,8 @@ const PATH = require('path');
 const FS = require('fs')
 
 
+
+
 window.addEventListener('DOMContentLoaded', () => {
   const replaceText = (selector, text) => {
     const element = document.getElementById(selector)

@@ -35,3 +35,32 @@ function Pause_Media_From_Modals() {
 
 }
 exports.Pause_Media_From_Modals = Pause_Media_From_Modals
+
+
+
+
+
+async function PDF_page_2_image(pdf,page_num) {
+    
+    const page = await pdf.getPage(page_num);
+    canvas = document.createElement('canvas')
+    
+    let viewport = page.getViewport({ scale: 1 });
+    canvas.width = viewport.width
+    canvas.height = viewport.height
+    
+    let renderContext = {
+        canvasContext: canvas.getContext("2d"),
+        viewport: viewport,
+    };
+    await page.render(renderContext).promise
+    const imageURL = canvas.toDataURL('image/jpg')
+    
+    return imageURL
+}
+exports.PDF_page_2_image = PDF_page_2_image
+
+
+
+
+
