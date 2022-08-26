@@ -44,7 +44,6 @@ let reg_exp_delims = /[#:,;| ]+/
 
 
 
-
 //returns the obj with the extended emotions auto filled (the object is not a full annotation obj, but just the extended obj for emotions)
 async function Auto_Fill_Emotions(super_res, file_annotation_obj) {
     let emotion_max_faces_tmp = {}
@@ -159,6 +158,8 @@ async function Handle_Delete_Collection_IMAGE_references(imageFileName) {
 
 //DISPLAY THE MAIN IMAGE START>>>
 async function Display_Image() {
+
+    
     const parent = document.getElementById("center-gallery-area-div-id")
     parent.innerText = ""
     const display_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation["imageFileName"]}`
@@ -177,6 +178,9 @@ async function Display_Image() {
         
     } else if( ft_res.mime.includes('pdf') == true ) {
         
+        let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+        processing_modal.style.display = "flex"
+
         const pdf = await pdfjsLib.getDocument(display_path).promise
         const total_pages = pdf.numPages
         let page_num = 1
@@ -223,6 +227,8 @@ async function Display_Image() {
 
         parent.appendChild(btn_div)
         
+        processing_modal.style.display = "none"
+
     } else { 
         center_gallery_element = document.createElement("video")  
         center_gallery_element.autoplay = true
@@ -233,6 +239,7 @@ async function Display_Image() {
     }
 
     center_gallery_element.id = 'center-gallery-image-id'
+
     //parent.appendChild(center_gallery_element) 
 }
 //DISPLAY THE MAIN IMAGE END<<<

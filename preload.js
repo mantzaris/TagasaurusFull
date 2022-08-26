@@ -3,7 +3,7 @@
 const PATH = require('path');
 const FS = require('fs')
 
-
+console.clear()
 
 
 window.addEventListener('DOMContentLoaded', () => {

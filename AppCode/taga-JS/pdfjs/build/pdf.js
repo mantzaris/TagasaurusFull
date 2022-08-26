@@ -1496,7 +1496,7 @@ function loadScript(src, removeScriptElement = false) {
 }
 
 function deprecated(details) {
-  console.log("Deprecated API usage: " + details);
+  //console.log("Deprecated API usage: " + details);
 }
 
 let pdfDateStringRegex;
