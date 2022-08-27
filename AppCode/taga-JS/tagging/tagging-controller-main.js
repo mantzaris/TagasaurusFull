@@ -392,6 +392,7 @@ async function Meme_Image_Clicked(meme_file_name) {
     let meme_click_modal_body_html_tmp = '';
 
     //pause element of meme if video
+    let pdf, total_pages, page_num, pdf_page_num;
     let clicked_meme_element = document.getElementById(`memes-image-img-id-${meme_file_name}`)
     let node_type = clicked_meme_element.nodeName
     let content_html;
@@ -402,8 +403,63 @@ async function Meme_Image_Clicked(meme_file_name) {
         clicked_meme_element.pause()
     } else if( node_type == "DIV" ) {
         //console.log()
-        content_html = `<div id="modal-meme-clicked-displayimg-id" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="memes-img-class" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${meme_file_name}</div>   </div>`     
+        //content_html = `<div id="modal-meme-clicked-displayimg-id" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="memes-img-class" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${meme_file_name}</div>   </div>`     
+        const parent = document.createElement('div')
+        //parent = "modal-meme-clicked-displayimg-id"
+        let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+        processing_modal.style.display = "flex"
 
+        pdf = await pdfjsLib.getDocument(`${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_file_name}`).promise
+        total_pages = pdf.numPages
+        page_num = 1
+        const imageURL = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf,page_num)
+        center_gallery_element = document.createElement("img")     
+        center_gallery_element.id = "modal-meme-clicked-displayimg-id"//"center-gallery-element-modal-pdf-id"
+        center_gallery_element.src = imageURL      
+        parent.appendChild(center_gallery_element) 
+
+        const btn_div = document.createElement('div')
+        btn_div.id = "pdf-btns-div-id"
+        let btn_next = document.createElement('button')
+        btn_next.id = "pdf-button-next-id"
+        btn_next.innerText = "NEXT PAGE"
+        btn_next.onclick = async () => {
+            if(page_num < total_pages) {
+                page_num += 1
+                pdf_page_num.value = page_num
+                center_gallery_element.src = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf,page_num)
+            }
+        }
+        let btn_prev = document.createElement('button')
+        btn_prev.id = "pdf-button-prev-id"
+        btn_prev.innerText = "PREV PAGE"
+        btn_prev.onclick = async () => {
+            if(page_num > 1) {
+                page_num -= 1
+                pdf_page_num.value = page_num
+                center_gallery_element.src = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf,page_num)
+            }
+        }
+
+        pdf_page_num = document.createElement('input')
+        pdf_page_num.type = "number"
+        pdf_page_num.min = 1
+        pdf_page_num.max = total_pages
+        pdf_page_num.onkeyup = async () => {
+            page_num = parseInt(pdf_page_num.value) || page_num   
+            page_num = Math.max(1, Math.min(page_num, total_pages))
+            pdf_page_num.value = page_num
+            center_gallery_element.src = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf,page_num)
+        }
+
+        btn_div.appendChild(btn_next)
+        btn_div.appendChild(btn_prev)
+        btn_div.appendChild(pdf_page_num)
+
+        parent.appendChild(btn_div)
+        content_html = parent.innerHTML
+        
+        processing_modal.style.display = "none"
     }
     meme_click_modal_body_html_tmp += content_html //`<img id="modal-meme-clicked-displayimg-id" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_file_name}" title="meme" alt="meme" />`;
     meme_click_modal_div.insertAdjacentHTML('beforeend', meme_click_modal_body_html_tmp);
@@ -434,6 +490,32 @@ async function Meme_Image_Clicked(meme_file_name) {
         modal_tags_html_tmp += `no tags added`;
     }
     document.getElementById("modal-meme-clicked-tag-list-div-container-id").innerHTML = modal_tags_html_tmp;
+
+
+    //event listeners for the pdf view
+    if( node_type == "DIV" ) {
+        const center_gallery_element = document.getElementById("modal-meme-clicked-displayimg-id")
+        const btn_next = document.getElementById("pdf-button-next-id")
+        btn_next.onclick = async () => {
+            if(page_num < total_pages) {
+                page_num += 1
+                pdf_page_num.value = page_num
+                center_gallery_element.src = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf,page_num)
+            }
+        }
+
+        const btn_prev = document.getElementById("pdf-button-prev-id")
+        btn_prev.onclick = async () => {
+            if(page_num > 1) {
+                page_num -= 1
+                pdf_page_num.value = page_num
+                center_gallery_element.src = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf,page_num)
+            }
+        }
+
+    }
+
+
 }
 //MEME STUFF END<<<
 

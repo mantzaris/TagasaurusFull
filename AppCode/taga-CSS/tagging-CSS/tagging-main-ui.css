@@ -502,7 +502,7 @@ input:checked + .slider:before {
   /* width: 100%;
   height: 100%; */
   height: 99999px;
-  /* object-fit: contain; */
+  object-fit: contain;
   max-height: 100%;
   max-width: 100%;
   display: block;
@@ -521,6 +521,9 @@ input:checked + .slider:before {
   display: flex;
   justify-content: center;
   align-items: center;
+  
+  transform: translate(-50%, -50%);
+  left: 50%;
 }
 
 .pdf-btn-class {
