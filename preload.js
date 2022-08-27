@@ -6,6 +6,9 @@ const FS = require('fs')
 console.clear()
 
 
+
+
+
 window.addEventListener('DOMContentLoaded', () => {
   const replaceText = (selector, text) => {
     const element = document.getElementById(selector)
@@ -39,6 +42,17 @@ if(BUILD_EXECUTABLE) {
 } else {
   window.USER_DATA_PATH = PATH.join( __dirname, '..', '..', '..' )
 }
+
+
+//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+//DB INIT
+window.DB_MODULE = require(PATH.join(__dirname,'AppCode','taga-DB','db-fns.js'))
+
+
+
 
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 

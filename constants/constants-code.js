@@ -8,8 +8,10 @@ const TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY,'data'); //PATH.resol
 exports.TAGA_DATA_DIRECTORY = TAGA_DATA_DIRECTORY;
 
 //module functions for DB connectivity
-const DB_MODULE = require(PATH.join(__dirname,'..','AppCode','taga-DB','db-fns.js')); //require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'db-fns.js');
-exports.DB_MODULE = DB_MODULE;
+//const DB_MODULE = require(PATH.join(__dirname,'..','AppCode','taga-DB','db-fns.js')); //require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'db-fns.js');
+//exports.DB_MODULE = DB_MODULE;
+exports.DB_MODULE = window.DB_MODULE
+
 
 const SEARCH_MODULE = require(PATH.join(__dirname,'..','AppCode','taga-JS','utilities','search-fns.js'))// require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'search-fns.js') // the module holding all the search algorithms
 exports.SEARCH_MODULE = SEARCH_MODULE;

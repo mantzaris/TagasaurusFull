@@ -3,7 +3,7 @@
 const PATH = require('path');
 const FS = require('fs');
 
-const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, GENERAL_HELPER_FNS, MASONRY } = require(PATH.join(__dirname,'..','constants','constants-code.js')); //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const { TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, GENERAL_HELPER_FNS, MASONRY } = require(PATH.join(__dirname,'..','constants','constants-code.js')); //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 const { CLOSE_ICON_RED, CLOSE_ICON_BLACK } = require(PATH.join(__dirname,'..','constants','constants-icons.js')) //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 

@@ -9,22 +9,22 @@ const PATH2 = require('path');
 const FSE = require('fs-extra');
 
 const { TAGA_DATA_DIRECTORY, TAGA_FILES_DIRECTORY } = require(PATH2.join(__dirname,'..','constants','constants-code.js')) // require(PATH2.resolve()+PATH2.sep+'constants'+PATH2.sep+'constants-code.js');
-const DB_MODULE2 = require(PATH2.join(__dirname,'taga-DB','db-fns.js')) // require(PATH2.resolve()+PATH2.sep+'AppCode'+PATH2.sep+'taga-DB'+PATH2.sep+'db-fns.js');
+//const DB_MODULE = require(PATH2.join(__dirname,'taga-DB','db-fns.js')) // require(PATH2.resolve()+PATH2.sep+'AppCode'+PATH2.sep+'taga-DB'+PATH2.sep+'db-fns.js');
 
 async function Tagging_Image_DB_Iterator() {
-    return await DB_MODULE2.Tagging_Image_DB_Iterator();
+    return await DB_MODULE.Tagging_Image_DB_Iterator();
 }
 async function Tagging_MEME_Image_DB_Iterator() {
-    return await DB_MODULE2.Tagging_MEME_Image_DB_Iterator();
+    return await DB_MODULE.Tagging_MEME_Image_DB_Iterator();
 }
 async function Collection_DB_Iterator() {
-    return await DB_MODULE2.Collection_DB_Iterator();
+    return await DB_MODULE.Collection_DB_Iterator();
 }
 async function Collection_IMAGE_DB_Iterator() {
-    return await DB_MODULE2.Collection_IMAGE_DB_Iterator();
+    return await DB_MODULE.Collection_IMAGE_DB_Iterator();
 }
 async function Collection_MEME_DB_Iterator() {
-    return await DB_MODULE2.Collection_MEME_DB_Iterator();
+    return await DB_MODULE.Collection_MEME_DB_Iterator();
 }
 
 

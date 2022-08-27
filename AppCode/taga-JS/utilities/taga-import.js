@@ -15,7 +15,8 @@ const DB_destination = require(PATH.join(__dirname,'taga-DB','db-fns.js')); // r
 const TAGA_DATA_destination = PATH.join(USER_DATA_PATH,'TagasaurusFiles','data'); // PATH.resolve(TAGA_FILES_DIRECTORY,'data');
 
 
-
+const IMPORT_DELIM = "::imported::"
+const contains_DELIM_Str_End = (str) => str.search(IMPORT_DELIM) == str.length - IMPORT_DELIM.length
 
 //db path that holds the import db
 let DB_import_path = ''
@@ -71,8 +72,12 @@ async function Import_User_Annotation_Data() {
             await Import_Collections_Records_Info_Migrate()            
             
             processing_modal.style.display = "none"
+
+            alert("successfully imported")
         }
+
     })
+    
 }
 
 
@@ -133,11 +138,14 @@ async function Import_Collections_Records_Info_Migrate() {
             }//)
             collection_dest_record_tmp.collectionMemes =   [... new Set( collection_dest_record_tmp["collectionMemes"].concat(new_meme_image_names_tmp) ) ]
 
-            if( record_collection_import_tmp.collectionDescription.length > 0 ) {
-                collection_dest_record_tmp.collectionDescription = collection_dest_record_tmp.collectionDescription + ' :imported: ' + record_collection_import_tmp.collectionDescription
-            } else {
-                collection_dest_record_tmp.collectionDescription = collection_dest_record_tmp.collectionDescription
-            }
+            //if( record_collection_import_tmp.collectionDescription.length > 0 ) {
+                //collection_dest_record_tmp.collectionDescription = collection_dest_record_tmp.collectionDescription + ' :imported: ' + record_collection_import_tmp.collectionDescription
+            collection_dest_record_tmp.collectionDescription = Merge_Descriptions(collection_dest_record_tmp.collectionDescription, record_collection_import_tmp.collectionDescription)
+            //}
+            // } else {
+            //     collection_dest_record_tmp.collectionDescription = collection_dest_record_tmp.collectionDescription
+            // }
+            
             //now concatenate the tagging Tags
             let diff_tags = record_collection_import_tmp["collectionDescriptionTags"].filter(x => !collection_dest_record_tmp["collectionDescriptionTags"].includes(x));
             collection_dest_record_tmp["collectionDescriptionTags"] = collection_dest_record_tmp["collectionDescriptionTags"].concat(diff_tags)
@@ -207,7 +215,10 @@ async function Import_Records_DB_Info_Migrate() {
 
             //alert('in the tagging merge')
             let record_dest_tmp = await DB_destination.Get_Tagging_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
-            record_dest_tmp.taggingRawDescription = record_dest_tmp.taggingRawDescription + ' imported : ' + record_import_tmp.taggingRawDescription
+
+            record_dest_tmp.taggingRawDescription = Merge_Descriptions(record_dest_tmp.taggingRawDescription, record_import_tmp.taggingRawDescription)
+            //record_dest_tmp.taggingRawDescription = record_dest_tmp.taggingRawDescription + IMPORT_DELIM + record_import_tmp.taggingRawDescription
+            
             //go through the emotion key -overlaps- and merge values
             let dest_tmp_emotion_keys = Object.keys(record_dest_tmp["taggingEmotions"])
             let import_emotions_keys = Object.keys(record_import_tmp["taggingEmotions"])
@@ -462,6 +473,18 @@ function Get_Obj_Collections_Fields_From_Record(record) {
 }
 
 
+
+function Merge_Descriptions(orig_text, import_text) {
+    if( import_text?.length == 0 ) {
+        return orig_text
+    } else if( contains_DELIM_Str_End(orig_text) == true && import_text.search(IMPORT_DELIM) == 0 ) {
+        return orig_text + import_text.substring(IMPORT_DELIM.length)
+    } else if( contains_DELIM_Str_End(orig_text) ) {
+        return orig_text + import_text
+    } else {
+        return orig_text + IMPORT_DELIM + import_text
+    }
+}
 
 // //for the meme list of the importing db to merge/insert into the destination db
 // //use via 'iter = await Import_Meme_Tagging_Image_DB_Iterator()' and 'rr = await iter()'
