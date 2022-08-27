@@ -724,8 +724,67 @@ async function Image_Clicked_Modal(filename, node_type) {
         let modal_body_html_tmp = `<video class="${GENERAL_HELPER_FNS.VIDEO_IDENTIFIER}" id="modal-image-clicked-displayimg-id" src="${PATH.join(TAGA_DATA_DIRECTORY,filename)}" controls muted />`
         modal_display_div.insertAdjacentHTML('afterbegin', modal_body_html_tmp);
     } else if( node_type == 'DIV' ) {
-        let modal_body_html_tmp = `<div id="modal-image-clicked-displayimg-id" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${filename}</div>   </div>` 
-        modal_display_div.insertAdjacentHTML('afterbegin', modal_body_html_tmp);
+        
+        //let modal_body_html_tmp = `<div id="modal-image-clicked-displayimg-id" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${filename}</div>   </div>` 
+        
+        //modal_display_div.insertAdjacentHTML('afterbegin', modal_body_html_tmp);
+
+        let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
+        processing_modal.style.display = "flex"
+
+        const pdf = await pdfjsLib.getDocument(PATH.join(TAGA_DATA_DIRECTORY,filename)).promise
+        const total_pages = pdf.numPages
+        let page_num = 1
+        const imageURL = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf,page_num)
+        center_gallery_element = document.createElement("img") 
+        center_gallery_element.id = "modal-image-clicked-displayimg-id"       
+        center_gallery_element.src = imageURL      
+        modal_display_div.appendChild(center_gallery_element)
+
+        const btn_div = document.createElement('div')
+        btn_div.id = "pdf-btns-div-id"
+        let btn_next = document.createElement('button')
+        btn_next.innerText = "NEXT PAGE"
+        btn_next.onclick = async () => {
+            if(page_num < total_pages) {
+                page_num += 1
+                pdf_page_num.value = page_num
+                center_gallery_element.src = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf,page_num)
+            }
+        }
+        let btn_prev = document.createElement('button')
+        btn_prev.innerText = "PREV PAGE"
+        btn_prev.onclick = async () => {
+            if(page_num > 1) {
+                page_num -= 1
+                pdf_page_num.value = page_num
+                center_gallery_element.src = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf,page_num)
+            }
+        }
+
+        let pdf_page_num = document.createElement('input')
+        pdf_page_num.type = "number"
+        pdf_page_num.min = 1
+        pdf_page_num.max = total_pages
+        pdf_page_num.onkeyup = async () => {
+            page_num = parseInt(pdf_page_num.value) || page_num   
+            page_num = Math.max(1, Math.min(page_num, total_pages))
+            pdf_page_num.value = page_num
+            center_gallery_element.src = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf,page_num)
+        }
+
+        btn_div.appendChild(btn_next)
+        btn_div.appendChild(btn_prev)
+        btn_div.appendChild(pdf_page_num)
+
+        modal_display_div.appendChild(btn_div)
+        
+        processing_modal.style.display = "none"
+
+
+
+
+
     }
     
     // Show the modal

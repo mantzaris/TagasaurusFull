@@ -721,3 +721,22 @@ input:checked + .slider:before {
   object-fit: cover;
   object-position: center;
 } */
+
+
+
+
+#pdf-btns-div-id {
+  position: fixed;
+  z-index: 100;
+  bottom: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  transform: translate(-50%, -50%);
+  left: 50%;
+}
+
+.pdf-btn-class {
+  position: relative;
+}
