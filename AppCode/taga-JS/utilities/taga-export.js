@@ -46,7 +46,10 @@ async function Export_User_Annotation_Data() {
                 FS.mkdirSync( PATH2.join(path_chosen.filePath,'data') );
                 FSE.copy( TAGA_DATA_DIRECTORY, PATH2.join(path_chosen.filePath,'data'), err => {
                     if (err){ return console.error(err) }
-                    else { console.log('data copy success!') }
+                    else { 
+                        console.log('data copy success!'); 
+                        alert("successfully exported") 
+                    }
                 })
                 //copy the actual DB file to the new directory as a 'snapshot' of the user state as well
                 FS.copyFileSync( PATH2.join(TAGA_FILES_DIRECTORY,'mainTagasaurusDB.db'), PATH2.join(path_chosen.filePath,'IMPORT-THIS-FILE-TAGA-EXPORTED-DB.db'), FS.constants.COPYFILE_EXCL)
@@ -116,7 +119,7 @@ async function Export_User_Annotation_Data() {
             } 
             
             processing_modal.style.display = "none"
-            alert("successfully exported")
+            
         }
     })    
 

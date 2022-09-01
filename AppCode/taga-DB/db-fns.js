@@ -16,10 +16,8 @@ const COLLECTION_IMAGESET_TABLE_NAME = 'COLLECTIONIMAGESET'
 
 const TAGA_FILES_DIRECTORY = PATH.join(USER_DATA_PATH,'TagasaurusFiles') //PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles')
 //set up the DB to use
-//console.log(`PATH.join(TAGA_FILES_DIRECTORY,DB_FILE_NAME) = `,PATH.join(TAGA_FILES_DIRECTORY,DB_FILE_NAME))
 const DB = new DATABASE( PATH.join(TAGA_FILES_DIRECTORY,DB_FILE_NAME), {  }) //new DATABASE(TAGA_FILES_DIRECTORY+PATH.sep+DB_FILE_NAME, { verbose: console.log }) //verbose: console.log }); //open db in that directory
 
-//const {  } = require( PATH.join('constants','constants-code.js') ) //PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 
 //TAGGING START>>>

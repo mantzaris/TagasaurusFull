@@ -5,8 +5,11 @@ const {app, ipcMain, dialog, BrowserWindow} = require('electron');
 const PATH = require('path');
 const FS = require('fs');
 
+//needed for ffmpeg, the shared buffer was not there by default for some reason
 app.commandLine.appendSwitch('enable-features','SharedArrayBuffer')
 
+//needs to be set prior to build creation
+//true when an installer for the OS is chosen but false for an executable without installation eg on USB
 const BUILD_EXECUTABLE = false;
 
 
@@ -18,8 +21,7 @@ if(BUILD_EXECUTABLE) {
 }
 
 const APP_PATH = app.getAppPath()
-const TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY,'data') //PATH.resolve(TAGA_FILES_DIRECTORY,'data') 
-
+const TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY,'data') //where the media files get stored
 //const USER_DATA_PATH = app.getPath('userData')
 
 
@@ -30,7 +32,7 @@ const DATABASE = require('better-sqlite3');
 let DB;
 DB_FILE_NAME = 'mainTagasaurusDB.db'
 
-
+//good to print at the start
 console.log(`APP_PATH = ${APP_PATH}`)
 let tmp_icon_dir = PATH.join(APP_PATH,'taga-icon','TagaIcon512x512.png')
 console.log('icon path = ',  tmp_icon_dir   )
@@ -57,32 +59,10 @@ function createWindow () {
     }
   })
   //LOAD THE STARTING .html OF THE APP->
-  //mainWindow.loadFile(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'welcome-screen.html')
   mainWindow.loadFile(PATH.join(__dirname,'AppCode','welcome-screen.html')) //PATH.resolve(__dirname,'./AppCode/welcome-screen.html'))
   //mainWindow.setIcon(tmp_icon_dir)
   // mainWindow.webContents.openDevTools()
 }
-
-const PDFWindow = require('electron-pdf-window')
-let pdf_window = null
-ipcMain.on('displayPDF', (_,pdfPath) => {
-  if(pdf_window == null) {
-    pdf_window = new PDFWindow({
-      width: 800,
-      height: 600
-    })
-    pdf_window.on('close', () => pdf_window = null )
-  }
-  pdf_window.loadURL(pdfPath)
-  pdf_window.show()
-})
-ipcMain.on('closePDF', (_) => {
-  if( pdf_window ) {
-    pdf_window.hide()
-    //pdf_window = null
-  }
-})
-
 
 
 //DB SET UP START>>>
@@ -171,8 +151,7 @@ if( tagging_table_exists_res["count(*)"] == 0 ){
       tagging_entry.taggingRawDescription = description_tmp
       info = INSERT_TAGGING_STMT.run(tagging_entry.imageFileName,tagging_entry.imageFileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices),JSON.stringify(tagging_entry.faceDescriptors));
 
-    }
-    
+    }    
     
     // new_filename = 'TE1_cover.jpg'
     // tmp_path = PATH.join(APP_PATH, new_filename) 
@@ -182,7 +161,6 @@ if( tagging_table_exists_res["count(*)"] == 0 ){
     // tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash( PATH.join(TAGA_DATA_DIRECTORY,new_filename) ) 
     // tagging_entry.taggingRawDescription = "Front and Back cover of the comic Book, Totem Eclipse (episode 1) by Vasexandros, Makis and Paul Regklis. Found on Amazon!"
     // info = INSERT_TAGGING_STMT.run(tagging_entry.imageFileName,tagging_entry.imageFileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices),JSON.stringify(tagging_entry.faceDescriptors));
-
 
 }
 //check to see if the TAGGING MEME table exists
@@ -251,19 +229,14 @@ ipcMain.handle('dialog:tagging-new-file-select', async (event, args) => {
               defaultPath: directory_default })
   return result
 })
-//for the ability to load the entity creation for the selection of a profile image set
-ipcMain.handle('dialog:openEntityImageSet', async (_, args) => {
-  const result = dialog.showOpenDialog({ properties: ['openFile', 'multiSelections' ], defaultPath: TAGA_DATA_DIRECTORY }) //!!! remove old reference
-  return result
-})
 //for the ability to save a data export
 ipcMain.handle('dialog:export', async (_, args) => {
-  const result = dialog.showSaveDialog({ title: "Enter Folder Name to Create", defaultPath: PATH.join(PATH.resolve()+PATH.sep+'..'+PATH.sep) })
+  const result = dialog.showSaveDialog({ title: "Enter Folder Name to Create", defaultPath: PATH.join(PATH.resolve(), '..') })
   return result
 })
 //for the ability to load the DB to import
 ipcMain.handle('dialog:importDB', async (_, args) => {
-  const result = dialog.showOpenDialog({ properties: ['openFile'], defaultPath: PATH.join(PATH.resolve()+PATH.sep+'..'+PATH.sep) }) //
+  const result = dialog.showOpenDialog({ properties: ['openFile'], defaultPath: PATH.join(PATH.resolve(), '..') }) //
   return result
 })
 //FILE SELECTION DIALOGUE WINDOWS END<<<
@@ -312,9 +285,8 @@ console.log(`-mainjs- the app.getPath('appPath') = ${app.getAppPath()}`)
 
 
 
-
-
-
+//change the media encoding of video and audio to those we know we can render
+//mp4 and mp3 are the targets when it is not mp4/mov or mp3/
 ipcMain.handle('ffmpegDecode', async (_, options) => {
   
   const { createFFmpeg, fetchFile } = require('@ffmpeg/ffmpeg');
@@ -333,6 +305,12 @@ ipcMain.handle('ffmpegDecode', async (_, options) => {
 })
 
 
+
+//for the ability to load the entity creation for the selection of a profile image set
+// ipcMain.handle('dialog:openEntityImageSet', async (_, args) => {
+//   const result = dialog.showOpenDialog({ properties: ['openFile', 'multiSelections' ], defaultPath: TAGA_DATA_DIRECTORY }) //!!! remove old reference
+//   return result
+// })
 ////for the GIF image extraction
 // const gifFrames = require('gif-frames')
 
@@ -382,4 +360,25 @@ ipcMain.handle('ffmpegDecode', async (_, options) => {
 //       "createDesktopShortcut": false,
 //       "artifactName": "tagasaurus.app"
 //     }
+
+// const PDFWindow = require('electron-pdf-window')
+// let pdf_window = null
+// ipcMain.on('displayPDF', (_,pdfPath) => {
+//   if(pdf_window == null) {
+//     pdf_window = new PDFWindow({
+//       width: 800,
+//       height: 600
+//     })
+//     pdf_window.on('close', () => pdf_window = null )
+//   }
+//   pdf_window.loadURL(pdfPath)
+//   pdf_window.show()
+// })
+// ipcMain.on('closePDF', (_) => {
+//   if( pdf_window ) {
+//     pdf_window.hide()
+//     //pdf_window = null
+//   }
+// })
+
 

@@ -717,7 +717,9 @@ async function Load_New_Image() {
     }
     last_user_image_directory_chosen = PATH.dirname(result.filePaths[0]);
     let filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY,Get_Tagging_Hash_From_DB);
+    //console.log('filesnames = ', filenames) //!!!
     if(filenames.length == 0){
+        alert('no new media selected')
         return
     }
 
@@ -803,9 +805,13 @@ async function Load_New_Image() {
             //console.log("tagging_entry_tmp",tagging_entry_tmp)
             await Insert_Record_Into_DB(tagging_entry_tmp); //sqlite version
             tagging_entry = tagging_entry_tmp;
-        }
-    }//);
+        } //else { //hash is present so set to load it
+            //tagging_entry = tagging_entry_tmp;
+            //console.log('in the else')
+        //}
+    } 
     processing_modal.style.display = "none"
+    //console.log('tagging_entry',tagging_entry)
     if(tagging_entry != null) {
         current_image_annotation = tagging_entry;
         Load_State_Of_Image_IDB();

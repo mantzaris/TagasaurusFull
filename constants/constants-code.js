@@ -1,4 +1,4 @@
-  
+
 
 const TAGA_FILES_DIRECTORY = PATH.join(USER_DATA_PATH,'TagasaurusFiles') //PATH.join(PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles');
 exports.TAGA_FILES_DIRECTORY = TAGA_FILES_DIRECTORY;

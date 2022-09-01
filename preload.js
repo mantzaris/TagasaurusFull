@@ -3,24 +3,11 @@
 const PATH = require('path');
 const FS = require('fs')
 
+//clear the console on a new start of the app
 console.clear()
 
 
-
-
-
-window.addEventListener('DOMContentLoaded', () => {
-  const replaceText = (selector, text) => {
-    const element = document.getElementById(selector)
-    if (element) element.innerText = text
-  }
-
-  for (const type of ['chrome', 'node', 'electron']) {
-    replaceText(`${type}-version`, process.versions[type])
-  }
-})
-
-
+//BUILD_EXECUTABLE true is to insall on the OS, and false to run without installation (eg folder or USB)
 const APP_NAME = "tagasaurus";
 const BUILD_EXECUTABLE = false;
 
@@ -30,7 +17,7 @@ function setupOSSpecificPaths() {
           return PATH.join(process.env.HOME, ".config", APP_NAME);
       case "win32":
           return PATH.join(process.env.APPDATA, APP_NAME);
-      case "darwin":
+      case "darwin": //currently not available
         return PATH.join(process.env.HOME, "Library", "Application Support", APP_NAME);
       default:
           return "Unimplimented Path for OS: " + process.platform;
@@ -47,11 +34,8 @@ if(BUILD_EXECUTABLE) {
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
-
-//DB INIT
+//DB INIT, sets the database and adds the obj ref to the window to not need to be loaded again
 window.DB_MODULE = require(PATH.join(__dirname,'AppCode','taga-DB','db-fns.js'))
-
-
 
 
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -119,18 +103,14 @@ window.Get_Image_Face_Descriptors_From_File = Get_Image_Face_Descriptors_From_Fi
 //distances are best at zero, so score on (1-dist)
 const FACE_DISTANCE_IMAGE = 0.67
 async function Get_Descriptors_DistanceScore(descriptors_reference, descriptors_query) {
-  //console.log('descriptors_reference.length = ', descriptors_reference.length)
-  //console.log('descriptors_query.length = ', descriptors_query.length)
+  
   let ref_faces_scores_array = new Array(descriptors_reference.length)
   for(let ref_ii=0;ref_ii < descriptors_reference.length; ref_ii++) {
     let score_ref_face_ii = 0
     for(let q_ii=0;q_ii < descriptors_query.length; q_ii++) {
       let score_tmp = 0
-      //console.log('descriptors_reference[ref_ii].descriptor = ', descriptors_reference[ref_ii])
-      //console.log('descriptors_query[ref_ii].descriptor = ', descriptors_query[ref_ii])
       //distance_tmp = faceapi.euclideanDistance( descriptors_reference[ref_ii].descriptor , descriptors_query[q_ii].descriptor )
       let distance_tmp = faceapi.euclideanDistance( descriptors_reference[ref_ii] , descriptors_query[q_ii] )
-      //console.log('distance_tmp = ', distance_tmp)
       if( distance_tmp < FACE_DISTANCE_IMAGE ) {
         score_tmp = 2**( 1 - 6*distance_tmp ) + 3
         if(score_ref_face_ii < score_tmp) {
@@ -140,12 +120,10 @@ async function Get_Descriptors_DistanceScore(descriptors_reference, descriptors_
     }
     ref_faces_scores_array[ref_ii] = score_ref_face_ii    
   }
-  //console.log('ref_faces_scores_array= ',ref_faces_scores_array)
   let ref_faces_scores_total = ref_faces_scores_array.reduce( (p,c) => p+c, 0)
   let nonzeros_total = ref_faces_scores_array.filter(el => el != 0).length
   let full_set_bonus = (nonzeros_total / descriptors_reference.length) * ref_faces_scores_total
   ref_faces_scores_total += full_set_bonus
-  //console.log('full_set_bonus = ', full_set_bonus)
   return ref_faces_scores_total
 }
 window.Get_Descriptors_DistanceScore = Get_Descriptors_DistanceScore
@@ -162,7 +140,6 @@ async function Get_Image_Face_Expresssions_From_GIF(imagePath, get_emotions=fals
   let {frames,width,height} = await DECODE_GIF(FS.readFileSync(imagePath));
   let gif_face_descriptors = []
   let emotions_total = {}
-  //console.log(`frames length = `, frames.length)
   let time_tmp_prev = 0 //init value is a flag that 
   let timecode_diff = 0 //difference in prev and current timecodes
   let res;
@@ -170,7 +147,6 @@ async function Get_Image_Face_Expresssions_From_GIF(imagePath, get_emotions=fals
     let frame_tmp = frames[frame_ind]
     let time_current = frame_tmp.timeCode //time in milliseconds
     timecode_diff = time_current - time_tmp_prev
-    //console.log(`timeCode = `, frame_tmp.timeCode)
     if( frames.length <= MAX_FRAMES_FULL_SAMPLE_GIF || Math.random() < (timecode_diff / MAX_TIME_BETWEEN_SAMPLES_GIF) ) {
       let image_tmp = await new ImageData(frame_tmp.data,width,height)
       let img = Imagedata_To_Image(image_tmp)
@@ -196,8 +172,7 @@ async function Get_Image_Face_Expresssions_From_GIF(imagePath, get_emotions=fals
       if( get_emotions == true ) {
         Face_Emotion_Aggregator(emotions_total, res)
       }
-      //console.log('descriptors_array_tmp length =', descriptors_array_tmp.length)
-      //console.log('gif_face_descriptors length =', gif_face_descriptors.length)
+      
     }
     time_tmp_prev = time_current
     //if width and height are different then it is a new image and process it regardless?..    
@@ -241,7 +216,6 @@ function Push_New_Face_Descriptors(base_faces, descriptors_query) {
   } else {
     total_faces = JSON.parse(JSON.stringify(descriptors_query))
   }
-  //console.log(`base_faces length = `, base_faces.length)
   return total_faces
 }
 
@@ -277,8 +251,6 @@ window.Get_Face_Descriptors_Arrays = Get_Face_Descriptors_Arrays
 
 function Face_Emotion_Aggregator(prev_emotions, super_res) {
   //console.log('in the new face emotions!')
-  //console.log('prev_emotions',prev_emotions)
-
   for(let face_ii=0; face_ii < super_res.length; face_ii++) {
     //console.log('super_res[face_ii].expressions = ', super_res[face_ii].expressions)
     for (let [key, value] of Object.entries(super_res[face_ii].expressions)) {          
@@ -286,7 +258,6 @@ function Face_Emotion_Aggregator(prev_emotions, super_res) {
         prev_emotions[key] = Math.round(value*100);
       } else { //check which emotion value should be used (take the largest value)
           if( prev_emotions[key] < value ) {
-            //console.log('less than value reset')
             prev_emotions[key] = Math.round(value*100);
           }
       }
@@ -295,8 +266,6 @@ function Face_Emotion_Aggregator(prev_emotions, super_res) {
   //console.log('prev_emotions',prev_emotions)
 }
 window.Face_Emotion_Aggregator = Face_Emotion_Aggregator
-
-
 
 
 
@@ -333,7 +302,6 @@ async function extractFramesFromVideo(videoUrl, get_emotions=false, get_only_emo
     let videoBlob = await fetch(videoUrl).then(r => r.blob());
     let videoObjectUrl = URL.createObjectURL(videoBlob);
     let video = document.createElement("video");
-    //console.log('video',video)
     video.addEventListener('error', async function(error) {
       alert('problem loading this video')
       window.location.reload()
@@ -345,7 +313,6 @@ async function extractFramesFromVideo(videoUrl, get_emotions=false, get_only_emo
     });
 
     video.addEventListener('loadeddata', async function() {
-      //console.log('video',video)
       //console.log('in loaded data')
       let canvas = document.createElement('canvas');
       let context = canvas.getContext('2d');
@@ -382,7 +349,7 @@ async function extractFramesFromVideo(videoUrl, get_emotions=false, get_only_emo
                                               withFaceExpressions().
                                               withFaceDescriptors()
         }
-                                              //console.log('res frame = ', res)
+
         frames.push(res);
         currentTime += interval;
       }
@@ -396,9 +363,6 @@ async function extractFramesFromVideo(videoUrl, get_emotions=false, get_only_emo
 
   });
 }
-
-
-
 
 
 
@@ -440,3 +404,15 @@ async function extractFramesFromVideo(videoUrl, get_emotions=false, get_only_emo
 //                                         withFaceExpressions()
 //   console.log('res = ', res)
 // },4000)
+
+//
+// window.addEventListener('DOMContentLoaded', () => {
+//   const replaceText = (selector, text) => {
+//     const element = document.getElementById(selector)
+//     if (element) element.innerText = text
+//   }
+
+//   for (const type of ['chrome', 'node', 'electron']) {
+//     replaceText(`${type}-version`, process.versions[type])
+//   }
+// })

@@ -5,8 +5,8 @@
 
 const IPC_Renderer3 = require('electron').ipcRenderer
 
-const FS3 = require('fs');
-const PATH3 = require('path');
+// const FS3 = require('fs');
+// const PATH3 = require('path');
 const DATABASE3 = require('better-sqlite3');
 
 //console.log(`${PATH.join(USER_DATA_PATH,'TagasaurusFiles','data')}`)
@@ -192,7 +192,6 @@ async function Import_Records_DB_Info_Migrate() {
     let iter_import = await Import_Tagging_Image_DB_Iterator()
     let record_import_tmp = await iter_import()
     while( record_import_tmp != undefined ) {
-        //console.log(`record_import_tmp = ${JSON.stringify(record_import_tmp)}`)
         //get the record filename and handle data on insert or merge based upon new name changes table
         let filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_import_tmp.imageFileName)
 
@@ -315,12 +314,7 @@ async function Import_FileName_Changes_Table_Fill() {
         record_import_tmp = await iter_import()
     }
 
-    // testq = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} ; `);
-    // tmp = testq.all()
-    // console.table(tmp)
-    // //alert('stop')
 }
-
 
 
 //sets up the table for the filename changes and the action needed to be taken by the file change
