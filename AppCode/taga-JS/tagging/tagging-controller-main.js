@@ -16,8 +16,8 @@ const { CLOSE_ICON_RED, CLOSE_ICON_BLACK, HASHTAG_ICON } = require(PATH.join(__d
 
 
 let TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
-                                    "imageFileName": '',
-                                    "imageFileHash": '',
+                                    "fileName": '',
+                                    "fileHash": '',
                                     "taggingRawDescription": "",
                                     "taggingTags": [],
                                     "taggingEmotions": {good:"0",bad:"0"},
@@ -67,22 +67,22 @@ async function Auto_Fill_Emotions(super_res, file_annotation_obj) {
 
 //actions for the AUTO-FILL emotions button being pressed, populate 
 document.getElementById(`auto-fill-emotions-button-id`).onclick = async function() {
-    let ft_res = await fileType.fromFile( PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation["imageFileName"]) )
+    let ft_res = await fileType.fromFile( PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation["fileName"]) )
     //console.log('ft_res = ', ft_res)
     if( ft_res.mime.includes('image') == true ) {
         if( ft_res.ext == 'gif' ) {
-            let {faceDescriptors,faceEmotions} = await Get_Image_Face_Expresssions_From_GIF( PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation["imageFileName"]), true, true )
+            let {faceDescriptors,faceEmotions} = await Get_Image_Face_Expresssions_From_GIF( PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation["fileName"]), true, true )
             current_image_annotation["taggingEmotions"] = faceEmotions
             await Update_Tagging_Annotation_DB(current_image_annotation);
             Emotion_Display_Fill();
         } else {
-            super_res = await Get_Image_Face_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation["imageFileName"]) )
+            super_res = await Get_Image_Face_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation["fileName"]) )
             current_image_annotation["taggingEmotions"] = await Auto_Fill_Emotions(super_res, current_image_annotation)
             await Update_Tagging_Annotation_DB(current_image_annotation);
             Emotion_Display_Fill();
         }
     } else if( ft_res.mime.includes('video') == true ) {
-        let { emotions_total} = await Get_Image_FaceApi_From_VIDEO( PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation["imageFileName"]) , true, true ) 
+        let { emotions_total} = await Get_Image_FaceApi_From_VIDEO( PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation["fileName"]) , true, true ) 
         current_image_annotation["taggingEmotions"] = emotions_total
         Emotion_Display_Fill();
     }
@@ -135,14 +135,14 @@ async function Tagging_MEME_Image_DB_Iterator() {
 async function Get_Tagging_MEME_Record_From_DB(image_name) { //
     return await DB_MODULE.Get_Tagging_MEME_Record_From_DB(image_name);
 }
-async function Update_Tagging_MEME_Connections(imageFileName,current_image_memes,new_image_memes) {
-    return await DB_MODULE.Update_Tagging_MEME_Connections(imageFileName,current_image_memes,new_image_memes);
+async function Update_Tagging_MEME_Connections(fileName,current_image_memes,new_image_memes) {
+    return await DB_MODULE.Update_Tagging_MEME_Connections(fileName,current_image_memes,new_image_memes);
 }
-async function Handle_Delete_Image_MEME_references(imageFileName) {
-    return await DB_MODULE.Handle_Delete_Image_MEME_references(imageFileName);
+async function Handle_Delete_Image_MEME_references(fileName) {
+    return await DB_MODULE.Handle_Delete_Image_MEME_references(fileName);
 }
-async function Handle_Delete_Collection_MEME_references(imageFileName) { //delete the references of this image as a meme in the collections
-    return await DB_MODULE.Handle_Delete_Collection_MEME_references(imageFileName)
+async function Handle_Delete_Collection_MEME_references(fileName) { //delete the references of this image as a meme in the collections
+    return await DB_MODULE.Handle_Delete_Collection_MEME_references(fileName)
 }
 async function Tagging_Random_DB_Images(num_of_records) {
     return await DB_MODULE.Tagging_Random_DB_Images(num_of_records)
@@ -151,8 +151,8 @@ async function Meme_Tagging_Random_DB_Images(num_of_records) {
     return await DB_MODULE.Meme_Tagging_Random_DB_Images(num_of_records)
 }
 
-async function Handle_Delete_Collection_IMAGE_references(imageFileName) {
-    return await DB_MODULE.Handle_Delete_Collection_IMAGE_references(imageFileName)
+async function Handle_Delete_Collection_IMAGE_references(fileName) {
+    return await DB_MODULE.Handle_Delete_Collection_IMAGE_references(fileName)
 }
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END>>>
 
@@ -162,7 +162,7 @@ async function Display_Image() {
     
     const parent = document.getElementById("center-gallery-area-div-id")
     parent.innerText = ""
-    const display_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation["imageFileName"]}`
+    const display_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation["fileName"]}`
     let center_gallery_element;
     let ft_res = await fileType.fromFile( display_path )
     //console.log('ft_res in Display Image = ', ft_res) 
@@ -559,9 +559,9 @@ async function New_Image_Display(n) {
     if( current_image_annotation == undefined || n == 0 ) {
         current_image_annotation = await Step_Get_Annotation('',0);
     } else if(n == 1) {
-        current_image_annotation = await Step_Get_Annotation(current_image_annotation.imageFileName,1);
+        current_image_annotation = await Step_Get_Annotation(current_image_annotation.fileName,1);
     } else if(n == -1) {
-        current_image_annotation = await Step_Get_Annotation(current_image_annotation.imageFileName,-1);
+        current_image_annotation = await Step_Get_Annotation(current_image_annotation.fileName,-1);
     }
     Load_State_Of_Image_IDB();
 }
@@ -605,7 +605,7 @@ async function First_Display_Init() {
     let records_remaining = await Number_of_Tagging_Records();
     if(records_remaining == 0) {
         Load_Default_Taga_Image();
-    } else if( window.location.href.indexOf("imageFileName") > -1 ) {
+    } else if( window.location.href.indexOf("fileName") > -1 ) {
         let tagging_name_param = window.location.search.split("=")[1]
         //console.log('tagging_name_param = ', tagging_name_param)
         tagging_name_param = fromBinary(atob(tagging_name_param))
@@ -657,7 +657,7 @@ async function Save_Image_Annotation_Changes() {
     let rawDescription = document.getElementById('description-textarea-id').value;
     let processed_tag_word_list = DESCRIPTION_PROCESS_MODULE.process_description(rawDescription);
     //change the object fields accordingly
-    //new_record.imageFileName = image_name;
+    //new_record.fileName = image_name;
     current_image_annotation.taggingMemeChoices = meme_switch_booleans;
     current_image_annotation.taggingRawDescription = rawDescription;
     current_image_annotation.taggingTags = processed_tag_word_list;
@@ -665,7 +665,7 @@ async function Save_Image_Annotation_Changes() {
         current_image_annotation["taggingEmotions"][key] = document.getElementById('emotion-range-id-'+key).value;
     }
     await Update_Tagging_Annotation_DB(current_image_annotation);
-    await Update_Tagging_MEME_Connections(current_image_annotation.imageFileName,current_memes,meme_switch_booleans)
+    await Update_Tagging_MEME_Connections(current_image_annotation.fileName,current_memes,meme_switch_booleans)
     Load_State_Of_Image_IDB(); //TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_annotations)
 }
 //load the default image, typically called to avoid having nothing in the DB but can be deleted later on
@@ -678,31 +678,31 @@ async function Load_Default_Taga_Image() {
         FS.copyFileSync(taga_source_path, `${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`, FS.constants.COPYFILE_EXCL);
     }
     let tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
-    tagging_entry.imageFileName = 'Taga.png';
-    tagging_entry.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
+    tagging_entry.fileName = 'Taga.png';
+    tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
     //for taga no emotion inference is needed but done for consistency
         
     await Insert_Record_Into_DB(tagging_entry); //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
 }
 //delete image from user choice
 async function Delete_Image() {
-    if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation.imageFileName}`) == true ) {
-        FS.unlinkSync( `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation.imageFileName}` );
+    if( FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation.fileName}`) == true ) {
+        FS.unlinkSync( `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation.fileName}` );
     }
 
-    await Update_Tagging_MEME_Connections(current_image_annotation.imageFileName,current_image_annotation.taggingMemeChoices,[])
-    await Handle_Delete_Image_MEME_references(current_image_annotation.imageFileName)
+    await Update_Tagging_MEME_Connections(current_image_annotation.fileName,current_image_annotation.taggingMemeChoices,[])
+    await Handle_Delete_Image_MEME_references(current_image_annotation.fileName)
     
-    await Handle_Delete_Collection_IMAGE_references(current_image_annotation.imageFileName)
-    await Handle_Delete_Collection_MEME_references(current_image_annotation.imageFileName)
+    await Handle_Delete_Collection_IMAGE_references(current_image_annotation.fileName)
+    await Handle_Delete_Collection_MEME_references(current_image_annotation.fileName)
 
     let records_remaining = await Number_of_Tagging_Records();
     if(records_remaining == 1) {
-        await Delete_Tagging_Annotation_DB( current_image_annotation.imageFileName );
+        await Delete_Tagging_Annotation_DB( current_image_annotation.fileName );
         await Load_Default_Taga_Image();
         New_Image_Display( 0 )
     } else {
-        let prev_tmp = current_image_annotation.imageFileName
+        let prev_tmp = current_image_annotation.fileName
         New_Image_Display( 1 );
         await Delete_Tagging_Annotation_DB( prev_tmp );
     }
@@ -731,33 +731,33 @@ async function Load_New_Image() {
     for(let filename of filenames) {
     //filenames.forEach( async filename => {
         let tagging_entry_tmp = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //cloning obj
-        tagging_entry_tmp.imageFileName = filename;
-        tagging_entry_tmp.imageFileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${filename}`);
-        let hash_present = await Get_Tagging_Hash_From_DB(tagging_entry_tmp.imageFileHash);
+        tagging_entry_tmp.fileName = filename;
+        tagging_entry_tmp.fileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${filename}`);
+        let hash_present = await Get_Tagging_Hash_From_DB(tagging_entry_tmp.fileHash);
         //console.log("tagging_entry_tmp",tagging_entry_tmp)
         if(hash_present == undefined) {
             //emotion inference upon the default selected
 
-            let ft_res = await fileType.fromFile( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
+            let ft_res = await fileType.fromFile( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["fileName"]) )
             //console.log('ft_res = ', ft_res)
             if( ft_res.mime.includes('image') == true ) {
                 if( ft_res.ext == 'gif' ) {
                     if( default_auto_fill_emotions == true ) {
-                        let {faceDescriptors,faceEmotions} = await Get_Image_Face_Expresssions_From_GIF( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]), true )
+                        let {faceDescriptors,faceEmotions} = await Get_Image_Face_Expresssions_From_GIF( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["fileName"]), true )
                         tagging_entry_tmp["faceDescriptors"] = faceDescriptors
                         tagging_entry_tmp["taggingEmotions"] = faceEmotions 
                     } else {
-                        let {faceDescriptors} = await Get_Image_Face_Expresssions_From_GIF( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
+                        let {faceDescriptors} = await Get_Image_Face_Expresssions_From_GIF( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["fileName"]) )
                         tagging_entry_tmp["faceDescriptors"] = faceDescriptors
                         //console.log(`tagging_entry_tmp["faceDescriptors"] = `, tagging_entry_tmp["faceDescriptors"] )
                     }
                 } else {
                     if( default_auto_fill_emotions == true ) {
-                        let super_res = await Get_Image_Face_Descriptors_And_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
+                        let super_res = await Get_Image_Face_Descriptors_And_Expresssions_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["fileName"]) )
                         tagging_entry_tmp["taggingEmotions"] = await Auto_Fill_Emotions(super_res, tagging_entry_tmp)
                         tagging_entry_tmp["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
                     } else {
-                        let super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) )
+                        let super_res = await Get_Image_Face_Descriptors_From_File( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["fileName"]) )
                         tagging_entry_tmp["faceDescriptors"] = await Get_Face_Descriptors_Arrays(super_res)
                         //console.log(`tagging_entry_tmp["faceDescriptors"] = `, tagging_entry_tmp["faceDescriptors"] )
                     }
@@ -767,33 +767,33 @@ async function Load_New_Image() {
                 
                 if( !( ft_res.mime.includes('mp4') || ft_res.mime.includes('mkv') || ft_res.mime.includes('mov') ) ) {
                     // 'ffmpegDecode'
-                    let base_name = PATH.parse(tagging_entry_tmp["imageFileName"]).name
+                    let base_name = PATH.parse(tagging_entry_tmp["fileName"]).name
                     let output_name = base_name + '.mp4'
-                    await ipcRenderer.invoke('ffmpegDecode', {base_dir:TAGA_DATA_DIRECTORY, file_in:tagging_entry_tmp["imageFileName"], file_out:output_name} )
+                    await ipcRenderer.invoke('ffmpegDecode', {base_dir:TAGA_DATA_DIRECTORY, file_in:tagging_entry_tmp["fileName"], file_out:output_name} )
                                     
-                    FS.unlink( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]), (err) => {if(err) console.log('problem deleting video copied after ffmpeg',err)} )
-                    tagging_entry_tmp["imageFileName"] = output_name
+                    FS.unlink( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["fileName"]), (err) => {if(err) console.log('problem deleting video copied after ffmpeg',err)} )
+                    tagging_entry_tmp["fileName"] = output_name
                 }
                 
 
                 if( default_auto_fill_emotions == true ) {
-                    let { video_face_descriptors, emotions_total} = await Get_Image_FaceApi_From_VIDEO( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) , true, false )
+                    let { video_face_descriptors, emotions_total} = await Get_Image_FaceApi_From_VIDEO( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["fileName"]) , true, false )
                     tagging_entry_tmp["faceDescriptors"] = video_face_descriptors
                     tagging_entry_tmp["taggingEmotions"] = emotions_total
 
                 } else { //only face descriptors and not emotions
-                    let { video_face_descriptors } = await Get_Image_FaceApi_From_VIDEO( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]) , false, false ) 
+                    let { video_face_descriptors } = await Get_Image_FaceApi_From_VIDEO( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["fileName"]) , false, false ) 
                     tagging_entry_tmp["faceDescriptors"] = video_face_descriptors
                 }
 
             } else if ( ft_res.mime.includes('audio') == true ) {
                 
                 if( !( ft_res.mime.includes('mp3') || ft_res.mime.includes('wav') ) ) {
-                    let base_name = PATH.parse(tagging_entry_tmp["imageFileName"]).name
+                    let base_name = PATH.parse(tagging_entry_tmp["fileName"]).name
                     let output_name = base_name + '.mp3'
-                    await ipcRenderer.invoke('ffmpegDecode', {base_dir:TAGA_DATA_DIRECTORY, file_in:tagging_entry_tmp["imageFileName"], file_out:output_name} )
-                    FS.unlink( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["imageFileName"]), (err) => { if(err) console.log('problem deleting video copied after ffmpeg',err)} )
-                    tagging_entry_tmp["imageFileName"] = output_name
+                    await ipcRenderer.invoke('ffmpegDecode', {base_dir:TAGA_DATA_DIRECTORY, file_in:tagging_entry_tmp["fileName"], file_out:output_name} )
+                    FS.unlink( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["fileName"]), (err) => { if(err) console.log('problem deleting video copied after ffmpeg',err)} )
+                    tagging_entry_tmp["fileName"] = output_name
                 }
             
                 //nothing special like for images and video
@@ -1266,7 +1266,7 @@ async function Add_New_Meme(){
         // the list will be from the 
         let meme_switch_booleans = []
         for (let ii = 0; ii < meme_search_results.length; ii++) {
-            if(memes_current.includes(meme_search_results[ii]) == false && current_image_annotation.imageFileName != meme_search_results[ii]){  //exclude memes already present
+            if(memes_current.includes(meme_search_results[ii]) == false && current_image_annotation.fileName != meme_search_results[ii]){  //exclude memes already present
                     let meme_boolean_tmp1 = document.getElementById(`add-memes-images-toggle-id-${meme_search_results[ii]}`).checked
                     if(meme_boolean_tmp1 == true){
                         meme_switch_booleans.push(meme_search_results[ii])
@@ -1274,14 +1274,14 @@ async function Add_New_Meme(){
             }
         }
         for (let ii = 0; ii < meme_search_meme_results.length; ii++) {
-            if(memes_current.includes(meme_search_meme_results[ii]) == false && current_image_annotation.imageFileName != meme_search_meme_results[ii]){  //exclude memes already present
+            if(memes_current.includes(meme_search_meme_results[ii]) == false && current_image_annotation.fileName != meme_search_meme_results[ii]){  //exclude memes already present
                     let meme_boolean_tmp2 = document.getElementById(`add-memes-meme-toggle-id-${meme_search_meme_results[ii]}`).checked
                     if(meme_boolean_tmp2 == true){
                         meme_switch_booleans.push(meme_search_meme_results[ii])
                     }
             }
         }
-        await Update_Tagging_MEME_Connections(current_image_annotation.imageFileName,JSON.parse(JSON.stringify(memes_current)),JSON.parse(JSON.stringify(meme_switch_booleans)))
+        await Update_Tagging_MEME_Connections(current_image_annotation.fileName,JSON.parse(JSON.stringify(memes_current)),JSON.parse(JSON.stringify(meme_switch_booleans)))
         meme_switch_booleans.push(...current_image_annotation.taggingMemeChoices)
         current_image_annotation.taggingMemeChoices = [...new Set(meme_switch_booleans)] //add a 'unique' set of memes as the 'new Set' has unique contents
         await Update_Tagging_Annotation_DB(current_image_annotation);
@@ -1315,7 +1315,7 @@ async function Add_New_Meme(){
     let search_meme_images_results_output = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
     search_meme_images_results_output.innerHTML = ""
     for(let file_key of meme_search_results) {
-        if(memes_current.includes(file_key) == false && current_image_annotation.imageFileName != file_key){ //exclude memes already present            
+        if(memes_current.includes(file_key) == false && current_image_annotation.fileName != file_key){ //exclude memes already present            
             search_meme_images_results_output.insertAdjacentHTML('beforeend', `
                 <label class="add-memes-memeswitch" title="deselect / include" >   
                     <input id="add-memes-images-toggle-id-${file_key}" type="checkbox" > 
@@ -1332,7 +1332,7 @@ async function Add_New_Meme(){
     let search_meme_images_memes_results_output = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
     search_meme_images_memes_results_output.innerHTML = ""
     for(let file_key of meme_search_meme_results) {
-        if(memes_current.includes(file_key) == false && current_image_annotation.imageFileName != file_key){ //exclude memes already present
+        if(memes_current.includes(file_key) == false && current_image_annotation.fileName != file_key){ //exclude memes already present
             search_meme_images_memes_results_output.insertAdjacentHTML('beforeend', `
                 <label class="add-memes-memeswitch" title="deselect / include" >   
                     <input id="add-memes-meme-toggle-id-${file_key}" type="checkbox" > 
@@ -1380,7 +1380,7 @@ async function Modal_Meme_Search_Btn(){
     let search_meme_images_results_output = document.getElementById("modal-search-add-memes-images-results-grid-div-area-id")
     search_meme_images_results_output.innerHTML = ""
     for(let file_key of meme_search_results) {
-        if(memes_current.includes(file_key) == false && current_image_annotation.imageFileName != file_key){ //exclude memes already present            
+        if(memes_current.includes(file_key) == false && current_image_annotation.fileName != file_key){ //exclude memes already present            
             search_meme_images_results_output.insertAdjacentHTML('beforeend', `
                 <label class="add-memes-memeswitch" title="deselect / include" >   
                     <input id="add-memes-images-toggle-id-${file_key}" type="checkbox" > 
@@ -1398,7 +1398,7 @@ async function Modal_Meme_Search_Btn(){
     search_meme_images_memes_results_output.innerHTML = ""
 
     for(let file_key of meme_search_meme_results) {
-        if(memes_current.includes(file_key) == false && current_image_annotation.imageFileName != file_key){ //exclude memes already present
+        if(memes_current.includes(file_key) == false && current_image_annotation.fileName != file_key){ //exclude memes already present
             search_meme_images_memes_results_output.insertAdjacentHTML('beforeend', `
                 <label class="add-memes-memeswitch" title="deselect / include" >   
                     <input id="add-memes-meme-toggle-id-${file_key}" type="checkbox" > 

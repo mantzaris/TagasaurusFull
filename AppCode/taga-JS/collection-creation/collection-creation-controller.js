@@ -16,7 +16,7 @@ let COLLECTION_DEFAULT_EMPTY_OBJECT = {
     "collectionImage": '',
     "collectionDescription": '',
     "collectionDescriptionTags": [],
-    "collectionImageSet": [],
+    "collectionGalleryFiles": [],
     "collectionEmotions": {good:"0",bad:"0"}, //{happy:happy_value,sad:sad_value,confused:confused_value},            
     "collectionMemes": []
 }
@@ -150,9 +150,9 @@ async function Creation_Next_Btn() {
         
         await Insert_Collection_Record_Into_DB(COLLECTION_DEFAULT_EMPTY_OBJECT)
         await Update_Collection_MEME_Connections(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName, [], COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes)
-        COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.push(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage)
-        COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet = [...COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet]
-        await Update_Collection_IMAGE_Connections(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName, [],COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet)
+        COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles.push(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage)
+        COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles = [...COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles]
+        await Update_Collection_IMAGE_Connections(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName, [],COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles)
         //console.log(`ending the step 5 on collection creation = `, COLLECTION_DEFAULT_EMPTY_OBJECT)
         //window redirect and pass collection name as a parameter
         window.location = "collections.html" + '?' + `collectionName=${COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName}`
@@ -444,7 +444,7 @@ async function Save_Meme_Changes(){
 
 //to save the edits to the gallery images which is the deletions
 async function Save_Gallery_Changes(){ //!!
-    let current_images = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet //get the memes of the current object
+    let current_images = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles //get the memes of the current object
     let length_original = current_images.length
     let gallery_switch_booleans = []
     for (let ii = 0; ii < current_images.length; ii++) {
@@ -460,14 +460,14 @@ async function Save_Gallery_Changes(){ //!!
     }
     let length_new = gallery_switch_booleans.length
     if(length_new < length_original){
-        COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet = gallery_switch_booleans
+        COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles = gallery_switch_booleans
         
        //clear gallery of gallery image objects
         document.querySelectorAll(".collection-images-gallery-grid-item-class").forEach(el => el.remove());
         //place the gallery images in the html and ignore the missing images (leave the lingering links)
         let gallery_div = document.getElementById("collections-images-gallery-grid-images-div-id")
         let gallery_html_tmp = ''
-        let image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet
+        let image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles
         for(let image_filename of image_set) {
         //image_set.forEach(function(image_filename) {
             let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
@@ -849,7 +849,7 @@ async function Add_Images_To_New_Collection() {
     for(let image_filename of search_image_results) {
     //search_image_results.forEach( image_filename => {
         let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
-        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
+        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
@@ -869,7 +869,7 @@ async function Add_Images_To_New_Collection() {
     for(let image_filename of search_image_meme_results) {
     //search_image_meme_results.forEach( image_filename => {
         let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
-        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
+        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
@@ -887,18 +887,18 @@ async function Add_Images_To_New_Collection() {
         let update = false
         search_image_results.forEach( image_filename => {
             let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
-            if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
+            if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles.includes(image_filename)==false) {
                 if(document.getElementById(`add-image-toggle-id-${image_filename}`).checked){
-                    COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.push(image_filename)
+                    COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles.push(image_filename)
                     update = true
                 }
             }
         })
         search_image_meme_results.forEach( image_filename => {
             let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
-            if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
+            if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles.includes(image_filename)==false) {
                 if(document.getElementById(`add-memes-meme-toggle-id-${image_filename}`).checked) {
-                    COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.push(image_filename)
+                    COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles.push(image_filename)
                     update = true
                 }
             }
@@ -909,7 +909,7 @@ async function Add_Images_To_New_Collection() {
             //place the gallery images in the html and ignore the missing images (leave the lingering links)
             let gallery_div = document.getElementById("collections-images-gallery-grid-images-div-id")
             let gallery_html_tmp = ''
-            let image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet
+            let image_set = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles
             for(let image_filename of image_set) {
             //image_set.forEach(function(image_filename) {
                 let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
@@ -958,7 +958,7 @@ async function Add_Images_To_New_Collection() {
         //reset toggles to default false
         all_image_keys.forEach( image_filename => {
             let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
-            if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
+            if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles.includes(image_filename)==false) {
                 if(document.getElementById(`add-image-toggle-id-${image_filename}`).checked){
                     document.getElementById(`add-image-toggle-id-${image_filename}`).checked = false
                 } 
@@ -1013,7 +1013,7 @@ async function Collection_Add_Image_Search_Action() {
     //search_image_results.forEach( image_filename => {
         //image_filename = all_image_keys[index] //!!! indexeddb !!!
         let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
-        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
+        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
@@ -1034,7 +1034,7 @@ async function Collection_Add_Image_Search_Action() {
     //search_image_meme_results.forEach( image_filename => {
         //image_filename = all_image_keys[index] //!!! indexeddb !!!
         let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
-        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImageSet.includes(image_filename)==false) {
+        if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles.includes(image_filename)==false) {
             search_display_inner_tmp += `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">

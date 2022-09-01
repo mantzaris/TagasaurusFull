@@ -29,7 +29,7 @@ let TAGGING_TABLE_NAME = 'TAGGING';
 let TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
 let COLLECTIONS_TABLE_NAME = 'COLLECTIONS';
 let COLLECTION_MEME_TABLE_NAME = 'COLLECTIONMEMES';
-let COLLECTION_IMAGESET_TABLE_NAME = 'COLLECTIONIMAGESET'
+let COLLECTION_GALLERY_TABLE_NAME = 'COLLECTIONFILESET'
 //table to hold the intermediate filename changes for the merge so that the importing file names get changed if needed
 let IMPORT_TABLE_NAME_CHANGES = 'NAMECHANGES'
 
@@ -84,9 +84,9 @@ async function Import_User_Annotation_Data() {
 //go through all the import collections and see if the name exists in the destination or not
 //if not do an insert, if the name exists the annotation information needs to be merged
 //iter = await Import_Collections_Image_DB_Iterator()' and 'rr = await iter()'
-//the table schema for the import name changes (imageFileNameOrig TEXT, imageFileNameNew TEXT, actionType TEXT)
+//the table schema for the import name changes (fileNameOrig TEXT, fileNameNew TEXT, actionType TEXT)
 async function Import_Collections_Records_Info_Migrate() {
-    GET_NAME_CHANGE_STMT = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} WHERE imageFileNameOrig=?;`);
+    GET_NAME_CHANGE_STMT = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} WHERE fileNameOrig=?;`);
 
     let iter_collection_import = await Import_Collections_Image_DB_Iterator()
     let record_collection_import_tmp = await iter_collection_import()
@@ -96,18 +96,18 @@ async function Import_Collections_Records_Info_Migrate() {
         if( collection_dest_record_tmp == undefined ) { //collection is not in the destination db so 'insert'
             //translate the file names for the destination file namespace created
             let new_collection_image_names_tmp = []
-            for( let image_name_tmp of record_collection_import_tmp.collectionImageSet ) {
-            //record_collection_import_tmp.collectionImageSet.forEach(async image_name_tmp => {
+            for( let image_name_tmp of record_collection_import_tmp.collectionGalleryFiles ) {
+            //record_collection_import_tmp.collectionGalleryFiles.forEach(async image_name_tmp => {
                 let tmp_change = await GET_NAME_CHANGE_STMT.get(image_name_tmp)
-                new_collection_image_names_tmp.push(tmp_change.imageFileNameNew)
+                new_collection_image_names_tmp.push(tmp_change.fileNameNew)
             }//)
-            record_collection_import_tmp.collectionImageSet = new_collection_image_names_tmp
+            record_collection_import_tmp.collectionGalleryFiles = new_collection_image_names_tmp
 
             let new_meme_image_names_tmp = []
             for( let image_name_tmp of record_collection_import_tmp.collectionMemes ) {
             //record_collection_import_tmp.collectionMemes.forEach(async image_name_tmp => {
                 let tmp_change = await GET_NAME_CHANGE_STMT.get(image_name_tmp)
-                new_meme_image_names_tmp.push(tmp_change.imageFileNameNew)
+                new_meme_image_names_tmp.push(tmp_change.fileNameNew)
             }//)
             record_collection_import_tmp.collectionMemes = new_meme_image_names_tmp
             
@@ -117,24 +117,24 @@ async function Import_Collections_Records_Info_Migrate() {
             //this will create the collection meme reference record if not already present
             await DB_destination.Update_Collection_MEME_Connections(record_collection_import_tmp.collectionName, [], record_collection_import_tmp.collectionMemes)
             //similarly for the collection imagesets
-            await DB_destination.Update_Collection_IMAGE_Connections(record_collection_import_tmp.collectionName, [], record_collection_import_tmp.collectionImageSet)
+            await DB_destination.Update_Collection_IMAGE_Connections(record_collection_import_tmp.collectionName, [], record_collection_import_tmp.collectionGalleryFiles)
 
         } else { //collection is present so perform a 'merge' of the annotation information
-            let collection_dest_images_original_tmp = JSON.parse(JSON.stringify(collection_dest_record_tmp.collectionImageSet))
+            let collection_dest_images_original_tmp = JSON.parse(JSON.stringify(collection_dest_record_tmp.collectionGalleryFiles))
             let new_collection_image_names_tmp = []
-            for( let image_name_tmp of record_collection_import_tmp.collectionImageSet ) {
-            //record_collection_import_tmp.collectionImageSet.forEach(async image_name_tmp => {
+            for( let image_name_tmp of record_collection_import_tmp.collectionGalleryFiles ) {
+            //record_collection_import_tmp.collectionGalleryFiles.forEach(async image_name_tmp => {
                 let tmp_change = await GET_NAME_CHANGE_STMT.get(image_name_tmp)
-                new_collection_image_names_tmp.push(tmp_change.imageFileNameNew)
+                new_collection_image_names_tmp.push(tmp_change.fileNameNew)
             }//)
-            collection_dest_record_tmp.collectionImageSet =  [... new Set( collection_dest_record_tmp["collectionImageSet"].concat(new_collection_image_names_tmp) ) ]
+            collection_dest_record_tmp.collectionGalleryFiles =  [... new Set( collection_dest_record_tmp["collectionGalleryFiles"].concat(new_collection_image_names_tmp) ) ]
 
             let collection_dest_memes_original_tmp = JSON.parse(JSON.stringify(collection_dest_record_tmp.collectionMemes))
             let new_meme_image_names_tmp = []
             for( let image_name_tmp of record_collection_import_tmp.collectionMemes ) {
             //record_collection_import_tmp.collectionMemes.forEach(async image_name_tmp => {
                 let tmp_change = await GET_NAME_CHANGE_STMT.get(image_name_tmp)
-                new_meme_image_names_tmp.push(tmp_change.imageFileNameNew)
+                new_meme_image_names_tmp.push(tmp_change.fileNameNew)
             }//)
             collection_dest_record_tmp.collectionMemes =   [... new Set( collection_dest_record_tmp["collectionMemes"].concat(new_meme_image_names_tmp) ) ]
 
@@ -174,7 +174,7 @@ async function Import_Collections_Records_Info_Migrate() {
             //this will create the collection meme reference record if not already present
             await DB_destination.Update_Collection_MEME_Connections(collection_dest_record_tmp.collectionName, collection_dest_memes_original_tmp, collection_dest_record_tmp.collectionMemes)
             //similarly for the collection imagesets
-            await DB_destination.Update_Collection_IMAGE_Connections(collection_dest_record_tmp.collectionName, collection_dest_images_original_tmp, collection_dest_record_tmp.collectionImageSet)
+            await DB_destination.Update_Collection_IMAGE_Connections(collection_dest_record_tmp.collectionName, collection_dest_images_original_tmp, collection_dest_record_tmp.collectionGalleryFiles)
 
         }
         record_collection_import_tmp = await iter_collection_import()
@@ -183,37 +183,37 @@ async function Import_Collections_Records_Info_Migrate() {
 
 
 //insert or merge the recods from import db into the destination db
-//the table schema for the import name changes (imageFileNameOrig TEXT, imageFileNameNew TEXT, actionType TEXT)
-//tagging structure: (imageFileName TEXT, imageFileHash TEXT, taggingRawDescription TEXT, taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT, faceDescriptors TEXT)`)
+//the table schema for the import name changes (fileNameOrig TEXT, fileNameNew TEXT, actionType TEXT)
+//tagging structure: (fileName TEXT, fileHash TEXT, taggingRawDescription TEXT, taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT, faceDescriptors TEXT)`)
 async function Import_Records_DB_Info_Migrate() {
-    GET_NAME_CHANGE_STMT = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} WHERE imageFileNameOrig=?;`);
+    GET_NAME_CHANGE_STMT = DB_import.prepare(`SELECT * FROM ${IMPORT_TABLE_NAME_CHANGES} WHERE fileNameOrig=?;`);
 
     //iterate through all the to be imported tagging records to get the name changes and action type
     let iter_import = await Import_Tagging_Image_DB_Iterator()
     let record_import_tmp = await iter_import()
     while( record_import_tmp != undefined ) {
         //get the record filename and handle data on insert or merge based upon new name changes table
-        let filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_import_tmp.imageFileName)
+        let filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(record_import_tmp.fileName)
 
         if( filename_change_record_tmp.actionType == 'insert' ) {
-            record_import_tmp.imageFileName = filename_change_record_tmp.imageFileNameNew
+            record_import_tmp.fileName = filename_change_record_tmp.fileNameNew
             let tmp_meme_filenames = []
             for( let meme_filename_tmp of record_import_tmp["taggingMemeChoices"] ) {
             //record_import_tmp["taggingMemeChoices"].forEach(async meme_filename_tmp => {
                 let meme_filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(meme_filename_tmp)
                 //console.log(`meme_filename_change_record_tmp = ${JSON.stringify(meme_filename_change_record_tmp)}`)
-                tmp_meme_filenames.push(meme_filename_change_record_tmp.imageFileNameNew)
+                tmp_meme_filenames.push(meme_filename_change_record_tmp.fileNameNew)
             }//)
             record_import_tmp["taggingMemeChoices"] = tmp_meme_filenames
             await DB_destination.Insert_Record_Into_DB(record_import_tmp)
 
             //!!!the tagging meme connections can be created and updated through this function
-            await DB_destination.Update_Tagging_MEME_Connections(record_import_tmp.imageFileName, [], record_import_tmp["taggingMemeChoices"])
+            await DB_destination.Update_Tagging_MEME_Connections(record_import_tmp.fileName, [], record_import_tmp["taggingMemeChoices"])
 
         } else if( filename_change_record_tmp.actionType == 'merge' ) {
 
             //alert('in the tagging merge')
-            let record_dest_tmp = await DB_destination.Get_Tagging_Record_From_DB(filename_change_record_tmp.imageFileNameNew)
+            let record_dest_tmp = await DB_destination.Get_Tagging_Record_From_DB(filename_change_record_tmp.fileNameNew)
 
             record_dest_tmp.taggingRawDescription = Merge_Descriptions(record_dest_tmp.taggingRawDescription, record_import_tmp.taggingRawDescription)
             //record_dest_tmp.taggingRawDescription = record_dest_tmp.taggingRawDescription + IMPORT_DELIM + record_import_tmp.taggingRawDescription
@@ -247,14 +247,14 @@ async function Import_Records_DB_Info_Migrate() {
             //record_import_tmp["taggingMemeChoices"].forEach(async meme_filename_orig_tmp => {
                 let meme_filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(meme_filename_orig_tmp)
                 //console.log(`meme_filename_change_record_tmp = ${JSON.stringify(meme_filename_change_record_tmp)}`)
-                tmp_meme_filenames.push(meme_filename_change_record_tmp.imageFileNameNew)
+                tmp_meme_filenames.push(meme_filename_change_record_tmp.fileNameNew)
             }//)
             record_dest_tmp["taggingMemeChoices"] = [...new Set( record_dest_tmp["taggingMemeChoices"].concat(tmp_meme_filenames) )]
 
             await DB_destination.Update_Tagging_Annotation_DB(record_dest_tmp)
 
             //!!!the tagging meme connections can be created and updated through this function
-            await DB_destination.Update_Tagging_MEME_Connections(record_dest_tmp.imageFileName, record_original_memes_tmp, record_dest_tmp["taggingMemeChoices"])
+            await DB_destination.Update_Tagging_MEME_Connections(record_dest_tmp.fileName, record_original_memes_tmp, record_dest_tmp["taggingMemeChoices"])
 
         }
         record_import_tmp = await iter_import()
@@ -263,24 +263,24 @@ async function Import_Records_DB_Info_Migrate() {
 
 
 
-//the table schema for the import name changes (imageFileNameOrig TEXT, imageFileNameNew TEXT, actionType TEXT)
-//tagging structure: (imageFileName TEXT, imageFileHash TEXT, taggingRawDescription TEXT, taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT)`)
+//the table schema for the import name changes (fileNameOrig TEXT, fileNameNew TEXT, actionType TEXT)
+//tagging structure: (fileName TEXT, fileHash TEXT, taggingRawDescription TEXT, taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT)`)
 async function Import_FileName_Changes_Table_Fill() {
-    INSERT_NAME_CHANGE_STMT = DB_import.prepare(`INSERT INTO ${IMPORT_TABLE_NAME_CHANGES} (imageFileNameOrig, imageFileNameNew, actionType) VALUES (?, ?, ?)`);
+    INSERT_NAME_CHANGE_STMT = DB_import.prepare(`INSERT INTO ${IMPORT_TABLE_NAME_CHANGES} (fileNameOrig, fileNameNew, actionType) VALUES (?, ?, ?)`);
     //iterate through all the to be imported tagging records to get the name changes and action type
     let iter_import = await Import_Tagging_Image_DB_Iterator()
     let record_import_tmp = await iter_import()
     while( record_import_tmp != undefined ) {
         //console.log(`record_import_tmp = ${JSON.stringify(record_import_tmp)}`)
         //get the record filename and hash to check if present or not
-        let filename_tmp_import = record_import_tmp.imageFileName
-        let filehash_tmp_import = record_import_tmp.imageFileHash
+        let filename_tmp_import = record_import_tmp.fileName
+        let filehash_tmp_import = record_import_tmp.fileHash
 
         let destination_filename_record_tmp = await DB_destination.Get_Tagging_Record_From_DB(filename_tmp_import)
         let destination_hash_record_tmp = await DB_destination.Get_Record_With_Tagging_Hash_From_DB(filehash_tmp_import)
         let filename_eql = false
         if( destination_hash_record_tmp != undefined ) {
-            filename_eql = destination_hash_record_tmp.imageFileName == filename_tmp_import
+            filename_eql = destination_hash_record_tmp.fileName == filename_tmp_import
         }
 
         //file contents unique and no filename conflict: insert name and record as is-copy file over
@@ -294,7 +294,7 @@ async function Import_FileName_Changes_Table_Fill() {
         }
         //file contents is present but filename is not overlapping: change name to destination name and merge records-no copy needed
         if( destination_filename_record_tmp == undefined && destination_hash_record_tmp != undefined ) {
-            await INSERT_NAME_CHANGE_STMT.run( filename_tmp_import, destination_hash_record_tmp.imageFileName, 'merge' );
+            await INSERT_NAME_CHANGE_STMT.run( filename_tmp_import, destination_hash_record_tmp.fileName, 'merge' );
         }
         //file contents unique but filename is present conflicting with content: change name to unique name and insert records-copy file over
         if( destination_filename_record_tmp != undefined && destination_hash_record_tmp == undefined ) {
@@ -309,7 +309,7 @@ async function Import_FileName_Changes_Table_Fill() {
         }
         //filename and contents present but contents under a different name: change name to hashname and merge-no copy needed
         if( destination_filename_record_tmp != undefined && destination_hash_record_tmp != undefined && filename_eql == false ) {
-            await INSERT_NAME_CHANGE_STMT.run( filename_tmp_import, destination_hash_record_tmp.imageFileName, 'merge' );
+            await INSERT_NAME_CHANGE_STMT.run( filename_tmp_import, destination_hash_record_tmp.fileName, 'merge' );
         }
         record_import_tmp = await iter_import()
     }
@@ -318,7 +318,7 @@ async function Import_FileName_Changes_Table_Fill() {
 
 
 //sets up the table for the filename changes and the action needed to be taken by the file change
-//(imageFileNameOrig TEXT, imageFileNameNew TEXT, actionType TEXT)`)
+//(fileNameOrig TEXT, fileNameNew TEXT, actionType TEXT)`)
 //the filename in the importing db, the filename to copy over to the destination db, and if the operation for tagging movement is a 'merge' or an 'insert'
 async function Import_Filename_Change_Table_SetUp() {
     let res = -1
@@ -335,7 +335,7 @@ async function Import_Filename_Change_Table_SetUp() {
     }
     console.log(` about to make the table that holds the name changes `)
     let STMT = DB_import.prepare(`CREATE TABLE IF NOT EXISTS ${IMPORT_TABLE_NAME_CHANGES}
-                    (imageFileNameOrig TEXT, imageFileNameNew TEXT, actionType TEXT)`);
+                    (fileNameOrig TEXT, fileNameNew TEXT, actionType TEXT)`);
     await STMT.run();
     import_table_name_changes_stmt = DB_import.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${IMPORT_TABLE_NAME_CHANGES}'; `);
     import_table_name_changes_res = await import_table_name_changes_stmt.get();
@@ -387,10 +387,10 @@ async function Check_DB_Tables() {
         console.log(`no ${COLLECTION_MEME_TABLE_NAME}`)
         return -1
     }
-    let collection_imageset_table_exists_stmt = DB_import.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTION_IMAGESET_TABLE_NAME}'; `);
+    let collection_imageset_table_exists_stmt = DB_import.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTION_GALLERY_TABLE_NAME}'; `);
     let collection_imageset_table_exists_res = await collection_imageset_table_exists_stmt.get();
     if( collection_imageset_table_exists_res["count(*)"] == 0 ) {
-        console.log(`no ${COLLECTION_IMAGESET_TABLE_NAME}`)
+        console.log(`no ${COLLECTION_GALLERY_TABLE_NAME}`)
         return -1
     }
     return 1
@@ -401,7 +401,7 @@ async function Check_DB_Tables() {
 //TAGGING ITERATOR VIA CLOSURE START>>>
 //use via 'iter = await Import_Tagging_Image_DB_Iterator()' and 'rr = await iter()'
 //after all rows complete 'undefined' is returned
-//(imageFileName TEXT, imageFileHash TEXT, taggingRawDescription TEXT, taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT, faceDescriptors TEXT)`)
+//(fileName TEXT, fileHash TEXT, taggingRawDescription TEXT, taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT, faceDescriptors TEXT)`)
 async function Import_Tagging_Image_DB_Iterator() {
     let IMPORT_GET_MIN_ROWID_STMT = DB_import.prepare(`SELECT MIN(ROWID) AS rowid FROM ${TAGGING_TABLE_NAME}`);
     let IMPORT_GET_RECORD_FROM_ROWID_TAGGING_STMT = DB_import.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE ROWID=?`);
@@ -435,7 +435,7 @@ function Get_Obj_Fields_From_Record(record) {
 //for the collection list of the importing db to merge/insert into the destination db
 //use via 'iter = await Import_Collections_Image_DB_Iterator()' and 'rr = await iter()'
 //after all rows complete 'undefined' is returned
-//(collectionName TEXT, collectionImage TEXT, collectionImageSet TEXT, collectionDescription TEXT, collectionDescriptionTags TEXT, collectionEmotions TEXT, collectionMemes TEXT)`)
+//(collectionName TEXT, collectionImage TEXT, collectionGalleryFiles TEXT, collectionDescription TEXT, collectionDescriptionTags TEXT, collectionEmotions TEXT, collectionMemes TEXT)`)
 async function Import_Collections_Image_DB_Iterator() {
     let IMPORT_GET_COLLECTIONS_MIN_ROWID_STMT = DB_import.prepare(`SELECT MIN(ROWID) AS rowid FROM ${COLLECTIONS_TABLE_NAME}`);
     let IMPORT_GET_COLLECTIONS_RECORD_FROM_ROWID_TAGGING_STMT = DB_import.prepare(`SELECT * FROM ${COLLECTIONS_TABLE_NAME} WHERE ROWID=?`);
@@ -459,7 +459,7 @@ async function Import_Collections_Image_DB_Iterator() {
     return Import_Tagging_Collections_Iterator_Next;
 }
 function Get_Obj_Collections_Fields_From_Record(record) {
-    record.collectionImageSet = JSON.parse(record.collectionImageSet);
+    record.collectionGalleryFiles = JSON.parse(record.collectionGalleryFiles);
     record.collectionDescriptionTags = JSON.parse(record.collectionDescriptionTags);
     record.collectionEmotions = JSON.parse(record.collectionEmotions);
     record.collectionMemes = JSON.parse(record.collectionMemes);
@@ -483,7 +483,7 @@ function Merge_Descriptions(orig_text, import_text) {
 // //for the meme list of the importing db to merge/insert into the destination db
 // //use via 'iter = await Import_Meme_Tagging_Image_DB_Iterator()' and 'rr = await iter()'
 // //after all rows complete 'undefined' is returned
-// //(imageMemeFileName TEXT, imageFileNames TEXT)`)
+// //(memeFileName TEXT, fileNames TEXT)`)
 // async function Import_Meme_Tagging_Image_DB_Iterator() {
 //     IMPORT_GET_MEME_TABLE_MIN_ROWID_STMT = DB_import.prepare(`SELECT MIN(ROWID) AS rowid FROM ${TAGGING_MEME_TABLE_NAME}`);
 //     IMPORT_GET_MEME_TABLE_RECORD_FROM_ROWID_TAGGING_STMT = DB_import.prepare(`SELECT * FROM ${TAGGING_MEME_TABLE_NAME} WHERE ROWID=?`);
@@ -507,8 +507,8 @@ function Merge_Descriptions(orig_text, import_text) {
 //     return Import_Tagging_Meme_Table_Iterator_Next;
 // }
 // function Get_Obj_Meme_Table_Fields_From_Record(record) {
-//     //(imageMemeFileName TEXT, imageFileNames TEXT)
-//     record.imageFileNames = JSON.parse(record.imageFileNames);
+//     //(memeFileName TEXT, fileNames TEXT)
+//     record.fileNames = JSON.parse(record.fileNames);
 //     return record;
 // }
 
@@ -547,11 +547,11 @@ function Merge_Descriptions(orig_text, import_text) {
 // //for the collection imageset table list of the importing db to merge/insert into the destination db
 // //use via 'iter = await Import_Collections_ImageSet_Table_Image_DB_Iterator()' and 'rr = await iter()'
 // //after all rows complete 'undefined' is returned
-// //(collectionImageFileName TEXT, collectionNames TEXT)`)
+// //(collectionGalleryFileName TEXT, collectionNames TEXT)`)
 // async function Import_Collections_ImageSet_Table_Image_DB_Iterator() {
-//     IMPORT_GET_COLLECTIONS_IMAGESET_TABLE_MIN_ROWID_STMT = DB_import.prepare(`SELECT MIN(ROWID) AS rowid FROM ${COLLECTION_IMAGESET_TABLE_NAME}`);
-//     IMPORT_GET_COLLECTIONS_IMAGESET_TABLE_RECORD_FROM_ROWID_TAGGING_STMT = DB_import.prepare(`SELECT * FROM ${COLLECTION_IMAGESET_TABLE_NAME} WHERE ROWID=?`);
-//     IMPORT_GET_COLLECTIONS_IMAGESET_TABLE_NEXT_ROWID_STMT = DB_import.prepare(`SELECT ROWID FROM ${COLLECTION_IMAGESET_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
+//     IMPORT_GET_COLLECTIONS_IMAGESET_TABLE_MIN_ROWID_STMT = DB_import.prepare(`SELECT MIN(ROWID) AS rowid FROM ${COLLECTION_GALLERY_TABLE_NAME}`);
+//     IMPORT_GET_COLLECTIONS_IMAGESET_TABLE_RECORD_FROM_ROWID_TAGGING_STMT = DB_import.prepare(`SELECT * FROM ${COLLECTION_GALLERY_TABLE_NAME} WHERE ROWID=?`);
+//     IMPORT_GET_COLLECTIONS_IMAGESET_TABLE_NEXT_ROWID_STMT = DB_import.prepare(`SELECT ROWID FROM ${COLLECTION_GALLERY_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
 
 //     iter_current_rowid = await IMPORT_GET_COLLECTIONS_IMAGESET_TABLE_MIN_ROWID_STMT.get().rowid;
 //     //inner function for closure

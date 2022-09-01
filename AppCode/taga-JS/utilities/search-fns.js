@@ -14,13 +14,13 @@ async function Image_Search_DB(search_obj,taggin_DB_iterator,Get_Tagging_Annotat
         //get the overlap score for this image tmp
         if( img_search_scores.length <= MAX_COUNT_SEARCH_RESULTS ) {
             img_search_scores.push(total_image_match_score);
-            img_search_scores_filenames.push(image_tagging_annotation_obj_tmp.imageFileName);
+            img_search_scores_filenames.push(image_tagging_annotation_obj_tmp.fileName);
         } else {
             let min_imgscore_tmp = Math.min(...img_search_scores);
             if( total_image_match_score > min_imgscore_tmp) { //place image in the set since it is bigger than the current minimum
                 let index_min_tmp = img_search_scores.indexOf(min_imgscore_tmp);
                 img_search_scores[index_min_tmp] = total_image_match_score;
-                img_search_scores_filenames[index_min_tmp] = image_tagging_annotation_obj_tmp.imageFileName;
+                img_search_scores_filenames[index_min_tmp] = image_tagging_annotation_obj_tmp.fileName;
             }
         }
         image_tagging_annotation_obj_tmp = await taggin_DB_iterator(); //next record extract and undefined if finished all records in table
@@ -81,18 +81,18 @@ async function Image_Meme_Search_DB(search_obj,tagging_meme_db_iterator,Get_Tagg
     let meme_key_relevance_scores_filenames = [];
     let image_tagging_meme_annotation_obj_tmp = await tagging_meme_db_iterator();
     while( image_tagging_meme_annotation_obj_tmp != undefined ) {
-        //console.log(`line 77: image_tagging_meme_annotation_obj_tmp.imageMemeFileName = ${image_tagging_meme_annotation_obj_tmp.imageMemeFileName}`)
+        //console.log(`line 77: image_tagging_meme_annotation_obj_tmp.memeFileName = ${image_tagging_meme_annotation_obj_tmp.memeFileName}`)
         let total_image_meme_match_score = await Meme_Image_Scoring(search_obj,image_tagging_meme_annotation_obj_tmp,Get_Tagging_Annotation_From_DB,search_tags_lowercase,search_memetags_lowercase);
         //get the overlap score for this image tmp
         if( meme_key_relevance_scores.length <= MAX_COUNT_SEARCH_RESULTS ) {
             meme_key_relevance_scores.push(total_image_meme_match_score);
-            meme_key_relevance_scores_filenames.push(image_tagging_meme_annotation_obj_tmp.imageMemeFileName);
+            meme_key_relevance_scores_filenames.push(image_tagging_meme_annotation_obj_tmp.memeFileName);
         } else {
             let min_imgscore_tmp = Math.min(...meme_key_relevance_scores);
             if( total_image_meme_match_score > min_imgscore_tmp) { //place image in the set since it is bigger than the current minimum
                 let index_min_tmp = meme_key_relevance_scores.indexOf(min_imgscore_tmp);
                 meme_key_relevance_scores[index_min_tmp] = total_image_meme_match_score;
-                meme_key_relevance_scores_filenames[index_min_tmp] = image_tagging_meme_annotation_obj_tmp.imageMemeFileName;
+                meme_key_relevance_scores_filenames[index_min_tmp] = image_tagging_meme_annotation_obj_tmp.memeFileName;
             }
         }
         image_tagging_meme_annotation_obj_tmp = await tagging_meme_db_iterator(); //next record extract and undefined if finished all records in table
@@ -110,13 +110,13 @@ async function Image_Meme_Search_DB(search_obj,tagging_meme_db_iterator,Get_Tagg
 exports.Image_Meme_Search_DB = Image_Meme_Search_DB;
 async function Meme_Image_Scoring(search_obj,image_tagging_meme_annotation_obj_tmp,Get_Tagging_Annotation_From_DB,search_tags_lowercase,search_memetags_lowercase) {
     //debatable whether the emotion overlap score should multiply the scores and be additive
-    let meme_length_score = image_tagging_meme_annotation_obj_tmp.imageFileNames.length;
-    let record_tmp = await Get_Tagging_Annotation_From_DB(image_tagging_meme_annotation_obj_tmp.imageMemeFileName);
+    let meme_length_score = image_tagging_meme_annotation_obj_tmp.fileNames.length;
+    let record_tmp = await Get_Tagging_Annotation_From_DB(image_tagging_meme_annotation_obj_tmp.memeFileName);
     let meme_tag_overlap_score = (record_tmp["taggingTags"].filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length;
     let emotion_overlap_score = 0;
     let tag_img_overlap_score = 0;
-    for(let ii=0; ii < image_tagging_meme_annotation_obj_tmp.imageFileNames.length; ii++) {
-        let img_tmp = image_tagging_meme_annotation_obj_tmp.imageFileNames[ii]
+    for(let ii=0; ii < image_tagging_meme_annotation_obj_tmp.fileNames.length; ii++) {
+        let img_tmp = image_tagging_meme_annotation_obj_tmp.fileNames[ii]
         let record_inner_tmp = await Get_Tagging_Annotation_From_DB(img_tmp);
         tag_img_overlap_score += (record_inner_tmp["taggingTags"].filter(tag => (search_tags_lowercase).includes(tag.toLowerCase()))).length;
         let record_tmp_emotion_keys = Object.keys(record_inner_tmp["taggingEmotions"])
@@ -156,13 +156,13 @@ async function Meme_Addition_Image_Search_DB(search_obj,taggin_DB_iterator,Get_T
         //get the overlap score for this image tmp
         if( img_search_scores.length <= MAX_COUNT_SEARCH_RESULTS ) {
             img_search_scores.push(total_image_match_score);
-            img_search_scores_filenames.push(image_tagging_annotation_obj_tmp.imageFileName);
+            img_search_scores_filenames.push(image_tagging_annotation_obj_tmp.fileName);
         } else {
             let min_imgscore_tmp = Math.min(...img_search_scores);
             if( total_image_match_score > min_imgscore_tmp) { //place image in the set since it is bigger than the current minimum
                 let index_min_tmp = img_search_scores.indexOf(min_imgscore_tmp);
                 img_search_scores[index_min_tmp] = total_image_match_score;
-                img_search_scores_filenames[index_min_tmp] = image_tagging_annotation_obj_tmp.imageFileName;
+                img_search_scores_filenames[index_min_tmp] = image_tagging_annotation_obj_tmp.fileName;
             }
         }
         image_tagging_annotation_obj_tmp = await taggin_DB_iterator(); //next record extract and undefined if finished all records in table
@@ -239,13 +239,13 @@ async function Meme_Addition_Image_Meme_Search_DB(search_obj,tagging_meme_db_ite
         //get the overlap score for this image tmp
         if( meme_key_relevance_scores.length <= MAX_COUNT_SEARCH_RESULTS ) {
             meme_key_relevance_scores.push(total_image_meme_match_score);
-            meme_key_relevance_scores_filenames.push(image_tagging_meme_annotation_obj_tmp.imageMemeFileName);
+            meme_key_relevance_scores_filenames.push(image_tagging_meme_annotation_obj_tmp.memeFileName);
         } else {
             let min_imgscore_tmp = Math.min(...meme_key_relevance_scores);
             if( total_image_meme_match_score > min_imgscore_tmp) { //place image in the set since it is bigger than the current minimum
                 let index_min_tmp = meme_key_relevance_scores.indexOf(min_imgscore_tmp);
                 meme_key_relevance_scores[index_min_tmp] = total_image_meme_match_score;
-                meme_key_relevance_scores_filenames[index_min_tmp] = image_tagging_meme_annotation_obj_tmp.imageMemeFileName;
+                meme_key_relevance_scores_filenames[index_min_tmp] = image_tagging_meme_annotation_obj_tmp.memeFileName;
             }
         }
         image_tagging_meme_annotation_obj_tmp = await tagging_meme_db_iterator(); //next record extract and undefined if finished all records in table
@@ -263,8 +263,8 @@ async function Meme_Addition_Image_Meme_Search_DB(search_obj,tagging_meme_db_ite
 exports.Meme_Addition_Image_Meme_Search_DB = Meme_Addition_Image_Meme_Search_DB;
 async function Meme_Addition_Meme_Image_Scoring(search_obj,image_tagging_meme_annotation_obj_tmp,Get_Tagging_Annotation_From_DB,search_tags_lowercase,search_memetags_lowercase) {
     //debatable whether the emotion overlap score should multiply the scores and be additive
-    let meme_length_score = image_tagging_meme_annotation_obj_tmp.imageFileNames.length;
-    let record_tmp = await Get_Tagging_Annotation_From_DB(image_tagging_meme_annotation_obj_tmp.imageMemeFileName);
+    let meme_length_score = image_tagging_meme_annotation_obj_tmp.fileNames.length;
+    let record_tmp = await Get_Tagging_Annotation_From_DB(image_tagging_meme_annotation_obj_tmp.memeFileName);
     let meme_tag_overlap_score = (record_tmp["taggingTags"].filter(tag => (search_memetags_lowercase).includes(tag.toLowerCase()))).length;
     //let self_meme_emotion_score = 0;
     let meme_emotion_overlap_score = 0;
@@ -281,8 +281,8 @@ async function Meme_Addition_Meme_Image_Scoring(search_obj,image_tagging_meme_an
     })
     let emotion_overlap_score = 0;
     let tag_img_overlap_score = 0;
-    for(let ii=0; ii < image_tagging_meme_annotation_obj_tmp.imageFileNames.length; ii++) { //{ //image_tagging_meme_annotation_obj_tmp.imageFileNames.forEach(async img_tmp => {
-        let img_tmp = image_tagging_meme_annotation_obj_tmp.imageFileNames[ii]
+    for(let ii=0; ii < image_tagging_meme_annotation_obj_tmp.fileNames.length; ii++) { //{ //image_tagging_meme_annotation_obj_tmp.fileNames.forEach(async img_tmp => {
+        let img_tmp = image_tagging_meme_annotation_obj_tmp.fileNames[ii]
         record_tmp = await Get_Tagging_Annotation_From_DB(img_tmp);
         tag_img_overlap_score += (record_tmp["taggingTags"].filter(tag => (search_tags_lowercase).includes(tag.toLowerCase()))).length;
         record_tmp_emotion_keys = Object.keys(record_tmp["taggingEmotions"])
@@ -400,7 +400,7 @@ async function Collection_Scoring(search_obj,collection_tagging_annotation_obj_t
     let record_tmp_tags = collection_tagging_annotation_obj_tmp["collectionDescriptionTags"];
     let record_tmp_emotions = collection_tagging_annotation_obj_tmp["collectionEmotions"];
     let record_tmp_memes = collection_tagging_annotation_obj_tmp["collectionMemes"];
-    let record_tmp_imgs = collection_tagging_annotation_obj_tmp["collectionImageSet"];
+    let record_tmp_imgs = collection_tagging_annotation_obj_tmp["collectionGalleryFiles"];
     //scores for the tags/emotions/memes
     //get the score of the overlap of the object with the search terms
     let tags_overlap_score = (record_tmp_tags.filter(tag => (search_tags_lowercase).includes(tag.toLowerCase()))).length;

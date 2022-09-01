@@ -134,7 +134,7 @@ async function Super_Search() {
     search_results.forEach(file => {
         document.getElementById(`search-result-single-img-id-${file}`).onclick = function() {            
             //console.log('btoa(file) ',btoa(file) )
-            window.location = "tagging.html" + '?' + `imageFileName=${ btoa(toBinary(file)) }`
+            window.location = "tagging.html" + '?' + `fileName=${ btoa(toBinary(file)) }`
         };
     });
     
