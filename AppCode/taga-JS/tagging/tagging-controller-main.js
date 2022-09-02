@@ -330,10 +330,11 @@ async function Meme_View_Fill() {
 
             let ft_res = await fileType.fromFile( `${TAGA_DATA_DIRECTORY}${PATH.sep}${file}` )
             //let type = ( ft_res.mime.includes("image") ) ? 'img' : 'video'
+            //console.log('ft_res.mime in meme view',ft_res.mime)
             let content_html;
             if(ft_res.mime.includes("image") == true ) {
                 content_html = `<img class="memes-img-class" id="memes-image-img-id-${file}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file}" title="view" alt="meme" />`
-            } else if( ft_res.mime.includes("video") == true ) {
+            } else if( ft_res.mime.includes("video") == true || ft_res.mime.includes("audio") == true ) {
                 content_html = `<video class="memes-img-class" id="memes-image-img-id-${file}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file}" controls muted />`
             } else if( ft_res.mime.includes("pdf") == true ) {
                 content_html = `<div id="memes-image-img-id-${file}" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="memes-img-class" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${file}</div>   </div>`     
@@ -787,8 +788,9 @@ async function Load_New_Image() {
                 }
 
             } else if ( ft_res.mime.includes('audio') == true ) {
-                
-                if( !( ft_res.mime.includes('mp3') || ft_res.mime.includes('wav') ) ) {
+                //console.log('ft_res.mime (in audio) = ', ft_res.mime)
+                if( !( ft_res.mime.includes('mp3') || ft_res.mime.includes('wav') || ft_res.mime.includes('mpeg') ) ) {
+                    //console.log('in audio about to convert')
                     let base_name = PATH.parse(tagging_entry_tmp["fileName"]).name
                     let output_name = base_name + '.mp3'
                     await ipcRenderer.invoke('ffmpegDecode', {base_dir:TAGA_DATA_DIRECTORY, file_in:tagging_entry_tmp["fileName"], file_out:output_name} )
