@@ -8,17 +8,17 @@ A key feature is that emotions are stored by the user's explicit input over a se
 
 ## Windows 
 
-- Installer:  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus.Setup.1.1.0.exe) sha256 41028d87b371cad39980421bc1785e39e34d7c5bebb383a31346e76b3d64346f
+- Installer:  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.2.0/tagasaurus.Setup.1.2.0.exe) sha256  aa6e123dce468df16ccb0c36c55faba92193ba2605c749615b96e94e5165c84b
 
-- Zip (unzip and run the executable file):  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus-1.1.0-win.zip) sha256 9bcd6fcb3fc980966161e632fea5df4ce2dcf666e2b95b6841d6d828f92d0107
+- Zip (unzip and run the executable file):  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.2.0/tagasaurus-1.2.0-win.zip) sha256  ac0d6a0ed2a2411cfe79a0721e8a865b0853b4dc0c8a88b706e25238b912b8a1
 
 ## Linux
 
-- Debian/Ubuntu (.deb, run with dpkg -i):  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus_1.1.0_amd64.deb) sha256 hash: 51c3b92236ee36af47e3b0c3cc69508c67250faa3b97af0ea85608229ee37f8b
+- Debian/Ubuntu (.deb, run with dpkg -i):  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.2.0/tagasaurus_1.2.0_amd64.deb) sha256 hash: d4713c0fbcd52a0bbfa7f860c3191d42cd180571f60947bbae19821e257d123e
 
-- Fedora/RHEL (.rpm):  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus-1.1.0.x86_64.rpm) sha256 hash: 1a63aaa1fdce8021b864220485f9af4d951408f8eab3cbc617a4270846ea3511
+- Fedora/RHEL (.rpm):  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.2.0/tagasaurus-1.2.0.x86_64.rpm) sha256 hash: dd15af8b3a89524e2f704ea3709997038035ef687c657ecd8be906626b5566a4
 
-- Linux Zip: [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.1.0/tagasaurus-1.1.0.zip) sha256 hash: fdff120c0fc752a6f970289f3cc1e5d7dd0841daa2e99a3dc00a989aed263520
+- Linux Zip: [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.2.0/tagasaurus-1.2.0.zip) sha256 hash: 949ff94bc75dcd27834b36ff8a234bed97939b9017070daca137481a3853f464
 
 
 ## Using Tagasaurus
@@ -32,6 +32,7 @@ A key feature is that emotions are stored by the user's explicit input over a se
 - To back-up your annotations you can export all the data which copies over all the files, database (sqlite3) and produces a text based set of files with the annotation data (for analytics). This can be re-imported later on or given to another taga user to 'import'. Upon imported if the same images are present a 'merge' of the data is produced. Same for the collections where the gallery is appended. 
 - Updating if you delete the app and then re-install another version (or same version) your data should be there. But you can export and then re-import just to be certain that you don't lose your annotation information. 
 - Version 1.1.0 onwards allows the user to apply ML that will auto populate the emotions based upon facial expressions and do facial recognition in the searches (from images and video).
+- Version 1.2.0 onwards allows a user to import media of Video, Audio and PDF. Linux users can use a script in the folder which remounts a vFAT formated external media with exec permissions.
 
 
 ## Scope
