@@ -11,8 +11,8 @@ async function Create_Media_Thumbnail(file_key, class_name, id_tmp, provide_path
     } else {
         file_path = file_key
     }
-    ft_res = await fileType.fromFile( file_path )
-    type = "meme"
+    let ft_res = await fileType.fromFile( file_path )
+    let type = "meme"
     if( ft_res.mime.includes('image') == true ) {
         return `<img class="${class_name}" id="${id_tmp}" src="${file_path}" title="view" alt="${type}" />`        
     } else if( ft_res.mime.includes('pdf') == true ) {

@@ -1,17 +1,17 @@
-Remember the awesome time of Nokia phones? But do you remember some of
+Remember the awesome time of Nokia phones? If so, do you remember some of
 their software that came with it such as the Nokia LifeBlog?
-(https://en.wikipedia.org/wiki/Nokia_Lifeblog) it was great! What was
-missing from it were TAGS, a sharing mechanism, and the incentive
-dynamic.
+(https://en.wikipedia.org/wiki/Nokia_Lifeblog) it was great! There
+were some things it did not have which Tagasaurus does.
 
-Tim Berners-Lee describes his motivation and thinking for the URL in
-his biographies which emphasize the emergence of the WWW. Those
-concepts have taken not only root but rest like the Turtle which
-supposedly held up the universe. Do URLs and URIs with their
+Tim Berners-Lee describes in his autobiography the motivation and thinking 
+for the URL which emphasizes the ideas behind the emergence of the WWW. Those
+concepts have become roots of communications but we can also consider
+whether those ideas are like the mythological Turtle which
+supposedly held up the universe on its shell. Do URLs and URIs with their
 insistance, or effort, to make things unique, not end up supporting
-our world on this hard but brittle 'shell'?  Our world has redundancy
-and the organic nature of life promotes redundancy. Resources in
-nature have duplicates and it is a natural occurance which is not
+our world on this hard but brittle 'net'? Our world has redundancy
+and the organic nature of life promotes redundancy even at a cost. Resources 
+in nature have duplicates and it is a natural occurance which is not
 truly embraced with the 'U' in URLs.
 
 This document, https://www.ietf.org/rfc/rfc3986.txt, describes in more
@@ -20,13 +20,13 @@ defining the URI in 2005. From the Abstract: <...resolving URI
 references that might be in relative form, along with guidelines and
 security considerations for the use of URIs on the Internet. The URI
 syntax defines a grammar that is a superset of all valid URIs...>, and
-the keywords 'resolving'/'security'/'valid'. These keywords have to
-emerge once you place that letter 'U' for universal/unique/uniform
-etc. It is a basic axiom from which other assumptions emerge
+the keywords 'resolving'/'security'/'valid'. These keywords have to have
+strong emphasis once you place that letter 'U' for universal/unique/uniform
+etc. It is a basic axiom from which other assumptions necessarily emerge
 directly. What is wrong with them? You have to 'resolve' issues from
-the stochastic nature of life to keep a common understanding, you have
-to keep it secure as to have the uniform it will need a central
-authority. This introduces, a vulnerability to the whole network and
+the stochastic nature of life to keep a 'common' understanding, you have
+to keep it secure for the uniform needing a central authority the common 
+consensus. This introduces, a vulnerability to the whole network and
 the word valid means there has to be a gatekeeper regardless of how
 that deciding entity is given access.
 
@@ -50,11 +50,7 @@ Even from early on in the document: 1.1. Overview of URIs
 <Uniformity provides some benefits...> Ok, but does it take any other
 benefits away?.. < It allows different types of resource identifiers
 to be used in the same context> Yes, that is correct but can you then
-use those types in different context without making mix ups?
-
-And Tim Berners-Lee finds it surprising that the web and data is under
-control and is trying to fix it with Inrupt and Solid using the same
-axioms of information space?..
+use those types in different contexts without making mix ups?
 
 It is reinforced throughout the document; "Each URI begins with a
 scheme name, as defined in Section 3.1, that refers to a specification
@@ -71,7 +67,7 @@ document outlining a bureaucracy of how to deal with all of the issues
 of the locations and identifications of resources. Yes, it brings a
 benefit set listed, but the question is; if I let go of those
 requirements can I get something in return for the loss? Hopefully
-something equally as good. At the moment it looks like a realestate
+something equally as good. At the moment it all looks like a realestate
 competition.
 
 The Good Stuff ---- After having pointed out all the things that can
@@ -96,10 +92,10 @@ that the Roman philosopher Epectitus said something similar many years
 before that?! What is more interesting is that the romantic languages
 (and others) give the ability for verbs to apply to inanimate objects
 and for them to have grammatical gender so that they are given a bit
-of personality. This in Homer is evident in parts where its described
+of personality. In Homer is evident in parts where its described
 how the arrow raced with all its might to the target, or even in
 George Martin's Game of Thrones books which also uses the Homer
-structure where there are chapters for each character in the great
+technique where there are chapters for each character in the great
 war; when Tyrion is in the underground tunnel system turning the
 frozen lock and its described how the 'lock screamed in protest'. So
 this means our triple store can have even
@@ -133,7 +129,7 @@ down what a URI means when it is engineered. The attempt to
 theoretical solutions which appear to lead no where after rounds of
 debate and consideration;
 https://www.w3.org/DesignIssues/PhilosophicalEngineering.html. The
-central unit organization has a lot of work to make sure local
+central unit of organization has a lot of work to make sure local
 stochasticity does not disrupt and spread. To avoid handling all those
 issues, protocols and regulations try to catch similar circumstances
 in the future to save time and money for the command center (or
@@ -146,40 +142,17 @@ consortium).
 - What are we going to do about it? Give users a tool to tag resources
   as they naturally desire and provide a sharing mechanism that
   captures the correspondance and compatibility of the resourses and
-  meta-data.
-
-- How will that work? Meta-data is applied to content by users which
-  is then shared, users receiving new content and the associated
-  meta-data sample the compatibility of the datasets applying a
-  confirmation or disapproval of the meta-data which is then used to
-  decide whether the source user's data is compatible for a merge or
-  not.
-
-- Why will people bother using it? Time is precious and this tool will
-  take time from the user, to help them avoid wasting even more time
-  scanning through resources which are hard to index/sort through
-  relevance, and have like minded people's effort augment their own.
-
-- Is there a way to lure power users to participate? It is known that
-  the effort amongst users in a group follows a power law and there
-  has to be incentive for those capable of putting in the time to do
-  so; some direct feedback for their efforts.
+  meta-data. A share becomes a merge.
 
 - Can a new approach filter out unwanted content? This is probably the
   most essential as filtration is a basic principle and the user will
   have to take responsibility on this matter in the merge.
 
-How the promotion scheme works can become intricate and complicated
-very easily. It can be kept simple by relying on the premise that any
-activity which a user produces can be shared with other users that can
-express their approval or disapproval.
-
 Why not use the method of Marko Rodriguez, the famous graph database
-scientist behind TitanDB and infamous Twitter user who also is a
-chicken farmer?  Yes, the method of <Rodriguez, M. A. (2009). A graph
-analysis of the linked data cloud. arXiv preprint arXiv:0903.0194.> is
-very intresting but even in the abstract he says "integrating Resource
-Description Framework (RDF)data sets into a single unified
+scientist behind TitanDB? Yes, the method of <Rodriguez, M. A. (2009). 
+A graph analysis of the linked data cloud. arXiv preprint arXiv:0903.0194.> 
+is very intresting but even in the abstract he says "integrating Resource
+Description Framework (RDF) datasets into a single unified
 representation" and does not deviate from that premise. There is the
 effort to do this 'automatically' in <Rodriguez, M. A., Bollen, J., &
 Sompel, H. V. D. (2009). Automatic metadata generation using
@@ -192,9 +165,10 @@ multi-relational networks and grammar-based particle swarms. In 2007
 40th Annual Hawaii International Conference on System Sciences
 (HICSS'07) (pp. 39-39). IEEE.> where the relations propagate through
 the network; but it never actually involves the user in that
-propagation!  The propagation without a user filtration for context
-means that errors can grow from the constant relevant signal of
-ontological information.  There is also an approach by Mantzaris
+propagation therefore another mapping or coalescence! The propagation 
+without a user filtration for context means that errors can grow 
+from the constant relevant signal of ontological information.  There is 
+also an approach by Mantzaris
 <Mantzaris, A. V., Walker, T. G., Taylor, C. E., & Ehling,
 D. (2019). Adaptive network diagram constructions for representing big
 data event streams on monitoring dashboards. Journal of Big Data,
@@ -203,13 +177,13 @@ frequency of co-occurances, but even though that does allow for
 overlaps of ontological tags, and a natural growth of edge types for
 separations permitting even disjoint networks; its method of analysis
 is aimed at people being able to visualize the network topologies
-rather than incentive them to tag or to organize their accumulated
-resource set.
+rather than incentivize them to tag or to organize their accumulated
+resource set in their own space.
 
 Once completed would this not fulfill the aspriration of Marvin Minsky
 to build a database of common sense? Yes and no. He wanted a database
 for all common sense of people as a single map which would mean that
-there would be so many exceptions for each rule/association that it
+there would be so many exceptions for each rule/association so it
 would not generalize well. People evolve and so does their view of
 common sense. What is even more daunting is the realization that as
 'common sense' evolves, changes, there are pockets of localized
@@ -218,7 +192,7 @@ propagate through the network.  The idea of relying upon localized
 incentive to perform the actions in an ad-hoc localized manner seems
 more plausible.
 
-*There is another version of this quote by Kalashnikov: "When a young
+*There is a quote by Kalashnikov: "When a young
 man, I read somewhere the following: God the Almighty said, 'All that
 is too complex is unnecessary, and it is simple that is needed' So
 this has been my lifetime motto – I have been creating weapons to
@@ -229,7 +203,7 @@ things that are useful are simple."
 From the book, "The Unfinished Revolution: How to Make Technology Work
 for Us--Instead of the Other Way Around", by the late Michael
 Dertouzos we can understand that his vision assumed individuals with
-local storage that would then choose to integrate their searches and
+local storage would then choose to integrate their searches and
 data with others based upon the chosen demand.
 
 Linus Torvalds: "Talk is cheap, show me the code" -why is it cheap?

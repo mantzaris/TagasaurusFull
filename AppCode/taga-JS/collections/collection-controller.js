@@ -125,7 +125,7 @@ function addMouseOverIconSwitch_Collection(emotion_div,child_num=1) {
         image.addEventListener("mouseover", () => (image.src = CLOSE_ICON_RED));
         image.addEventListener("mouseout", () => (image.src = CLOSE_ICON_BLACK));
     }
-    //console.log('get ')
+    
 }
 
 //this function deletes the entity object currently in focus from var 'current_key_index', and calls for the refresh of the next entity to be in view
@@ -335,8 +335,8 @@ async function Collection_Memes_Page() {
     //masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
     //solution from: https://stackoverflow.com/a/60949881/410975
     Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
-        var grid_gallery = document.querySelector(".collection-image-annotation-memes-images-grid-class");
-        var msnry = new MASONRY(grid_gallery, {
+        let grid_gallery = document.querySelector(".collection-image-annotation-memes-images-grid-class");
+        let msnry = new MASONRY(grid_gallery, {
             columnWidth: '.collection-image-annotation-memes-masonry-grid-sizer',
             itemSelector: '.collection-image-annotation-memes-grid-item-class',
             percentPosition: true,
@@ -372,6 +372,7 @@ async function Save_Meme_Changes(){
 async function Display_Gallery_Images() {
     //clear gallery of gallery image objects
     document.querySelectorAll(".collection-images-gallery-grid-item-class").forEach(el => el.remove());
+
     //place the gallery images in the html and ignore the missing images (leave the lingering links)
     let gallery_div = document.getElementById("collections-images-gallery-grid-images-div-id")
     let gallery_html_tmp = ''
@@ -395,8 +396,8 @@ async function Display_Gallery_Images() {
     //masonry is called after all the images have loaded, it checks that the images have all loaded from a promise and then runs the masonry code
     //solution from: https://stackoverflow.com/a/60949881/410975
     Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))).then(() => {
-        var grid_gallery = document.querySelector(".collection-images-gallery-grid-class");
-        var msnry = new MASONRY(grid_gallery, {
+        let grid_gallery = document.querySelector(".collection-images-gallery-grid-class");
+        let msnry = new MASONRY(grid_gallery, {
             columnWidth: '.collection-images-gallery-masonry-grid-sizer',
             itemSelector: '.collection-images-gallery-grid-item-class',
             percentPosition: true,
@@ -406,7 +407,7 @@ async function Display_Gallery_Images() {
     });
     //event listener to modal focus image upon click
     image_set.forEach(function(image_filename) {
-        image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
+        let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true){
             document.getElementById(`collection-image-annotation-grid-img-id-${image_filename}`).onclick = function (event) {
                 
@@ -536,7 +537,7 @@ async function Show_Collection() {
     //display the entity hastag 'name'
     document.getElementById("collection-name-text-label-id").textContent = current_collection_obj.collectionName;
     //display gallery images
-    Display_Gallery_Images()
+    await Display_Gallery_Images()
     //
     if(annotation_view_ind == 1) {
         Collection_Description_Page()
@@ -548,10 +549,8 @@ async function Show_Collection() {
 }
 async function Update_Profile_Image() {
     let file_path = PATH.join(TAGA_DATA_DIRECTORY, current_collection_obj.collectionImage);
-    //console.log('file_path',file_path)
     let ft_res = await fileType.fromFile(file_path)
     //let node_type = ( ft_res.mime.includes("image") ) ? 'IMG' : 'VIDEO'
-    //console.log('node_type',node_type)
     let content_html;
     if( ft_res.mime.includes("image") ) {
         content_html = `<img id="collection-profile-image-img-id" src="${file_path}" title="view" alt="collection-profile-image"/>`
@@ -710,7 +709,6 @@ Initialize_Collection_Page()
 //whenever an image is clicked to pop up a modal to give a big display of the image
 //and list the tags and emotions
 async function Image_Clicked_Modal(filename, node_type) {
-    //console.log(filename)
     //document.getElementById("modal-image-clicked-displayimg-id").src = PATH.join(TAGA_DATA_DIRECTORY,filename)
     let modal_display_div = document.getElementById("modal-image-clicked-image-gridbox-id")
     document.getElementById("modal-image-clicked-image-gridbox-id").innerHTML = ""
@@ -1843,7 +1841,6 @@ async function Search_Collections_Search_Action() {
     // var indices = new Array(len);
     // for (var i = 0; i < len; ++i) indices[i] = i;
     // indices.sort(function (a, b) { return test[a] < test[b] ? -1 : test[a] > test[b] ? 1 : 0; });
-    // console.log(indices); // prints [2,3,0,1]
 
 
 
