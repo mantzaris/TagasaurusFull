@@ -55,62 +55,62 @@ async function Export_User_Annotation_Data() {
                 FS.copyFileSync( PATH2.join(TAGA_FILES_DIRECTORY,'mainTagasaurusDB.db'), PATH2.join(path_chosen.filePath,'IMPORT-THIS-FILE-TAGA-EXPORTED-DB.db'), FS.constants.COPYFILE_EXCL)
                 //Now start to put the DB data into JSON format for the exporting
                 //export tagging data to json
-                let res = FS.openSync( PATH2.join(path_chosen.filePath,'TAGGING.data'), 'w');
+                let res = FS.openSync( PATH2.join(path_chosen.filePath,'TAGGING.ndjson'), 'w');
                 let iter_tagging = await Tagging_Image_DB_Iterator();
                 let tagging_record_tmp = await iter_tagging()
                 while( tagging_record_tmp != undefined ) {
                     let content = JSON.stringify(tagging_record_tmp)
                     content += "\n";
-                    FS.appendFile( PATH2.join(path_chosen.filePath,'TAGGING.data') , content, (err) => {
+                    FS.appendFile( PATH2.join(path_chosen.filePath,'TAGGING.ndjson') , content, (err) => {
                         if(err) console.log(err);
                     });
                     tagging_record_tmp = await iter_tagging()
                 }
                 //export tagging meme image records
-                res = FS.openSync( PATH2.join(path_chosen.filePath,'TAGGING-MEMES.data') , 'w');
+                res = FS.openSync( PATH2.join(path_chosen.filePath,'TAGGING-MEMES.ndjson') , 'w');
                 let iter_tagging_meme = await Tagging_MEME_Image_DB_Iterator();
                 let tagging_meme_record_tmp = await iter_tagging_meme()
                 while( tagging_meme_record_tmp != undefined ) {
                     let content = JSON.stringify(tagging_meme_record_tmp)
                     content += "\n";
-                    FS.appendFile( PATH2.join(path_chosen.filePath,'TAGGING-MEMES.data') , content, (err) => {
+                    FS.appendFile( PATH2.join(path_chosen.filePath,'TAGGING-MEMES.ndjson') , content, (err) => {
                         if(err) console.log(err);
                     });
                     tagging_meme_record_tmp = await iter_tagging_meme()
                 }
                 //export collection records to json as well
-                res = FS.openSync( PATH2.join(path_chosen.filePath,'COLLECTIONS.data') , 'w');
+                res = FS.openSync( PATH2.join(path_chosen.filePath,'COLLECTIONS.ndjson') , 'w');
                 let iter_collection = await Collection_DB_Iterator();
                 let collection_record_tmp = await iter_collection()
                 while( collection_record_tmp != undefined ) {
                     let content = JSON.stringify(collection_record_tmp)
                     content += "\n";
-                    FS.appendFile( PATH2.join(path_chosen.filePath,'COLLECTIONS.data') , content, (err) => {
+                    FS.appendFile( PATH2.join(path_chosen.filePath,'COLLECTIONS.ndjson') , content, (err) => {
                         if(err) console.log(err);
                     });
                     collection_record_tmp = await iter_collection()
                 }
                 //export image collection records to json as well (the image and collection memberships)
-                res = FS.openSync( PATH2.join(path_chosen.filePath,'COLLECTIONS-IMAGES.data') , 'w');
+                res = FS.openSync( PATH2.join(path_chosen.filePath,'COLLECTIONS-IMAGES.ndjson') , 'w');
                 let iter_image_collection = await Collection_IMAGE_DB_Iterator();
                 let collection_image_record_tmp = await iter_image_collection()
                 while( collection_image_record_tmp != undefined ) {
                     let content = JSON.stringify(collection_image_record_tmp)
                     content += "\n";
-                    FS.appendFile( PATH2.join(path_chosen.filePath,'COLLECTIONS-IMAGES.data') , content, (err) => {
+                    FS.appendFile( PATH2.join(path_chosen.filePath,'COLLECTIONS-IMAGES.ndjson') , content, (err) => {
                         if(err) console.log(err);
                     });
                     collection_image_record_tmp = await iter_image_collection()
                 }
                 //export meme collection records to json as well (the meme and collection memberships)
-                res = FS.openSync( PATH2.join(path_chosen.filePath,'COLLECTIONS-MEMES.data') , 'w');
+                res = FS.openSync( PATH2.join(path_chosen.filePath,'COLLECTIONS-MEMES.ndjson') , 'w');
                 let iter_meme_collection = await Collection_MEME_DB_Iterator();
                 let collection_meme_record_tmp = await iter_meme_collection()
                 while( collection_meme_record_tmp != undefined ) {
                     //console.log(`collection_meme_record_tmp = `,collection_meme_record_tmp)
                     let content = JSON.stringify(collection_meme_record_tmp)
                     content += "\n";
-                    FS.appendFile( PATH2.join(path_chosen.filePath,'COLLECTIONS-MEMES.data') , content, (err) => {
+                    FS.appendFile( PATH2.join(path_chosen.filePath,'COLLECTIONS-MEMES.ndjson') , content, (err) => {
                         if(err) console.log(err);
                     });
                     collection_meme_record_tmp = await iter_meme_collection()
