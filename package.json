@@ -24,8 +24,7 @@
   "main": "main.js",
   "scripts": {
     "start": "BUILD_EXECUTABLE=${BUILD_EXECUTABLE:-false}  electron  .  ",
-    "build": "BUILD_EXECUTABLE=$BUILD_EXECUTABLE electron-builder $LINUXTARGETS",
-    "foo": "echo $LINUXTARGETS"
+    "build": "BUILD_EXECUTABLE=$BUILD_EXECUTABLE electron-builder $OSTARGETS"
   },
   "devDependencies": {
     "electron": "^18.0.0",
