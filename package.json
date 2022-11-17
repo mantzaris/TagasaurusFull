@@ -29,7 +29,7 @@
     "rebuild": "npm run clean && npm install && npm rebuild && electron-rebuild",
     "start-win": "npm run start-dev --build_installer=true",
     "start-dev": "electron  .",
-    "build": "electron-builder $OSTARGETS --build_installer=$BUILD_INSTALLER",
+    "build": "electron-builder $OSTARGETS",
     "build-win-portable": "electron-builder --win=zip",
     "build-win-installer": "electron-builder --win=nsis"
   },

@@ -1,7 +1,7 @@
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    OSTARGETS="--linux=rpm deb"  BUILD_INSTALLER=true npm run build 
-    OSTARGETS="--linux=zip"  BUILD_INSTALLER=false npm run build 
+    OSTARGETS="--linux=rpm deb"  npm run build --build_installer=true 
+    OSTARGETS="--linux=zip"  npm run build --build_installer=false 
 
 elif [ [ "$OSTYPE" == "cygwin" ] || [ "$OSTYPE" == "msys" ] || [ "$OSTYPE" == "win32" ] ]; then
     npm run rebuild
