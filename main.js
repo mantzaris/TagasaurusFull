@@ -4,14 +4,16 @@
 const {app, ipcMain, dialog, BrowserWindow} = require('electron');
 const PATH = require('path');
 const FS = require('fs');
+require('dotenv').config()
+
 
 //needed for ffmpeg, the shared buffer was not there by default for some reason
 app.commandLine.appendSwitch('enable-features','SharedArrayBuffer')
 
 //needs to be set prior to build creation
 //true when an installer for the OS is chosen but false for an executable without installation eg on USB
-const BUILD_EXECUTABLE = false;
-
+const BUILD_EXECUTABLE = process.env.BUILD_EXECUTABLE === 'true'
+console.log('process.env.BUILD_EXECUTABLE',process.env.BUILD_EXECUTABLE)
 
 let TAGA_FILES_DIRECTORY;
 if(BUILD_EXECUTABLE) {

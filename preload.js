@@ -2,14 +2,16 @@
 // It has the same sandbox as a Chrome extension.
 const PATH = require('path');
 const FS = require('fs')
+require('dotenv').config()
+//console.log(process.env)
 
 //clear the console on a new start of the app
-console.clear()
+//console.clear()
 
 
 //BUILD_EXECUTABLE true is to insall on the OS, and false to run without installation (eg folder or USB)
 const APP_NAME = "tagasaurus";
-const BUILD_EXECUTABLE = false;
+const BUILD_EXECUTABLE = process.env.BUILD_EXECUTABLE === 'true'
 
 function setupOSSpecificPaths() {  
   switch (process.platform) {

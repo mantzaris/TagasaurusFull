@@ -23,8 +23,9 @@
   ],
   "main": "main.js",
   "scripts": {
-    "start": "electron  .  ",
-    "build": "electron-builder"
+    "start": "BUILD_EXECUTABLE=${BUILD_EXECUTABLE:-false}  electron  .  ",
+    "build": "BUILD_EXECUTABLE=$BUILD_EXECUTABLE electron-builder $LINUXTARGETS",
+    "foo": "echo $LINUXTARGETS"
   },
   "devDependencies": {
     "electron": "^18.0.0",
@@ -39,6 +40,7 @@
     "@tensorflow/tfjs-node": "^3.18.0",
     "better-sqlite3": "^7.6.2",
     "decode-gif": "^1.0.1",
+    "dotenv": "^16.0.3",
     "electron-pdf-window": "^1.0.12",
     "face-api.js": "^0.22.2",
     "file-type": "16.5.3",
@@ -52,12 +54,10 @@
     "appId": "tagasaurus",
     "files": [
       "!.github",
-      "!README.md"
+      "!README.md",
+      "!docs"
     ],
-    "linux": {
-      "target": [
-        "zip"
-      ],
+    "linux": {      
       "icon": "taga-icon/TagaIcon512x512.png",
       "maintainer": "mantzaris",
       "category": "utility"
