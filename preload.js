@@ -9,9 +9,9 @@ require('dotenv').config()
 //console.clear()
 
 
-//BUILD_EXECUTABLE true is to insall on the OS, and false to run without installation (eg folder or USB)
+// BUILD_INSTALLER = whether to build a installer. If false will build a free standing binary
 const APP_NAME = "tagasaurus";
-const BUILD_EXECUTABLE = process.env.BUILD_EXECUTABLE === 'true'
+const BUILD_INSTALLER = process.env.npm_config_build_installer === "true";
 
 function setupOSSpecificPaths() {  
   switch (process.platform) {
@@ -26,7 +26,7 @@ function setupOSSpecificPaths() {
   }
 }
 
-if(BUILD_EXECUTABLE) {
+if(BUILD_INSTALLER) {
   window.USER_DATA_PATH = setupOSSpecificPaths();
 } else {
   window.USER_DATA_PATH = PATH.join( __dirname, '..', '..', '..' )

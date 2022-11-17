@@ -22,9 +22,16 @@
     "hastags"
   ],
   "main": "main.js",
+  "postinstall": "electron-builder install-app-deps",
   "scripts": {
-    "start": "BUILD_EXECUTABLE=${BUILD_EXECUTABLE:-false}  electron  .  ",
-    "build": "BUILD_EXECUTABLE=$BUILD_EXECUTABLE electron-builder $OSTARGETS"
+    "start": "npm run start-dev --build_installer=false",
+    "clean": "rm -rf ./node_modules && rm -rf ./dist",
+    "rebuild": "npm run clean && npm install && npm rebuild && electron-rebuild",
+    "start-win": "npm run start-dev --build_installer=true",
+    "start-dev": "electron  .",
+    "build": "electron-builder $OSTARGETS --build_installer=$BUILD_INSTALLER",
+    "build-win-portable": "electron-builder --win=zip",
+    "build-win-installer": "electron-builder --win=nsis"
   },
   "devDependencies": {
     "electron": "^18.0.0",
@@ -56,14 +63,16 @@
       "!README.md",
       "!docs"
     ],
-    "linux": {      
+    "linux": {
       "icon": "taga-icon/TagaIcon512x512.png",
       "maintainer": "mantzaris",
       "category": "utility"
     },
+    "win": {
+      "icon": "taga-icon/TagaIcon512x512.png"
+    },
     "portable": {
       "artifactName": "tagasaurus.app"
     }
-  },
-  "postinstall": "electron-builder install-app-deps"
+  }
 }

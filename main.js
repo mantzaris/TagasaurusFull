@@ -7,20 +7,19 @@ const FS = require('fs');
 require('dotenv').config()
 
 
+
 //needed for ffmpeg, the shared buffer was not there by default for some reason
 app.commandLine.appendSwitch('enable-features','SharedArrayBuffer')
 
-//needs to be set prior to build creation
-//true when an installer for the OS is chosen but false for an executable without installation eg on USB
-const BUILD_EXECUTABLE = process.env.BUILD_EXECUTABLE === 'true'
-console.log('process.env.BUILD_EXECUTABLE',process.env.BUILD_EXECUTABLE)
+const BUILD_INSTALLER = process.env.npm_config_build_installer === "true";
 
 let TAGA_FILES_DIRECTORY;
-if(BUILD_EXECUTABLE) {
+if(BUILD_INSTALLER) {
   TAGA_FILES_DIRECTORY = PATH.join(app.getPath('userData'),'TagasaurusFiles') //PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles')
-} else {
+} else { // non installer zip etc...
   TAGA_FILES_DIRECTORY = PATH.join( __dirname, '..', '..', '..', 'TagasaurusFiles' )
 }
+
 
 const APP_PATH = app.getAppPath()
 const TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY,'data') //where the media files get stored
