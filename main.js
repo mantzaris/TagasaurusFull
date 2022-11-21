@@ -226,7 +226,7 @@ ipcMain.handle('dialog:tagging-new-file-select', async (event, args) => {
   if(args.directory != ''){
     directory_default = args.directory
   }
-  let result = await dialog.showOpenDialog({ properties: ['openFile', 'multiSelections' ], 
+  let result = await dialog.showOpenDialog({ properties: ['openFile'], //, 'multiSelections' ], 
               defaultPath: directory_default })
   return result
 })

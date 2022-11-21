@@ -2,6 +2,8 @@ const PATH = require('path');
 const FS = require('fs');
 const CRYPTO = require('crypto')
 
+const fileType = require('file-type');
+
 const HASH_TYPE = 'sha256';
 const SALT_LENGTH = 15;
 const salt_characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -18,7 +20,8 @@ function Make_Salt() {
 exports.Make_Salt = Make_Salt
 
 
-async function Copy_Non_Taga_Files(result,dir_pics,Get_Tagging_Hash_From_DB){
+
+async function Copy_Non_Taga_Files(result,dir_pics,Get_Tagging_Hash_From_DB) {
     let new_filename_array = []
 
     let current_file_hashes_tmp = new Set()
@@ -26,6 +29,11 @@ async function Copy_Non_Taga_Files(result,dir_pics,Get_Tagging_Hash_From_DB){
     let file_paths = result.filePaths    
     for(let ii=0; ii<file_paths.length;ii++) {  //
         let file_path = file_paths[ii]
+
+        let ft_res = await fileType.fromFile( file_path )
+        if( ft_res == undefined ) continue
+        else if( !Check_Allowed_FileTypes(ft_res.mime) ) continue
+
         //await file_paths.forEach( async file_path => {
         let file_hash_tmp = Return_File_Hash(file_path);
         let hash_tmp = await Get_Tagging_Hash_From_DB( file_hash_tmp );
@@ -62,3 +70,14 @@ function Return_File_Hash(image_file_path){
 exports.Return_File_Hash = Return_File_Hash
 
 
+
+function Check_Allowed_FileTypes(mime='') {
+    const allowed = ['image', 'video', 'audio', 'pdf']
+    for( const tag of allowed ) {
+        if(mime.includes(tag)) {
+            return true
+        }
+    }
+    //ft_res.mime.includes('image') == true )
+    return false
+}

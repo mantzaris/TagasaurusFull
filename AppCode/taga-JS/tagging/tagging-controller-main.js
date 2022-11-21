@@ -740,7 +740,9 @@ async function Load_New_Image() {
             //emotion inference upon the default selected
 
             let ft_res = await fileType.fromFile( PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp["fileName"]) )
-            //console.log('ft_res = ', ft_res)
+            if( !ft_res ) continue
+
+            console.log('ft_res = ', ft_res)
             if( ft_res.mime.includes('image') == true ) {
                 if( ft_res.ext == 'gif' ) {
                     if( default_auto_fill_emotions == true ) {
