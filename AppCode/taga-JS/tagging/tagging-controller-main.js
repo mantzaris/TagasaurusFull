@@ -568,6 +568,9 @@ async function New_Image_Display(n) {
 }
 //called upon app loading
 async function First_Display_Init() {
+    //instantiates the document listening for the drag and drop
+    DraggingEvents()
+
     //add UI button event listeners
     document.getElementById(`left-gallery-image-button-id`).addEventListener("click", function() {
         New_Image_Display(-1);
@@ -710,19 +713,25 @@ async function Delete_Image() {
 }
 //dialog window explorer to select new images to import, and calls the functions to update the view
 //checks whether the directory of the images is the taga image folder and if so returns
-async function Load_New_Image() {    
-    const result = await IPC_RENDERER.invoke('dialog:tagging-new-file-select',{directory: last_user_image_directory_chosen});
-    //ignore selections from the taga image folder store
-    if(result.canceled == true || PATH.dirname(result.filePaths[0]) == TAGA_DATA_DIRECTORY) {
-        return
+async function Load_New_Image(filename) {   
+    let filenames;
+    if(!filename) {
+        const result = await IPC_RENDERER.invoke('dialog:tagging-new-file-select',{directory: last_user_image_directory_chosen});
+        //ignore selections from the taga image folder store
+        if(result.canceled == true || PATH.dirname(result.filePaths[0]) == TAGA_DATA_DIRECTORY) {
+            return
+        }
+        last_user_image_directory_chosen = PATH.dirname(result.filePaths[0]);
+        filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY,Get_Tagging_Hash_From_DB);
+    } else {
+        const result = {filePaths:[filename]}
+        filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY,Get_Tagging_Hash_From_DB);
     }
-    last_user_image_directory_chosen = PATH.dirname(result.filePaths[0]);
-    let filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY,Get_Tagging_Hash_From_DB);
-    //console.log('filesnames = ', filenames) //!!!
     if(filenames.length == 0){
         alert('no new media selected')
         return
-    }
+    }     
+    
 
     //show loading modal and disallow user input !!!
     let processing_modal = document.querySelector(".processing-notice-modal-top-div-class")
@@ -835,6 +844,30 @@ function addMouseOverIconSwitch(emotion_div) {
         image.addEventListener("mouseout", () => (image.src = CLOSE_ICON_BLACK));
     }
     //console.log('get ')
+}
+
+
+//drag and drop
+function DraggingEvents() {
+
+    document.addEventListener("drop", (ev) => {
+        ev.preventDefault()
+        ev.stopPropagation()
+        if( ev.dataTransfer.files.length > 1 ) {
+            alert('only 1 file at a time')
+            return
+        }
+        const { path } = ev.dataTransfer.files[0]
+        Load_New_Image(path) 
+    })
+    document.addEventListener('dragover', (ev) => {
+        ev.preventDefault()
+        ev.stopPropagation()
+        // for( const file of ev.dataTransfer.files ) {
+        //     console.log('file dropped',file)
+        // }
+    })
+
 }
 
 
