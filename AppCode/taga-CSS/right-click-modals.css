@@ -1,0 +1,17 @@
+
+
+#right-click-modal {
+
+    padding: 1em 2em;
+    position: absolute;
+    display: none;
+    
+}
+
+#right-click-modal > button {
+
+    display: block;
+    
+}
+
+

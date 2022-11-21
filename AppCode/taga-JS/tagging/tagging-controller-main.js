@@ -849,7 +849,6 @@ function addMouseOverIconSwitch(emotion_div) {
 
 //drag and drop
 function DraggingEvents() {
-
     document.addEventListener("drop", (ev) => {
         ev.preventDefault()
         ev.stopPropagation()
@@ -867,8 +866,9 @@ function DraggingEvents() {
         //     console.log('file dropped',file)
         // }
     })
-
 }
+
+
 
 
 
@@ -1449,6 +1449,52 @@ async function Modal_Meme_Search_Btn(){
         }
     }
 }
+
+
+//SAVING CONTENT (EXPORTING)
+function rightClickModals(divName,modalName,getFileName) {
+    const centerDiv = document.getElementById(divName)
+    const modal = document.getElementById(modalName)
+    console.log(centerDiv,modal)
+
+    document.body.addEventListener('mousedown', (ev) => {
+        console.log('ev',ev)
+        console.log('ev.target', ev.target)
+        if(ev.button == 0) {
+            if(ev.target !== modal) {
+                let tmp = false
+                for( const child of modal.children ) {
+                    if(ev.target == child) { 
+                        tmp = true
+                    }
+                }
+                if(!tmp) modal.style.display = 'none'
+            }
+        } else {
+            const positionX = ev.clientX
+            const positionY = ev.clientY
+            console.log('x = ', positionX, 'y = ', positionY)
+            modal.style.display = 'block'
+            modal.style.left = positionX + 'px'
+            modal.style.top = positionY + 'px'
+        }
+
+    })
+    document.getElementById("save-file").addEventListener('click', async ()=>{
+        modal.style.display = 'none'
+        const results = await IPC_RENDERER.invoke('dialog:saveFile')
+        console.log({results})
+        if( results.canceled ) return
+        const output_name = results.filePath
+        const filename_current = getFileName()
+        console.log({filename_current})
+        //const filename_current = current_image_annotation.fileName
+        FS.copyFileSync( filename_current, output_name, FS.constants.COPYFILE_EXCL)
+        alert('saved file to download')
+    })
+}
+rightClickModals("center-gridbox-id","right-click-modal",() => PATH.join(TAGA_DATA_DIRECTORY,current_image_annotation.fileName) )
+
 
 
 

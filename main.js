@@ -240,6 +240,11 @@ ipcMain.handle('dialog:importDB', async (_, args) => {
   const result = dialog.showOpenDialog({ properties: ['openFile'], defaultPath: PATH.join(PATH.resolve(), '..') }) //
   return result
 })
+//for the ability to save a taga content file
+ipcMain.handle('dialog:saveFile', async (_, args) => {
+  const result = dialog.showSaveDialog({ title: "name and place to save", defaultPath: app.getPath('downloads') })
+  return result
+})
 //FILE SELECTION DIALOGUE WINDOWS END<<<
 
 
