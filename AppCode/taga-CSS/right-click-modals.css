@@ -1,17 +1,18 @@
 
 
-#right-click-modal {
+.rc-modal {
 
     padding: 1em 2em;
     position: absolute;
     display: none;
-    
+    z-index: 200;
 }
 
-#right-click-modal > button {
+.rc-modal > button {
 
     display: block;
-    
+
 }
+
 
 
