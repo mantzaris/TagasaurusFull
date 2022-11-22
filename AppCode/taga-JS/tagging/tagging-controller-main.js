@@ -1452,117 +1452,172 @@ async function Modal_Meme_Search_Btn(){
 
 
 //SAVING CONTENT (EXPORTING)
-
-function rightClickModal_Center(divName,modalName,getFileName) {
-    const centerDiv = document.getElementById(divName)
-    const modal = document.getElementById(modalName)
-    console.log(centerDiv,modal)
-
-    centerDiv.addEventListener('contextmenu',(ev)=>{
-        const positionX = ev.clientX
-        const positionY = ev.clientY
-        console.log('x = ', positionX, 'y = ', positionY)
-        modal.style.display = 'block'
-        modal.style.left = positionX + 'px'
-        modal.style.top = positionY + 'px'
-    })
-
-    centerDiv.parentElement.addEventListener('mousedown', (ev) => {
-        console.log('ev',ev)
-        console.log('ev.target', ev.target)
-        if( document.getElementById("modal-meme-clicked-top-id").style.display == 'none' ) {
-            if(ev.button == 0) {
-                if(ev.target !== modal) {
-                    let tmp = false
-                    for( const child of modal.children ) {
-                        if(ev.target == child) { 
-                            tmp = true
-                        }
-                    }
-                    if(!tmp) modal.style.display = 'none'
+let center_div = document.getElementById("center-gallery-area-div-id")
+let save_modal_center_tagging = document.getElementById("right-click-modal-tagging-center")
+save_modal_center_tagging.style.display = 'none'
+center_div.addEventListener('contextmenu', (ev) => { //show the save file modal if right clicked on the center div for tagging
+    const positionX = ev.clientX
+    const positionY = ev.clientY
+    save_modal_center_tagging.style.left = positionX + 'px'
+    save_modal_center_tagging.style.top = positionY + 'px'
+    save_modal_center_tagging.style.display = 'block'
+})
+let meme_image_div = document.getElementById("modal-meme-clicked-image-gridbox-id")
+let save_modal_meme_tagging = document.getElementById("right-click-modal-tagging-meme")
+save_modal_meme_tagging.style.display = 'none'
+meme_image_div.addEventListener('contextmenu', (ev) => { //show the save file modal if right clicked on the center div for tagging
+    const positionX = ev.clientX
+    const positionY = ev.clientY
+    save_modal_meme_tagging.style.left = positionX + 'px'
+    save_modal_meme_tagging.style.top = positionY + 'px'
+    save_modal_meme_tagging.style.display = 'block'
+})
+document.body.addEventListener('mousedown', async (ev) => { //catch the mouse downs to handle them
+    if(ev.button == 0) { //left clicked
+        if( save_modal_center_tagging.style.display == 'block' ) {
+            if( ev.target.id == 'save-file-tagging-center' ) { // save button clicked from the tagging center modal, 
+                //console.log('save tagging content!')
+                const results = await IPC_RENDERER.invoke('dialog:saveFile')
+                if( results.canceled == false ) {
+                    const output_name = results.filePath
+                    FS.copyFileSync( PATH.join(TAGA_DATA_DIRECTORY,current_image_annotation.fileName) , output_name , FS.constants.COPYFILE_EXCL )
+                    alert('saved file to download')
                 }
-            } 
-        }
-    })
-    document.body.addEventListener('mousedown', (ev) => {
-        if(ev.button == 0) {
-            if(ev.target !== modal) {
-                modal.style.display = 'none'
+                save_modal_center_tagging.style.display = 'none'
+            } else { // clicked but not on the button so get rid of the button
+                //console.log('NOT saving tagging content!')
+                save_modal_center_tagging.style.display = 'none'
             }
         }
-    })
-
-    document.getElementById("save-file-tagging-center").addEventListener('click', async ()=>{
-        modal.style.display = 'none'
-        const results = await IPC_RENDERER.invoke('dialog:saveFile')
-        console.log({results})
-        if( results.canceled ) return
-        const output_name = results.filePath
-        const filename_current = getFileName()
-        console.log({filename_current})
-        //const filename_current = current_image_annotation.fileName
-        FS.copyFileSync( filename_current, output_name, FS.constants.COPYFILE_EXCL)
-        alert('saved file to download')
-    })
-}
-rightClickModal_Center("center-gallery-area-div-id","right-click-modal-tagging-center",() => PATH.join(TAGA_DATA_DIRECTORY,current_image_annotation.fileName) )
-
-function rightClickModal_Meme(divName,modalName,getFileName) {
-    const centerDiv = document.getElementById(divName)
-    const modal = document.getElementById(modalName)
-    console.log(centerDiv,modal)
-
-    centerDiv.addEventListener('contextmenu',(ev)=>{
-        const positionX = ev.clientX
-        const positionY = ev.clientY
-        console.log('x = ', positionX, 'y = ', positionY)
-        modal.style.display = 'block'
-        modal.style.left = positionX + 'px'
-        modal.style.top = positionY + 'px'
-    })
-
-    centerDiv.parentElement.addEventListener('mousedown', (ev) => {
-        console.log('ev',ev)
-        console.log('ev.target', ev.target)
-        if( document.getElementById("modal-meme-clicked-top-id").style.display !== 'none' ) {
-            console.log('ahhh in the meme stuff.. :/')
-            if(ev.button == 0) {
-                if(ev.target !== modal) {
-                    let tmp = false
-                    for( const child of modal.children ) {
-                        if(ev.target == child) { 
-                            tmp = true
-                        }
-                    }
-                    if(!tmp) modal.style.display = 'none'
-                    console.log('anything really')
+        if( save_modal_meme_tagging.style.display == 'block' ) {
+            if( ev.target.id == 'save-file-tagging-meme' ) { // save button clicked from the tagging center modal, 
+                //console.log('save tagging content!')
+                const results = await IPC_RENDERER.invoke('dialog:saveFile')
+                if( results.canceled == false ) {
+                    const output_name = results.filePath
+                    FS.copyFileSync( PATH.join(TAGA_DATA_DIRECTORY,PATH.basename(document.getElementById("modal-meme-clicked-displayimg-id").src)) , output_name , FS.constants.COPYFILE_EXCL )
+                    alert('saved file to download')
                 }
-            } 
-        }
-    })
-    document.body.addEventListener('mousedown', (ev) => {
-        if(ev.button == 0) {
-            if(ev.target !== modal) {
-                modal.style.display = 'none'
+                save_modal_meme_tagging.style.display = 'none'
+            } else { // clicked but not on the button so get rid of the button
+                //console.log('NOT saving tagging content!')
+                save_modal_meme_tagging.style.display = 'none'
             }
         }
-    })
+    }
+})
+
+
+// function rightClickModal_Center(divName,modalName,getFileName) {
+//     const centerDiv = document.getElementById(divName)
+//     const modal = document.getElementById(modalName)
+//     console.log(centerDiv,modal)
+
+//     centerDiv.addEventListener('contextmenu',(ev)=>{
+//         const positionX = ev.clientX
+//         const positionY = ev.clientY
+//         console.log('x = ', positionX, 'y = ', positionY)
+//         modal.style.display = 'block'
+//         modal.style.left = positionX + 'px'
+//         modal.style.top = positionY + 'px'
+//     })
+
+//     centerDiv.parentElement.addEventListener('mousedown', (ev) => {
+//         console.log('ev',ev)
+//         console.log('ev.target', ev.target)
+//         if( document.getElementById("modal-meme-clicked-top-id").style.display == 'none' ) {
+//             if(ev.button == 0) {
+//                 if(ev.target !== modal) {
+//                     let tmp = false
+//                     for( const child of modal.children ) {
+//                         if(ev.target == child) { 
+//                             tmp = true
+//                         }
+//                     }
+//                     if(!tmp) modal.style.display = 'none'
+//                 }
+//             } 
+//         }
+//     })
+//     document.body.addEventListener('mousedown', (ev) => {
+//         if(ev.button == 0) {
+//             if(ev.target !== modal) {
+//                 modal.style.display = 'none'
+//             }
+//         }
+//     })
+
+//     document.getElementById("save-file-tagging-center").addEventListener('click', async ()=>{
+//         modal.style.display = 'none'
+//         const results = await IPC_RENDERER.invoke('dialog:saveFile')
+//         console.log({results})
+//         if( results.canceled ) return
+//         const output_name = results.filePath
+//         const filename_current = getFileName()
+//         console.log({filename_current})
+//         //const filename_current = current_image_annotation.fileName
+//         FS.copyFileSync( filename_current, output_name, FS.constants.COPYFILE_EXCL)
+//         alert('saved file to download')
+//     })
+// }
+// //rightClickModal_Center("center-gallery-area-div-id","right-click-modal-tagging-center",() => PATH.join(TAGA_DATA_DIRECTORY,current_image_annotation.fileName) )
+
+// function rightClickModal_Meme(divName,modalName,getFileName) {
+//     const centerDiv = document.getElementById(divName)
+//     const modal = document.getElementById(modalName)
+//     console.log(centerDiv,modal)
+
+//     centerDiv.addEventListener('contextmenu',(ev)=>{
+//         const positionX = ev.clientX
+//         const positionY = ev.clientY
+//         console.log('x = ', positionX, 'y = ', positionY)
+//         modal.style.display = 'block'
+//         modal.style.left = positionX + 'px'
+//         modal.style.top = positionY + 'px'
+//     })
+
+//     centerDiv.parentElement.addEventListener('mousedown', (ev) => {
+//         console.log('ev',ev)
+//         console.log('ev.target', ev.target)
+//         if( document.getElementById("modal-meme-clicked-top-id").style.display !== 'none' ) {
+//             console.log('ahhh in the meme stuff.. :/')
+//             if(ev.button == 0) {
+//                 if(ev.target !== modal) {
+//                     let tmp = false
+//                     for( const child of modal.children ) {
+//                         if(ev.target == child) { 
+//                             tmp = true
+//                         }
+//                     }
+//                     if(!tmp) modal.style.display = 'none'
+//                     console.log('anything really')
+//                 }
+//             } 
+//         }
+//     })
+//     document.body.addEventListener('mousedown', (ev) => {
+//         if(ev.button == 0) {
+//             if(ev.target !== modal) {
+//                 modal.style.display = 'none'
+//             }
+//         }
+//     })
     
-    document.getElementById("save-file-tagging-meme").addEventListener('click', async ()=>{
-        modal.style.display = 'none'
-        const results = await IPC_RENDERER.invoke('dialog:saveFile')
-        console.log({results})
-        if( results.canceled ) return
-        const output_name = results.filePath
-        const filename_current = getFileName()
-        console.log({filename_current})
-        //const filename_current = current_image_annotation.fileName
-        FS.copyFileSync( filename_current, output_name, FS.constants.COPYFILE_EXCL)
-        alert('saved file to download')
-    })
-}
-rightClickModal_Meme("modal-meme-clicked-image-gridbox-id","right-click-modal-tagging-meme",
-        () => PATH.join(TAGA_DATA_DIRECTORY,PATH.basename(document.getElementById("modal-meme-clicked-displayimg-id").src)) )
+//     document.getElementById("save-file-tagging-meme").addEventListener('click', async ()=>{
+//         modal.style.display = 'none'
+//         const results = await IPC_RENDERER.invoke('dialog:saveFile')
+//         console.log({results})
+//         if( results.canceled ) return
+//         const output_name = results.filePath
+//         const filename_current = getFileName()
+//         console.log({filename_current})
+//         //const filename_current = current_image_annotation.fileName
+//         FS.copyFileSync( filename_current, output_name, FS.constants.COPYFILE_EXCL)
+//         alert('saved file to download')
+//     })
+// }
+//rightClickModal_Meme("modal-meme-clicked-image-gridbox-id","right-click-modal-tagging-meme",
+  //      () => PATH.join(TAGA_DATA_DIRECTORY,PATH.basename(document.getElementById("modal-meme-clicked-displayimg-id").src)) )
 //document.getElementById("modal-meme-clicked-displayimg-id").src
 
 
