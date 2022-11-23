@@ -1451,7 +1451,7 @@ async function Modal_Meme_Search_Btn(){
 }
 
 
-//SAVING CONTENT (EXPORTING)
+//START SAVING CONTENT (EXPORTING) RIGHT CLICK CONTENT >>>>>>>>>>>>>>
 let center_div = document.getElementById("center-gallery-area-div-id")
 let save_modal_center_tagging = document.getElementById("right-click-modal-tagging-center")
 save_modal_center_tagging.style.display = 'none'
@@ -1461,17 +1461,36 @@ center_div.addEventListener('contextmenu', (ev) => { //show the save file modal 
     save_modal_center_tagging.style.left = positionX + 'px'
     save_modal_center_tagging.style.top = positionY + 'px'
     save_modal_center_tagging.style.display = 'block'
+    save_meme_tagging.style.display = 'none' //turn off the meme button view
 })
-let meme_image_div = document.getElementById("modal-meme-clicked-image-gridbox-id")
+let meme_modal_image_div = document.getElementById("modal-meme-clicked-image-gridbox-id")
 let save_modal_meme_tagging = document.getElementById("right-click-modal-tagging-meme")
 save_modal_meme_tagging.style.display = 'none'
-meme_image_div.addEventListener('contextmenu', (ev) => { //show the save file modal if right clicked on the center div for tagging
+meme_modal_image_div.addEventListener('contextmenu', (ev) => { //show the save file modal if right clicked on the center div for tagging
     const positionX = ev.clientX
     const positionY = ev.clientY
     save_modal_meme_tagging.style.left = positionX + 'px'
     save_modal_meme_tagging.style.top = positionY + 'px'
     save_modal_meme_tagging.style.display = 'block'
 })
+let meme_set_div = document.getElementById("memes-innerbox-displaymemes-id") //for the memes of the tagging view
+let save_meme_tagging = document.getElementById("right-click-tagging-meme")
+save_meme_tagging.style.display = 'none'
+let recent_meme_thumbnail_context = ''
+meme_set_div.addEventListener('contextmenu', (ev) => { //get the save button for this meme, show the button for this meme
+    if( ev.target.id.substring(0,19) == 'memes-image-img-id-' ) {
+        console.log('selected a MEME IMAGE!')
+        console.log(ev.target.id)
+        const positionX = ev.clientX
+        const positionY = ev.clientY
+        save_meme_tagging.style.left = positionX + 'px'
+        save_meme_tagging.style.top = positionY + 'px'
+        recent_meme_thumbnail_context = ev.target.id.substring(19)
+        save_meme_tagging.style.display = 'block'
+        save_modal_center_tagging.style.display = 'none' //turn off the center button view
+    }
+})
+
 document.body.addEventListener('mousedown', async (ev) => { //catch the mouse downs to handle them
     if(ev.button == 0) { //left clicked
         if( save_modal_center_tagging.style.display == 'block' ) {
@@ -1490,7 +1509,7 @@ document.body.addEventListener('mousedown', async (ev) => { //catch the mouse do
             }
         }
         if( save_modal_meme_tagging.style.display == 'block' ) {
-            if( ev.target.id == 'save-file-tagging-meme' ) { // save button clicked from the tagging center modal, 
+            if( ev.target.id == 'save-file-tagging-modal-meme' ) { // save button clicked from the tagging center modal, 
                 //console.log('save tagging content!')
                 const results = await IPC_RENDERER.invoke('dialog:saveFile')
                 if( results.canceled == false ) {
@@ -1504,8 +1523,34 @@ document.body.addEventListener('mousedown', async (ev) => { //catch the mouse do
                 save_modal_meme_tagging.style.display = 'none'
             }
         }
+        if( save_meme_tagging.style.display == 'block' ) {
+            if( ev.target.id == 'save-file-tagging-meme' ) { // save button clicked from the tagging center modal, 
+                console.log('save MEME tagging content!')
+                console.log({ev})
+                const results = await IPC_RENDERER.invoke('dialog:saveFile')
+                if( results.canceled == false ) {
+                    const output_name = results.filePath
+                    FS.copyFileSync( PATH.join(TAGA_DATA_DIRECTORY, recent_meme_thumbnail_context ) , output_name , FS.constants.COPYFILE_EXCL )
+                    alert('saved file to download')
+                }
+                save_meme_tagging.style.display = 'none'
+                recent_meme_thumbnail_context = ''
+            } else { // clicked but not on the button so get rid of the button
+                //console.log('NOT saving tagging content!')
+                save_meme_tagging.style.display = 'none'
+                recent_meme_thumbnail_context = ''
+            }
+        }
     }
 })
+//END SAVING CONTENT (EXPORTING) RIGHT CLICK CONTENT <<<<<<<<<<<<<<
+
+
+
+
+
+
+
 
 
 // function rightClickModal_Center(divName,modalName,getFileName) {
