@@ -11,6 +11,8 @@
 .rc-modal > button {
 
     display: block;
+    font-weight: bold;
+    font-size: 1.75vmin;
 
 }
 

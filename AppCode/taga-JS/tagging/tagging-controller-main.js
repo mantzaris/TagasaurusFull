@@ -1479,8 +1479,6 @@ save_meme_tagging.style.display = 'none'
 let recent_meme_thumbnail_context = ''
 meme_set_div.addEventListener('contextmenu', (ev) => { //get the save button for this meme, show the button for this meme
     if( ev.target.id.substring(0,19) == 'memes-image-img-id-' ) {
-        console.log('selected a MEME IMAGE!')
-        console.log(ev.target.id)
         const positionX = ev.clientX
         const positionY = ev.clientY
         save_meme_tagging.style.left = positionX + 'px'
@@ -1525,8 +1523,7 @@ document.body.addEventListener('mousedown', async (ev) => { //catch the mouse do
         }
         if( save_meme_tagging.style.display == 'block' ) {
             if( ev.target.id == 'save-file-tagging-meme' ) { // save button clicked from the tagging center modal, 
-                console.log('save MEME tagging content!')
-                console.log({ev})
+                
                 const results = await IPC_RENDERER.invoke('dialog:saveFile')
                 if( results.canceled == false ) {
                     const output_name = results.filePath
