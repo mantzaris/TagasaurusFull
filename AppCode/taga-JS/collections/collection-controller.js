@@ -1789,10 +1789,9 @@ async function Search_Collections_Search_Action() {
                     continue
                 }
                 let imageset_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_tmp)  // collectionGalleryFiles
-                search_display_inner_tmp += `
-                                            <img class="collections-modal-search-result-collection-gallery-img-class" src="${imageset_path_tmp}" title="view" alt="image"/>
+                // <img class="collections-modal-search-result-collection-gallery-img-class" src="${imageset_path_tmp}" title="view" alt="image"/>
+                search_display_inner_tmp += `                                            
                                             ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_tmp,'collections-modal-search-result-collection-gallery-img-class', `` )}
-
                                             `
             }
             search_display_inner_tmp += `

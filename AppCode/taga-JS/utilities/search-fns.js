@@ -137,7 +137,7 @@ async function Meme_Image_Scoring(search_obj,image_tagging_meme_annotation_obj_t
         face_recognition_score = await Get_Descriptors_DistanceScore(search_obj.faceDescriptors, record_tmp.faceDescriptors)
     }
 
-    let meme_score = meme_length_score + meme_tag_overlap_score + emotion_overlap_score + tag_img_overlap_score + face_recognition_score;
+    let meme_score = meme_tag_overlap_score + emotion_overlap_score + tag_img_overlap_score + face_recognition_score //+ meme_length_score
     return meme_score;
 }
 //IMAGE SEARCH MODAL IN TAGGING END<<<
@@ -270,10 +270,11 @@ async function Meme_Addition_Meme_Image_Scoring(search_obj,image_tagging_meme_an
     let meme_emotion_overlap_score = 0;
     let record_tmp_emotion_keys = Object.keys(record_tmp["taggingEmotions"])
     let search_emotions_keys = Object.keys(search_obj["meme_emotions"])
+    
     search_emotions_keys.forEach(search_key_emotion_label => {
         record_tmp_emotion_keys.forEach(record_emotion_key_label => {
             if(search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()) {
-                let delta_tmp = (record_tmp_emotions[record_emotion_key_label] - search_obj["meme_emotions"][search_key_emotion_label]) / 50
+                let delta_tmp = (record_tmp["taggingEmotions"][record_emotion_key_label] - search_obj["meme_emotions"][search_key_emotion_label]) / 50
                 let emotion_overlap_score_tmp = 1 - Math.abs( delta_tmp )
                 meme_emotion_overlap_score += emotion_overlap_score_tmp //scores range [-1,1]
             }
@@ -297,7 +298,7 @@ async function Meme_Addition_Meme_Image_Scoring(search_obj,image_tagging_meme_an
             })
         })
     } //)
-    return meme_length_score + meme_tag_overlap_score + meme_emotion_overlap_score + emotion_overlap_score + tag_img_overlap_score;
+    return meme_tag_overlap_score + meme_emotion_overlap_score + emotion_overlap_score + tag_img_overlap_score //+ meme_length_score
 }
 //MEME ADDITION IN TAGGING MODAL END<<<
 
