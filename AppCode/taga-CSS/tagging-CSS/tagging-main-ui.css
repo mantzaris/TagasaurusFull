@@ -442,7 +442,7 @@ input:checked + .slider:before {
   border-radius: 15%;
   width: 90%;
   margin: auto;
-  font-size: 2.5vmin;
+  font-size: 2.0vmin;
   height: 100%;
   cursor: pointer;
 }
@@ -460,7 +460,7 @@ input:checked + .slider:before {
   grid-area: center-button-area-div-id;
   background-color: #808a80;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
 }
 .center-lower-buttons {
   font-weight: bold;
