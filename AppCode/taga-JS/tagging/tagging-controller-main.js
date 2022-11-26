@@ -1363,6 +1363,14 @@ async function Add_New_Meme(){
                 </div>
                 `
             )
+            //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
+            document.getElementById(`modal-image-search-add-memes-result-single-image-img-id-${file_key}`).onclick = function() {
+                if( document.getElementById(`add-memes-images-toggle-id-${file_key}`).checked == true ) {
+                    document.getElementById(`add-memes-images-toggle-id-${file_key}`).checked = false
+                } else {
+                    document.getElementById(`add-memes-images-toggle-id-${file_key}`).checked = true
+                } //
+            }
         }
     }
     //search results display image memes
@@ -1380,6 +1388,14 @@ async function Add_New_Meme(){
                 </div>
                 `
             )
+            //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
+            document.getElementById(`modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}`).onclick = function() {
+                if( document.getElementById(`add-memes-meme-toggle-id-${file_key}`).checked == true ) {
+                    document.getElementById(`add-memes-meme-toggle-id-${file_key}`).checked = false
+                } else {
+                    document.getElementById(`add-memes-meme-toggle-id-${file_key}`).checked = true
+                } //
+            }
         }
     }
     
@@ -1428,6 +1444,14 @@ async function Modal_Meme_Search_Btn(){
                 </div>
                 `
             )
+            //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
+            document.getElementById(`modal-image-search-add-memes-result-single-image-img-id-${file_key}`).onclick = function() {
+                if( document.getElementById(`add-memes-images-toggle-id-${file_key}`).checked == true ) {
+                    document.getElementById(`add-memes-images-toggle-id-${file_key}`).checked = false
+                } else {
+                    document.getElementById(`add-memes-images-toggle-id-${file_key}`).checked = true
+                } //
+            }
         }
     }
     //search results display image memes
@@ -1446,7 +1470,16 @@ async function Modal_Meme_Search_Btn(){
                 </div>
                 `
             )
+            //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
+            document.getElementById(`modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}`).onclick = function() {
+                if( document.getElementById(`add-memes-meme-toggle-id-${file_key}`).checked == true ) {
+                    document.getElementById(`add-memes-meme-toggle-id-${file_key}`).checked = false
+                } else {
+                    document.getElementById(`add-memes-meme-toggle-id-${file_key}`).checked = true
+                } //
+            }
         }
+        //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
     }
 }
 

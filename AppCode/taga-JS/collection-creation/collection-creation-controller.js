@@ -242,7 +242,7 @@ async function Creation_Next_Btn() {
         if( node_type == 'VIDEO' ) { document.getElementById("step4-profile-image-display-id").pause() }
 
         let button_back = document.getElementById("creation-next-button-id")
-        button_back.innerHTML = "COMPLETE"
+        button_back.innerHTML = "FINISH" //COMPLETE
         document.getElementById("step5-name-div-id").innerHTML = COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName
 
         node_type = document.getElementById(`profile-image-display-id`).nodeName
@@ -850,7 +850,8 @@ async function Add_Images_To_New_Collection() {
     //search_image_results.forEach( image_filename => {
         let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles.includes(image_filename)==false) {
-            search_display_inner_tmp += `
+            //search_display_inner_tmp += `
+            search_display_div.insertAdjacentHTML('beforeend', `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
                                                 <input id="add-image-toggle-id-${image_filename}" type="checkbox">
@@ -859,9 +860,18 @@ async function Add_Images_To_New_Collection() {
                                             ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-result-single-image-img-id-${image_filename}` )}
                                         </div>
                                         `
+            )
+            //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
+            document.getElementById(`modal-image-search-result-single-image-img-id-${image_filename}`).onclick = function() {
+                if( document.getElementById(`add-image-toggle-id-${image_filename}`).checked == true ) {
+                    document.getElementById(`add-image-toggle-id-${image_filename}`).checked = false
+                } else {
+                    document.getElementById(`add-image-toggle-id-${image_filename}`).checked = true
+                } //
+            }
         }
     }
-    search_display_div.innerHTML += search_display_inner_tmp
+    //search_display_div.innerHTML += search_display_inner_tmp
     //memes section
     let search_meme_display_div = document.getElementById("modal-search-meme-images-results-grid-div-area-id")
     search_meme_display_div.innerHTML = ""
@@ -870,7 +880,8 @@ async function Add_Images_To_New_Collection() {
     //search_image_meme_results.forEach( image_filename => {
         let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles.includes(image_filename)==false) {
-            search_display_inner_tmp += `
+            //search_display_inner_tmp += `
+            search_meme_display_div.insertAdjacentHTML('beforeend', `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
                                                 <input id="add-memes-meme-toggle-id-${image_filename}" type="checkbox">
@@ -879,9 +890,18 @@ async function Add_Images_To_New_Collection() {
                                             ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-result-single-meme-image-img-id-${image_filename}` )}
                                         </div>
                                         `
+            )
+            //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
+            document.getElementById(`modal-image-search-result-single-meme-image-img-id-${image_filename}`).onclick = function() {
+                if( document.getElementById(`add-memes-meme-toggle-id-${image_filename}`).checked == true ) {
+                    document.getElementById(`add-memes-meme-toggle-id-${image_filename}`).checked = false
+                } else {
+                    document.getElementById(`add-memes-meme-toggle-id-${image_filename}`).checked = true
+                } //
+            }
         }
     }
-    search_meme_display_div.innerHTML += search_display_inner_tmp
+    //search_meme_display_div.innerHTML += search_display_inner_tmp
     //add an event listener to the images to select them to be added to the gallery and the current obj and the collection DB updated
     document.getElementById("modal-search-images-results-select-images-order-button-id").onclick = async function() {
         let update = false
@@ -1014,7 +1034,8 @@ async function Collection_Add_Image_Search_Action() {
         //image_filename = all_image_keys[index] //!!! indexeddb !!!
         let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles.includes(image_filename)==false) {
-            search_display_inner_tmp += `
+            //search_display_inner_tmp += `
+            search_display_div.insertAdjacentHTML('beforeend', `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
                                                 <input id="add-image-toggle-id-${image_filename}" type="checkbox">
@@ -1023,9 +1044,18 @@ async function Collection_Add_Image_Search_Action() {
                                             ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-result-single-image-img-id-${image_filename}` )}
                                         </div>
                                         `
+            )
+            //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
+            document.getElementById(`modal-image-search-result-single-image-img-id-${image_filename}`).onclick = function() {
+                if( document.getElementById(`add-image-toggle-id-${image_filename}`).checked == true ) {
+                    document.getElementById(`add-image-toggle-id-${image_filename}`).checked = false
+                } else {
+                    document.getElementById(`add-image-toggle-id-${image_filename}`).checked = true
+                } //
+            }
         }
     }
-    search_display_div.innerHTML += search_display_inner_tmp
+    //search_display_div.innerHTML += search_display_inner_tmp
     //memes section
     let search_meme_display_div = document.getElementById("modal-search-meme-images-results-grid-div-area-id")
     search_meme_display_div.innerHTML = ""
@@ -1035,7 +1065,8 @@ async function Collection_Add_Image_Search_Action() {
         //image_filename = all_image_keys[index] //!!! indexeddb !!!
         let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles.includes(image_filename)==false) {
-            search_display_inner_tmp += `
+            //search_display_inner_tmp += `
+            search_meme_display_div.insertAdjacentHTML('beforeend', `
                                         <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
                                                 <input id="add-memes-meme-toggle-id-${image_filename}" type="checkbox">
@@ -1044,9 +1075,18 @@ async function Collection_Add_Image_Search_Action() {
                                             ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-result-single-meme-image-img-id-${image_filename}` )}
                                         </div>
                                         `
+            )
+            //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
+            document.getElementById(`modal-image-search-result-single-meme-image-img-id-${image_filename}`).onclick = function() {
+                if( document.getElementById(`add-memes-meme-toggle-id-${image_filename}`).checked == true ) {
+                    document.getElementById(`add-memes-meme-toggle-id-${image_filename}`).checked = false
+                } else {
+                    document.getElementById(`add-memes-meme-toggle-id-${image_filename}`).checked = true
+                } //
+            }
         }
     }
-    search_meme_display_div.innerHTML += search_display_inner_tmp
+    //search_meme_display_div.innerHTML += search_display_inner_tmp
 
 }
 
@@ -1176,7 +1216,8 @@ async function Add_Meme_Images() {
     //meme_search_image_results.forEach( image_filename => {
         let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.includes(image_filename)==false) {
-            search_display_inner_tmp += `
+            //search_display_inner_tmp += `
+            search_display_div.insertAdjacentHTML('beforeend', `
                                         <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
                                                 <input id="add-meme-image-toggle-id-${image_filename}" type="checkbox">
@@ -1185,9 +1226,18 @@ async function Add_Meme_Images() {
                                             ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-image-img-id-${image_filename}` )}
                                         </div>
                                         `
+            )
+            //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
+            document.getElementById(`modal-image-search-add-memes-result-single-image-img-id-${image_filename}`).onclick = function() {
+                if( document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked == true ) {
+                    document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked = false
+                } else {
+                    document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked = true
+                } //
+            }
         }
     }
-    search_display_div.innerHTML += search_display_inner_tmp
+    //search_display_div.innerHTML += search_display_inner_tmp
     //memes section
     let search_meme_display_div = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
     search_meme_display_div.innerHTML = ""
@@ -1196,7 +1246,8 @@ async function Add_Meme_Images() {
     //meme_search_image_meme_results.forEach( image_filename => {
         let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.includes(image_filename)==false) {
-            search_display_inner_tmp += `
+            //search_display_inner_tmp += `
+            search_meme_display_div.insertAdjacentHTML('beforeend', `
                                         <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
                                                 <input id="add-meme-image-meme-toggle-id-${image_filename}" type="checkbox">
@@ -1205,9 +1256,18 @@ async function Add_Meme_Images() {
                                             ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-meme-image-img-id-${image_filename}` )}
                                         </div>
                                         `
+            )
+            //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
+            document.getElementById(`modal-image-search-add-memes-result-single-meme-image-img-id-${image_filename}`).onclick = function() {
+                if( document.getElementById(`add-meme-image-meme-toggle-id-${image_filename}`).checked == true ) {
+                    document.getElementById(`add-meme-image-meme-toggle-id-${image_filename}`).checked = false
+                } else {
+                    document.getElementById(`add-meme-image-meme-toggle-id-${image_filename}`).checked = true
+                } //
+            }
         }
     }
-    search_meme_display_div.innerHTML += search_display_inner_tmp
+    //search_meme_display_div.innerHTML += search_display_inner_tmp
     //add an event listener to the images to select them to be added to the gallery and the current obj and the collection DB updated
     document.getElementById("modal-search-add-memes-images-results-select-images-order-button-id").onclick = async function() {
         let update = false
@@ -1347,7 +1407,8 @@ async function Collection_Add_Memes_Search_Action(){
         //image_filename = all_image_keys[index] //!!!indexeddb !!!
         let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.includes(image_filename)==false) {
-            search_display_inner_tmp += `
+            //search_display_inner_tmp += `
+            search_display_div.insertAdjacentHTML('beforeend', `
                                         <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
                                                 <input id="add-meme-image-toggle-id-${image_filename}" type="checkbox">
@@ -1356,9 +1417,18 @@ async function Collection_Add_Memes_Search_Action(){
                                             ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-image-img-id-${image_filename}` )}
                                         </div>
                                         `
+            )
+            //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
+            document.getElementById(`modal-image-search-add-memes-result-single-image-img-id-${image_filename}`).onclick = function() {
+                if( document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked == true ) {
+                    document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked = false
+                } else {
+                    document.getElementById(`add-meme-image-toggle-id-${image_filename}`).checked = true
+                } //
+            }
         }
     }
-    search_display_div.innerHTML += search_display_inner_tmp
+    //search_display_div.innerHTML += search_display_inner_tmp
     //memes section
     let search_meme_display_div = document.getElementById("modal-search-add-memes-meme-images-results-grid-div-area-id")
     search_meme_display_div.innerHTML = ""
@@ -1368,7 +1438,8 @@ async function Collection_Add_Memes_Search_Action(){
         //image_filename = all_image_keys[index] //!!!indexeddb !!!
         let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         if(FS.existsSync(image_path_tmp) == true && COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes.includes(image_filename)==false) {
-            search_display_inner_tmp += `
+            //search_display_inner_tmp += `
+            search_meme_display_div.insertAdjacentHTML('beforeend', `
                                         <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${image_filename}">
                                             <label class="add-memes-memeswitch" title="deselect / include">
                                                 <input id="add-meme-image-meme-toggle-id-${image_filename}" type="checkbox">
@@ -1377,9 +1448,18 @@ async function Collection_Add_Memes_Search_Action(){
                                             ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(image_filename,'modal-image-search-result-single-image-img-obj-class', `modal-image-search-add-memes-result-single-meme-image-img-id-${image_filename}` )}
                                         </div>
                                         `
+            )
+            //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
+            document.getElementById(`modal-image-search-add-memes-result-single-meme-image-img-id-${image_filename}`).onclick = function() {
+                if( document.getElementById(`add-meme-image-meme-toggle-id-${image_filename}`).checked == true ) {
+                    document.getElementById(`add-meme-image-meme-toggle-id-${image_filename}`).checked = false
+                } else {
+                    document.getElementById(`add-meme-image-meme-toggle-id-${image_filename}`).checked = true
+                } //
+            }
         }
     }
-    search_meme_display_div.innerHTML += search_display_inner_tmp
+    //search_meme_display_div.innerHTML += search_display_inner_tmp
 }
 
 

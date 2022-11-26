@@ -250,6 +250,7 @@
 .modal-image-search-result-single-image-img-obj-class {
   max-height: 25vh;
   max-width: 100%;
+  cursor: pointer;
 }
 
 #modal-search-meme-images-results-grid-div-area-id {
