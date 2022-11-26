@@ -144,7 +144,7 @@ if( tagging_table_exists_res["count(*)"] == 0 ){
     for( let [f_name, description_tmp] of Object.entries(file_names_description_obj) ) {
 
       let new_filename = f_name
-      let tmp_path = PATH.join(APP_PATH, 'zExtraPics', new_filename) 
+      let tmp_path = PATH.join(APP_PATH, '/build/zExtraPics', new_filename) 
       FS.copyFileSync(tmp_path, PATH.join(TAGA_DATA_DIRECTORY, new_filename), FS.constants.COPYFILE_EXCL);
       tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
       tagging_entry.fileName = new_filename;
