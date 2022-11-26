@@ -64,12 +64,12 @@
       "!docs"
     ],
     "linux": {
-      "icon": "taga-icon/TagaIcon512x512.png",
+      "icon": "/build/taga-icon/TagaIcon512x512.png",
       "maintainer": "mantzaris",
       "category": "utility"
     },
     "win": {
-      "icon": "taga-icon/TagaIcon512x512.png"
+      "icon": "/build/taga-icon/TagaIcon512x512.png"
     },
     "portable": {
       "artifactName": "tagasaurus.app"

@@ -35,7 +35,7 @@ DB_FILE_NAME = 'mainTagasaurusDB.db'
 
 //good to print at the start
 console.log(`APP_PATH = ${APP_PATH}`)
-let tmp_icon_dir = PATH.join(APP_PATH,'taga-icon','TagaIcon512x512.png')
+let tmp_icon_dir = PATH.join(APP_PATH,'/build/taga-icon','TagaIcon512x512.png')
 console.log('icon path = ',  tmp_icon_dir   )
 let exists = FS.existsSync( tmp_icon_dir  )
 console.log(`exists = `, exists)
