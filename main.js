@@ -245,6 +245,7 @@ ipcMain.handle('dialog:saveFile', async (_, args) => {
   const result = dialog.showSaveDialog({ title: "name and place to save", defaultPath: app.getPath('downloads') })
   return result
 })
+ipcMain.handle('getDownloadsFolder',async () => app.getPath("downloads"))
 //FILE SELECTION DIALOGUE WINDOWS END<<<
 
 

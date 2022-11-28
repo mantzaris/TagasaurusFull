@@ -31,6 +31,7 @@ async function Copy_Non_Taga_Files(result,dir_pics,Get_Tagging_Hash_From_DB) {
         let file_path = file_paths[ii]
 
         let ft_res = await fileType.fromFile( file_path )
+        //console.log({ft_res})
         if( ft_res == undefined ) continue
         else if( !Check_Allowed_FileTypes(ft_res.mime) ) continue
 

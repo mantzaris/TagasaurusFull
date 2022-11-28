@@ -857,6 +857,7 @@ function DraggingEvents() {
             return
         }
         const { path } = ev.dataTransfer.files[0]
+        //console.log({path})
         Load_New_Image(path) 
     })
     document.addEventListener('dragover', (ev) => {
@@ -867,6 +868,196 @@ function DraggingEvents() {
         // }
     })
 }
+
+
+
+//using the WEBCAM
+document.getElementById("load-webcam-input-button-id").onclick = async function() {
+
+    let modal_meme_click_top_id_element = document.getElementById("modal-webcam-clicked-top-id");
+    modal_meme_click_top_id_element.style.display = "block";
+    document.getElementById("webcam-video-id").style.display = "block"
+
+    let meme_modal_close_btn = document.getElementById("modal-webcam-clicked-close-button-id");
+    // When the user clicks on the button, close the modal
+    meme_modal_close_btn.onclick = function() {
+        Close_Modal()
+    }
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal_meme_click_top_id_element) {
+            Close_Modal()
+        }
+    }
+
+    let capture_button = document.getElementById("capture-button-id")
+    let select_capture_button = document.getElementById("select-capture-button-id")
+    let video = document.getElementById("webcam-video-id")
+    let canvas = document.getElementById("canvas-webcam-id")
+    let photo = document.getElementById("webcam-webcam-clicked-displayimg-id")
+    let record_video_btn = document.getElementById("capture-video-button-id")
+    record_video_btn.onclick = record_video;
+    let display_area_element = document.getElementById("modal-webcam-clicked-image-gridbox-id")
+    //console.log('display_area_element height = ', display_area_element.offsetHeight )
+    //console.log('display_area_element offsetWidth = ', display_area_element.offsetWidth )
+    
+    let width
+    let height
+
+    let data;
+    let stream = await capture_media_devices() // navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    video.srcObject = stream;
+    video.play();
+    let recording = false
+    //record video from webcam now!
+    const stop_video_btn = document.getElementById("stop-video-button-id")
+    stop_video_btn.onclick = stop_record_video
+    let recorder = null
+
+    let captured = false
+
+    let streaming
+    video.addEventListener('canplay', function(ev){
+        if (!streaming) {
+            height = video.videoHeight
+            width = video.videoWidth;
+            video.setAttribute('width', width);
+            video.setAttribute('height', height);
+            canvas.setAttribute('width', width);
+            canvas.setAttribute('height', height);
+            streaming = true;
+        }
+    }, false);
+
+    document.onkeydown = function(e) {
+        
+        if( e.keyCode == 32 || e.code == "Space" ) {
+            Take_Picture(e)
+        }
+        
+    }
+
+    capture_button.onclick = function(ev) {
+        canvas.style.display = "block"
+        Take_Picture(ev)
+    }
+
+    function clearphoto() {
+        const context = canvas.getContext('2d');
+        context.fillStyle = "#AAA";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+    
+        data = canvas.toDataURL('image/png');
+        photo.setAttribute('src', data);
+    }
+    function Take_Picture(ev) {
+        ev.preventDefault()
+        const context = canvas.getContext('2d');
+        if (width && height) {
+            canvas.width = width;
+            canvas.height = height;
+            context.drawImage(video, 0, 0, width, height);
+    
+            data = canvas.toDataURL('image/png');
+            //console.log('data = ', data)
+            photo.setAttribute('src', data);
+
+            select_capture_button.style.display = "block"
+            captured = true
+            document.getElementById("webcam-video-id").style.display = "none"
+            document.getElementById("back-capture-button-id").style.display = "block"
+        } else {
+            clearphoto();
+        }
+    }
+
+    select_capture_button.onclick = function() {
+        selected_images_type.unshift('webcam')
+        selected_images.unshift(data) //add to the start of the array
+        selected_images = [... new Set(selected_images)]
+        Update_Selected_Images()
+        Close_Modal()
+    }
+
+    function Close_Modal() {
+        if(stream) {
+            stream.getTracks().forEach( track => {        
+                track.stop()
+            })
+        }
+        streaming = false
+        captured = false
+        select_capture_button.style.display = "none"
+        modal_meme_click_top_id_element.style.display = "none";
+        photo.src = ""
+        document.getElementById("back-capture-button-id").style.display = "none"
+        capture_button.style.display = "block"
+        stop_video_btn.style.display = "none"
+        record_video_btn.style.display = "block"
+        video.style.borderColor = "transparent"
+    }
+
+    document.getElementById("back-capture-button-id").onclick = function() {
+        select_capture_button.style.display = "none"
+            captured = false
+            document.getElementById("webcam-video-id").style.display = "block"
+            document.getElementById("back-capture-button-id").style.display = "none"
+            canvas.style.display = "none"
+    }
+
+
+    async function record_video() {
+        //alert("record video!")     
+        recording = true   
+        capture_button.style.display = "none"
+        stop_video_btn.style.display = "block"
+        record_video_btn.style.display = "none"
+        video.style.borderColor = "red"    
+        recorder = new MediaRecorder(stream)
+        let chunks = []
+
+
+        recorder.ondataavailable = (ev) => {
+            if(ev.data.size > 0) {
+                chunks.push(ev.data)
+            }
+        }
+        
+        recorder.onstop = async () => {
+            if(!recording) {
+                const blob = new Blob(chunks,{
+                    type: "video/webm"
+                })
+                chunks = []
+                let outputname = `w${crypto.randomUUID()}${Date.now()}.webm`
+                const bytes = new Uint8Array(await blob.arrayBuffer())
+                const final_path = PATH.join( await IPC_RENDERER.invoke('getDownloadsFolder'), outputname)
+                FS.writeFileSync( final_path, bytes )
+                await Load_New_Image(final_path) 
+            }
+            
+            Close_Modal()
+        }
+        recorder.start()
+    }
+
+    function stop_record_video() {
+        recording = false
+        recorder.stream.getTracks().forEach(track => track.stop())
+        //alert("in stop recording video")
+    }
+
+    async function capture_media_devices() {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: true, audio: true        
+        })
+        return stream
+    }
+
+    
+}
+
+
 
 
 

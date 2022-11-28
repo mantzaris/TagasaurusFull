@@ -28,6 +28,9 @@
 
 	<!-- style sheet for the right click options modal -->
 	<link rel="stylesheet" href="./taga-CSS/right-click-modals.css">
+	
+	<!-- style sheet for the webcam input modal -->
+	<link rel="stylesheet" href="./taga-CSS/tagging-CSS/tagging-add-webcam-media-modal.css">
 
 	<script src="./taga-JS/pdfjs/build/pdf.js" ></script>
 	
@@ -88,7 +91,7 @@
 			<div id="center-button-area-div-id">
 				<button class="center-buttons fun-button-blue" type="button" id="search-images-button-id">Search</button>
 				<button class="center-buttons fun-button-blue" type="button" id="load-new-image-button-id">Load New</button>
-				<button class="center-buttons fun-button-blue" type="button" id="load-new-image-button-id">Use Webcam</button>
+				<button class="center-buttons fun-button-blue" type="button" id="load-webcam-input-button-id">Use Webcam</button>
 				<button class="center-buttons fun-button-red" type="button" id="delete-image-button-id">Delete</button>
 				<button class="center-buttons fun-button-blue" type="button" id="return-to-main-button-id">Main Menu</button>
 			</div>
@@ -461,6 +464,40 @@
 	</div>
 
 	<!-- END DIV FOR THE RIGHT CLICK EVENTS -->
+
+
+	<!-- MODAL FOR THE WEBCAM INPUTS -->
+	<div id="modal-webcam-clicked-top-id" class="modal-top-class">
+		<!-- MEME MODAL CLOSE -->
+		<img class="modal-close-button-class" id="modal-webcam-clicked-close-button-id" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+							onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
+		<!-- Modal content container -->
+		<div class="modal-content-container">
+			<div id="modal-webcam-clicked-grid-container-id">
+				<div id="modal-webcam-clicked-tag-list-div-container-id">
+					<!-- Tags: #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde  -->
+					<button style="display: none;" class="fun-button-blue" id="back-capture-button-id"> STREAM AGAIN </button>
+					<button class="fun-button-blue" id="capture-button-id"> CAPTURE IMAGE (SPACE BAR) </button>
+					<button class="fun-button-blue" id="capture-video-button-id"> RECORD VIDEO </button>
+					<button class="fun-button-blue" style="display: none;" id="stop-video-button-id"> STOP RECORDING</button>
+					<button class="fun-button-blue" id="select-capture-button-id" style="display: none;"> SELECT IMAGE  </button>
+				</div>
+				
+				<div id="modal-webcam-clicked-image-gridbox-id">
+	
+					<canvas id="canvas-webcam-id">  </canvas>
+					<img style="display: none;" id="webcam-webcam-clicked-displayimg-id" src="" title="" alt="" />
+	
+					<video src="" id="webcam-video-id" >  </video>   
+											
+									
+				</div>
+			</div>
+		</div>
+	
+	</div>
+
+
 
 	<!-- MODALS FINISH -->
 	<!-- ------------------------- -->
