@@ -918,6 +918,15 @@ document.getElementById("load-webcam-input-button-id").onclick = async function(
 
     let captured = false
 
+
+    async function capture_media_devices() {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: true, audio: true        
+        })
+        return stream
+    }
+
+
     let streaming
     video.addEventListener('canplay', function(ev){
         if (!streaming) {
@@ -976,11 +985,9 @@ document.getElementById("load-webcam-input-button-id").onclick = async function(
     }
 
     //!!!xxx needs to save data and not update a set like for super search
-    select_capture_button.onclick = function() {
-        selected_images_type.unshift('webcam')
-        selected_images.unshift(data) //add to the start of the array
-        selected_images = [... new Set(selected_images)]
-        Update_Selected_Images()
+    select_capture_button.onclick = async function() {
+        const base64Data = data.replace(/^data:image\/png;base64,/, "");
+        FS.writeFileSync( PATH.join( await IPC_RENDERER.invoke('getDownloadsFolder'), 'test.png') , base64Data , 'base64')
         Close_Modal()
     }
 
@@ -1053,12 +1060,6 @@ document.getElementById("load-webcam-input-button-id").onclick = async function(
         //alert("in stop recording video")
     }
 
-    async function capture_media_devices() {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: true, audio: true        
-        })
-        return stream
-    }
 
     
 }
