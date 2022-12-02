@@ -186,6 +186,7 @@ document.getElementById("use-webcam-button-id").onclick = function() {
     let select_capture_button = document.getElementById("select-capture-button-id")
     let video = document.getElementById("webcam-video-id")
     let canvas = document.getElementById("canvas-webcam-id")
+    canvas.style.display = 'none'
     let photo = document.getElementById("webcam-meme-clicked-displayimg-id")
     
     let display_area_element = document.getElementById("modal-meme-clicked-image-gridbox-id")
@@ -226,6 +227,7 @@ document.getElementById("use-webcam-button-id").onclick = function() {
     document.onkeydown = function(e) {
         
         if( e.keyCode == 32 || e.code == "Space" ) {
+            canvas.style.display = "block"
             Take_Picture(e)
         }
         

@@ -891,9 +891,11 @@ document.getElementById("load-webcam-input-button-id").onclick = async function(
     }
 
     let capture_button = document.getElementById("capture-button-id")
+    let stream_again_btn = document.getElementById("back-capture-button-id")
     let select_capture_button = document.getElementById("select-capture-button-id")
     let video = document.getElementById("webcam-video-id")
     let canvas = document.getElementById("canvas-webcam-id")
+    canvas.style.display = 'none'
     let photo = document.getElementById("webcam-webcam-clicked-displayimg-id")
     let record_video_btn = document.getElementById("capture-video-button-id")
     record_video_btn.onclick = record_video;
@@ -929,12 +931,13 @@ document.getElementById("load-webcam-input-button-id").onclick = async function(
         }
     }, false);
 
-    document.onkeydown = function(e) {
-        
-        if( e.keyCode == 32 || e.code == "Space" ) {
-            Take_Picture(e)
+    document.onkeydown = function(e) { 
+        if( recording == false ) {
+            if( e.keyCode == 32 || e.code == "Space" ) {
+                canvas.style.display = "block"
+                Take_Picture(e)
+            }
         }
-        
     }
 
     capture_button.onclick = function(ev) {
@@ -964,13 +967,15 @@ document.getElementById("load-webcam-input-button-id").onclick = async function(
 
             select_capture_button.style.display = "block"
             captured = true
-            document.getElementById("webcam-video-id").style.display = "none"
-            document.getElementById("back-capture-button-id").style.display = "block"
+            video.style.display = "none"
+            record_video_btn.style.display = 'none'
+            stream_again_btn.style.display = "block"
         } else {
             clearphoto();
         }
     }
 
+    //!!!xxx needs to save data and not update a set like for super search
     select_capture_button.onclick = function() {
         selected_images_type.unshift('webcam')
         selected_images.unshift(data) //add to the start of the array
@@ -990,19 +995,20 @@ document.getElementById("load-webcam-input-button-id").onclick = async function(
         select_capture_button.style.display = "none"
         modal_meme_click_top_id_element.style.display = "none";
         photo.src = ""
-        document.getElementById("back-capture-button-id").style.display = "none"
+        stream_again_btn.style.display = "none"
         capture_button.style.display = "block"
         stop_video_btn.style.display = "none"
         record_video_btn.style.display = "block"
         video.style.borderColor = "transparent"
     }
 
-    document.getElementById("back-capture-button-id").onclick = function() {
+    stream_again_btn.onclick = function() {
         select_capture_button.style.display = "none"
             captured = false
-            document.getElementById("webcam-video-id").style.display = "block"
-            document.getElementById("back-capture-button-id").style.display = "none"
+            video.style.display = "block"
+            stream_again_btn.style.display = "none"
             canvas.style.display = "none"
+            record_video_btn.style.display = "block"
     }
 
 
