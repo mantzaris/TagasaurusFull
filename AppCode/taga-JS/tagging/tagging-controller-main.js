@@ -914,9 +914,11 @@ document.getElementById("load-webcam-input-button-id").onclick = async function(
     //record video from webcam now!
     const stop_video_btn = document.getElementById("stop-video-button-id")
     stop_video_btn.onclick = stop_record_video
+    const cancel_video_btn = document.getElementById("cancel-video-button-id")
+    //cancel_video_btn.onclick = stop_record_video
     let recorder = null
 
-    let captured = false
+    let canceled = false
 
 
     async function capture_media_devices() {
@@ -984,10 +986,14 @@ document.getElementById("load-webcam-input-button-id").onclick = async function(
         }
     }
 
-    //!!!xxx needs to save data and not update a set like for super search
+    //
     select_capture_button.onclick = async function() {
         const base64Data = data.replace(/^data:image\/png;base64,/, "");
-        FS.writeFileSync( PATH.join( await IPC_RENDERER.invoke('getDownloadsFolder'), 'test.png') , base64Data , 'base64')
+        let outputname = `w${crypto.randomUUID()}${Date.now()}.png`
+        const final_path = PATH.join( await IPC_RENDERER.invoke('getDownloadsFolder'), outputname)
+        FS.writeFileSync( final_path , base64Data , 'base64' )
+        await Load_New_Image(final_path)
+        FS.unlinkSync(final_path)
         Close_Modal()
     }
 
@@ -999,6 +1005,7 @@ document.getElementById("load-webcam-input-button-id").onclick = async function(
         }
         streaming = false
         captured = false
+        recording = false
         select_capture_button.style.display = "none"
         modal_meme_click_top_id_element.style.display = "none";
         photo.src = ""
@@ -1006,6 +1013,7 @@ document.getElementById("load-webcam-input-button-id").onclick = async function(
         capture_button.style.display = "block"
         stop_video_btn.style.display = "none"
         record_video_btn.style.display = "block"
+        cancel_video_btn.style.display = 'none'
         video.style.borderColor = "transparent"
     }
 
@@ -1024,6 +1032,7 @@ document.getElementById("load-webcam-input-button-id").onclick = async function(
         recording = true   
         capture_button.style.display = "none"
         stop_video_btn.style.display = "block"
+        cancel_video_btn.style.display = 'block'
         record_video_btn.style.display = "none"
         video.style.borderColor = "red"    
         recorder = new MediaRecorder(stream)
@@ -1037,27 +1046,52 @@ document.getElementById("load-webcam-input-button-id").onclick = async function(
         }
         
         recorder.onstop = async () => {
-            if(!recording) {
-                const blob = new Blob(chunks,{
-                    type: "video/webm"
-                })
+            if(canceled == false) {
+                if(!recording) {
+                    const blob = new Blob(chunks,{
+                        type: "video/webm"
+                    })
+                    chunks = []
+                    let outputname = `w${crypto.randomUUID()}${Date.now()}.webm`
+                    const bytes = new Uint8Array(await blob.arrayBuffer())
+                    const final_path = PATH.join( await IPC_RENDERER.invoke('getDownloadsFolder'), outputname)
+                    FS.writeFileSync( final_path, bytes )
+                    await Load_New_Image(final_path) 
+                    FS.unlinkSync(final_path)
+                }
+                
+                Close_Modal()
+            } else {
                 chunks = []
-                let outputname = `w${crypto.randomUUID()}${Date.now()}.webm`
-                const bytes = new Uint8Array(await blob.arrayBuffer())
-                const final_path = PATH.join( await IPC_RENDERER.invoke('getDownloadsFolder'), outputname)
-                FS.writeFileSync( final_path, bytes )
-                await Load_New_Image(final_path) 
+                stream_again_btn.style.display = "none"
+                capture_button.style.display = "block"
+                stop_video_btn.style.display = "none"
+                record_video_btn.style.display = "block"
+                cancel_video_btn.style.display = 'none'
+                video.style.borderColor = "transparent"
+                canceled = false
+                //video.play()  //
+                //recorder.start()
             }
-            
-            Close_Modal()
         }
         recorder.start()
     }
 
     function stop_record_video() {
         recording = false
+        stop_video_btn.style.display = 'none'
+        cancel_video_btn.style.display = 'none'
         recorder.stream.getTracks().forEach(track => track.stop())
         //alert("in stop recording video")
+    }
+
+    cancel_video_btn.onclick = async () => {
+        canceled = true
+        recording = false
+        recorder.stream.getTracks().forEach(track => track.stop())
+        stream = await capture_media_devices() // navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+        video.srcObject = stream;
+        video.play();
     }
 
 
