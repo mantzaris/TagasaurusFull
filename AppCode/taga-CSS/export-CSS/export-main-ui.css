@@ -24,12 +24,25 @@ body {
     overflow-x: hidden;
     height: 10vh;
     width: 100vw;
-    background-color: aqua;
+    font-size: 3vmin;
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#export-button-id,
+#mainmenu-button-id {
+    font-size: 3.5vmin;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 5px;
 }
 .exportOptions {
     /* grid-area: exportOptions; */
     width: 100vw;
-    height: 100%;
+    height: 80vh;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -38,9 +51,24 @@ body {
 }
 .option {
     min-height: 12vh;
-    background-color: blue;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    
+    /* background-color: blue; */
+
 }
-
-
-
+.selection-checkbox {
+    width: 4vmin;
+    height: 4vmin;
+    margin-left: 25px;
+    margin-right: 20px;
+    outline: 4px solid #005000;
+}
+.output-description {
+    font-size: 3vmin;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 5px;
+}
 
