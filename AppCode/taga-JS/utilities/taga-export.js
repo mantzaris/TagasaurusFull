@@ -53,12 +53,19 @@ async function Export_User_Annotation_Data() {
                 })
                 //copy the actual DB file to the new directory as a 'snapshot' of the user state as well
                 FS.copyFileSync( PATH2.join(TAGA_FILES_DIRECTORY,'mainTagasaurusDB.db'), PATH2.join(path_chosen.filePath,'IMPORT-THIS-FILE-TAGA-EXPORTED-DB.db'), FS.constants.COPYFILE_EXCL)
+                //finished with files and DB of sqlite
+
+
+                
+
+                
                 //Now start to put the DB data into JSON format for the exporting
                 //export tagging data to json
                 let res = FS.openSync( PATH2.join(path_chosen.filePath,'TAGGING.ndjson'), 'w');
                 let iter_tagging = await Tagging_Image_DB_Iterator();
                 let tagging_record_tmp = await iter_tagging()
                 while( tagging_record_tmp != undefined ) {
+                    tagging_record_tmp['tableName'] = 'TAGGING'
                     let content = JSON.stringify(tagging_record_tmp)
                     content += "\n";
                     FS.appendFile( PATH2.join(path_chosen.filePath,'TAGGING.ndjson') , content, (err) => {
