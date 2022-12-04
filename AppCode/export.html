@@ -28,7 +28,7 @@
             <div>
                 <button type="button" class="fun-button-blue" id="export-button-id"> EXPORT DATA </button>
                 or
-                <button type="button" class="fun-button-blue" id="mainmenu-button-id"> Return to Main </button>
+                <button onclick="window.location.href='./welcome-screen.html'" type="button" class="fun-button-blue" id="mainmenu-button-id"> Return to Main </button>
             </div>
 
         </div>
@@ -37,7 +37,7 @@
             
             <div class="option">
                 <div>
-                    <input type="checkbox" class="selection-checkbox">
+                    <input checked="true" type="checkbox" class="selection-checkbox" id="media-files-checkbox">
                 </div>
                 <div class="output-description">
                     1) MEDIA FILES: Export all of the media content files in Tagasaurus. This means 
@@ -50,7 +50,7 @@
 
             <div class="option">
                 <div>
-                    <input type="checkbox" class="selection-checkbox">
+                    <input checked="true" type="checkbox" class="selection-checkbox" id="sql-db-checkbox" >
                 </div>
                 <div class="output-description">
                     2) ANNOTATION INFORMATION (database file): 
@@ -63,7 +63,7 @@
 
             <div class="option">
                 <div>
-                    <input type="checkbox" class="selection-checkbox">
+                    <input type="checkbox" class="selection-checkbox" id="ndjson-checkbox" >
                 </div>
                 <div class="output-description">
                     3) ND-JSON ANNOTATION INFORMATION: Newline delimited JSONs
@@ -79,12 +79,19 @@
 
     </div>
 
+    <div id="processing-notice-modal-top-div-id" class="processing-notice-modal-top-div-class">
+		<div id="processing-notice-modal-content-div-id" class="processing-notice-modal-content-div-class">
+			<div class="spinner"></div> 
+			
+			PROCESSING...
+		</div>
+    </div>
+
 
 </body>
 
-<!-- <script src="./taga-JS/tagging/tagging-controller-main.js"></script> -->
+
+<script src="./taga-JS/utilities/taga-export.js"></script>
 <!-- <script src="./taga-JS/utilities/general-helper-fns.js"></script> -->
-
-
 
 </html>

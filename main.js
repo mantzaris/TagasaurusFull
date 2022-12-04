@@ -232,12 +232,12 @@ ipcMain.handle('dialog:tagging-new-file-select', async (event, args) => {
 })
 //for the ability to save a data export
 ipcMain.handle('dialog:export', async (_, args) => {
-  const result = dialog.showSaveDialog({ title: "Enter Folder Name to Create", defaultPath: PATH.join(PATH.resolve(), '..') })
+  const result = dialog.showSaveDialog({ title: "Enter Folder Name to Create", defaultPath: app.getPath('downloads') })
   return result
 })
 //for the ability to load the DB to import
 ipcMain.handle('dialog:importDB', async (_, args) => {
-  const result = dialog.showOpenDialog({ properties: ['openFile'], defaultPath: PATH.join(PATH.resolve(), '..') }) //
+  const result = dialog.showOpenDialog({ properties: ['openFile'], defaultPath: app.getPath('downloads') }) //
   return result
 })
 //for the ability to save a taga content file
