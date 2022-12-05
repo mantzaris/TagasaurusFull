@@ -94,7 +94,7 @@ async function Get_Image_Face_Descriptors_From_File(imagePath) {
                                           withFaceDescriptors()
 }
 window.Get_Image_Face_Descriptors_From_File = Get_Image_Face_Descriptors_From_File;
-
+window.faceapi = faceapi
 
 //each descriptor is an 'object' not an array so that each dimension of the descriptor feature vector has a key pointing to the value 
 //but we just use the values that are needed to 

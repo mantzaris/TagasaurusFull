@@ -9,7 +9,7 @@ body {
 #welcome-screen-body-div-id {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 1fr 6fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 6fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   min-width: 0;
   min-height: 0;
   height: 100vh;
@@ -21,6 +21,7 @@ body {
     "tagging-button"
     "collection-button"
     "super-search-button"
+    "stream-search-button"
     "export-button"
     "import-button"
     "support-button";
@@ -115,6 +116,12 @@ body {
 }
 #super-search-button-div-id {
   grid-area: super-search-button;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+#stream-search-button-div-id {
+  grid-area: stream-search-button;
   display: flex;
   align-items: flex-end;
   justify-content: center;

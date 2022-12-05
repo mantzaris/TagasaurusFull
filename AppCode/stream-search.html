@@ -1,0 +1,39 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tagasaurus</title>
+</head>
+<body>
+    
+
+    <div id="selection-screen">
+        <label for="search-type">Choose a stream search type:</label>
+        <select name="" id="search-type">
+            <option value="keywords-only">Keywords only</option>
+            <option value="keywords-images">Keywords and Images</option>
+            <option value="keywords-images-memes">Keywords, Images and Memes</option>      
+        </select> 
+        <button id="continue-btn"> Continue </button>
+    </div>
+
+    <div style="display: none;" id="stream-view">
+
+        <div style="position: relative" class="margin">
+            <video  id="inputVideo" autoplay muted></video>
+            <canvas id="overlay" />
+        </div>
+
+    </div>
+
+
+
+</body>
+
+<script src="./taga-JS/stream-search/stream-search.js"></script>
+
+</html>
