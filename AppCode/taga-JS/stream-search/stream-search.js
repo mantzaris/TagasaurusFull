@@ -1,8 +1,26 @@
 
+const keywords_only_description = "Displays keywords related to faces stored. Finds images/videos/gifs containing a similar face and displays the keywords from the description."
+const keywords_images_description = "Displays keywords and images related to faces stored. Finds images/videos/gifs containing a similar face and displays the keywords from the description. Images containing the face with a match are also shown."
+const keywords_images_memes_description = "Displays keywords, images and memes related to faces stored. Finds images/videos/gifs containing a similar face and displays the keywords from the description as well as images containing the face with a match. Connected memes will also be presented."
 
 
 const continue_btn = document.getElementById("continue-btn")
 const selection_set = document.getElementById("search-type")
+const selection_description = document.getElementById("stream-type-description")
+selection_description.innerText = keywords_only_description
+selection_set.onchange = () => {
+    console.log("new selection")
+    console.log(`new selection is = ${selection_set.value}`)
+    if( selection_set.value == "keywords-only" ) {
+        selection_description.innerText = keywords_only_description
+    } else if( selection_set.value == "keywords-images" ) {
+        selection_description.innerText = keywords_images_description
+    } else if( selection_set.value == "keywords-images-memes" ) {
+        selection_description.innerText = keywords_images_memes_description
+    } 
+}
+
+
 
 continue_btn.onclick = () => {
 

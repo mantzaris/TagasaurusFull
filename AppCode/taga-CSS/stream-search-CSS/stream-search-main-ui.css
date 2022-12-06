@@ -1,0 +1,36 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Verdana, sans-serif;
+    box-sizing: border-box;
+    background-color: #808a80;
+}
+
+#selection-screen {
+    width: 80%;
+    margin: auto;
+    margin-top: 10%;
+    
+}
+
+#search-type-label {
+    font-size: 4vmin;
+    font-weight: bold;
+    
+}
+
+#search-type {
+    font-size: 3.2vmin;
+}
+
+#continue-btn{
+    font-size: 3.5vmin;
+    margin-top: 5px;
+    padding: 6px;
+}
+
+#stream-type-description {
+    font-size: 3vmin;
+    margin-top: 7px;
+}

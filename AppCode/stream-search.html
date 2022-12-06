@@ -7,18 +7,31 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tagasaurus</title>
+
+    <!-- The general cross app style sheet for things like button design -->
+    <link rel="stylesheet" href="../AppCode/taga-CSS/general-styles.css">
+
+    <!-- The stream search specific styles -->
+    <link rel="stylesheet" href="../AppCode/taga-CSS/stream-search-CSS/stream-search-main-ui.css">
+
+
 </head>
 <body>
     
 
     <div id="selection-screen">
-        <label for="search-type">Choose a stream search type:</label>
+        <label id="search-type-label" for="search-type">Choose a stream search type:</label>
+        <br>
         <select name="" id="search-type">
             <option value="keywords-only">Keywords only</option>
             <option value="keywords-images">Keywords and Images</option>
             <option value="keywords-images-memes">Keywords, Images and Memes</option>      
         </select> 
-        <button id="continue-btn"> Continue </button>
+        <div id="stream-type-description">
+
+        </div>
+        <br>
+        <button class='fun-button-blue' id="continue-btn"> Continue </button>
     </div>
 
     <div style="display: none;" id="stream-view">
