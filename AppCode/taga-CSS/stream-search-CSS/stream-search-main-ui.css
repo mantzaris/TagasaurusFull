@@ -24,11 +24,13 @@ body {
     font-size: 3.2vmin;
 }
 
-#continue-btn{
+#continue-btn,
+#main-menu-btn {
     font-size: 3.5vmin;
     margin-top: 5px;
     padding: 6px;
 }
+
 
 #stream-type-description {
     font-size: 3vmin;

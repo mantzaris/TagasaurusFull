@@ -5,6 +5,7 @@ const keywords_images_memes_description = "Displays keywords, images and memes r
 
 
 const continue_btn = document.getElementById("continue-btn")
+const main_menu_btn = document.getElementById("main-menu-btn")
 const selection_set = document.getElementById("search-type")
 const selection_description = document.getElementById("stream-type-description")
 selection_description.innerText = keywords_only_description
@@ -23,22 +24,18 @@ selection_set.onchange = () => {
 
 
 continue_btn.onclick = () => {
-
     Init()
-
+}
+main_menu_btn.onclick = () => {
+    location.href = "welcome-screen.html";
 }
 
 
 function Keywords_Only() {
-
-
 }
-
 function Keywords_Images() {
-
 }
 function Keywords_Images_Memes() {
-
 }
 
 
@@ -85,7 +82,9 @@ async function testing() {
         video.play();
     })
     .catch(function(err) {
-        console.log("An error occurred: " + err);
+        console.log("An error occurred in the navigator.mediaDevices.getUserMedia: " + err);
+        alert('please connect webcam, then come back')
+        location.href = "welcome-screen.html";
     });
     
     let streaming
