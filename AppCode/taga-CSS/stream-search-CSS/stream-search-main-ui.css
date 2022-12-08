@@ -25,7 +25,8 @@ body {
 }
 
 #continue-btn,
-#main-menu-btn {
+#main-menu-btn,
+#screen-btn {
     font-size: 3.5vmin;
     margin-top: 5px;
     padding: 6px;

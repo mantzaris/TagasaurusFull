@@ -24,6 +24,8 @@ selection_set.onchange = () => {
 
 
 continue_btn.onclick = () => {
+    let stream_ok = Set_Stream()
+    if(!stream_ok) { return }
     Init()
 }
 main_menu_btn.onclick = () => {
@@ -61,31 +63,41 @@ function Init() {
 
 
 
-async function testing() {
+let stream
+let video = document.getElementById("inputVideo")
 
-    let width
-    let height
-    let data
-    let stream
-
-    document.getElementById("stream-view").style.display = 'block'
-    let video = document.getElementById("inputVideo")
-    let canvas = document.getElementById("overlay")
-    canvas.style.display = 'block'
-    const ctx = canvas.getContext('2d');
-    let photo = document.createElement('img')    
-
+function Set_Stream() {
+    let stream_ok = false
     navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(function(s) {
         stream = s
         video.srcObject = stream;
         video.play();
+        stream_ok = true
     })
     .catch(function(err) {
         console.log("An error occurred in the navigator.mediaDevices.getUserMedia: " + err);
-        alert('please connect webcam, then come back')
-        location.href = "welcome-screen.html";
+        alert('please connect webcam for this option')
+        stream_ok = false
+        //location.href = "welcome-screen.html";
     });
+    return stream_ok
+}
+
+
+async function testing() {
+
+    let width
+    let height
+    let data    
+
+    document.getElementById("stream-view").style.display = 'block'
+    
+    let canvas = document.getElementById("overlay")
+    canvas.style.display = 'block'
+    const ctx = canvas.getContext('2d');
+    let photo = document.createElement('img')    
+
     
     let streaming
     setTimeout(setInterval(Draw_Descriptors),3000)
