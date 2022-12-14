@@ -23,10 +23,12 @@ selection_set.onchange = () => {
 
 
 
-continue_btn.onclick = () => {
-    let stream_ok = Set_Stream()
-    if(!stream_ok) { return }
+continue_btn.onclick = async () => {
     Init()
+    let stream_ok = await Set_Stream()
+    if(!stream_ok) { return }
+    testing()    
+    
 }
 main_menu_btn.onclick = () => {
     location.href = "welcome-screen.html";
@@ -66,21 +68,18 @@ function Init() {
 let stream
 let video = document.getElementById("inputVideo")
 
-function Set_Stream() {
+async function Set_Stream() {
     let stream_ok = false
-    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    .then(function(s) {
-        stream = s
+    try { 
+        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false }) 
         video.srcObject = stream;
         video.play();
         stream_ok = true
-    })
-    .catch(function(err) {
+    } catch (e) { 
         console.log("An error occurred in the navigator.mediaDevices.getUserMedia: " + err);
         alert('please connect webcam for this option')
         stream_ok = false
-        //location.href = "welcome-screen.html";
-    });
+    }
     return stream_ok
 }
 
@@ -92,15 +91,17 @@ async function testing() {
     let data    
 
     document.getElementById("stream-view").style.display = 'block'
+    video.style.display = 'none'
     
     let canvas = document.getElementById("overlay")
     canvas.style.display = 'block'
     const ctx = canvas.getContext('2d');
     let photo = document.createElement('img')    
 
-    
+    let worker
     let streaming
-    setTimeout(setInterval(Draw_Descriptors),3000)
+    let interval
+    let detections = []
 
     video.addEventListener('canplay', function(ev){
         if (!streaming) {
@@ -111,8 +112,18 @@ async function testing() {
             canvas.setAttribute('width', width);
             canvas.setAttribute('height', height);
             streaming = true;
+            //worker = new Worker( './taga-JS/stream-search/stream-worker.js')
+            //requestAnimationFrame(Draw_Descriptors)
+            //interval = setInterval( Draw_Descriptors  )
+            Draw_Descriptors()
+            //interval = setInterval( Set_Detections_Interval )
         }
     }, false);
+    // async function Set_Detections_Interval() {
+    //     clearInterval(interval)
+    //     detections = await faceapi.detectAllFaces(photo)//.withFaceLandmarks().withFaceDescriptors()
+    //     setInterval(Set_Detections_Interval)
+    // }
 
     function Take_Picture() {    
         canvas.width = width;
@@ -120,28 +131,62 @@ async function testing() {
         ctx.drawImage(video, 0, 0, width, height);
         data = canvas.toDataURL('image/png');
         photo.setAttribute('src', data);
+        //worker.postMessage(data)
     }
 
-    async function Draw_Descriptors() {
-        if( canvas.width > 0 && canvas.height >0 ) {
-            Take_Picture()
-            const detections = await faceapi.detectAllFaces(photo)
-            console.log(detections)
-
-            for( const face of detections ){
-                const {x,y,width,height} = face.box
-                ctx.beginPath()
-                ctx.rect(x,y,width*1.4,height*1.4)
-                ctx.strokeStyle = 'red'
-                ctx.lineWidth = '8'
-                ctx.stroke()    
-
+    const fps = 3
+    const count_with_Descriptors = 4 // calculate the face descriptors every 3 detections to reduce the processing time
+    let descriptor_count = 0
+    let rect_face_array = []
+    let rect_face = { x:0, y:0, width:0, height:0 }
+    async function Detect_Faces() {
+        let detectionsNEW
+        if( descriptor_count == count_with_Descriptors ) {
+            console.log('yes descriptors')
+            detectionsNEW = await faceapi.detectAllFaces(photo).withFaceLandmarks().withFaceDescriptors()
+            descriptor_count = 0
+            rect_face_array = []
+            for( const face of detectionsNEW ) {
+                let {x,y,width,height} = face.detection.box // face.box
+                let rect_face_tmp = JSON.parse(JSON.stringify(rect_face))
+                rect_face_tmp.x = x - (width * 0.2)
+                rect_face_tmp.y = y - (height * 0.2) 
+                rect_face_tmp.width = width * 1.4
+                rect_face_tmp.height = height * 1.4
+                rect_face_array.push(rect_face_tmp)
             }
-            
-        }
+        } else {
+            console.log('no descriptors')
+            detectionsNEW = await faceapi.detectAllFaces(photo) //
+            descriptor_count++
+            rect_face_array = []
+            for( const face of detectionsNEW ) {
+                let {x,y,width,height} = face.box
+                let rect_face_tmp = JSON.parse(JSON.stringify(rect_face))
+                rect_face_tmp.x = x - (width * 0.2)
+                rect_face_tmp.y = y - (height * 0.2) 
+                rect_face_tmp.width = width * 1.4
+                rect_face_tmp.height = height * 1.4
+                rect_face_array.push(rect_face_tmp)
+            }
+        }        
+    }
+    setInterval( Detect_Faces , 1000/fps ) //ms = 1000/fps
+
+    async function Draw_Descriptors() {        
+        if( canvas.width > 0 && canvas.height > 0 ) {
+            Take_Picture()
+            for( const face_rect of rect_face_array ) {
+                ctx.rect(face_rect.x,face_rect.y,face_rect.width,face_rect.height)
+                ctx.strokeStyle = 'red'
+                ctx.lineWidth = 5
+                ctx.stroke()  
+            }
+        } else { }
+        requestAnimationFrame(Draw_Descriptors)
     }
 }
-testing()
+
 
 
 

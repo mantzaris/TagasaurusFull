@@ -44,7 +44,11 @@ window.DB_MODULE = require(PATH.join(__dirname,'AppCode','taga-DB','db-fns.js'))
 
 //--------->>>>>>>>>>>>>>>
 //FACE RECOGNITION STUFF!!!
-let faceapi = require("face-api.js")
+const tf = require('@tensorflow/tfjs-node')
+const faceapi = require('@vladmandic/face-api')
+//let faceapi = require("face-api.js")
+//require('@tensorflow/tfjs-node')
+
 
 const minConfidenceFace = 0.5;
 const faceapiOptions = new faceapi.SsdMobilenetv1Options({ minConfidenceFace });

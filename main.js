@@ -7,7 +7,6 @@ const FS = require('fs');
 require('dotenv').config()
 
 
-
 //needed for ffmpeg, the shared buffer was not there by default for some reason
 app.commandLine.appendSwitch('enable-features','SharedArrayBuffer')
 
@@ -56,6 +55,9 @@ function createWindow () {
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true,
+      nodeIntegrationInWorker: true,
+      webgl:true,
+      allowRunningInsecureContent: true,
       devTools: !app.isPackaged
     }
   })
