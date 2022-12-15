@@ -172,27 +172,62 @@ async function testing() {
     }
     setInterval( Detect_Faces , 1000/fps ) //ms = 1000/fps
 
+    let face_found = false
+    let rect_face_selected = { x:0, y:0, width:0, height:0 }
     async function Draw_Descriptors() {        
         if( canvas.width > 0 && canvas.height > 0 ) {
             Take_Picture()
-            for( const face_rect of rect_face_array ) {
+            //find the selected box by finding the closes x,y face to the selected face and update it as well
+            let selected_face_ind = -1
+            if( face_found == true && rect_face_array.length > 0 ) { //draw the selected box for which keywords exist
+                dist_min = 10**6
+                for( const [ind,face_rect] of rect_face_array.entries() ) { //get the index of the closest face rectangle to the selected face rectangle
+                    let dist_tmp = Math.sqrt( (face_rect.x-rect_face_selected.x)**2 + (face_rect.y-rect_face_selected.y)**2 ) //find the min distance face and update the index for it
+                    if( dist_tmp < dist_min ) {
+                        dist_min = dist_tmp
+                        selected_face_ind = ind
+                    }
+                }
+                //update the position of the box for the face min rectangle
+                rect_face_selected.x = rect_face_array[selected_face_ind].x
+                rect_face_selected.y = rect_face_array[selected_face_ind].y
+                rect_face_selected.width = rect_face_array[selected_face_ind].width
+                rect_face_selected.height = rect_face_array[selected_face_ind].height
+                
+                ctx.beginPath()
+                ctx.rect(rect_face_selected.x,rect_face_selected.y,rect_face_selected.width,rect_face_selected.height)
+                ctx.setLineDash([])
+                ctx.strokeStyle = 'red'
+                ctx.lineWidth = 6
+                ctx.stroke()
+                
+            }
+            
+            for( const [ind,face_rect] of rect_face_array.entries() ) { //draw rest of the faces not in selected
+                if(selected_face_ind == ind) { continue }
+                ctx.beginPath()
                 ctx.rect(face_rect.x,face_rect.y,face_rect.width,face_rect.height)
                 ctx.strokeStyle = 'red'
-                ctx.lineWidth = 5
+                ctx.setLineDash([16, 14]); //dashes are 5px and spaces are 3px
+                ctx.lineWidth = 3
                 ctx.stroke()  
             }
         } else { }
         requestAnimationFrame(Draw_Descriptors)
     }
 
-    let db_search_delay = 1000 // in ms
-    let max_records = await Number_of_Tagging_Records() 
+
+    GenerateTable( )
+    let db_search_delay = 2000 // in ms
+    //let max_records = await Number_of_Tagging_Records() 
     let record_sample_num = 10 //Math.min( 1000 , Math.floor( 0.1 * max_records ) )
     let face_keywords = []
     async function face_db_search() { //will improve in next version !!!! XXX use tree based methods!!!
         face_keywords = []
+        
         if( rect_face_array.length == 0 ) { return }
-        let ref_face_tmp = rect_face_array[ Math.floor(Math.random()*rect_face_array.length) ].descriptor
+        let ref_face_tmp = rect_face_array[ Math.floor(Math.random()*rect_face_array.length) ]
+        let ref_face_tmp_descriptor = ref_face_tmp.descriptor
         let sample_filenames = await Tagging_Random_DB_Images(record_sample_num)
         
         for( const filename_tmp of sample_filenames ) {
@@ -200,22 +235,55 @@ async function testing() {
             let annotation_obj_tmp = await Get_Tagging_Annotation_From_DB(filename_tmp)
             let face_descriptors_tmp = annotation_obj_tmp["faceDescriptors"]
             if( face_descriptors_tmp.length == 0 ) continue 
-            let score_tmp = await Get_Descriptors_DistanceScore( [ref_face_tmp] , face_descriptors_tmp )
+            let score_tmp = await Get_Descriptors_DistanceScore( [ref_face_tmp_descriptor] , face_descriptors_tmp )
             console.log(`score_tmp = ${score_tmp}`)
-            if( score_tmp  > 0.0 ) {
+            if( score_tmp  > 6 ) {
                 face_keywords.push(...annotation_obj_tmp["taggingTags"])
                 console.log(face_keywords)
             }
         
         }
+        if( face_keywords.length > 0 ) { 
+            console.log('in box position reset')
+            face_found = true 
+            rect_face_selected.x = ref_face_tmp.x
+            rect_face_selected.y = ref_face_tmp.y
+            rect_face_selected.width = ref_face_tmp.width
+            rect_face_selected.height = ref_face_tmp.height
+        }
+        else { face_found = false }
+        tableFiller( face_keywords ) 
         
         
     }
     setInterval( face_db_search , db_search_delay )
 
+    function tableFiller( keywords = [] ) {
+        const table = document.getElementById("tableK")
+        for(let i=0;i<table.children.length;i++) {
+            if(i<keywords.length) {
+                table.children[i].firstChild.innerText = keywords[i]
+            } else {
+                table.children[i].firstChild.innerText = "*"
+            }
+        }
+    }
+
+
 }
 
 
+function GenerateTable( countOfKeywords = 20 ) {
+    const table = document.getElementById("tableK")
+    for(let i=0;i<countOfKeywords;i++) {
+        const td = document.createElement("td")
+        const tr = document.createElement("tr")
+        td.innerText = ""
+        tr.appendChild(td)
+        table.appendChild(tr)
+    }
+    
+}
 
 
 
