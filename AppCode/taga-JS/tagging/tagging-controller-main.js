@@ -1015,6 +1015,7 @@ document.getElementById("load-webcam-input-button-id").onclick = async function(
         record_video_btn.style.display = "block"
         cancel_video_btn.style.display = 'none'
         video.style.borderColor = "transparent"
+        document.onkeydown = null
     }
 
     stream_again_btn.onclick = function() {

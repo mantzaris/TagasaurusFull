@@ -1,3 +1,6 @@
+//const { max } = require("@tensorflow/tfjs-node")
+const PATH = require('path');
+
 
 const keywords_only_description = "Displays keywords related to faces stored. Finds images/videos/gifs containing a similar face and displays the keywords from the description."
 const keywords_images_description = "Displays keywords and images related to faces stored. Finds images/videos/gifs containing a similar face and displays the keywords from the description. Images containing the face with a match are also shown."
@@ -21,6 +24,20 @@ selection_set.onchange = () => {
     } 
 }
 
+
+const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, GENERAL_HELPER_FNS } = require(PATH.join(__dirname,'..','constants','constants-code.js')) // require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+async function Tagging_Image_DB_Iterator() {
+    return DB_MODULE.Tagging_Image_DB_Iterator();
+}
+async function Tagging_Random_DB_Images(num_of_records) {
+    return DB_MODULE.Tagging_Random_DB_Images(num_of_records)
+}
+async function Get_Tagging_Annotation_From_DB(image_name) { //
+    return await DB_MODULE.Get_Tagging_Record_From_DB(image_name);
+}
+async function Number_of_Tagging_Records() {
+    return await DB_MODULE.Number_of_Tagging_Records()
+}
 
 
 continue_btn.onclick = async () => {
@@ -135,40 +152,22 @@ async function testing() {
     }
 
     const fps = 3
-    const count_with_Descriptors = 4 // calculate the face descriptors every 3 detections to reduce the processing time
-    let descriptor_count = 0
     let rect_face_array = []
-    let rect_face = { x:0, y:0, width:0, height:0 }
+    let rect_face = { x:0, y:0, width:0, height:0, descriptor:[] }
     async function Detect_Faces() {
         let detectionsNEW
-        if( descriptor_count == count_with_Descriptors ) {
-            console.log('yes descriptors')
-            detectionsNEW = await faceapi.detectAllFaces(photo).withFaceLandmarks().withFaceDescriptors()
-            descriptor_count = 0
-            rect_face_array = []
-            for( const face of detectionsNEW ) {
-                let {x,y,width,height} = face.detection.box // face.box
-                let rect_face_tmp = JSON.parse(JSON.stringify(rect_face))
-                rect_face_tmp.x = x - (width * 0.2)
-                rect_face_tmp.y = y - (height * 0.2) 
-                rect_face_tmp.width = width * 1.4
-                rect_face_tmp.height = height * 1.4
-                rect_face_array.push(rect_face_tmp)
-            }
-        } else {
-            console.log('no descriptors')
-            detectionsNEW = await faceapi.detectAllFaces(photo) //
-            descriptor_count++
-            rect_face_array = []
-            for( const face of detectionsNEW ) {
-                let {x,y,width,height} = face.box
-                let rect_face_tmp = JSON.parse(JSON.stringify(rect_face))
-                rect_face_tmp.x = x - (width * 0.2)
-                rect_face_tmp.y = y - (height * 0.2) 
-                rect_face_tmp.width = width * 1.4
-                rect_face_tmp.height = height * 1.4
-                rect_face_array.push(rect_face_tmp)
-            }
+        detectionsNEW = await faceapi.detectAllFaces(photo).withFaceLandmarks().withFaceDescriptors()
+        descriptor_count = 0
+        rect_face_array = []
+        for( const face of detectionsNEW ) {
+            let {x,y,width,height} = face.detection.box // face.box
+            let rect_face_tmp = JSON.parse(JSON.stringify(rect_face))
+            rect_face_tmp.x = x - (width * 0.2)
+            rect_face_tmp.y = y - (height * 0.2) 
+            rect_face_tmp.width = width * 1.4
+            rect_face_tmp.height = height * 1.4
+            rect_face_tmp.descriptor = face.descriptor
+            rect_face_array.push(rect_face_tmp)
         }        
     }
     setInterval( Detect_Faces , 1000/fps ) //ms = 1000/fps
@@ -185,8 +184,36 @@ async function testing() {
         } else { }
         requestAnimationFrame(Draw_Descriptors)
     }
-}
 
+    let db_search_delay = 1000 // in ms
+    let max_records = await Number_of_Tagging_Records() 
+    let record_sample_num = 10 //Math.min( 1000 , Math.floor( 0.1 * max_records ) )
+    let face_keywords = []
+    async function face_db_search() { //will improve in next version !!!! XXX use tree based methods!!!
+        face_keywords = []
+        if( rect_face_array.length == 0 ) { return }
+        let ref_face_tmp = rect_face_array[ Math.floor(Math.random()*rect_face_array.length) ].descriptor
+        let sample_filenames = await Tagging_Random_DB_Images(record_sample_num)
+        
+        for( const filename_tmp of sample_filenames ) {
+
+            let annotation_obj_tmp = await Get_Tagging_Annotation_From_DB(filename_tmp)
+            let face_descriptors_tmp = annotation_obj_tmp["faceDescriptors"]
+            if( face_descriptors_tmp.length == 0 ) continue 
+            let score_tmp = await Get_Descriptors_DistanceScore( [ref_face_tmp] , face_descriptors_tmp )
+            console.log(`score_tmp = ${score_tmp}`)
+            if( score_tmp  > 0.0 ) {
+                face_keywords.push(...annotation_obj_tmp["taggingTags"])
+                console.log(face_keywords)
+            }
+        
+        }
+        
+        
+    }
+    setInterval( face_db_search , db_search_delay )
+
+}
 
 
 
