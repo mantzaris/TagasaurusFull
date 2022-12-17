@@ -13,17 +13,13 @@ body {
     margin-top: 10%;
     
 }
-
 #search-type-label {
     font-size: 4vmin;
     font-weight: bold;
-    
 }
-
 #search-type {
     font-size: 3.2vmin;
 }
-
 #continue-btn,
 #main-menu-btn,
 #screen-btn {
@@ -31,9 +27,59 @@ body {
     margin-top: 5px;
     padding: 6px;
 }
-
-
 #stream-type-description {
     font-size: 3vmin;
     margin-top: 7px;
+}
+
+#stream-view1 {
+    display: grid;
+    grid-template-columns: 1fr 7fr;
+    grid-template-rows: 1fr 14fr;
+    min-height: 0;
+    min-width: 0;
+    height: 100vh;
+    width: 100vw;
+    box-sizing: border-box;
+    grid-template-areas:
+        "stream-btns-div1 stream-btns-div1"
+        "keyword-display1-div stream-view1-video";
+}
+#stream-btns-div1 {
+    grid-area: stream-btns-div1;
+    display: flex;
+    justify-content: center;
+    border-bottom: 4px solid #005000;
+}
+#return-stream-btn {
+    height: 100%;
+    font-size: 3.5vmin;
+}
+#keyword-display1-div {
+    grid-area: keyword-display1-div;
+    height: 100%;
+    width: 100%;
+    font-size: 3vmin;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-break: break-all; 
+    hyphens: auto;
+
+}
+#stream-view1-video {
+    grid-area: stream-view1-video;
+    width: 100%;
+    height: 100%; 
+    box-sizing:border-box;
+    background-color: blue;
+}
+.keyword {
+    border-bottom: 4px dotted #005000;
+}
+
+#overlay { 
+    display: block;
+    width: 100%;
+    height: 100%;  
+    
 }
