@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,7 +12,6 @@
     <!-- The stream search specific styles -->
     <link rel="stylesheet" href="../AppCode/taga-CSS/stream-search-CSS/stream-search-main-ui.css">
     <!-- <meta charset="UTF-8" http-equiv="Content-Security-Policy" content="script-src self unsafe-inline;"> -->
-
 
 </head>
 <body>
@@ -37,9 +34,10 @@
         <button class='fun-button-blue' id="main-menu-btn"> Main Menu </button>
     </div>
 
+    <!-- START THE HTML STREAM VIEW OF VIEW1 -->
     <div id="stream-view1">
         <div id="stream-btns-div1">
-            <button class='fun-button-blue' id="return-stream-btn"> Return/Stop </button>
+            <button class='fun-button-blue' id="return-stream-btn1"> Return/Stop </button>
         </div>
         <div id="keyword-display1-div">
             <!-- <div class="keyword">
@@ -47,12 +45,32 @@
             </div> -->
         </div>
         <div id="stream-view1-video"  class="margin">
-            <!-- <div  style="position: relative"> -->
-            <!-- <div> -->
-                <canvas id="overlay" />
-                <video  id="inputVideo" autoplay muted></video> 
-                
-            <!-- </div> -->
+                <canvas id="overlay1" />
+                <video  id="inputVideo1" autoplay muted></video>
+        </div>
+    </div>
+
+    <!-- START THE HTML STREAM VIEW OF VIEW2 -->
+    <div id="stream-view2">
+        <div id="stream-btns-div2">
+            <button class='fun-button-blue' id="return-stream-btn2"> Return/Stop </button>
+        </div>
+        <div id="keyword-display2-div">
+            <!-- <div class="keyword">
+                keyword1
+            </div> -->
+        </div>
+        <div id="stream-view2-video"  class="margin">
+                <canvas id="overlay2" />
+                <video  id="inputVideo2" autoplay muted></video>
+        </div>
+        <div id="images-display2-div">
+            <!-- <div class="image-thumbnail-div">
+                <img class="image-thumbnail" id="" src="../../Taga.png" title="view" alt="meme" />
+            </div>
+            <div class="image-thumbnail-div">
+                <img class="image-thumbnail" id="" src="../../Taga.png" title="view" alt="meme" />
+            </div> -->
         </div>
     </div>
 

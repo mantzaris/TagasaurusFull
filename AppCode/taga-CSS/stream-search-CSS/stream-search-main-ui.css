@@ -32,6 +32,8 @@ body {
     margin-top: 7px;
 }
 
+
+/*START: CSS for the first stream selection view1 */
 #stream-view1 {
     display: grid;
     grid-template-columns: 1fr 7fr;
@@ -51,7 +53,7 @@ body {
     justify-content: center;
     border-bottom: 4px solid #005000;
 }
-#return-stream-btn {
+#return-stream-btn1 {
     height: 100%;
     font-size: 3.5vmin;
 }
@@ -71,13 +73,88 @@ body {
     height: 100%; 
     box-sizing:border-box;
 }
-.keyword {
-    border-bottom: 4px dotted #005000;
-}
 
-#overlay { 
+#overlay1 { 
     display: block;
     width: 100%;
     height: 100%;  
     
+}
+
+
+/*START: CSS for the first stream selection view2 which includes keywords and images */
+#stream-view2 {
+    display: grid;
+    grid-template-columns: 2fr 13fr 3fr;
+    grid-template-rows: 1fr 14fr;
+    min-height: 0;
+    min-width: 0;
+    height: 100vh;
+    width: 100vw;
+    box-sizing: border-box;
+    grid-template-areas:
+        "stream-btns-div2 stream-btns-div2 stream-btns-div2"
+        "keyword-display2-div stream-view2-video images-display2-div";
+}
+#stream-btns-div2 {
+    grid-area: stream-btns-div2;
+    display: flex;
+    justify-content: center;
+    border-bottom: 4px solid #005000;
+}
+#return-stream-btn2 {
+    height: 100%;
+    font-size: 3.5vmin;
+}
+#keyword-display2-div {
+    grid-area: keyword-display2-div;
+    height: 100%;
+    width: 100%;
+    font-size: 3vmin;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-break: break-all; 
+    hyphens: auto;
+}
+#stream-view2-video {
+    grid-area: stream-view2-video;
+    width: 100%;
+    height: 100%; 
+    box-sizing:border-box;
+}
+#images-display2-div {
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-left: 3px solid #005000;
+}
+#overlay2 { 
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+
+.keyword {
+    border-bottom: 4px dotted #005000;
+}
+.image-thumbnail-div {
+    height: 15vh;
+    width: 100%;
+    margin-bottom: 5px;
+    position: relative;
+}
+.image-thumbnail {
+    /* height: 100px;
+    width: 100px; */
+    height: 99999px;
+    object-fit: contain;
+    max-height: 100%;
+    max-width: 100%;
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto auto;
 }
