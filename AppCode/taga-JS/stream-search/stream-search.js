@@ -8,6 +8,7 @@ const keywords_images_memes_description = "Displays keywords, images and memes r
 
 document.getElementById("stream-view1").style.display = 'none'
 document.getElementById("stream-view2").style.display = 'none'
+document.getElementById("stream-view3").style.display = 'none'
 
 const webcam_selection_btn = document.getElementById("continue-btn")
 const main_menu_btn = document.getElementById("main-menu-btn")
@@ -17,6 +18,8 @@ const return_from_stream_btn1 = document.getElementById("return-stream-btn1")
 return_from_stream_btn1.onclick = () => { Stop_Stream_Search() }
 const return_from_stream_btn2 = document.getElementById("return-stream-btn2")
 return_from_stream_btn2.onclick = () => { Stop_Stream_Search() }
+const return_from_stream_btn3 = document.getElementById("return-stream-btn3")
+return_from_stream_btn3.onclick = () => { Stop_Stream_Search() }
 
 let stream_selection = "keywords-only"
 selection_description.innerText = keywords_only_description
@@ -56,6 +59,7 @@ let descriptors_interval
 let face_keywords_interval
 let keyword_div
 let images_div
+let memes_div
 let canvas
 
 
@@ -86,6 +90,13 @@ function Keywords_Images_Start() {
     canvas = document.getElementById("overlay2")
 }
 function Keywords_Images_Memes_Start() {
+    document.getElementById("selection-screen").style.display = 'none'
+    document.getElementById("stream-view3").style.display = 'grid'
+    video = document.getElementById("inputVideo3")
+    keyword_div = document.getElementById("keyword-display3-div")
+    images_div = document.getElementById("images-display3-div")
+    memes_div = document.getElementById("memes-display3-div")
+    canvas = document.getElementById("overlay3")
 }
 function Keywords_Only_End() {
     document.getElementById("stream-view1").style.display = 'none'
@@ -96,6 +107,8 @@ function Keywords_Images_End() {
     document.getElementById("selection-screen").style.display = 'block'
 }
 function Keywords_Images_Memes_End() {
+    document.getElementById("stream-view3").style.display = 'none'
+    document.getElementById("selection-screen").style.display = 'block'
 }
 
 function Init() {
@@ -104,7 +117,7 @@ function Init() {
         Keywords_Only_Start()
     } else if ( selection == "keywords-images" ) {
         Keywords_Images_Start()
-    } else {
+    } else if ( selection == "keywords-images-memes" ) {
         Keywords_Images_Memes_Start()
     }
     
@@ -116,7 +129,7 @@ function Stop_Stream_Search() {
         Keywords_Only_End()
     } else if ( selection == "keywords-images" ) {
         Keywords_Images_End()
-    } else {
+    } else if ( selection == "keywords-images-memes" ) {
         Keywords_Images_Memes_End()
     }    
     stream_ok = false
@@ -248,16 +261,24 @@ async function Stream_Search_Run() {
         if( stream_selection == "keywords-only" ) {
             if( face_keywords.length > 0 && face_found == true ) {
                 Display_Keywords()
-            }
+            } else { keyword_div.innerHTML = "Keywords: <br>" }
         } else if ( stream_selection == "keywords-images" ) {
             if( face_keywords.length > 0 && face_found == true ) {
                 Display_Keywords()
-            }
+            } else { keyword_div.innerHTML = "Keywords: <br>" }
             if( face_including_images.length > 0 && face_found == true ) {
                 Display_Images_Found()
-            }
-        } else {
-            
+            } else { images_div.innerHTML = "Images: <br>" }
+        } else if ( stream_selection == "keywords-images-memes" ) {
+            if( face_keywords.length > 0 && face_found == true ) {
+                Display_Keywords()
+            } else { keyword_div.innerHTML = "Keywords: <br>" }
+            if( face_including_images.length > 0 && face_found == true ) {
+                Display_Images_Found()
+            } else { images_div.innerHTML = "Images: <br>" }
+            if( face_including_memes.length > 0 && face_found == true ) {
+                Display_Memes_Found()
+            } else { memes_div.innerHTML = "Memes: <br>" }
         }    
         if(stream_ok) { requestAnimationFrame(Draw_Descriptors) }
     }
@@ -280,11 +301,24 @@ async function Stream_Search_Run() {
             //console.log(`face image = ${image}`)
             images_html += `
                             <div class="image-thumbnail-div">
-                                <img class="image-thumbnail" id="" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${image}" title="view" alt="meme" />
+                                <img class="image-thumbnail" id="" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${image}" title="view" alt="img" />
                             </div>
                             `
         }
         images_div.innerHTML = images_html
+    }
+    function Display_Memes_Found() {
+        memes_div.innerHTML = ""
+        memes_html = "Memes: <br>"
+        for( const meme of face_including_memes ) {
+            //console.log(`face image = ${image}`)
+            memes_html += `
+                            <div class="meme-thumbnail-div">
+                                <img class="meme-thumbnail" id="" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme}" title="view" alt="meme" />
+                            </div>
+                            `
+        }
+        memes_div.innerHTML = memes_html
     }
     //END: loop for drawing the boxes of the face rectangles on the canvas, selected box has a different stroke style
 
@@ -294,9 +328,11 @@ async function Stream_Search_Run() {
     let record_sample_num = Math.min( 5000 , Math.floor( 1 * max_records ) ) //allow up to 4K records to be searched in each sweep since more may incur too much delay
     let face_keywords = [] //holds the keywords for the selected image in focus
     let face_including_images = [] //holds the images where a face match was found (could be 1 face in many present)
+    let face_including_memes = [] //holds the memes connected to a face match was found (could be 1 face in many present)
     async function face_db_search() { //will improve in next version !!!! XXX use tree based methods!!!
         face_keywords = [] //reset the keywords
         face_including_images = [] //reset the face images
+        face_including_memes = [] //reset the face memes
         if( rect_face_array.length == 0 ) { return } //if no faces present skip/exit
         let ref_face_tmp = rect_face_array[ Math.floor(Math.random()*rect_face_array.length) ] //get some random face to analyze
         let ref_face_tmp_descriptor = ref_face_tmp.descriptor //get the face descriptor array
@@ -309,7 +345,8 @@ async function Stream_Search_Run() {
             //console.log(`score_tmp = ${score_tmp}`)
             if( score_tmp > 5 ) { //why is this not between 0 and 1 ??? !!!! xxx
                 face_keywords.push(...annotation_obj_tmp["taggingTags"]) //add to the keywords
-                face_including_images.push(annotation_obj_tmp["fileName"])
+                face_including_images.push(annotation_obj_tmp["fileName"]) //add images related to the face
+                face_including_memes.push(...annotation_obj_tmp["taggingMemeChoices"]) //add memes related to the face
                 //console.log(face_keywords)
             }        
         }
@@ -340,13 +377,14 @@ async function Stream_Search_Run() {
     //related to that face descriptor, also helpes when the face box is cycling through a set
     let faces_short_memories = [] //hold objects of face-descriptors-and-counters-keywords to remember face
     let memory_time = 1000*60*2
-    let face_memory = {memory_time:memory_time, descriptor:[], keywords:[], images:[]}
+    let face_memory = {memory_time:memory_time, descriptor:[], keywords:[], images:[], memes:[]}
     async function Faces_Short_Memory(ref_face_descriptor) {
         if( faces_short_memories.length == 0 ) { //keywords not updated since this is a first to be seen
             let new_face_memory = JSON.parse(JSON.stringify(face_memory))
             new_face_memory.descriptor = ref_face_descriptor
             new_face_memory.keywords = face_keywords
             new_face_memory.images = face_including_images
+            new_face_memory.memes = face_including_memes
             faces_short_memories.push(new_face_memory)
             return //nothing left to do so exit
         }
@@ -359,9 +397,16 @@ async function Stream_Search_Run() {
                 faces_short_memories[ind].keywords.push(...face_keywords) //merge the arrays
                 faces_short_memories[ind].keywords = [...new Set(faces_short_memories[ind].keywords)] //get the unique of the merged
                 face_keywords = faces_short_memories[ind].keywords //update the current keyword list
+                face_keywords = face_keywords.sort((a, b) => 0.5 - Math.random()) //shuffle
                 faces_short_memories[ind].images.push(...face_including_images) //merge the arrays
                 faces_short_memories[ind].images = [...new Set(faces_short_memories[ind].images)] //get the unique of the merged
                 face_including_images = faces_short_memories[ind].images //update the current images list
+                face_including_images = face_including_images.sort((a, b) => 0.5 - Math.random()) //shuffle
+                faces_short_memories[ind].memes.push(...face_including_memes) //merge the arrays
+                faces_short_memories[ind].memes = [...new Set(faces_short_memories[ind].memes)] //get the unique of the merged
+                face_including_memes = faces_short_memories[ind].memes //update the current memes list
+                face_including_memes = face_including_memes.sort((a, b) => 0.5 - Math.random()) //shuffle
+
             }
         }
         if(found_face == false) { //face needs to be added to the seen set
@@ -369,13 +414,13 @@ async function Stream_Search_Run() {
             new_face_memory.memory_time = memory_time
             new_face_memory.keywords = face_keywords
             new_face_memory.images = face_including_images
+            new_face_memory.memes = face_including_memes
             new_face_memory.descriptor = ref_face_descriptor
             faces_short_memories.push(new_face_memory)
         }
     }
     function Face_Short_Memory_Reduction() { //reduce the time for each memory on a loop and remove those out of time
         for( const [ind,memory] of faces_short_memories.entries() ) { 
-            console.log({faces_short_memories})
             faces_short_memories[ind].memory_time -= 10000 //take time off of that memory
             console.log({faces_short_memories})
         }

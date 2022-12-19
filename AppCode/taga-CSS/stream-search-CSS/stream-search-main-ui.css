@@ -134,16 +134,75 @@ body {
 }
 
 
+/*START: CSS for the first stream selection view3 which includes keywords and images */
+#stream-view3 {
+    display: grid;
+    grid-template-columns: 2fr 13fr 3fr;
+    grid-template-rows: 1fr 7fr 7fr;
+    min-height: 0;
+    min-width: 0;
+    height: 100vh;
+    width: 100vw;
+    box-sizing: border-box;
+    grid-template-areas:
+        "stream-btns-div3 stream-btns-div3 stream-btns-div3"
+        "keyword-display3-div stream-view3-video images-display3-div"
+        "keyword-display3-div stream-view3-video memes-display3-div";
+}
+#stream-btns-div3 {
+    grid-area: stream-btns-div3;
+    display: flex;
+    justify-content: center;
+    border-bottom: 4px solid #005000;
+}
+#return-stream-btn3 {
+    height: 100%;
+    font-size: 3.5vmin;
+}
+#keyword-display3-div {
+    grid-area: keyword-display3-div;
+    height: 100%;
+    width: 100%;
+    font-size: 3vmin;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-break: break-all; 
+    hyphens: auto;
+}
+#stream-view3-video {
+    grid-area: stream-view3-video;
+    width: 100%;
+    height: 100%; 
+    box-sizing:border-box;
+}
+#images-display3-div {
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-left: 3px solid #005000;
+}
+#memes-display3-div {
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-left: 3px solid #005000;
+}
+#overlay3 { 
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+
+
 .keyword {
     border-bottom: 4px dotted #005000;
 }
-.image-thumbnail-div {
+.image-thumbnail-div, .meme-thumbnail-div {
     height: 15vh;
     width: 100%;
     margin-bottom: 5px;
     position: relative;
 }
-.image-thumbnail {
+.image-thumbnail, .meme-thumbnail {
     /* height: 100px;
     width: 100px; */
     height: 99999px;
