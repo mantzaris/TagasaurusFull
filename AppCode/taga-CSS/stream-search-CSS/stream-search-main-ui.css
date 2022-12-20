@@ -13,16 +13,26 @@ body {
     margin-top: 10%;
     
 }
-#search-type-label {
+#search-type-label,
+#source-label,
+#accuracy-label {
     font-size: 4vmin;
     font-weight: bold;
 }
-#search-type {
+#mlAccuracy {
+    width: 25%;
+}
+#search-type,
+#source-type,
+#accuracy-description {
     font-size: 3.2vmin;
+}
+#source-type {
+    max-width: 60%;
 }
 #continue-btn,
 #main-menu-btn,
-#screen-btn {
+#screen-capture-btn {
     font-size: 3.5vmin;
     margin-top: 5px;
     padding: 6px;
@@ -216,4 +226,7 @@ body {
     left: 0;
     right: 0;
     margin: auto auto;
+}
+.separator {
+    height: 5vh;
 }

@@ -1,7 +1,7 @@
 // Modules to control application life and create native browser window
 //'ipcMain' and 'dialog' are introduced to open the dialog window in slides.js
 //
-const {app, ipcMain, dialog, BrowserWindow} = require('electron');
+const {app, ipcMain, dialog, BrowserWindow, desktopCapturer} = require('electron');
 const PATH = require('path');
 const FS = require('fs');
 require('dotenv').config()
@@ -314,6 +314,31 @@ ipcMain.handle('ffmpegDecode', async (_, options) => {
 })
 
 
+
+//for the screen capture of the stream search
+ipcMain.handle('getCaptureID', async(_) => {
+  const sources = await desktopCapturer.getSources({types: ['window','screen']})
+  return sources.map( image => {
+    return {
+      id:image.id, name:image.name, thumbnail:image.thumbnail.toDataURL()
+    }
+  })
+})
+
+
+
+// function formatBytes(bytes, decimals = 2) {
+//   if (!+bytes) return '0 Bytes'
+
+//   const k = 1024
+//   const dm = decimals < 0 ? 0 : decimals
+//   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+
+//   const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+//   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
+// }
+// setInterval( () => console.log( formatBytes( process.memoryUsage().heapUsed ) ) , 2000 )
 
 //for the ability to load the entity creation for the selection of a profile image set
 // ipcMain.handle('dialog:openEntityImageSet', async (_, args) => {

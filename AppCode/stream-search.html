@@ -18,6 +18,15 @@
     
 
     <div id="selection-screen">
+        <!-- <label id="accuracy-label" for="">Face Accuracy Sensitivity:</label>
+        <div id="accuracy-description">
+            Control how close faces must match those in the database.
+        </div>
+        <br>
+        very low
+        <input type="range" min="0" max="100" value="60" class="slider" id="mlAccuracy">
+        very high
+        <div class="separator"></div> -->
         <label id="search-type-label" for="search-type">Choose a stream search type:</label>
         <br>
         <select name="" id="search-type">
@@ -28,9 +37,19 @@
         <div id="stream-type-description">
 
         </div>
+        <div class="separator"></div>
         <br>
-        <button class='fun-button-blue' id="continue-btn"> WEBCAM INPUT </button>
-        <button class='fun-button-blue' id="screen-btn"> SCREEN INPUT </button>
+        
+        <!--<button class='fun-button-blue' id="screen-capture-btn"> SCREEN INPUT </button> -->
+
+        <label id="source-label" for="">Choose video source</label>
+        <br>
+        <select name="" id="source-type">
+            <!-- <option value="keywords-images-memes">Keywords, Images and Memes</option>       -->
+        </select> 
+        <br>
+        <div class="separator"></div>
+        <button class='fun-button-blue' disabled id="continue-btn"> START </button>
         <button class='fun-button-blue' id="main-menu-btn"> Main Menu </button>
     </div>
 
