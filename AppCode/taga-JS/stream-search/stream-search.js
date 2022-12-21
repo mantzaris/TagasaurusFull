@@ -1,6 +1,7 @@
 //const { max } = require("@tensorflow/tfjs-node")
 const { ipcRenderer } = require('electron');
 const PATH = require('path');
+const fileType = require('file-type');
 
 const keywords_only_description =
   'Displays keywords related to faces stored. Finds images/videos/gifs containing a similar face and displays the keywords from the description.';
@@ -80,6 +81,7 @@ let selection_sources;
 let media_source = '';
 
 let face_threshold = 6.4;
+let max_sample_num = 3000;
 
 ipcRenderer.invoke('getCaptureID').then((sources) => {
   selection_sources = document.getElementById('source-type');
@@ -174,9 +176,9 @@ function Stop_Stream_Search() {
     Keywords_Images_Memes_End();
   }
   stream_ok = false;
-  clearInterval(face_keywords_interval);
-  clearInterval(descriptors_interval);
-  clearInterval(memory_loss_interval);
+  if (face_keywords_interval) clearInterval(face_keywords_interval);
+  if (descriptors_interval) clearInterval(descriptors_interval);
+  if (memory_loss_interval) clearInterval(memory_loss_interval);
   stream.getTracks().forEach(function (track) {
     track.stop();
   });
@@ -419,12 +421,13 @@ async function Stream_Search_Run() {
   //END: loop for drawing the boxes of the face rectangles on the canvas, selected box has a different stroke style
 
   //START: in a separate loop, search and fill keywords for a randomly selected face in the faces array rect_face_array (next version should use tree based indexes on clusters)
-  let db_search_delay = 2500; //amount of time the DB has to find data related to a face, in ms
+  let db_search_delay = 3000; //amount of time the DB has to find data related to a face, in ms
   let max_records = await Number_of_Tagging_Records();
-  let record_sample_num = Math.min(5000, Math.floor(1 * max_records)); //allow up to 4K records to be searched in each sweep since more may incur too much delay
+  let record_sample_num = Math.min(max_sample_num, Math.floor(1 * max_records)); //allow up to 4K records to be searched in each sweep since more may incur too much delay
   let face_keywords = []; //holds the keywords for the selected image in focus
   let face_including_images = []; //holds the images where a face match was found (could be 1 face in many present)
   let face_including_memes = []; //holds the memes connected to a face match was found (could be 1 face in many present)
+  //const file_type_lookup = new Map(); //holds the file types to ignore videos
   async function face_db_search() {
     //will improve in next version !!!! XXX use tree based methods!!!
     face_keywords = []; //reset the keywords
@@ -442,8 +445,22 @@ async function Stream_Search_Run() {
       let annotation_obj_tmp = await Get_Tagging_Annotation_From_DB(
         filename_tmp
       );
+
       let face_descriptors_tmp = annotation_obj_tmp['faceDescriptors'];
       if (face_descriptors_tmp.length == 0) continue; //no face
+
+      // //check for the type of the file
+      // if (file_type_lookup.has(filename_tmp)) {
+      //   if (!file_type_lookup.get(filename_tmp)) continue;
+      // } else {
+      //   let ft_res = await fileType.fromFile(
+      //     PATH.join(TAGA_DATA_DIRECTORY, filename_tmp)
+      //   );
+      //   const usable = !ft_res.mime.includes('video');
+      //   file_type_lookup.set(filename_tmp, usable);
+      //   if (!usable) continue;
+      // }
+
       let score_tmp = await Get_Descriptors_DistanceScore(
         [ref_face_tmp_descriptor],
         face_descriptors_tmp
@@ -562,21 +579,21 @@ async function Stream_Search_Run() {
   //END: memory
 }
 
-function formatBytes(bytes, decimals = 2) {
-  if (!+bytes) return '0 Bytes';
+// function formatBytes(bytes, decimals = 2) {
+//   if (!+bytes) return '0 Bytes';
 
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+//   const k = 1024;
+//   const dm = decimals < 0 ? 0 : decimals;
+//   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
+//   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
-}
-setInterval(
-  () => console.log(formatBytes(performance.memory.usedJSHeapSize)),
-  2000
-);
+//   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+// }
+// setInterval(
+//   () => console.log(formatBytes(performance.memory.usedJSHeapSize)),
+//   2000
+// );
 //END of stream search functionality view
 
 //     let ft_res = await fileType.fromFile( PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation["fileName"]) )
