@@ -1,6 +1,6 @@
 {
   "name": "tagasaurus",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Tag your Planet!",
   "author": "Alexander V. Mantzaris",
   "license": "MIT",
@@ -45,15 +45,12 @@
   "dependencies": {
     "@ffmpeg/core": "^0.11.0",
     "@ffmpeg/ffmpeg": "^0.11.1",
-    "@tensorflow/tfjs": "^4.1.0",
-    "@tensorflow/tfjs-node": "^3.21.1",
-    "@tensorflow/tfjs-node-gpu": "^4.1.0",
+    "@tensorflow/tfjs-node": "^4.1.0",
     "@vladmandic/face-api": "^1.7.7",
     "better-sqlite3": "^7.6.2",
     "decode-gif": "^1.0.1",
     "dotenv": "^16.0.3",
     "electron-pdf-window": "^1.0.12",
-    "face-api.js": "^0.22.2",
     "file-type": "16.5.3",
     "fs-extra": "^10.0.0",
     "json": "^11.0.0",
@@ -69,12 +66,12 @@
       "!docs"
     ],
     "linux": {
-      "icon": "/build/taga-icon/TagaIcon512x512.png",
+      "icon": "taga-icon/TagaIcon512x512.png",
       "maintainer": "mantzaris",
       "category": "utility"
     },
     "win": {
-      "icon": "/build/taga-icon/TagaIcon512x512.png"
+      "icon": "taga-icon/TagaIcon512x512.png"
     },
     "portable": {
       "artifactName": "tagasaurus.app"

@@ -1,46 +1,61 @@
 // Modules to control application life and create native browser window
 //'ipcMain' and 'dialog' are introduced to open the dialog window in slides.js
 //
-const {app, ipcMain, dialog, BrowserWindow, desktopCapturer} = require('electron');
+const {
+  app,
+  ipcMain,
+  dialog,
+  BrowserWindow,
+  desktopCapturer,
+} = require('electron');
 const PATH = require('path');
 const FS = require('fs');
-require('dotenv').config()
-
+require('dotenv').config();
 
 //needed for ffmpeg, the shared buffer was not there by default for some reason
-app.commandLine.appendSwitch('enable-features','SharedArrayBuffer')
+app.commandLine.appendSwitch('enable-features', 'SharedArrayBuffer');
 
-const BUILD_INSTALLER = process.env.npm_config_build_installer === "true";
+const BUILD_INSTALLER = process.env.npm_config_build_installer === 'true';
 
 let TAGA_FILES_DIRECTORY;
-if(BUILD_INSTALLER) {
-  TAGA_FILES_DIRECTORY = PATH.join(app.getPath('userData'),'TagasaurusFiles') //PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles')
-} else { // non installer zip etc...
-  TAGA_FILES_DIRECTORY = PATH.join( __dirname, '..', '..', '..', 'TagasaurusFiles' )
+if (BUILD_INSTALLER) {
+  TAGA_FILES_DIRECTORY = PATH.join(app.getPath('userData'), 'TagasaurusFiles'); //PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles')
+} else {
+  // non installer zip etc...
+  TAGA_FILES_DIRECTORY = PATH.join(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    'TagasaurusFiles'
+  );
 }
 
-
-const APP_PATH = app.getAppPath()
-const TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY,'data') //where the media files get stored
+const APP_PATH = app.getAppPath();
+const TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY, 'data'); //where the media files get stored
 //const USER_DATA_PATH = app.getPath('userData')
 
-
-const MY_FILE_HELPER = require( PATH.join(__dirname,'AppCode','taga-JS','utilities','copy-new-file-helper.js')) //PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'copy-new-file-helper.js') //require('./myJS/copy-new-file-helper.js')
+const MY_FILE_HELPER = require(PATH.join(
+  __dirname,
+  'AppCode',
+  'taga-JS',
+  'utilities',
+  'copy-new-file-helper.js'
+)); //PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'copy-new-file-helper.js') //require('./myJS/copy-new-file-helper.js')
 
 const DATABASE = require('better-sqlite3');
 //const { build } = require('electron-builder');
 let DB;
-DB_FILE_NAME = 'mainTagasaurusDB.db'
+DB_FILE_NAME = 'mainTagasaurusDB.db';
 
 //good to print at the start
-console.log(`APP_PATH = ${APP_PATH}`)
-let tmp_icon_dir = PATH.join(APP_PATH,'/build/taga-icon','TagaIcon512x512.png')
-console.log('icon path = ',  tmp_icon_dir   )
-let exists = FS.existsSync( tmp_icon_dir  )
-console.log(`exists = `, exists)
+console.log(`APP_PATH = ${APP_PATH}`);
+let tmp_icon_dir = PATH.join(APP_PATH, 'taga-icon', 'TagaIcon512x512.png');
+console.log('icon path = ', tmp_icon_dir);
+let exists = FS.existsSync(tmp_icon_dir);
+console.log(`exists = `, exists);
 
-
-function createWindow () {
+function createWindow() {
   // //tray stuff
   //const tray = new Tray(PATH.join(__dirname,"icon.png"))
   // Create the browser window.
@@ -56,17 +71,16 @@ function createWindow () {
       contextIsolation: false,
       enableRemoteModule: true,
       nodeIntegrationInWorker: true,
-      webgl:true,
+      webgl: true,
       allowRunningInsecureContent: true,
-      devTools: !app.isPackaged
-    }
-  })
+      devTools: true, //!app.isPackaged,
+    },
+  });
   //LOAD THE STARTING .html OF THE APP->
-  mainWindow.loadFile(PATH.join(__dirname,'AppCode','welcome-screen.html')) //PATH.resolve(__dirname,'./AppCode/welcome-screen.html'))
+  mainWindow.loadFile(PATH.join(__dirname, 'AppCode', 'welcome-screen.html')); //PATH.resolve(__dirname,'./AppCode/welcome-screen.html'))
   //mainWindow.setIcon(tmp_icon_dir)
   // mainWindow.webContents.openDevTools()
 }
-
 
 //DB SET UP START>>>
 //create folders for data and db -> check if db tables exist -> create indexes on tables
@@ -75,257 +89,353 @@ const TAGGING_TABLE_NAME = 'TAGGING';
 const TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
 const COLLECTIONS_TABLE_NAME = 'COLLECTIONS';
 const COLLECTION_MEME_TABLE_NAME = 'COLLECTIONMEMES';
-const COLLECTION_GALLERY_TABLE_NAME = 'COLLECTIONFILESET'
+const COLLECTION_GALLERY_TABLE_NAME = 'COLLECTIONFILESET';
 
-console.log(`about to make directory or not of ${TAGA_FILES_DIRECTORY}`)
-if( FS.existsSync(TAGA_FILES_DIRECTORY) == false ) { //directory for files exists?
-  console.log('directory TAGA_FILES_DIRECTORY does not exist')
+console.log(`about to make directory or not of ${TAGA_FILES_DIRECTORY}`);
+if (FS.existsSync(TAGA_FILES_DIRECTORY) == false) {
+  //directory for files exists?
+  console.log('directory TAGA_FILES_DIRECTORY does not exist');
   FS.mkdirSync(TAGA_FILES_DIRECTORY);
-  console.log('directory TAGA_FILES_DIRECTORY does not exist 2 ')
-}  
-DB = new DATABASE( PATH.join(TAGA_FILES_DIRECTORY,DB_FILE_NAME), { verbose: console.log }); //open db in that directory
-if( FS.existsSync(TAGA_FILES_DIRECTORY) == true && FS.existsSync(TAGA_DATA_DIRECTORY) == false ) { //directory for data exists?
+  console.log('directory TAGA_FILES_DIRECTORY does not exist 2 ');
+}
+DB = new DATABASE(PATH.join(TAGA_FILES_DIRECTORY, DB_FILE_NAME), {
+  verbose: console.log,
+}); //open db in that directory
+if (
+  FS.existsSync(TAGA_FILES_DIRECTORY) == true &&
+  FS.existsSync(TAGA_DATA_DIRECTORY) == false
+) {
+  //directory for data exists?
   FS.mkdirSync(TAGA_DATA_DIRECTORY);
 }
 //check to see if the TAGGING table exists
-let tagging_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${TAGGING_TABLE_NAME}'; `);
+let tagging_table_exists_stmt = DB.prepare(
+  ` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${TAGGING_TABLE_NAME}'; `
+);
 let tagging_table_exists_res = tagging_table_exists_stmt.get();
 //if tagging table does not exit, so create it
-if( tagging_table_exists_res["count(*)"] == 0 ){
+if (tagging_table_exists_res['count(*)'] == 0) {
   STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${TAGGING_TABLE_NAME}
                     (fileName TEXT, fileHash TEXT, taggingRawDescription TEXT,
                             taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT,
                             faceDescriptors TEXT)`);
   STMT.run();
   //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
-  let STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX fileName_index ON ${TAGGING_TABLE_NAME} (fileName); `);
+  let STMT_index1 = DB.prepare(
+    ` CREATE UNIQUE INDEX fileName_index ON ${TAGGING_TABLE_NAME} (fileName); `
+  );
   STMT_index1.run();
-  let STMT_index2 = DB.prepare(` CREATE UNIQUE INDEX imageFileHash_index ON ${TAGGING_TABLE_NAME} (fileHash); `);
+  let STMT_index2 = DB.prepare(
+    ` CREATE UNIQUE INDEX imageFileHash_index ON ${TAGGING_TABLE_NAME} (fileHash); `
+  );
   STMT_index2.run();
 
   //also add a default tagging object to avoid errors at start up
   let TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
-    "fileName": '',
-    "fileHash": '',
-    "taggingRawDescription": "",
-    "taggingTags": [],
-    "taggingEmotions": {good:"0",bad:"0"},
-    "taggingMemeChoices": [],
-    "faceDescriptors": []
-    }
-    let taga_source_path = PATH.join(APP_PATH,'Taga.png') //PATH.resolve()+PATH.sep+'Taga.png';
-    if( FS.existsSync(PATH.join(TAGA_DATA_DIRECTORY,'Taga.png')) == false ) {
-      FS.copyFileSync(taga_source_path, PATH.join(TAGA_DATA_DIRECTORY,'Taga.png'), FS.constants.COPYFILE_EXCL);
-    }
-    let tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
-    tagging_entry.fileName = 'Taga.png';
-    tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash( PATH.join(TAGA_DATA_DIRECTORY,'Taga.png') ) //`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
+    fileName: '',
+    fileHash: '',
+    taggingRawDescription: '',
+    taggingTags: [],
+    taggingEmotions: { good: '0', bad: '0' },
+    taggingMemeChoices: [],
+    faceDescriptors: [],
+  };
+  let taga_source_path = PATH.join(APP_PATH, 'Taga.png'); //PATH.resolve()+PATH.sep+'Taga.png';
+  if (FS.existsSync(PATH.join(TAGA_DATA_DIRECTORY, 'Taga.png')) == false) {
+    FS.copyFileSync(
+      taga_source_path,
+      PATH.join(TAGA_DATA_DIRECTORY, 'Taga.png'),
+      FS.constants.COPYFILE_EXCL
+    );
+  }
+  let tagging_entry = JSON.parse(
+    JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)
+  ); //clone the default obj
+  tagging_entry.fileName = 'Taga.png';
+  tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash(
+    PATH.join(TAGA_DATA_DIRECTORY, 'Taga.png')
+  ); //`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
 
-    INSERT_TAGGING_STMT = DB.prepare(`INSERT INTO ${TAGGING_TABLE_NAME} (fileName, fileHash, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors) VALUES (?, ?, ?, ?, ?, ?, ?)`);
-    let info = INSERT_TAGGING_STMT.run(tagging_entry.fileName,tagging_entry.fileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices),JSON.stringify(tagging_entry.faceDescriptors));
-    //console.log(`loging in the main js line 86`)
+  INSERT_TAGGING_STMT = DB.prepare(
+    `INSERT INTO ${TAGGING_TABLE_NAME} (fileName, fileHash, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors) VALUES (?, ?, ?, ?, ?, ?, ?)`
+  );
+  let info = INSERT_TAGGING_STMT.run(
+    tagging_entry.fileName,
+    tagging_entry.fileHash,
+    tagging_entry.taggingRawDescription,
+    JSON.stringify(tagging_entry.taggingTags),
+    JSON.stringify(tagging_entry.taggingEmotions),
+    JSON.stringify(tagging_entry.taggingMemeChoices),
+    JSON.stringify(tagging_entry.faceDescriptors)
+  );
+  //console.log(`loging in the main js line 86`)
 
-    //extra images
-    file_names_description_obj = {
-      'Antikythera.jpg': "Ancient Greek Technology, the  - Antikythera mechanism - from 100 to 200 B.C., an example of an ancient Analogue Computer",
-      'TagzParrot.jpg': "A Macaw parrot flying! (from Wikipedia, user Lviatour https://commons.wikimedia.org/wiki/User:Lviatour)",
-      'TheKakapo.jpg': "A Kakapo parrot, from the book A History of the Birds of New Zealand by Walter Lawry Buller, published in 1873",
-      'YoungJamesClerkMaxwell.jpg': "Scottish scientist, James Clerk Maxwell. His discoveries changed the world (statistical mechanics, maxwell's equations, control theory and many more)",
-      'TE1_cover.jpg': "Front and Back cover of the comic Book, Totem Eclipse (episode 1) by Vasexandros, Makis and Paul Regklis. (on Amazon)",
-      'TE3_Fcover.jpg': "Front cover of the awesome comic Book, Totem Eclipse (episode 3) by Vasexandros, Makis and Paul Regklis. Find it on Amazon!",
-      'TE4_Fcover.jpg': "Front cover of the comic Book, Totem Eclipse (episode 4) by Vasexandros, Makis and Paul Regklis. (USA  https://www.amazon.com/dp/B086PLNK4B/ref=cm_sw_r_tw_dp_GB2TTR9A4NFMP1CFRSTE )",
-      'TE5_Fcover.png': "Front cover of the comic Book, Totem Eclipse (episode 5) by Vasexandros, Makis and Paul Regklis",
-      'TheLabor2sample.png': "The Second of Labor of Hercules by Vasexandros, and Paul Regklis (on Amazon)",
-      'TheLaborsOfHerculesAHerosGuide.png': "The Labors of Hercules by Vasexandros and Paul Regklis  (USA https://www.amazon.com/dp/B0977P9NV2/ref=cm_sw_r_tw_dp_ZE67RVGAEAR0ZK9ZM5BX ) ",
-      'TheLaborsOfHerculesAHerosGuideFRONTBACK.png': "great book, The Labors of Hercules by Vasexandros and Paul Regklis  (USA https://www.amazon.com/dp/B0977P9NV2/ref=cm_sw_r_tw_dp_ZE67RVGAEAR0ZK9ZM5BX )",
-      'TheCats.jpg': "Examples of cats (borrowed from Wikipedia picture by user; https://commons.wikimedia.org/wiki/User:Alvesgaspar",
-      'AristarchusOfSamos.jpg': "mathematician Aristarchus of Samos Island in Ancient Greece, in the 3rd century B.C. with calculations of the relative sizes of the Sun, Earth and Moon",
-      'ShannonAndMouse.png': "Claude Shannon (established Information theory), experimenting with a mechanical mouse names Theseus",
-      'JamesWebbSpaceTelescope.jpg': "The James Webb Telescope looks so different. Maybe new discoveries are made with it! Cool"
-    }
-    for( let [f_name, description_tmp] of Object.entries(file_names_description_obj) ) {
+  //extra images
+  file_names_description_obj = {
+    'Antikythera.jpg':
+      'Ancient Greek Technology, the  - Antikythera mechanism - from 100 to 200 B.C., an example of an ancient Analogue Computer',
+    'TagzParrot.jpg':
+      'A Macaw parrot flying! (from Wikipedia, user Lviatour https://commons.wikimedia.org/wiki/User:Lviatour)',
+    'TheKakapo.jpg':
+      'A Kakapo parrot, from the book A History of the Birds of New Zealand by Walter Lawry Buller, published in 1873',
+    'YoungJamesClerkMaxwell.jpg':
+      "Scottish scientist, James Clerk Maxwell. His discoveries changed the world (statistical mechanics, maxwell's equations, control theory and many more)",
+    'TE1_cover.jpg':
+      'Front and Back cover of the comic Book, Totem Eclipse (episode 1) by Vasexandros, Makis and Paul Regklis. (on Amazon)',
+    'TE3_Fcover.jpg':
+      'Front cover of the awesome comic Book, Totem Eclipse (episode 3) by Vasexandros, Makis and Paul Regklis. Find it on Amazon!',
+    'TE4_Fcover.jpg':
+      'Front cover of the comic Book, Totem Eclipse (episode 4) by Vasexandros, Makis and Paul Regklis. (USA  https://www.amazon.com/dp/B086PLNK4B/ref=cm_sw_r_tw_dp_GB2TTR9A4NFMP1CFRSTE )',
+    'TE5_Fcover.png':
+      'Front cover of the comic Book, Totem Eclipse (episode 5) by Vasexandros, Makis and Paul Regklis',
+    'TheLabor2sample.png':
+      'The Second of Labor of Hercules by Vasexandros, and Paul Regklis (on Amazon)',
+    'TheLaborsOfHerculesAHerosGuide.png':
+      'The Labors of Hercules by Vasexandros and Paul Regklis  (USA https://www.amazon.com/dp/B0977P9NV2/ref=cm_sw_r_tw_dp_ZE67RVGAEAR0ZK9ZM5BX ) ',
+    'TheLaborsOfHerculesAHerosGuideFRONTBACK.png':
+      'great book, The Labors of Hercules by Vasexandros and Paul Regklis  (USA https://www.amazon.com/dp/B0977P9NV2/ref=cm_sw_r_tw_dp_ZE67RVGAEAR0ZK9ZM5BX )',
+    'TheCats.jpg':
+      'Examples of cats (borrowed from Wikipedia picture by user; https://commons.wikimedia.org/wiki/User:Alvesgaspar',
+    'AristarchusOfSamos.jpg':
+      'mathematician Aristarchus of Samos Island in Ancient Greece, in the 3rd century B.C. with calculations of the relative sizes of the Sun, Earth and Moon',
+    'ShannonAndMouse.png':
+      'Claude Shannon (established Information theory), experimenting with a mechanical mouse names Theseus',
+    'JamesWebbSpaceTelescope.jpg':
+      'The James Webb Telescope looks so different. Maybe new discoveries are made with it! Cool',
+  };
+  for (let [f_name, description_tmp] of Object.entries(
+    file_names_description_obj
+  )) {
+    let new_filename = f_name;
+    let tmp_path = PATH.join(APP_PATH, 'zExtraPics', new_filename);
+    console.log(`tmp_path = ${tmp_path}`);
+    FS.copyFileSync(
+      tmp_path,
+      PATH.join(TAGA_DATA_DIRECTORY, new_filename),
+      FS.constants.COPYFILE_EXCL
+    );
+    tagging_entry = JSON.parse(
+      JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)
+    ); //clone the default obj
+    tagging_entry.fileName = new_filename;
+    tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash(
+      PATH.join(TAGA_DATA_DIRECTORY, new_filename)
+    );
+    tagging_entry.taggingRawDescription = description_tmp;
+    info = INSERT_TAGGING_STMT.run(
+      tagging_entry.fileName,
+      tagging_entry.fileHash,
+      tagging_entry.taggingRawDescription,
+      JSON.stringify(tagging_entry.taggingTags),
+      JSON.stringify(tagging_entry.taggingEmotions),
+      JSON.stringify(tagging_entry.taggingMemeChoices),
+      JSON.stringify(tagging_entry.faceDescriptors)
+    );
+  }
 
-      let new_filename = f_name
-      let tmp_path = PATH.join(APP_PATH, '/build/zExtraPics', new_filename) 
-      FS.copyFileSync(tmp_path, PATH.join(TAGA_DATA_DIRECTORY, new_filename), FS.constants.COPYFILE_EXCL);
-      tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
-      tagging_entry.fileName = new_filename;
-      tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash( PATH.join(TAGA_DATA_DIRECTORY,new_filename) ) 
-      tagging_entry.taggingRawDescription = description_tmp
-      info = INSERT_TAGGING_STMT.run(tagging_entry.fileName,tagging_entry.fileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices),JSON.stringify(tagging_entry.faceDescriptors));
-
-    }    
-    
-    // new_filename = 'TE1_cover.jpg'
-    // tmp_path = PATH.join(APP_PATH, new_filename) 
-    // FS.copyFileSync(tmp_path, PATH.join(TAGA_DATA_DIRECTORY,new_filename), FS.constants.COPYFILE_EXCL);
-    // tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
-    // tagging_entry.fileName = new_filename;
-    // tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash( PATH.join(TAGA_DATA_DIRECTORY,new_filename) ) 
-    // tagging_entry.taggingRawDescription = "Front and Back cover of the comic Book, Totem Eclipse (episode 1) by Vasexandros, Makis and Paul Regklis. Found on Amazon!"
-    // info = INSERT_TAGGING_STMT.run(tagging_entry.fileName,tagging_entry.fileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices),JSON.stringify(tagging_entry.faceDescriptors));
-
+  // new_filename = 'TE1_cover.jpg'
+  // tmp_path = PATH.join(APP_PATH, new_filename)
+  // FS.copyFileSync(tmp_path, PATH.join(TAGA_DATA_DIRECTORY,new_filename), FS.constants.COPYFILE_EXCL);
+  // tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
+  // tagging_entry.fileName = new_filename;
+  // tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash( PATH.join(TAGA_DATA_DIRECTORY,new_filename) )
+  // tagging_entry.taggingRawDescription = "Front and Back cover of the comic Book, Totem Eclipse (episode 1) by Vasexandros, Makis and Paul Regklis. Found on Amazon!"
+  // info = INSERT_TAGGING_STMT.run(tagging_entry.fileName,tagging_entry.fileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices),JSON.stringify(tagging_entry.faceDescriptors));
 }
 //check to see if the TAGGING MEME table exists
-let tagging_meme_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${TAGGING_MEME_TABLE_NAME}'; `);
+let tagging_meme_table_exists_stmt = DB.prepare(
+  ` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${TAGGING_MEME_TABLE_NAME}'; `
+);
 let tagging_meme_table_exists_res = tagging_meme_table_exists_stmt.get();
 //if tagging table does not exit, so create it
-if( tagging_meme_table_exists_res["count(*)"] == 0 ){
-  let STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${TAGGING_MEME_TABLE_NAME} (memeFileName TEXT, fileNames TEXT)`);
+if (tagging_meme_table_exists_res['count(*)'] == 0) {
+  let STMT = DB.prepare(
+    `CREATE TABLE IF NOT EXISTS ${TAGGING_MEME_TABLE_NAME} (memeFileName TEXT, fileNames TEXT)`
+  );
   STMT.run();
   //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
-  let STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX memeFileNameIndex ON ${TAGGING_MEME_TABLE_NAME} (memeFileName); `);
+  let STMT_index1 = DB.prepare(
+    ` CREATE UNIQUE INDEX memeFileNameIndex ON ${TAGGING_MEME_TABLE_NAME} (memeFileName); `
+  );
   STMT_index1.run();
 }
 //check to see if the COLLECTIONS table exists
-let collection_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTIONS_TABLE_NAME}'; `);
+let collection_table_exists_stmt = DB.prepare(
+  ` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTIONS_TABLE_NAME}'; `
+);
 let collection_table_exists_res = collection_table_exists_stmt.get();
 //if collection table does not exit, so create it
-if( collection_table_exists_res["count(*)"] == 0 ){
-  let STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTIONS_TABLE_NAME} (collectionName TEXT, collectionImage TEXT, collectionGalleryFiles TEXT, 
+if (collection_table_exists_res['count(*)'] == 0) {
+  let STMT =
+    DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTIONS_TABLE_NAME} (collectionName TEXT, collectionImage TEXT, collectionGalleryFiles TEXT, 
                       collectionDescription TEXT, collectionDescriptionTags TEXT,
                       collectionEmotions TEXT, collectionMemes TEXT)`);
   STMT.run();
   //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
-  let STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX collectionNameIndex ON ${COLLECTIONS_TABLE_NAME} (collectionName); `);
+  let STMT_index1 = DB.prepare(
+    ` CREATE UNIQUE INDEX collectionNameIndex ON ${COLLECTIONS_TABLE_NAME} (collectionName); `
+  );
   STMT_index1.run();
 }
 //The collections also each have a meme set, and this is dependent upon the tagging DB as well, since when an image from the tagging view
 //is deleted it should be deleted from the collection set.
-collection_meme_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTION_MEME_TABLE_NAME}'; `);
+collection_meme_table_exists_stmt = DB.prepare(
+  ` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTION_MEME_TABLE_NAME}'; `
+);
 collection_meme_table_exists_res = collection_meme_table_exists_stmt.get();
 //if collection table does not exit, so create it
-if( collection_meme_table_exists_res["count(*)"] == 0 ) {
-  STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTION_MEME_TABLE_NAME} (collectionMemeFileName TEXT, collectionNames TEXT)`);
+if (collection_meme_table_exists_res['count(*)'] == 0) {
+  STMT = DB.prepare(
+    `CREATE TABLE IF NOT EXISTS ${COLLECTION_MEME_TABLE_NAME} (collectionMemeFileName TEXT, collectionNames TEXT)`
+  );
   STMT.run(); //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
-  let STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX collectionMemeFileNameIndex ON ${COLLECTION_MEME_TABLE_NAME} (collectionMemeFileName); `);
+  let STMT_index1 = DB.prepare(
+    ` CREATE UNIQUE INDEX collectionMemeFileNameIndex ON ${COLLECTION_MEME_TABLE_NAME} (collectionMemeFileName); `
+  );
   STMT_index1.run();
 } else {
   //console.log('line 105 ')
 }
 //The collections also have an 'imageSet' as a gallery for the images associated with the collection name
 //this needs to be updated so that when an image in the tagging phase is deleted, that there is an efficient look up to remove stale/lingering links
-let collection_imageset_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTION_GALLERY_TABLE_NAME}'; `);
-let collection_imageset_table_exists_res = collection_imageset_table_exists_stmt.get();
+let collection_imageset_table_exists_stmt = DB.prepare(
+  ` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${COLLECTION_GALLERY_TABLE_NAME}'; `
+);
+let collection_imageset_table_exists_res =
+  collection_imageset_table_exists_stmt.get();
 //if collection table does not exit, so create it
-if( collection_imageset_table_exists_res["count(*)"] == 0 ) {
+if (collection_imageset_table_exists_res['count(*)'] == 0) {
   //console.log(`line 111 in main js about to create the COLLECTION_GALLERY_TABLE_NAME again`)
-  let STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${COLLECTION_GALLERY_TABLE_NAME} (collectionGalleryFileName TEXT, collectionNames TEXT)`);
+  let STMT = DB.prepare(
+    `CREATE TABLE IF NOT EXISTS ${COLLECTION_GALLERY_TABLE_NAME} (collectionGalleryFileName TEXT, collectionNames TEXT)`
+  );
   STMT.run(); //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
-  let STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX collectionGalleryFileNameIndex ON ${COLLECTION_GALLERY_TABLE_NAME} (collectionGalleryFileName); `);
+  let STMT_index1 = DB.prepare(
+    ` CREATE UNIQUE INDEX collectionGalleryFileNameIndex ON ${COLLECTION_GALLERY_TABLE_NAME} (collectionGalleryFileName); `
+  );
   STMT_index1.run();
 } else {
   //console.log(`not creating table in main js 117: collection_imageset_table_exists_res["count(*)"] = ${collection_imageset_table_exists_res["count(*)"]}`)
 }
 //DB SET UP END<<<
 
-
-
 //FILE SELECTION DIALOGUE WINDOWS START>>>
 //for the ability to load a dialog window in selecting images/files
 ipcMain.handle('dialog:tagging-new-file-select', async (event, args) => {
-  let directory_default = app.getPath('pictures')
-  if(args.directory != ''){
-    directory_default = args.directory
+  let directory_default = app.getPath('pictures');
+  if (args.directory != '') {
+    directory_default = args.directory;
   }
-  let result = await dialog.showOpenDialog({ properties: ['openFile'], //, 'multiSelections' ], 
-              defaultPath: directory_default })
-  return result
-})
+  let result = await dialog.showOpenDialog({
+    properties: ['openFile'], //, 'multiSelections' ],
+    defaultPath: directory_default,
+  });
+  return result;
+});
 //for the ability to save a data export
 ipcMain.handle('dialog:export', async (_, args) => {
-  const result = dialog.showSaveDialog({ title: "Enter Folder Name to Create", defaultPath: app.getPath('downloads') })
-  return result
-})
+  const result = dialog.showSaveDialog({
+    title: 'Enter Folder Name to Create',
+    defaultPath: app.getPath('downloads'),
+  });
+  return result;
+});
 //for the ability to load the DB to import
 ipcMain.handle('dialog:importDB', async (_, args) => {
-  const result = dialog.showOpenDialog({ properties: ['openFile'], defaultPath: app.getPath('downloads') }) //
-  return result
-})
+  const result = dialog.showOpenDialog({
+    properties: ['openFile'],
+    defaultPath: app.getPath('downloads'),
+  }); //
+  return result;
+});
 //for the ability to save a taga content file
 ipcMain.handle('dialog:saveFile', async (_, args) => {
-  const result = dialog.showSaveDialog({ title: "name and place to save", defaultPath: app.getPath('downloads') })
-  return result
-})
-ipcMain.handle('getDownloadsFolder',async () => app.getPath("downloads"))
+  const result = dialog.showSaveDialog({
+    title: 'name and place to save',
+    defaultPath: app.getPath('downloads'),
+  });
+  return result;
+});
+ipcMain.handle('getDownloadsFolder', async () => app.getPath('downloads'));
 //FILE SELECTION DIALOGUE WINDOWS END<<<
-
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  createWindow()  
+  createWindow();
   //tray stuff
   //const tray = new Tray(PATH.join(__dirname,"icon.png"))
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
-})
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+});
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') app.quit()
-})
+  if (process.platform !== 'darwin') app.quit();
+});
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 const env = process.env.NODE_ENV;
 if (env === 'development' || app.isPackaged == false) {
   require('electron-reload')(__dirname, {
-      electron: PATH.join(__dirname, 'node_modules', '.bin', 'electron'),
-      hardResetMethod: 'exit'
+    electron: PATH.join(__dirname, 'node_modules', '.bin', 'electron'),
+    hardResetMethod: 'exit',
   });
 }
 
-
 //for functions to get the appPath
-ipcMain.handle('getAppPath', () => APP_PATH ) 
+ipcMain.handle('getAppPath', () => APP_PATH);
 
-
-
-console.log(`__dirname = ${__dirname}`)
-console.log(`-mainjs- the app.getPath('userData') = ${app.getPath('userData')}`)
-console.log(`-mainjs- the app.getPath('appPath') = ${app.getAppPath()}`)
-
-
-
+console.log(`__dirname = ${__dirname}`);
+console.log(
+  `-mainjs- the app.getPath('userData') = ${app.getPath('userData')}`
+);
+console.log(`-mainjs- the app.getPath('appPath') = ${app.getAppPath()}`);
 
 //change the media encoding of video and audio to those we know we can render
 //mp4 and mp3 are the targets when it is not mp4/mov or mp3/
 ipcMain.handle('ffmpegDecode', async (_, options) => {
-  
   const { createFFmpeg, fetchFile } = require('@ffmpeg/ffmpeg');
   const ffmpeg = createFFmpeg({ log: false });
-  
-  const { base_dir, file_in, file_out } = options
+
+  const { base_dir, file_in, file_out } = options;
   await ffmpeg.load();
-  ffmpeg.FS('writeFile', file_in, await fetchFile( PATH.join(base_dir,file_in) ));
+  ffmpeg.FS(
+    'writeFile',
+    file_in,
+    await fetchFile(PATH.join(base_dir, file_in))
+  );
   await ffmpeg.run('-i', file_in, file_out);
-  await FS.promises.writeFile( PATH.join(base_dir,file_out), ffmpeg.FS('readFile', file_out));
-  
+  await FS.promises.writeFile(
+    PATH.join(base_dir, file_out),
+    ffmpeg.FS('readFile', file_out)
+  );
+
   /* Delete file in MEMFS */
   ffmpeg.FS('unlink', file_in);
 
-  return PATH.join(base_dir,file_out)
-})
-
-
+  return PATH.join(base_dir, file_out);
+});
 
 //for the screen capture of the stream search
-ipcMain.handle('getCaptureID', async(_) => {
-  const sources = await desktopCapturer.getSources({types: ['window','screen']})
-  return sources.map( image => {
+ipcMain.handle('getCaptureID', async (_) => {
+  const sources = await desktopCapturer.getSources({
+    types: ['window', 'screen'],
+  });
+  return sources.map((image) => {
     return {
-      id:image.id, name:image.name, thumbnail:image.thumbnail.toDataURL()
-    }
-  })
-})
-
-
+      id: image.id,
+      name: image.name,
+      thumbnail: image.thumbnail.toDataURL(),
+    };
+  });
+});
 
 // function formatBytes(bytes, decimals = 2) {
 //   if (!+bytes) return '0 Bytes'
@@ -356,7 +466,7 @@ ipcMain.handle('getCaptureID', async(_) => {
 //   }
 //   let gif_file_names = []
 //   frameData.forEach( async (image,index) => {
-    
+
 //     gif_file_names.push( writeFrameDataToFile(image,index) )
 //   })
 //   let gifFilenames = await Promise.all(gif_file_names)
@@ -371,8 +481,7 @@ ipcMain.handle('getCaptureID', async(_) => {
 //       resolve(filename_tmp)
 //     })
 //   })
-// } 
-
+// }
 
 // console.log(`__dirname = ${__dirname}`)
 // console.log(`-mainjs- the app.getPath('userData') = ${app.getPath('userData')}`)
@@ -414,5 +523,3 @@ ipcMain.handle('getCaptureID', async(_) => {
 //     //pdf_window = null
 //   }
 // })
-
-
