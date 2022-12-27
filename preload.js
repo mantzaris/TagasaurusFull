@@ -52,12 +52,14 @@ window.DB_MODULE = require(PATH.join(
 //FACE RECOGNITION STUFF!!!
 const tf = require('@tensorflow/tfjs-node');
 const faceapi = require('@vladmandic/face-api');
-//let faceapi = require("face-api.js")
+//let faceapi = require('face-api.js');
 //require('@tensorflow/tfjs-node')
 //package.json    "@tensorflow/tfjs": "^4.1.0",
 //"face-api.js": "^0.22.2",
 //"@tensorflow/tfjs-node": "^3.21.1",
 //"@vladmandic/face-api": "^1.7.7",
+//"@vladmandic/face-api": "^1.7.7",
+//    "@tensorflow/tfjs-node": "^4.1.0",
 
 const minConfidenceFace = 0.5;
 const faceapiOptions = new faceapi.SsdMobilenetv1Options({ minConfidenceFace });
