@@ -15,7 +15,8 @@ require('dotenv').config();
 //needed for ffmpeg, the shared buffer was not there by default for some reason
 app.commandLine.appendSwitch('enable-features', 'SharedArrayBuffer');
 
-const BUILD_INSTALLER = process.env.npm_config_build_installer === 'true';
+//!!! XXX !!! manually set
+const BUILD_INSTALLER = false; //process.env.build_installer === 'true';
 
 let TAGA_FILES_DIRECTORY;
 if (BUILD_INSTALLER) {
@@ -33,7 +34,9 @@ if (BUILD_INSTALLER) {
 
 const APP_PATH = app.getAppPath();
 const TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY, 'data'); //where the media files get stored
-//const USER_DATA_PATH = app.getPath('userData')
+//const USER_DATA_PATH = app.getPath('documents')
+//console.log(`2nd in main.js TAGA_FILES_DIRECTORY = ${TAGA_FILES_DIRECTORY}`);
+//console.log(`in mainjs TAGA_DATA_DIRECTORY = ${TAGA_DATA_DIRECTORY}`);
 
 const MY_FILE_HELPER = require(PATH.join(
   __dirname,
@@ -94,9 +97,8 @@ const COLLECTION_GALLERY_TABLE_NAME = 'COLLECTIONFILESET';
 console.log(`about to make directory or not of ${TAGA_FILES_DIRECTORY}`);
 if (FS.existsSync(TAGA_FILES_DIRECTORY) == false) {
   //directory for files exists?
-  console.log('directory TAGA_FILES_DIRECTORY does not exist');
   FS.mkdirSync(TAGA_FILES_DIRECTORY);
-  console.log('directory TAGA_FILES_DIRECTORY does not exist 2 ');
+  console.log('directory TAGA_FILES_DIRECTORY did not exist ');
 }
 DB = new DATABASE(PATH.join(TAGA_FILES_DIRECTORY, DB_FILE_NAME), {
   verbose: console.log,
@@ -393,9 +395,7 @@ if (env === 'development' || app.isPackaged == false) {
 ipcMain.handle('getAppPath', () => APP_PATH);
 
 console.log(`__dirname = ${__dirname}`);
-console.log(
-  `-mainjs- the app.getPath('userData') = ${app.getPath('userData')}`
-);
+console.log(`-mainjs- the process.env.HOME = ${process.env.HOME}`);
 console.log(`-mainjs- the app.getPath('appPath') = ${app.getAppPath()}`);
 
 //change the media encoding of video and audio to those we know we can render
@@ -484,8 +484,8 @@ ipcMain.handle('getCaptureID', async (_) => {
 // }
 
 // console.log(`__dirname = ${__dirname}`)
-// console.log(`-mainjs- the app.getPath('userData') = ${app.getPath('userData')}`)
-// console.log(`-mainjs- the app.getPath('userData') = ${app.getPath('appData')}`)
+// console.log(`-mainjs- the app.getPath('documents') = ${app.getPath('documents')}`)
+// console.log(`-mainjs- the app.getPath('documents') = ${app.getPath('appData')}`)
 
 // "win": {
 //   "target": [
