@@ -16,7 +16,7 @@ require('dotenv').config();
 app.commandLine.appendSwitch('enable-features', 'SharedArrayBuffer');
 
 //!!! XXX !!! manually set
-const BUILD_INSTALLER = false; //process.env.build_installer === 'true';
+const BUILD_INSTALLER = true; //process.env.build_installer === 'true';
 
 let TAGA_FILES_DIRECTORY;
 if (BUILD_INSTALLER) {

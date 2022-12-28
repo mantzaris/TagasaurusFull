@@ -12,7 +12,7 @@ require('dotenv').config();
 const APP_NAME = 'tagasaurus';
 
 //!!! XXX !!! manually set
-const BUILD_INSTALLER = false; //process.env.npm_config_build_installer === 'true';
+const BUILD_INSTALLER = true; //process.env.npm_config_build_installer === 'true';
 
 function setupOSSpecificPaths() {
   switch (process.platform) {
