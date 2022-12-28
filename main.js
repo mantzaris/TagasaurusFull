@@ -16,7 +16,7 @@ require('dotenv').config();
 app.commandLine.appendSwitch('enable-features', 'SharedArrayBuffer');
 
 //!!! XXX !!! manually set
-const BUILD_INSTALLER = true; //process.env.build_installer === 'true';
+const BUILD_INSTALLER = false; //process.env.build_installer === 'true';
 
 let TAGA_FILES_DIRECTORY;
 if (BUILD_INSTALLER) {
@@ -76,7 +76,7 @@ function createWindow() {
       nodeIntegrationInWorker: true,
       webgl: true,
       allowRunningInsecureContent: true,
-      devTools: true, //!app.isPackaged,
+      devTools: !app.isPackaged,
     },
   });
   //LOAD THE STARTING .html OF THE APP->
