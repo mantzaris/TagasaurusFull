@@ -80,7 +80,7 @@ let canvas;
 let selection_sources;
 let media_source = '';
 
-let face_threshold = 6.4;
+let face_threshold = 6.3;
 let max_sample_num = 3000;
 
 ipcRenderer.invoke('getCaptureID').then((sources) => {
