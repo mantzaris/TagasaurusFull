@@ -8,17 +8,15 @@ A key feature is that emotions are stored by the user's explicit input over a se
 
 ## Windows 
 
-- Installer:  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.2.0/tagasaurus.Setup.1.2.0.exe) sha256  aa6e123dce468df16ccb0c36c55faba92193ba2605c749615b96e94e5165c84b
-
-- Zip (unzip and run the executable file):  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.2.0/tagasaurus-1.2.0-win.zip) sha256  ac0d6a0ed2a2411cfe79a0721e8a865b0853b4dc0c8a88b706e25238b912b8a1
+- Zip (unzip and run the executable file):  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.3.0/tagasaurus-1.3.0-win.zip) sha256 hash: 0c9c600c63d6fe4d51be2e0c5a7080e1c16d2f55f6c1e9e7c5b2d7751f1e8791
 
 ## Linux
 
-- Debian/Ubuntu (.deb, run with dpkg -i):  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.2.0/tagasaurus_1.2.0_amd64.deb) sha256 hash: d4713c0fbcd52a0bbfa7f860c3191d42cd180571f60947bbae19821e257d123e
+- Debian/Ubuntu (.deb, run with dpkg -i):  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.3.0/tagasaurus_1.3.0_amd64.deb) sha256 hash: 3db56148b4da8db8308c80842eebea4eaf2ad85764679e21fc4ed2b60d5b4b7f
 
-- Fedora/RHEL (.rpm):  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.2.0/tagasaurus-1.2.0.x86_64.rpm) sha256 hash: dd15af8b3a89524e2f704ea3709997038035ef687c657ecd8be906626b5566a4
+- Fedora/RHEL (.rpm):  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.3.0/tagasaurus-1.3.0.x86_64.rpm) sha256 hash: 56d6e56f722f1f502188434f4f15145e9fbd273d4150a2f1213e2f22107dff0e
 
-- Linux Zip: [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.2.0/tagasaurus-1.2.0.zip) sha256 hash: 949ff94bc75dcd27834b36ff8a234bed97939b9017070daca137481a3853f464
+- Linux Zip: [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.3.0/tagasaurus-1.3.0.zip) sha256 hash: 086e35399ba14ce51839d438de336ea8573842edf3583a8b268ad1fd545af13c
 
 
 ## Using Tagasaurus
