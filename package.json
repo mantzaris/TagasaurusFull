@@ -47,7 +47,7 @@
     "@ffmpeg/ffmpeg": "^0.11.1",
     "@tensorflow/tfjs-node": "^4.1.0",
     "@vladmandic/face-api": "^1.7.7",
-    "better-sqlite3": "^7.6.2",
+    "better-sqlite3": "^8.2.0",
     "decode-gif": "^1.0.1",
     "dotenv": "^16.0.3",
     "electron-pdf-window": "^1.0.12",
