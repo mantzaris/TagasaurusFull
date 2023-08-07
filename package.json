@@ -24,14 +24,10 @@
   "main": "main.js",
   "postinstall": "electron-builder install-app-deps",
   "scripts": {
-    "start": "npm run start-dev --build_installer=false",
-    "clean": "rm -rf ./node_modules && rm -rf ./dist",
+    "clean": "rm -rf ./node_modules package-lock.json ./dist",
     "rebuild": "npm run clean && npm install && npm rebuild && electron-rebuild",
-    "start-win": "npm run start-dev --build_installer=true",
-    "start-dev": "electron  .",
+    "dev": "electron .",
     "build": "electron-builder $OSTARGETS",
-    "build-win-portable": "electron-builder --win=zip",
-    "build-win-installer": "electron-builder --win=nsis",
     "format": "npx prettier --write ."
   },
   "devDependencies": {
@@ -40,6 +36,7 @@
     "electron-rebuild": "^3.2.7",
     "electron-reload": "^1.5.0",
     "electron-reloader": "^1.2.0",
+    "cross-env": "^7.0.3",
     "prettier": "2.8.1"
   },
   "dependencies": {

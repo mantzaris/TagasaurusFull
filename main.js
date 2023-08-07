@@ -16,7 +16,13 @@ require('dotenv').config();
 app.commandLine.appendSwitch('enable-features', 'SharedArrayBuffer');
 
 //!!! XXX !!! manually set
-const BUILD_INSTALLER = false; //process.env.build_installer === 'true';
+//const BUILD_INSTALLER = false; //process.env.build_installer === 'true';
+const INSTALLER_CONFIG = JSON.parse(
+  FS.readFileSync(PATH.join(__dirname, 'config.json'), 'utf-8')
+);
+const { BUILD_INSTALLER } = INSTALLER_CONFIG;
+
+console.log(INSTALLER_CONFIG);
 
 let TAGA_FILES_DIRECTORY;
 if (BUILD_INSTALLER) {
