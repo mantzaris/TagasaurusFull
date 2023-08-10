@@ -10,19 +10,17 @@ const {
 } = require('electron');
 const PATH = require('path');
 const FS = require('fs');
+const FSE = require('fs-extra');
 require('dotenv').config();
 
 //needed for ffmpeg, the shared buffer was not there by default for some reason
 app.commandLine.appendSwitch('enable-features', 'SharedArrayBuffer');
 
-//!!! XXX !!! manually set
 //const BUILD_INSTALLER = false; //process.env.build_installer === 'true';
 const INSTALLER_CONFIG = JSON.parse(
   FS.readFileSync(PATH.join(__dirname, 'config.json'), 'utf-8')
 );
 const { BUILD_INSTALLER } = INSTALLER_CONFIG;
-
-console.log(INSTALLER_CONFIG);
 
 let TAGA_FILES_DIRECTORY;
 if (BUILD_INSTALLER) {
@@ -59,7 +57,12 @@ DB_FILE_NAME = 'mainTagasaurusDB.db';
 
 //good to print at the start
 console.log(`APP_PATH = ${APP_PATH}`);
-let tmp_icon_dir = PATH.join(APP_PATH, 'taga-icon', 'TagaIcon512x512.png');
+let tmp_icon_dir = PATH.join(
+  APP_PATH,
+  'Assets',
+  'taga-icon',
+  'TagaIcon512x512.png'
+);
 console.log('icon path = ', tmp_icon_dir);
 let exists = FS.existsSync(tmp_icon_dir);
 console.log(`exists = `, exists);
@@ -216,7 +219,7 @@ if (tagging_table_exists_res['count(*)'] == 0) {
     file_names_description_obj
   )) {
     let new_filename = f_name;
-    let tmp_path = PATH.join(APP_PATH, 'zExtraPics', new_filename);
+    let tmp_path = PATH.join(APP_PATH, 'Assets', 'InitPics', new_filename);
     console.log(`tmp_path = ${tmp_path}`);
     FS.copyFileSync(
       tmp_path,
@@ -443,6 +446,26 @@ ipcMain.handle('getCaptureID', async (_) => {
     };
   });
 });
+
+// only the linux installation will include the LinuxRunOnExternalMedia directory and if a zip and not installer then we want the zip to be able to run on USB and need to copy the remount script forward for the user to use
+// if (!BUILD_INSTALLER) {
+//   const unpacked_linux_run_dir_path = PATH.join(
+//     __dirname,
+//     '..',
+//     'app.asar.unpacked',
+//     'LinuxRunOnExternalMedia'
+//   );
+//   const linux_run_dir_exists = FS.existsSync(unpacked_linux_run_dir_path);
+//   if (linux_run_dir_exists) {
+//     const target_dir = PATH.join(
+//       __dirname,
+//       '..',
+//       '..',
+//       'LinuxRunOnExternalMedia'
+//     );
+//     FSE.copySync(unpacked_linux_run_dir_path, target_dir);
+//   }
+// }
 
 // function formatBytes(bytes, decimals = 2) {
 //   if (!+bytes) return '0 Bytes'

@@ -82,11 +82,12 @@ faceapi.env.monkeyPatch({
   createImageElement: () => document.createElement('img'),
 });
 
+const weight_path = PATH.join(__dirname, 'Assets', 'weights');
 async function Load_Face_Api_Model() {
-  await detectionNet.load('../weights');
-  await faceapi.loadFaceLandmarkModel('../weights');
-  await faceapi.loadFaceExpressionModel('../weights');
-  await faceapi.loadFaceRecognitionModel('../weights');
+  await detectionNet.load(weight_path);
+  await faceapi.loadFaceLandmarkModel(weight_path);
+  await faceapi.loadFaceExpressionModel(weight_path);
+  await faceapi.loadFaceRecognitionModel(weight_path);
 }
 Load_Face_Api_Model();
 

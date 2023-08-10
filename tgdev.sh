@@ -56,6 +56,24 @@ else
 fi
 
 
+# So that the linux run on USB is at top level 
+    # # Extract the ZIP file
+    # unzip dist/yourApp-linux-x64.zip -d dist/tempDir
+
+    # # Copy the directory within the extracted contents
+    # cp -r dist/tempDir/resources/app.asar.unpacked/yourDirectory dist/tempDir/destinationDirectory
+
+    # # Recreate the ZIP file with the modified contents
+    # cd dist/tempDir
+    # zip -r ../yourApp-linux-x64-modified.zip .
+    # cd -
+
+    # # Clean up: remove the extracted contents and the original ZIP
+    # rm -r dist/tempDir
+    # rm dist/yourApp-linux-x64.zip
+
+
+
 #    npx cross-env BUILD_INSTALLER=true npm run dev
 
 # if [[ "$OSTYPE" == "linux-gnu"* ]]; then

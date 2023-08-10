@@ -60,15 +60,18 @@
     "files": [
       "!.github",
       "!README.md",
-      "!docs"
+      "!.vscode",
+      "!.prettierrc.json",
+      "!tgdev.sh"      
     ],
     "linux": {
-      "icon": "taga-icon/TagaIcon512x512.png",
+      "icon": "Assets/taga-icon/TagaIcon512x512.png",
+      "asarUnpack": ["LinuxRunOnExternalMedia/**"],
       "maintainer": "mantzaris",
       "category": "utility"
     },
     "win": {
-      "icon": "taga-icon/TagaIcon512x512.png"
+      "icon": "Assets/taga-icon/TagaIcon512x512.png"
     },
     "portable": {
       "artifactName": "tagasaurus.app"
