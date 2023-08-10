@@ -211,6 +211,7 @@ if (tagging_table_exists_res['count(*)'] == 0) {
     'JamesWebbSpaceTelescope.jpg':
       'The James Webb Telescope looks so different. Maybe new discoveries are made with it! Cool',
   };
+
   for (let [f_name, description_tmp] of Object.entries(
     file_names_description_obj
   )) {

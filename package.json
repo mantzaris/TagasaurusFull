@@ -1,6 +1,6 @@
 {
   "name": "tagasaurus",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Tag your Planet!",
   "author": "Alexander V. Mantzaris",
   "license": "MIT",
@@ -31,12 +31,12 @@
     "format": "npx prettier --write ."
   },
   "devDependencies": {
-    "electron": "^18.0.0",
-    "electron-builder": "^23.0.3",
+    "cross-env": "^7.0.3",
+    "electron": "^25.5.0",
+    "electron-builder": "^24.6.3",
     "electron-rebuild": "^3.2.7",
     "electron-reload": "^1.5.0",
     "electron-reloader": "^1.2.0",
-    "cross-env": "^7.0.3",
     "prettier": "2.8.1"
   },
   "dependencies": {
@@ -44,11 +44,11 @@
     "@ffmpeg/ffmpeg": "^0.11.1",
     "@tensorflow/tfjs-node": "^4.1.0",
     "@vladmandic/face-api": "^1.7.7",
-    "better-sqlite3": "^7.6.2",
+    "better-sqlite3": "^8.5.0",
     "decode-gif": "^1.0.1",
     "dotenv": "^16.0.3",
     "electron-pdf-window": "^1.0.12",
-    "file-type": "16.5.3",
+    "file-type": "^16.5.3",
     "fs-extra": "^10.0.0",
     "json": "^11.0.0",
     "masonry-layout": "^4.2.2",

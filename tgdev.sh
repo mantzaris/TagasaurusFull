@@ -19,8 +19,8 @@ elif [ "$1" == "pack" ]; then
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 
         echo "building linux installers"
-        set_config
-        npx cross-env OSTARGETS="--linux=deb rpm" npm run build
+        #set_config
+        #npx cross-env OSTARGETS="--linux=deb rpm" npm run build
         
         echo "building linux zip"
         BUILD_INSTALLER=false
