@@ -44,6 +44,9 @@ if (BUILD_INSTALLER) {
   window.USER_DATA_PATH = PATH.join(__dirname, '..', '..', '..');
 }
 
+window.TAGA_FILES_DIRECTORY = PATH.join(USER_DATA_PATH, 'TagasaurusFiles'); //PATH.join(PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles');
+window.TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY, 'data'); //PATH.resolve(TAGA_FILES_DIRECTORY,'data');
+
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 //DB INIT, sets the database and adds the obj ref to the window to not need to be loaded again

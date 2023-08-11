@@ -127,7 +127,7 @@ let tagging_table_exists_res = tagging_table_exists_stmt.get();
 //if tagging table does not exit, so create it
 if (tagging_table_exists_res['count(*)'] == 0) {
   STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${TAGGING_TABLE_NAME}
-                    (fileName TEXT, fileHash TEXT, taggingRawDescription TEXT,
+                    (fileName TEXT, fileHash TEXT, fileType TEXT, taggingRawDescription TEXT,
                             taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT,
                             faceDescriptors TEXT)`);
   STMT.run();
@@ -145,6 +145,7 @@ if (tagging_table_exists_res['count(*)'] == 0) {
   let TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
     fileName: '',
     fileHash: '',
+    fileType: 'image',
     taggingRawDescription: '',
     taggingTags: [],
     taggingEmotions: { good: '0', bad: '0' },
@@ -168,11 +169,12 @@ if (tagging_table_exists_res['count(*)'] == 0) {
   ); //`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
 
   INSERT_TAGGING_STMT = DB.prepare(
-    `INSERT INTO ${TAGGING_TABLE_NAME} (fileName, fileHash, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors) VALUES (?, ?, ?, ?, ?, ?, ?)`
+    `INSERT INTO ${TAGGING_TABLE_NAME} (fileName, fileHash, fileType, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
   );
   let info = INSERT_TAGGING_STMT.run(
     tagging_entry.fileName,
     tagging_entry.fileHash,
+    tagging_entry.fileType,
     tagging_entry.taggingRawDescription,
     JSON.stringify(tagging_entry.taggingTags),
     JSON.stringify(tagging_entry.taggingEmotions),
@@ -237,22 +239,16 @@ if (tagging_table_exists_res['count(*)'] == 0) {
     info = INSERT_TAGGING_STMT.run(
       tagging_entry.fileName,
       tagging_entry.fileHash,
+      tagging_entry.fileType,
       tagging_entry.taggingRawDescription,
       JSON.stringify(tagging_entry.taggingTags),
       JSON.stringify(tagging_entry.taggingEmotions),
       JSON.stringify(tagging_entry.taggingMemeChoices),
       JSON.stringify(tagging_entry.faceDescriptors)
     );
+    console.log('info=', info);
+    console.log('tagging_entry= ', tagging_entry);
   }
-
-  // new_filename = 'TE1_cover.jpg'
-  // tmp_path = PATH.join(APP_PATH, new_filename)
-  // FS.copyFileSync(tmp_path, PATH.join(TAGA_DATA_DIRECTORY,new_filename), FS.constants.COPYFILE_EXCL);
-  // tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
-  // tagging_entry.fileName = new_filename;
-  // tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash( PATH.join(TAGA_DATA_DIRECTORY,new_filename) )
-  // tagging_entry.taggingRawDescription = "Front and Back cover of the comic Book, Totem Eclipse (episode 1) by Vasexandros, Makis and Paul Regklis. Found on Amazon!"
-  // info = INSERT_TAGGING_STMT.run(tagging_entry.fileName,tagging_entry.fileHash,tagging_entry.taggingRawDescription,JSON.stringify(tagging_entry.taggingTags),JSON.stringify(tagging_entry.taggingEmotions),JSON.stringify(tagging_entry.taggingMemeChoices),JSON.stringify(tagging_entry.faceDescriptors));
 }
 //check to see if the TAGGING MEME table exists
 let tagging_meme_table_exists_stmt = DB.prepare(
@@ -262,7 +258,7 @@ let tagging_meme_table_exists_res = tagging_meme_table_exists_stmt.get();
 //if tagging table does not exit, so create it
 if (tagging_meme_table_exists_res['count(*)'] == 0) {
   let STMT = DB.prepare(
-    `CREATE TABLE IF NOT EXISTS ${TAGGING_MEME_TABLE_NAME} (memeFileName TEXT, fileNames TEXT)`
+    `CREATE TABLE IF NOT EXISTS ${TAGGING_MEME_TABLE_NAME} (memeFileName TEXT, fileType TEXT, fileNames TEXT)`
   );
   STMT.run();
   //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //

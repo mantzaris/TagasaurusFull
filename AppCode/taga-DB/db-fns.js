@@ -5,6 +5,13 @@
 const PATH = require('path');
 const FS = require('fs');
 const DATABASE = require('better-sqlite3');
+const { GetFileTypeFromFileName } = require(PATH.join(
+  __dirname,
+  '..',
+  'taga-JS',
+  'utilities',
+  'files.js'
+));
 
 const DB_FILE_NAME = 'mainTagasaurusDB.db';
 const TAGGING_TABLE_NAME = 'TAGGING';
@@ -32,10 +39,10 @@ const GET_RECORD_FROM_ROWID_TAGGING_STMT = DB.prepare(
   `SELECT * FROM ${TAGGING_TABLE_NAME} WHERE ROWID=?`
 );
 const INSERT_TAGGING_STMT = DB.prepare(
-  `INSERT INTO ${TAGGING_TABLE_NAME} (fileName, fileHash, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors) VALUES (?, ?, ?, ?, ?, ?, ?)`
+  `INSERT INTO ${TAGGING_TABLE_NAME} (fileName, fileHash, fileType, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 );
 const UPDATE_FILENAME_TAGGING_STMT = DB.prepare(
-  `UPDATE ${TAGGING_TABLE_NAME} SET fileName=?, fileHash=?, taggingRawDescription=?, taggingTags=?, taggingEmotions=?, taggingMemeChoices=?, faceDescriptors=? WHERE fileName=?`
+  `UPDATE ${TAGGING_TABLE_NAME} SET fileName=?, fileHash=?, fileType=?, taggingRawDescription=?, taggingTags=?, taggingEmotions=?, taggingMemeChoices=?, faceDescriptors=? WHERE fileName=?`
 );
 const DELETE_FILENAME_TAGGING_STMT = DB.prepare(
   `DELETE FROM ${TAGGING_TABLE_NAME} WHERE fileName=?`
@@ -169,6 +176,7 @@ async function Insert_Record_Into_DB(tagging_obj) {
   let info = await INSERT_TAGGING_STMT.run(
     tagging_obj.fileName,
     tagging_obj.fileHash,
+    tagging_obj.fileType,
     tagging_obj.taggingRawDescription,
     JSON.stringify(tagging_obj.taggingTags),
     JSON.stringify(tagging_obj.taggingEmotions),
@@ -184,6 +192,7 @@ async function Update_Tagging_Annotation_DB(tagging_obj) {
   let info = await UPDATE_FILENAME_TAGGING_STMT.run(
     tagging_obj.fileName,
     tagging_obj.fileHash,
+    tagging_obj.fileType,
     tagging_obj.taggingRawDescription,
     JSON.stringify(tagging_obj.taggingTags),
     JSON.stringify(tagging_obj.taggingEmotions),
@@ -262,7 +271,7 @@ const UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT = DB.prepare(
   `UPDATE ${TAGGING_MEME_TABLE_NAME} SET fileNames=? WHERE memeFileName=?`
 );
 const INSERT_MEME_TABLE_TAGGING_STMT = DB.prepare(
-  `INSERT INTO ${TAGGING_MEME_TABLE_NAME} (memeFileName, fileNames) VALUES (?, ?)`
+  `INSERT INTO ${TAGGING_MEME_TABLE_NAME} (memeFileName, fileType, fileNames) VALUES (?, ?, ?)`
 );
 const DELETE_MEME_TABLE_ENTRY_STMT = DB.prepare(
   `DELETE FROM ${TAGGING_MEME_TABLE_NAME} WHERE memeFileName=?`
@@ -271,6 +280,7 @@ const DELETE_MEME_TABLE_ENTRY_STMT = DB.prepare(
 async function Insert_Meme_Tagging_Entry(record) {
   INSERT_MEME_TABLE_TAGGING_STMT.run(
     record.memeFileName,
+    record.fileType,
     JSON.stringify(record.fileNames)
   );
 }
@@ -285,7 +295,8 @@ async function Get_Tagging_MEME_Record_From_DB(filename) {
   let row_obj = await GET_FILENAME_TAGGING_MEME_STMT.get(filename);
   if (row_obj == undefined) {
     //record non-existant so make one
-    INSERT_MEME_TABLE_TAGGING_STMT.run(filename, JSON.stringify([]));
+    const fileType = await GetFileTypeFromFileName(filename);
+    INSERT_MEME_TABLE_TAGGING_STMT.run(filename, fileType, JSON.stringify([]));
     row_obj = await GET_FILENAME_TAGGING_MEME_STMT.get(filename);
   }
   row_obj = Get_Obj_Fields_From_MEME_Record(row_obj);
