@@ -1,8 +1,11 @@
 const ft = require('file-type');
 const PATH = require('path');
 
-async function GetFileTypeFromFileName(filename) {
-  let ft_res = await ft.fromFile(PATH.join(TAGA_DATA_DIRECTORY, filename));
+async function GetFileTypeFromFileName(
+  filename,
+  data_directory = TAGA_DATA_DIRECTORY
+) {
+  let ft_res = await ft.fromFile(PATH.join(data_directory, filename));
 
   if (ft_res == undefined) {
     return null;
