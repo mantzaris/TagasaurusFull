@@ -4,6 +4,13 @@ const fileType = require('file-type');
 //the object for the window functionality
 const IPC_RENDERER = require('electron').ipcRenderer;
 const { ipcRenderer } = require('electron');
+console.log(__dirname);
+const { GetFileTypeFromFileName, GetFileTypeFromMimeType } = require(PATH.join(
+  __dirname,
+  'taga-JS',
+  'utilities',
+  'files.js'
+));
 const { domainToUnicode } = require('url');
 const { parse } = require('path/posix');
 //FSE is not being used but should be for the directory batch import
@@ -85,12 +92,10 @@ async function Auto_Fill_Emotions(super_res, file_annotation_obj) {
 //actions for the AUTO-FILL emotions button being pressed, populate
 document.getElementById(`auto-fill-emotions-button-id`).onclick =
   async function () {
-    let ft_res = await fileType.fromFile(
-      PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation['fileName'])
-    );
+    const ft_res = current_image_annotation['fileType'];
     //console.log('ft_res = ', ft_res)
-    if (ft_res.mime.includes('image') == true) {
-      if (ft_res.ext == 'gif') {
+    if (ft_res == 'image') {
+      if (ft_res == 'gif') {
         let { faceDescriptors, faceEmotions } =
           await Get_Image_Face_Expresssions_From_GIF(
             PATH.join(
@@ -114,7 +119,7 @@ document.getElementById(`auto-fill-emotions-button-id`).onclick =
         await Update_Tagging_Annotation_DB(current_image_annotation);
         Emotion_Display_Fill();
       }
-    } else if (ft_res.mime.includes('video') == true) {
+    } else if (ft_res == 'video') {
       let { emotions_total } = await Get_Image_FaceApi_From_VIDEO(
         PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation['fileName']),
         true,
@@ -212,17 +217,19 @@ async function Display_Image() {
   parent.innerText = '';
   const display_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation['fileName']}`;
   let center_gallery_element;
-  let ft_res = await fileType.fromFile(display_path);
+  let ft_res = current_image_annotation['fileType'];
+  console.log('current_image_annotation = ', current_image_annotation);
+  console.log('ft_res', ft_res);
   //console.log('ft_res in Display Image = ', ft_res)
   // if( ft_res.mime.includes('pdf') == false ) {
   //     //IPC_RENDERER.send('closePDF')
   // }
 
-  if (ft_res.mime.includes('image') == true) {
+  if (ft_res == 'image') {
     center_gallery_element = document.createElement('img');
     center_gallery_element.src = display_path;
     parent.appendChild(center_gallery_element);
-  } else if (ft_res.mime.includes('pdf') == true) {
+  } else if (ft_res == 'pdf') {
     let processing_modal = document.querySelector(
       '.processing-notice-modal-top-div-class'
     );
@@ -391,20 +398,15 @@ async function Meme_View_Fill() {
   let meme_choices = current_image_annotation['taggingMemeChoices'];
   for (file of meme_choices) {
     if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true) {
-      let ft_res = await fileType.fromFile(
-        `${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`
-      );
+      const ft_res = current_image_annotation['fileType'];
       //let type = ( ft_res.mime.includes("image") ) ? 'img' : 'video'
       //console.log('ft_res.mime in meme view',ft_res.mime)
       let content_html;
-      if (ft_res.mime.includes('image') == true) {
+      if (ft_res == 'image') {
         content_html = `<img class="memes-img-class" id="memes-image-img-id-${file}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file}" title="view" alt="meme" />`;
-      } else if (
-        ft_res.mime.includes('video') == true ||
-        ft_res.mime.includes('audio') == true
-      ) {
+      } else if (ft_res == 'video' || ft_res == 'audio') {
         content_html = `<video class="memes-img-class" id="memes-image-img-id-${file}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file}" controls muted />`;
-      } else if (ft_res.mime.includes('pdf') == true) {
+      } else if (ft_res == 'pdf') {
         content_html = `<div id="memes-image-img-id-${file}" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="memes-img-class" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${file}</div>   </div>`;
         //console.log('pdf view content', content_html)
       }
@@ -874,6 +876,9 @@ async function Load_Default_Taga_Image() {
   tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash(
     `${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`
   );
+  tagging_entry.fileType = await GetFileTypeFromFileName(
+    tagging_entry.fileName
+  );
   //for taga no emotion inference is needed but done for consistency
 
   await Insert_Record_Into_DB(tagging_entry); //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
@@ -965,6 +970,7 @@ async function Load_New_Image(filename) {
     tagging_entry_tmp.fileHash = MY_FILE_HELPER.Return_File_Hash(
       `${TAGA_DATA_DIRECTORY}${PATH.sep}${filename}`
     );
+
     let hash_present = await Get_Tagging_Hash_From_DB(
       tagging_entry_tmp.fileHash
     );
@@ -972,10 +978,14 @@ async function Load_New_Image(filename) {
     if (hash_present == undefined) {
       //emotion inference upon the default selected
 
+      //const ft_res = await GetFileTypeFromFileName(tagging_entry_tmp['fileName'])
+
       let ft_res = await fileType.fromFile(
         PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp['fileName'])
       );
       if (!ft_res) continue;
+
+      tagging_entry_tmp['fileType'] = GetFileTypeFromMimeType(ft_res.mime);
 
       //console.log('ft_res = ', ft_res)
       if (ft_res.mime.includes('image') == true) {

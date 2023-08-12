@@ -13,6 +13,11 @@ async function GetFileTypeFromFileName(
 
   const mime = ft_res.mime;
 
+  return GetFileTypeFromMimeType(mime);
+}
+exports.GetFileTypeFromFileName = GetFileTypeFromFileName;
+
+function GetFileTypeFromMimeType(mime) {
   if (mime.includes('image')) {
     return 'image';
   } else if (mime.includes('video')) {
@@ -26,4 +31,4 @@ async function GetFileTypeFromFileName(
   }
   return null;
 }
-exports.GetFileTypeFromFileName = GetFileTypeFromFileName;
+exports.GetFileTypeFromMimeType = GetFileTypeFromMimeType;

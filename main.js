@@ -178,6 +178,7 @@ async function Init() {
     tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash(
       PATH.join(TAGA_DATA_DIRECTORY, 'Taga.png')
     ); //`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
+    tagging_entry.fileType = 'image';
 
     INSERT_TAGGING_STMT = DB.prepare(
       `INSERT INTO ${TAGGING_TABLE_NAME} (fileName, fileHash, fileType, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
