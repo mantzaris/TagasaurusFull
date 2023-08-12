@@ -16,6 +16,7 @@ async function Create_Media_Thumbnail(
     file_path = file_key;
   }
   let ft_res = await fileType.fromFile(file_path);
+  console.log('ft res = ', ft_res);
   let type = 'meme';
   if (ft_res.mime.includes('image') == true) {
     return `<img class="${class_name}" id="${id_tmp}" src="${file_path}" title="view" alt="${type}" />`;

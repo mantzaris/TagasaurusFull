@@ -4,7 +4,7 @@ const fileType = require('file-type');
 //the object for the window functionality
 const IPC_RENDERER = require('electron').ipcRenderer;
 const { ipcRenderer } = require('electron');
-console.log(__dirname);
+
 const { GetFileTypeFromFileName, GetFileTypeFromMimeType } = require(PATH.join(
   __dirname,
   'taga-JS',
@@ -218,8 +218,7 @@ async function Display_Image() {
   const display_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation['fileName']}`;
   let center_gallery_element;
   let ft_res = current_image_annotation['fileType'];
-  console.log('current_image_annotation = ', current_image_annotation);
-  console.log('ft_res', ft_res);
+
   //console.log('ft_res in Display Image = ', ft_res)
   // if( ft_res.mime.includes('pdf') == false ) {
   //     //IPC_RENDERER.send('closePDF')
@@ -396,9 +395,10 @@ async function Add_New_Emotion() {
 async function Meme_View_Fill() {
   let meme_box = document.getElementById('memes-innerbox-displaymemes-id');
   let meme_choices = current_image_annotation['taggingMemeChoices'];
+
   for (file of meme_choices) {
     if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true) {
-      const ft_res = current_image_annotation['fileType'];
+      const ft_res = (await Get_Tagging_Annotation_From_DB(file)).fileType;
       //let type = ( ft_res.mime.includes("image") ) ? 'img' : 'video'
       //console.log('ft_res.mime in meme view',ft_res.mime)
       let content_html;
@@ -1548,20 +1548,20 @@ async function Search_Images() {
           });
       });
     };
-  //default search results are the order the user has them now
-  if (search_results == '' && search_meme_results == '') {
-    let processing_modal = document.querySelector(
-      '.processing-notice-modal-top-div-class'
-    );
-    processing_modal.style.display = 'flex';
+  // always provide a new search random
 
-    search_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
-    search_meme_results = await Meme_Tagging_Random_DB_Images(
-      MAX_COUNT_SEARCH_RESULTS
-    );
+  let processing_modal = document.querySelector(
+    '.processing-notice-modal-top-div-class'
+  );
+  processing_modal.style.display = 'flex';
 
-    processing_modal.style.display = 'none';
-  }
+  search_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+  search_meme_results = await Meme_Tagging_Random_DB_Images(
+    MAX_COUNT_SEARCH_RESULTS
+  );
+
+  processing_modal.style.display = 'none';
+
   //display default ordering first
   let search_image_results_output = document.getElementById(
     'modal-search-images-results-grid-div-area-id'
@@ -2125,22 +2125,22 @@ async function Add_New_Meme() {
       Modal_Meme_Search_Btn();
     };
 
-  //default search results are the order the user has them now
-  if (meme_search_results == '' && meme_search_meme_results == '') {
-    let processing_modal = document.querySelector(
-      '.processing-notice-modal-top-div-class'
-    );
-    processing_modal.style.display = 'flex';
+  // always fresh random search
 
-    meme_search_results = await Tagging_Random_DB_Images(
-      MAX_COUNT_SEARCH_RESULTS
-    );
-    meme_search_meme_results = await Meme_Tagging_Random_DB_Images(
-      MAX_COUNT_SEARCH_RESULTS
-    );
+  let processing_modal = document.querySelector(
+    '.processing-notice-modal-top-div-class'
+  );
+  processing_modal.style.display = 'flex';
 
-    processing_modal.style.display = 'none';
-  }
+  meme_search_results = await Tagging_Random_DB_Images(
+    MAX_COUNT_SEARCH_RESULTS
+  );
+  meme_search_meme_results = await Meme_Tagging_Random_DB_Images(
+    MAX_COUNT_SEARCH_RESULTS
+  );
+
+  processing_modal.style.display = 'none';
+
   //display meme candidates
   let memes_current = current_image_annotation.taggingMemeChoices;
   let search_meme_images_results_output = document.getElementById(
