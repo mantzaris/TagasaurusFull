@@ -6,16 +6,16 @@
   /* box-sizing: border-box; */
   padding: 0%;
   grid-template-areas:
-    "collections-modal-search-main-button-container-div-id"
-    "collections-modal-search-tag-entry-container-div-id"
-    "collections-modal-search-meme-tag-entry-top-div-id"
-    "collections-modal-search-emotion-entry-top-div-id"
-    "collections-modal-search-images-results-display-id";
+    'collections-modal-search-main-button-container-div-id'
+    'collections-modal-search-tag-entry-container-div-id'
+    'collections-modal-search-meme-tag-entry-top-div-id'
+    'collections-modal-search-emotion-entry-top-div-id'
+    'collections-modal-search-images-results-display-id';
 }
 
 /* SEARCH BUTTON START */
 #collections-modal-search-main-button-container-div-id {
-  background-color: #00c600;
+  background-color: var(--primary-300);
   grid-area: collections-modal-search-main-button-container-div-id;
   display: flex;
   justify-content: center;
@@ -43,7 +43,7 @@
 
 /* TAG SEARCH START */
 #collections-modal-search-tag-entry-container-div-id {
-  background-color: #00c600;
+  background-color: var(--primary-300);
   grid-area: collections-modal-search-tag-entry-container-div-id;
   box-sizing: border-box;
   min-height: 0; /* NEW */
@@ -73,16 +73,16 @@
 
 /* EMOTION FIELD SEARCH START */
 #collections-modal-search-emotion-entry-top-div-id {
-  background-color: #00c600;
+  background-color: var(--primary-300);
   grid-area: collections-modal-search-emotion-entry-top-div-id;
   /* display: flex;
       align-items: center; */
   display: grid;
   grid-template-columns: 3fr 3fr 8fr;
   grid-template-areas:
-    "collections-grid-emotion-area-1-id"
-    "collections-grid-emotion-area-2-id"
-    "collections-grid-emotion-area-3-id";
+    'collections-grid-emotion-area-1-id'
+    'collections-grid-emotion-area-2-id'
+    'collections-grid-emotion-area-3-id';
   /* justify-content: center; */
 }
 #collections-grid-emotion-area-1-id {
@@ -107,8 +107,8 @@
   box-sizing: border-box;
   padding: 0%;
   grid-template-areas:
-    "collections-modal-search-emotion-label-value-textarea-entry-id"
-    "collections-modal-search-emotion-value-range-entry-id";
+    'collections-modal-search-emotion-label-value-textarea-entry-id'
+    'collections-modal-search-emotion-value-range-entry-id';
 }
 #collections-modal-search-emotion-label-value-textarea-entry-id {
   grid-area: collections-modal-search-emotion-label-value-textarea-entry-id;
@@ -150,7 +150,7 @@
 
 /* MEME TAG LIST START */
 #collections-modal-search-meme-tag-entry-top-div-id {
-  background-color: #00c600;
+  background-color: var(--primary-300);
   grid-area: collections-modal-search-meme-tag-entry-top-div-id;
   box-sizing: border-box;
   min-height: 0; /* NEW */
@@ -181,9 +181,9 @@
 
 /* IMAGE SEARCH RESULTS START */
 #collections-modal-search-images-results-display-id {
-  background-color: #00c600;
+  background-color: var(--primary-300);
   grid-area: collections-modal-search-images-results-display-id;
-  border-top: 6px solid #005000;
+  border-top: 6px solid var(--primary);
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 11fr;
@@ -194,13 +194,13 @@
   /* overflow-y: scroll; */
   box-sizing: border-box;
   grid-template-areas:
-    "collections-modal-search-images-results-button-div-id   collections-modal-search-images-results-button-div-id"
-    "collections-modal-search-images-results-grid-div-area-id   collections-modal-search-images-results-grid-div-area-id";
+    'collections-modal-search-images-results-button-div-id   collections-modal-search-images-results-button-div-id'
+    'collections-modal-search-images-results-grid-div-area-id   collections-modal-search-images-results-grid-div-area-id';
 }
 
 #collections-modal-search-images-results-button-div-id {
-  background-color: #00c600;
-  border-right: solid 6px #005000;
+  background-color: var(--primary-300);
+  border-right: solid 6px var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -219,9 +219,9 @@
 }
 
 #collections-modal-search-images-results-grid-div-area-id {
-  background-color: #005000;
+  background-color: var(--primary);
   overflow-y: scroll;
-  border-top: 3px solid #005000;
+  border-top: 3px solid var(--primary);
   box-sizing: border-box;
   min-height: 0; /* NEW */
   min-width: 0; /* NEW; needed for Firefox */
@@ -240,7 +240,7 @@
   height: 30vh;
   max-height: 30vh;
   padding-bottom: 6px;
-  border-bottom: 3px solid #00c600;
+  border-bottom: 3px solid var(--primary-300);
   margin-top: 4px;
 }
 
@@ -255,8 +255,8 @@
   grid-template-rows: 2fr 12fr;
   box-sizing: border-box;
   grid-template-areas:
-    "    collection-name-result-div-class                  collection-name-result-div-class  "
-    " collection-profileimage-search-div    collections-search-result-collections-img-set-class   ";
+    '    collection-name-result-div-class                  collection-name-result-div-class  '
+    ' collection-profileimage-search-div    collections-search-result-collections-img-set-class   ';
 }
 
 .collection-name-result-div-class {
@@ -266,7 +266,7 @@
   align-items: center; */
   font-size: 2.5vmin;
   z-index: 2;
-  background-color: #00c600;
+  background-color: var(--primary-300);
   height: 100%;
   overflow-x: auto;
   white-space: nowrap;

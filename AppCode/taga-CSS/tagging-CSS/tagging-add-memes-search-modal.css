@@ -7,16 +7,16 @@
   /* box-sizing: border-box; */
   padding: 0%;
   grid-template-areas:
-    "modal-search-add-memes-main-button-container-div-id   modal-search-add-memes-main-button-container-div-id"
-    "modal-search-tag-entry-container-div-id   modal-search-meme-tag-entry-top-div-id"
-    "modal-search-add-memes-emotion-entry-top-div-id  ."
-    "modal-search-emotion-entry-top-div-id   modal-search-emotion-entry-top-div-id"
-    "modal-search-images-results-display-id   modal-search-images-results-display-id";
+    'modal-search-add-memes-main-button-container-div-id   modal-search-add-memes-main-button-container-div-id'
+    'modal-search-tag-entry-container-div-id   modal-search-meme-tag-entry-top-div-id'
+    'modal-search-add-memes-emotion-entry-top-div-id  .'
+    'modal-search-emotion-entry-top-div-id   modal-search-emotion-entry-top-div-id'
+    'modal-search-images-results-display-id   modal-search-images-results-display-id';
 }
 
 /* TOP SEARCH BUTTON and RESET BUTTON START */
 #modal-search-add-memes-main-button-container-div-id {
-  background-color: #00c600;
+  background-color: var(--primary-300);
   grid-area: modal-search-add-memes-main-button-container-div-id;
   display: flex;
   justify-content: center;
@@ -44,7 +44,7 @@
 
 /* TAG SEARCH START */
 #modal-search-add-memes-tag-entry-container-div-id {
-  background-color: #00c600;
+  background-color: var(--primary-300);
   grid-area: modal-search-tag-entry-container-div-id;
   box-sizing: border-box;
   min-height: 0; /* NEW */
@@ -74,7 +74,7 @@
 
 /* EMOTION FIELD SEARCH START */
 #modal-search-add-memes-emotion-entry-top-div-id {
-  background-color: #00c600;
+  background-color: var(--primary-300);
   grid-area: modal-search-emotion-entry-top-div-id;
   /* display: flex;
   align-items: center; */
@@ -83,8 +83,8 @@
   grid-template-columns: 1fr 11fr 1fr 11fr;
   grid-template-rows: 1fr 1fr;
   grid-template-areas:
-    "grid-emotion-area-1-id  grid-emotion-area-2-id   grid-emotion-area-1-idb  grid-emotion-area-2-idb" /* grid-emotion-area-2-id*/
-    "grid-emotion-area-3-id grid-emotion-area-3-id   grid-emotion-area-3-idb   grid-emotion-area-3-idb";
+    'grid-emotion-area-1-id  grid-emotion-area-2-id   grid-emotion-area-1-idb  grid-emotion-area-2-idb' /* grid-emotion-area-2-id*/
+    'grid-emotion-area-3-id grid-emotion-area-3-id   grid-emotion-area-3-idb   grid-emotion-area-3-idb';
   /* justify-content: center; */
 }
 
@@ -100,7 +100,7 @@
   text-align: center;
   height: 90%;
   width: 100%;
-  background-color: #1884ff;
+  background-color: var(--info);
   border-radius: 15%;
   font-weight: bold;
   font-size: 5vmin;
@@ -116,8 +116,8 @@
 
   padding: 0%;
   grid-template-areas:
-    "modal-search-add-memes-emotion-label-value-textarea-entry-id"
-    "modal-search-add-memes-emotion-value-range-entry-id";
+    'modal-search-add-memes-emotion-label-value-textarea-entry-id'
+    'modal-search-add-memes-emotion-value-range-entry-id';
 }
 #modal-search-add-memes-emotion-label-value-textarea-entry-id {
   grid-area: modal-search-add-memes-emotion-label-value-textarea-entry-id;
@@ -163,7 +163,7 @@
   text-align: center;
   height: 90%;
   width: 100%;
-  background-color: #1884ff;
+  background-color: var(--info);
   border-radius: 15%;
   font-weight: bold;
   font-size: 5vmin;
@@ -179,8 +179,8 @@
 
   padding: 0%;
   grid-template-areas:
-    "modal-search-add-memes-emotion-label-value-textarea-entry-idb"
-    "modal-search-add-memes-emotion-value-range-entry-idb";
+    'modal-search-add-memes-emotion-label-value-textarea-entry-idb'
+    'modal-search-add-memes-emotion-value-range-entry-idb';
 }
 #modal-search-add-memes-emotion-meme-label-value-textarea-entry-id {
   grid-area: modal-search-add-memes-emotion-label-value-textarea-entry-idb;
@@ -221,7 +221,7 @@
 
 /* MEME TAG LIST START */
 #modal-search-add-memes-tag-entry-top-div-id {
-  background-color: #00c600;
+  background-color: var(--primary-300);
   grid-area: modal-search-meme-tag-entry-top-div-id;
   box-sizing: border-box;
   min-height: 0; /* NEW */
@@ -253,9 +253,9 @@
 
 /* IMAGE SEARCH RESULTS START */
 #modal-search-add-memes-images-results-display-id {
-  background-color: #00c600;
+  background-color: var(--primary-300);
   grid-area: modal-search-images-results-display-id;
-  border-top: 6px solid #005000;
+  border-top: 6px solid var(--primary);
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 11fr;
@@ -265,12 +265,12 @@
   /* overflow-y: scroll; */
   box-sizing: border-box;
   grid-template-areas:
-    "modal-search-images-results-button-div-id   modal-search-images-results-button-div-id"
-    "modal-search-images-results-grid-div-area-id   modal-search-meme-images-results-grid-div-area-id";
+    'modal-search-images-results-button-div-id   modal-search-images-results-button-div-id'
+    'modal-search-images-results-grid-div-area-id   modal-search-meme-images-results-grid-div-area-id';
 }
 
 #modal-search-add-memes-images-results-button-div-id {
-  background-color: #00c600;
+  background-color: var(--primary-300);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -278,20 +278,20 @@
   grid-area: modal-search-images-results-button-div-id;
 }
 #modal-search-add-memes-images-results-select-images-order-button-id {
-  background-color: #1884ff;
+  background-color: var(--info);
   /* height: 70%; */
   border-radius: 10%;
   width: 70%;
   margin: 2px;
   font-size: 2.75vmin;
   font-weight: bold;
-  border-right: 2px #00c600 solid;
+  border-right: 2px var(--primary-300) solid;
 }
 
 #modal-search-add-memes-images-results-grid-div-area-id {
-  background-color: #005000;
+  background-color: var(--primary);
   overflow-y: scroll;
-  border-top: 3px solid #005000;
+  border-top: 3px solid var(--primary);
   /* max-height: 100%; */
   /* overflow-y: scroll; */
   grid-area: modal-search-images-results-grid-div-area-id;
@@ -307,8 +307,8 @@
 }
 
 #modal-search-add-memes-meme-images-results-grid-div-area-id {
-  background-color: #005000;
-  border-top: 3px solid #005000;
+  background-color: var(--primary);
+  border-top: 3px solid var(--primary);
   /* height: 100%; */
   overflow-y: scroll;
   grid-area: modal-search-meme-images-results-grid-div-area-id;
@@ -334,13 +334,13 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ad2021;
+  background-color: var(--warning);
   -webkit-transition: 0.4s;
   transition: 0.4s;
 }
 .add-memes-slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 75%;
   width: 26px;
   left: 4px;
@@ -350,10 +350,10 @@
   transition: 0.4s;
 }
 input:checked + .add-memes-slider {
-  background-color: #1884ff;
+  background-color: var(--info);
 }
 input:focus + .add-memes-slider {
-  box-shadow: 0 0 1px #1884ff;
+  box-shadow: 0 0 1px var(--info);
 }
 input:checked + .add-memes-slider:before {
   -webkit-transform: translateX(26px);

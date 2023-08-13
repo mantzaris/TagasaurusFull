@@ -1,232 +1,227 @@
 html,
 body {
-    margin: 0;
-    padding: 0;
-    font-family: Verdana, sans-serif;
-    box-sizing: border-box;
-    background-color: #808a80;
+  margin: 0;
+  padding: 0;
+  font-family: Verdana, sans-serif;
+  box-sizing: border-box;
+  background-color: var(--bg);
 }
 
 #selection-screen {
-    width: 80%;
-    margin: auto;
-    margin-top: 10%;
-    
+  width: 80%;
+  margin: auto;
+  margin-top: 10%;
 }
 #search-type-label,
 #source-label,
 #accuracy-label {
-    font-size: 4vmin;
-    font-weight: bold;
+  font-size: 4vmin;
+  font-weight: bold;
 }
 #mlAccuracy {
-    width: 25%;
+  width: 25%;
 }
 #search-type,
 #source-type,
 #accuracy-description {
-    font-size: 3.2vmin;
+  font-size: 3.2vmin;
 }
 #source-type {
-    max-width: 60%;
+  max-width: 60%;
 }
 #continue-btn,
 #main-menu-btn,
 #screen-capture-btn {
-    font-size: 3.5vmin;
-    margin-top: 5px;
-    padding: 6px;
+  font-size: 3.5vmin;
+  margin-top: 5px;
+  padding: 6px;
 }
 #stream-type-description {
-    font-size: 3vmin;
-    margin-top: 7px;
+  font-size: 3vmin;
+  margin-top: 7px;
 }
-
 
 /*START: CSS for the first stream selection view1 */
 #stream-view1 {
-    display: grid;
-    grid-template-columns: 1fr 7fr;
-    grid-template-rows: 1fr 14fr;
-    min-height: 0;
-    min-width: 0;
-    height: 100vh;
-    width: 100vw;
-    box-sizing: border-box;
-    grid-template-areas:
-        "stream-btns-div1 stream-btns-div1"
-        "keyword-display1-div stream-view1-video";
+  display: grid;
+  grid-template-columns: 1fr 7fr;
+  grid-template-rows: 1fr 14fr;
+  min-height: 0;
+  min-width: 0;
+  height: 100vh;
+  width: 100vw;
+  box-sizing: border-box;
+  grid-template-areas:
+    'stream-btns-div1 stream-btns-div1'
+    'keyword-display1-div stream-view1-video';
 }
 #stream-btns-div1 {
-    grid-area: stream-btns-div1;
-    display: flex;
-    justify-content: center;
-    border-bottom: 4px solid #005000;
+  grid-area: stream-btns-div1;
+  display: flex;
+  justify-content: center;
+  border-bottom: 4px solid var(--primary);
 }
 #return-stream-btn1 {
-    height: 100%;
-    font-size: 3.5vmin;
+  height: 100%;
+  font-size: 3.5vmin;
 }
 #keyword-display1-div {
-    grid-area: keyword-display1-div;
-    height: 100%;
-    width: 100%;
-    font-size: 3vmin;
-    overflow-y: auto;
-    overflow-x: hidden;
-    word-break: break-all; 
-    hyphens: auto;
+  grid-area: keyword-display1-div;
+  height: 100%;
+  width: 100%;
+  font-size: 3vmin;
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-break: break-all;
+  hyphens: auto;
 }
 #stream-view1-video {
-    grid-area: stream-view1-video;
-    width: 100%;
-    height: 100%; 
-    box-sizing:border-box;
+  grid-area: stream-view1-video;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
 }
 
-#overlay1 { 
-    display: block;
-    width: 100%;
-    height: 100%;  
-    
+#overlay1 {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
-
 
 /*START: CSS for the first stream selection view2 which includes keywords and images */
 #stream-view2 {
-    display: grid;
-    grid-template-columns: 2fr 13fr 3fr;
-    grid-template-rows: 1fr 14fr;
-    min-height: 0;
-    min-width: 0;
-    height: 100vh;
-    width: 100vw;
-    box-sizing: border-box;
-    grid-template-areas:
-        "stream-btns-div2 stream-btns-div2 stream-btns-div2"
-        "keyword-display2-div stream-view2-video images-display2-div";
+  display: grid;
+  grid-template-columns: 2fr 13fr 3fr;
+  grid-template-rows: 1fr 14fr;
+  min-height: 0;
+  min-width: 0;
+  height: 100vh;
+  width: 100vw;
+  box-sizing: border-box;
+  grid-template-areas:
+    'stream-btns-div2 stream-btns-div2 stream-btns-div2'
+    'keyword-display2-div stream-view2-video images-display2-div';
 }
 #stream-btns-div2 {
-    grid-area: stream-btns-div2;
-    display: flex;
-    justify-content: center;
-    border-bottom: 4px solid #005000;
+  grid-area: stream-btns-div2;
+  display: flex;
+  justify-content: center;
+  border-bottom: 4px solid var(--primary);
 }
 #return-stream-btn2 {
-    height: 100%;
-    font-size: 3.5vmin;
+  height: 100%;
+  font-size: 3.5vmin;
 }
 #keyword-display2-div {
-    grid-area: keyword-display2-div;
-    height: 100%;
-    width: 100%;
-    font-size: 3vmin;
-    overflow-y: auto;
-    overflow-x: hidden;
-    word-break: break-all; 
-    hyphens: auto;
+  grid-area: keyword-display2-div;
+  height: 100%;
+  width: 100%;
+  font-size: 3vmin;
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-break: break-all;
+  hyphens: auto;
 }
 #stream-view2-video {
-    grid-area: stream-view2-video;
-    width: 100%;
-    height: 100%; 
-    box-sizing:border-box;
+  grid-area: stream-view2-video;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
 }
 #images-display2-div {
-    overflow-y: auto;
-    overflow-x: hidden;
-    border-left: 3px solid #005000;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-left: 3px solid var(--primary);
 }
-#overlay2 { 
-    display: block;
-    width: 100%;
-    height: 100%;
+#overlay2 {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
-
 
 /*START: CSS for the first stream selection view3 which includes keywords and images */
 #stream-view3 {
-    display: grid;
-    grid-template-columns: 2fr 13fr 3fr;
-    grid-template-rows: 1fr 7fr 7fr;
-    min-height: 0;
-    min-width: 0;
-    height: 100vh;
-    width: 100vw;
-    box-sizing: border-box;
-    grid-template-areas:
-        "stream-btns-div3 stream-btns-div3 stream-btns-div3"
-        "keyword-display3-div stream-view3-video images-display3-div"
-        "keyword-display3-div stream-view3-video memes-display3-div";
+  display: grid;
+  grid-template-columns: 2fr 13fr 3fr;
+  grid-template-rows: 1fr 7fr 7fr;
+  min-height: 0;
+  min-width: 0;
+  height: 100vh;
+  width: 100vw;
+  box-sizing: border-box;
+  grid-template-areas:
+    'stream-btns-div3 stream-btns-div3 stream-btns-div3'
+    'keyword-display3-div stream-view3-video images-display3-div'
+    'keyword-display3-div stream-view3-video memes-display3-div';
 }
 #stream-btns-div3 {
-    grid-area: stream-btns-div3;
-    display: flex;
-    justify-content: center;
-    border-bottom: 4px solid #005000;
+  grid-area: stream-btns-div3;
+  display: flex;
+  justify-content: center;
+  border-bottom: 4px solid var(--primary);
 }
 #return-stream-btn3 {
-    height: 100%;
-    font-size: 3.5vmin;
+  height: 100%;
+  font-size: 3.5vmin;
 }
 #keyword-display3-div {
-    grid-area: keyword-display3-div;
-    height: 100%;
-    width: 100%;
-    font-size: 3vmin;
-    overflow-y: auto;
-    overflow-x: hidden;
-    word-break: break-all; 
-    hyphens: auto;
+  grid-area: keyword-display3-div;
+  height: 100%;
+  width: 100%;
+  font-size: 3vmin;
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-break: break-all;
+  hyphens: auto;
 }
 #stream-view3-video {
-    grid-area: stream-view3-video;
-    width: 100%;
-    height: 100%; 
-    box-sizing:border-box;
+  grid-area: stream-view3-video;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
 }
 #images-display3-div {
-    overflow-y: auto;
-    overflow-x: hidden;
-    border-left: 3px solid #005000;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-left: 3px solid var(--primary);
 }
 #memes-display3-div {
-    overflow-y: auto;
-    overflow-x: hidden;
-    border-left: 3px solid #005000;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-left: 3px solid var(--primary);
 }
-#overlay3 { 
-    display: block;
-    width: 100%;
-    height: 100%;
+#overlay3 {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
-
-
 
 .keyword {
-    border-bottom: 4px dotted #005000;
+  border-bottom: 4px dotted var(--primary);
 }
-.image-thumbnail-div, .meme-thumbnail-div {
-    height: 15vh;
-    width: 100%;
-    margin-bottom: 5px;
-    position: relative;
+.image-thumbnail-div,
+.meme-thumbnail-div {
+  height: 15vh;
+  width: 100%;
+  margin-bottom: 5px;
+  position: relative;
 }
-.image-thumbnail, .meme-thumbnail {
-    /* height: 100px;
+.image-thumbnail,
+.meme-thumbnail {
+  /* height: 100px;
     width: 100px; */
-    height: 99999px;
-    object-fit: contain;
-    max-height: 100%;
-    max-width: 100%;
-    display: block;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    margin: auto auto;
+  height: 99999px;
+  object-fit: contain;
+  max-height: 100%;
+  max-width: 100%;
+  display: block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto auto;
 }
 .separator {
-    height: 5vh;
+  height: 5vh;
 }

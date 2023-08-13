@@ -19,30 +19,29 @@ body {
   width: 100vw;
   box-sizing: border-box;
   grid-template-areas:
-    "emotions-gridbox-id   center-gridbox-id  description-gridbox"
-    "emotions-gridbox-id   center-gridbox-id  description-gridbox"
-    "emotions-gridbox-id   center-gridbox-id  description-gridbox"
-    "memes-gridbox-id      center-gridbox-id  description-gridbox"
-    "memes-gridbox-id      center-gridbox-id  hashtags-gridbox-id"
-    "memes-gridbox-id      center-gridbox-id  hashtags-gridbox-id"
-    "memes-gridbox-id      center-gridbox-id  hashtags-gridbox-id";
+    'emotions-gridbox-id   center-gridbox-id  description-gridbox'
+    'emotions-gridbox-id   center-gridbox-id  description-gridbox'
+    'emotions-gridbox-id   center-gridbox-id  description-gridbox'
+    'memes-gridbox-id      center-gridbox-id  description-gridbox'
+    'memes-gridbox-id      center-gridbox-id  hashtags-gridbox-id'
+    'memes-gridbox-id      center-gridbox-id  hashtags-gridbox-id'
+    'memes-gridbox-id      center-gridbox-id  hashtags-gridbox-id';
   border-style: solid;
   border-width: thin;
-  border-color: #005000;
+  border-color: var(--primary);
 }
 
 #emotions-gridbox-id {
-  background-color: #808a80;
+  background-color: var(--bg);
   grid-area: emotions-gridbox-id;
   display: grid;
   grid-template-rows: 2fr 6fr 14fr;
   box-sizing: border-box;
   grid-template-areas:
-    "emotions-innerbox-label-id"
-    "emotions-innerbox-newemotions-id"
-    "emotions-innerbox-displayemotions-id";
+    'emotions-innerbox-label-id'
+    'emotions-innerbox-newemotions-id'
+    'emotions-innerbox-displayemotions-id';
 }
-
 
 #hashtags-gridbox-id {
   /* background-color: #BBBBBB; */
@@ -54,13 +53,13 @@ body {
 #description-gridbox-id,
 #memes-gridbox-id,
 #hashtags-gridbox-id {
-  border-color: #005000;
+  border-color: var(--primary);
   border-style: solid;
   border-width: medium;
 }
 
 #emotions-innerbox-label-id {
-  background-color: #808a80;
+  background-color: var(--bg);
   grid-area: emotions-innerbox-label-id;
   font-size: 3.75vmin;
   overflow: hidden;
@@ -87,11 +86,10 @@ body {
 }
 
 #add-new-emotion-button-id {
-  
-  background-color: #1884ff;
+  background-color: var(--info);
   display: block;
   width: 95%;
-  margin-top: 0.0em;
+  margin-top: 0em;
   border-radius: 12px;
   font-size: 1.6vmin;
   margin-left: auto;
@@ -100,7 +98,6 @@ body {
 }
 
 #emotions-new-emotion-textarea-id {
-  
   width: 95%;
   max-width: 95%;
   height: 1.8vmin;
@@ -109,7 +106,7 @@ body {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 0.00em;
+  margin-top: 0em;
   border-radius: 5px;
   resize: none;
 }
@@ -133,11 +130,10 @@ body {
 #new-emotion-range-id {
   grid-area: emotion-range;
   width: 60%;
-  background: #1884ff;
+  background: var(--info);
 }
 
 #auto-emotions-div-id {
-  
   display: flex;
   flex-wrap: nowrap;
   justify-content: flex-start;
@@ -145,11 +141,11 @@ body {
   width: 90%;
 }
 #auto-fill-emotions-button-id {
-  background-color: #1884ff;
+  background-color: var(--info);
   display: inline-block;
-  
+
   width: 75%;
-  margin-top: 0.0em;
+  margin-top: 0em;
   border-radius: 12px;
   font-size: 1.6vmin;
   margin-left: auto;
@@ -163,15 +159,14 @@ body {
 #auto-fill-emotions-check-box-id {
   display: inline-block;
   position: relative;
-  outline: 2px solid #1884ff;
-  
+  outline: 2px solid var(--info);
 }
 
 #emotions-innerbox-displayemotions-id {
-  background-color: #808a80;
+  background-color: var(--bg);
   grid-area: emotions-innerbox-displayemotions-id;
   overflow-y: auto;
-  border-top: 5px #005000 dotted;
+  border-top: 5px var(--primary) dotted;
 }
 
 .emotion-delete-icon-class {
@@ -185,7 +180,7 @@ body {
 }
 
 .emotion-list-class {
-  border-bottom: 5px #005000 dotted;
+  border-bottom: 5px var(--primary) dotted;
   padding-top: 0.3em;
   padding-bottom: 0.3em;
 }
@@ -196,15 +191,15 @@ body {
 
 /* MEME COMPONENT STYLES */
 #memes-gridbox-id {
-  background-color: #808a80;
+  background-color: var(--bg);
   grid-area: memes-gridbox-id;
   display: grid;
   grid-template-rows: 1fr 1fr 12fr;
   box-sizing: border-box;
   grid-template-areas:
-    "memes-innerbox-label-id"
-    "memes-innerbox-newememes"
-    "memes-innerbox-displaymemes-id";
+    'memes-innerbox-label-id'
+    'memes-innerbox-newememes'
+    'memes-innerbox-displaymemes-id';
 }
 
 #memes-text-label-id {
@@ -228,7 +223,7 @@ body {
   float: left;
 }
 #add-new-memes-button-id {
-  background-color: #1884ff;
+  background-color: var(--info);
   display: block;
   width: 95%;
   margin-top: 0.1em;
@@ -239,10 +234,10 @@ body {
   cursor: pointer;
 }
 #memes-innerbox-displaymemes-id {
-  background-color: #808a80;
+  background-color: var(--bg);
   grid-area: memes-innerbox-displaymemes-id;
   overflow-y: auto;
-  border-top: 3px #005000 dotted;
+  border-top: 3px var(--primary) dotted;
 }
 
 .memes-img-class {
@@ -275,13 +270,13 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ad2021;
+  background-color: var(--warning);
   -webkit-transition: 0.4s;
   transition: 0.4s;
 }
 .slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 75%;
   width: 26px;
   left: 4px;
@@ -291,10 +286,10 @@ body {
   transition: 0.4s;
 }
 input:checked + .slider {
-  background-color: #1884ff;
+  background-color: var(--info);
 }
 input:focus + .slider {
-  box-shadow: 0 0 1px #1884ff;
+  box-shadow: 0 0 1px var(--info);
 }
 input:checked + .slider:before {
   -webkit-transform: translateX(26px);
@@ -306,17 +301,17 @@ input:checked + .slider:before {
 /* DESCRIPTION AREA START */
 #description-gridbox-id {
   grid-area: description-gridbox;
-  background-color: #808a80;
+  background-color: var(--bg);
   display: grid;
   grid-template-rows: 1fr 15fr 2fr;
   box-sizing: border-box;
   grid-template-areas:
-    "description-label-div-gridarea-textentry-id"
-    "description-div-gridarea-textentry-id"
-    "buttons-div-gridarea-textentry";
+    'description-label-div-gridarea-textentry-id'
+    'description-div-gridarea-textentry-id'
+    'buttons-div-gridarea-textentry';
 }
 #description-label-div-gridarea-textentry-id {
-  background-color: #808a80;
+  background-color: var(--bg);
   grid-area: description-label-div-gridarea-textentry-id;
   font-size: 3.5vmin;
   overflow: hidden;
@@ -373,17 +368,17 @@ input:checked + .slider:before {
 
 /* HASHTAGS GRID AREA START */
 #hashtags-gridbox-id {
-  background-color: #808a80;
+  background-color: var(--bg);
   grid-area: hashtags-gridbox-id;
   display: grid;
   grid-template-rows: 1fr 11fr;
   box-sizing: border-box;
   grid-template-areas:
-    "hashtags-innerbox-label-id"
-    "hashtags-innerbox-displayhashtags-id";
+    'hashtags-innerbox-label-id'
+    'hashtags-innerbox-displayhashtags-id';
 }
 #hashtags-innerbox-label-id {
-  background-color: #808a80;
+  background-color: var(--bg);
   grid-area: hashtags-innerbox-label-id;
   font-size: 3.25vmin;
   overflow: hidden;
@@ -403,7 +398,7 @@ input:checked + .slider:before {
   float: left;
 }
 #hashtags-innerbox-displayhashtags-id {
-  background-color: #808a80;
+  background-color: var(--bg);
   grid-area: hashtags-innerbox-displayhashtags-id;
   overflow-y: auto;
   margin-top: 0.2em;
@@ -426,23 +421,23 @@ input:checked + .slider:before {
 
 /* CENTER GRID AREA START */
 #center-gridbox-id {
-  background-color: #808a80;
+  background-color: var(--bg);
   grid-area: center-gridbox-id;
   min-height: 0;
   display: grid;
   grid-template-rows: 2fr 1fr 21fr; /* 1fr */
   box-sizing: border-box;
   grid-template-areas:
-    "center-button-area-div-id"
-    "center-lower-button-area-div-id"
-    "center-gallery-area-div-id";
+    'center-button-area-div-id'
+    'center-lower-button-area-div-id'
+    'center-gallery-area-div-id';
 }
 .center-buttons {
   font-weight: bold;
   border-radius: 15%;
   width: 90%;
   margin: auto;
-  font-size: 2.0vmin;
+  font-size: 2vmin;
   height: 100%;
   cursor: pointer;
 }
@@ -451,14 +446,14 @@ input:checked + .slider:before {
 #return-to-main-button-id,
 #left-gallery-image-button-id,
 #right-gallery-image-button-id {
-  background-color: #1884ff;
+  background-color: var(--info);
 }
 #delete-image-button-id {
-  background-color: #ad2021;
+  background-color: var(--warning);
 }
 #center-button-area-div-id {
   grid-area: center-button-area-div-id;
-  background-color: #808a80;
+  background-color: var(--bg);
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
 }
@@ -473,28 +468,28 @@ input:checked + .slider:before {
 }
 #center-lower-button-area-div-id {
   grid-area: center-lower-button-area-div-id;
-  border-top: #005000 solid medium;
+  border-top: var(--primary) solid medium;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-areas: "left-gallery-image-button-id    right-gallery-image-button-id";
+  grid-template-areas: 'left-gallery-image-button-id    right-gallery-image-button-id';
 }
 #left-gallery-image-button-id {
   grid-area: left-gallery-image-button-id;
   margin-right: 5px;
-  background-color: #1884ff;
+  background-color: var(--info);
 }
 #right-gallery-image-button-id {
   grid-area: right-gallery-image-button-id;
   margin-left: 5px;
-  background-color: #1884ff;
+  background-color: var(--info);
 }
 #center-gallery-area-div-id {
   grid-area: center-gallery-area-div-id;
-  background-color: #808a80;
+  background-color: var(--bg);
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
-  border-top: #005000 solid medium;
+  border-top: var(--primary) solid medium;
   /* padding: 4px; */
 }
 
@@ -521,7 +516,7 @@ input:checked + .slider:before {
   display: flex;
   justify-content: center;
   align-items: center;
-  
+
   transform: translate(-50%, -50%);
   left: 50%;
 }

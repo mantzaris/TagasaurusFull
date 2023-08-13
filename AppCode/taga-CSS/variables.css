@@ -1,0 +1,22 @@
+:root {
+  --bg: #b0bab0; /* var(--bg) */
+  --bg-alpha: rgba(128, 138, 128, 0.8);
+  --bg-alpha-Pnt5: rgba(128, 138, 128, 0.5);
+  --gray: #cccccc;
+  --gray-700: #aaaaaa; /* var(--gray-700) */
+  --primary: #005000; /* var(--primary) */
+  --primary-300: #00c600; /* var(--primary-300) */
+  --primary-400: #008800; /* var(--primary-400) */
+
+  --info: #1884ff; /* var(--info) */
+  --info-300: #8fb0d6;
+  --info-600: #0084ff;
+  --info-800: #0000ff;
+  --info-900: #012880;
+
+  --warning: #ad2021; /* var(--warning) */
+  --warning-300: #bd7a7a;
+  --warning-600: #aa0000; /* var(--warning-600) */
+
+  --toast: rgb(220, 220, 119);
+}

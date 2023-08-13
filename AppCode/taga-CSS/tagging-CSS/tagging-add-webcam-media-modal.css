@@ -1,33 +1,29 @@
-
-
-
-
 #modal-webcam-clicked-grid-container-id {
-    width: 100%;
-    display: grid;
-    grid-template-rows: 1fr  9fr;
-    min-height: 0;
-    min-width: 0;
-    height: 100%;
-    width: 100%;
-    /* box-sizing: border-box; */
-    padding: 0%;
-    grid-template-areas:
-      "modal-webcam-clicked-tag-list-div-container-id"
-      "modal-webcam-clicked-image-gridbox-id";
+  width: 100%;
+  display: grid;
+  grid-template-rows: 1fr 9fr;
+  min-height: 0;
+  min-width: 0;
+  height: 100%;
+  width: 100%;
+  /* box-sizing: border-box; */
+  padding: 0%;
+  grid-template-areas:
+    'modal-webcam-clicked-tag-list-div-container-id'
+    'modal-webcam-clicked-image-gridbox-id';
 }
 
 #modal-webcam-clicked-tag-list-div-container-id {
-    background-color: #00c600;
-    grid-area: modal-webcam-clicked-tag-list-div-container-id;
-    font-weight: bold;
-    font-size: 3vmin;
-    color: black;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
+  background-color: var(--primary-300);
+  grid-area: modal-webcam-clicked-tag-list-div-container-id;
+  font-weight: bold;
+  font-size: 3vmin;
+  color: black;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
 }
 #capture-button-id,
 #capture-video-button-id,
@@ -35,42 +31,40 @@
 #back-capture-button-id,
 #cancel-video-button-id,
 #stop-video-button-id {
-    font-size: 2.5vmin;
+  font-size: 2.5vmin;
 }
-
-
 
 #modal-webcam-clicked-image-gridbox-id {
-    background-color: #005000;
-    grid-area: modal-webcam-clicked-image-gridbox-id;
-    overflow-y: auto;
-    overflow-x: auto;
-    height: 100%;
-    display: grid;
-    grid-template-rows: 1fr  1fr;
-    min-height: 0;
-    min-width: 0;
-    height: 100%;
-    width: 100%;
-    /* box-sizing: border-box; */
-    padding: 0%;
-    grid-template-areas:
-      "video-area"
-      "canvas-area";
+  background-color: var(--primary);
+  grid-area: modal-webcam-clicked-image-gridbox-id;
+  overflow-y: auto;
+  overflow-x: auto;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  min-height: 0;
+  min-width: 0;
+  height: 100%;
+  width: 100%;
+  /* box-sizing: border-box; */
+  padding: 0%;
+  grid-template-areas:
+    'video-area'
+    'canvas-area';
 }
 #canvas-webcam-id {
-    grid-area: canvas-area;
-    height: 100%;
-    width: 100%;
-    
-    /* background-color: burlywood; */
+  grid-area: canvas-area;
+  height: 100%;
+  width: 100%;
+
+  /* background-color: burlywood; */
 }
 #webcam-video-id {
-    grid-area: video-area;
-    height: 100%;
-    width: 100%;
-    border: solid 2px transparent;
-    /* background-color: blueviolet; */
+  grid-area: video-area;
+  height: 100%;
+  width: 100%;
+  border: solid 2px transparent;
+  /* background-color: blueviolet; */
 }
 
 /* #modal-meme-clicked-displayimg-id {

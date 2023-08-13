@@ -16,16 +16,16 @@ body {
   width: 100vw;
   box-sizing: border-box;
   grid-template-areas:
-    "title"
-    "skill-bars"
-    "tagging-button"
-    "collection-button"
-    "super-search-button"
-    "stream-search-button"
-    "export-button"
-    "import-button"
-    "support-button";
-  background-color: #808a80;
+    'title'
+    'skill-bars'
+    'tagging-button'
+    'collection-button'
+    'super-search-button'
+    'stream-search-button'
+    'export-button'
+    'import-button'
+    'support-button';
+  background-color: var(--bg);
 }
 #title-div-id {
   grid-area: title;
@@ -34,13 +34,12 @@ body {
   font-weight: bold;
   font-size: 6vmin;
 
-  color: #005000;
+  color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
 
-  text-shadow: 7px 12px 12px rgba(0, 158, 0, 0.75),
-    -3px 10px 12px rgba(0, 198, 0, 0.5);
+  text-shadow: 7px 12px 12px var(--primary-400), -3px 10px 12px var(--primary-300);
 }
 
 #skill-bars-div-id {
@@ -56,10 +55,10 @@ body {
 
   box-sizing: border-box;
   grid-template-areas:
-    "tagging-score"
-    "emotions-score"
-    "meme-score"
-    "awesomeness-score";
+    'tagging-score'
+    'emotions-score'
+    'meme-score'
+    'awesomeness-score';
 }
 #tagging-score-div-id {
   grid-area: tagging-score;
@@ -85,12 +84,12 @@ body {
 }
 /* SKILL BAR START */
 .skill-bar-div-class {
-  background-color: #005000;
+  background-color: var(--primary);
   width: 80%;
   border-radius: 15px;
 }
 .skill {
-  background-color: #00c600;
+  background-color: var(--primary-300);
   color: black;
   padding: 1%;
   text-align: right;

@@ -9,7 +9,7 @@ body {
 #support-items-div-id {
   height: 100vh;
   width: 100vw;
-  background-color: #808a80;
+  background-color: var(--bg);
   overflow-y: auto;
 }
 
@@ -41,13 +41,13 @@ body {
 
   box-sizing: border-box;
   grid-template-areas:
-    "icon  type "
-    "icon  link "
-    "icon  content ";
+    'icon  type '
+    'icon  link '
+    'icon  content ';
 
   border-style: solid;
   border-width: 4px;
-  border-color: #009e00;
+  border-color: var(--primary-400);
 }
 .icon-div-class {
   grid-area: icon;
@@ -75,7 +75,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #00c600;
+  background-color: var(--primary-300);
 }
 .text-div-class {
   grid-area: content;

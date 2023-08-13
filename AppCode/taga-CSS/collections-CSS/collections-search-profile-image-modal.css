@@ -7,17 +7,17 @@
   /* box-sizing: border-box; */
   padding: 0%;
   grid-template-areas:
-    "modal-search-profileimage-main-button-container-div-id"
-    "modal-search-profileimage-tag-entry-container-div-id"
-    "modal-search-profileimage-meme-tag-entry-top-div-id"
-    "modal-search-profileimage-emotion-entry-top-div-id"
-    "modal-search-profileimage-images-results-display-id";
+    'modal-search-profileimage-main-button-container-div-id'
+    'modal-search-profileimage-tag-entry-container-div-id'
+    'modal-search-profileimage-meme-tag-entry-top-div-id'
+    'modal-search-profileimage-emotion-entry-top-div-id'
+    'modal-search-profileimage-images-results-display-id';
 }
 
 /* SEARCH BUTTON START */
 #modal-search-profileimage-main-button-container-div-id,
 #modal-search-profileimage-main-button-container-div-id {
-  background-color: #00c600;
+  background-color: var(--primary-300);
   grid-area: modal-search-profileimage-main-button-container-div-id;
   display: flex;
   justify-content: center;
@@ -48,7 +48,7 @@
 /* TAG SEARCH START */
 #modal-search-profileimage-tag-entry-container-div-id,
 #modal-search-profileimage-tag-entry-container-div-id {
-  background-color: #00c600;
+  background-color: var(--primary-300);
   grid-area: modal-search-profileimage-tag-entry-container-div-id;
   box-sizing: border-box;
   min-height: 0; /* NEW */
@@ -82,16 +82,16 @@
 /* EMOTION FIELD SEARCH START */
 #modal-search-profileimage-emotion-entry-top-div-id,
 #modal-search-profileimage-emotion-entry-top-div-id {
-  background-color: #00c600;
+  background-color: var(--primary-300);
   grid-area: modal-search-profileimage-emotion-entry-top-div-id;
   /* display: flex;
     align-items: center; */
   display: grid;
   grid-template-columns: 3fr 3fr 8fr;
   grid-template-areas:
-    "grid-emotion-area-1-id"
-    "grid-emotion-area-2-id"
-    "grid-emotion-area-3-id";
+    'grid-emotion-area-1-id'
+    'grid-emotion-area-2-id'
+    'grid-emotion-area-3-id';
   /* justify-content: center; */
 }
 #grid-emotion-area-1-id {
@@ -118,8 +118,8 @@
   box-sizing: border-box;
   padding: 0%;
   grid-template-areas:
-    "modal-search-profileimage-emotion-label-value-textarea-entry-id"
-    "modal-search-profileimage-emotion-value-range-entry-id";
+    'modal-search-profileimage-emotion-label-value-textarea-entry-id'
+    'modal-search-profileimage-emotion-value-range-entry-id';
 }
 #modal-search-profileimage-emotion-label-value-textarea-entry-id,
 #modal-search-profileimage-emotion-label-value-textarea-entry-id {
@@ -165,7 +165,7 @@
 /* MEME TAG LIST START */
 #modal-search-profileimage-meme-tag-entry-top-div-id,
 #modal-search-profileimage-meme-tag-entry-top-div-id {
-  background-color: #00c600;
+  background-color: var(--primary-300);
   grid-area: modal-search-profileimage-meme-tag-entry-top-div-id;
   box-sizing: border-box;
   min-height: 0; /* NEW */
@@ -199,9 +199,9 @@
 
 /* IMAGE SEARCH RESULTS START */
 #modal-search-profileimage-images-results-display-id {
-  background-color: #00c600;
+  background-color: var(--primary-300);
   grid-area: modal-search-profileimage-images-results-display-id;
-  border-top: 6px solid #005000;
+  border-top: 6px solid var(--primary);
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr 11fr;
@@ -213,12 +213,12 @@ min-height: 1px;
 / overflow-y: scroll; */
   box-sizing: border-box;
   grid-template-areas:
-    "modal-search-profileimage-images-results-title-div-id"
-    "modal-search-profileimage-images-results-grid-div-area-id";
+    'modal-search-profileimage-images-results-title-div-id'
+    'modal-search-profileimage-images-results-grid-div-area-id';
 }
 
 #modal-search-profileimage-images-results-title-div-id {
-  background-color: #00c600;
+  background-color: var(--primary-300);
   /* border-right: solid 6px #005000; */
   display: flex;
   align-items: center;
@@ -229,14 +229,12 @@ min-height: 1px;
   font-weight: bold;
 }
 
-
 #modal-search-profileimage-images-results-grid-div-area-id {
-  background-color: #005000;
-  border-top: 3px solid #005000;
+  background-color: var(--primary);
+  border-top: 3px solid var(--primary);
   grid-area: modal-search-profileimage-images-results-grid-div-area-id;
   overflow-y: auto;
 }
-
 
 .profile-thumb-div {
   max-height: 25vh;
@@ -276,7 +274,6 @@ min-height: 1px;
   max-height: 25vh;
   max-width: 100%;
 } */
-
 
 /* IMAGE SEARCH RESULTS END */
 

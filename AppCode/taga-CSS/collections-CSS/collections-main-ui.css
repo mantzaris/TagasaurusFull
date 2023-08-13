@@ -18,12 +18,12 @@ body {
   width: 100vw;
   box-sizing: border-box;
   grid-template-areas:
-    "collection-name-gridarea-id            collection-control-buttons-gridarea-id"
-    "collection-profile-image-gridarea-id   collection-images-gallery-gridarea-id"
-    "collection-annotations-gridarea-id     collection-images-gallery-gridarea-id";
+    'collection-name-gridarea-id            collection-control-buttons-gridarea-id'
+    'collection-profile-image-gridarea-id   collection-images-gallery-gridarea-id'
+    'collection-annotations-gridarea-id     collection-images-gallery-gridarea-id';
   border-style: solid;
   border-width: thin;
-  border-color: #005000;
+  border-color: var(--primary) 0;
 }
 
 #collection-name-gridarea-id,
@@ -31,14 +31,14 @@ body {
 #collection-profile-image-gridarea-id,
 #collection-annotations-gridarea-id,
 #collection-images-gallery-gridarea-id {
-  border-color: #005000;
+  border-color: var(--primary);
   border-style: solid;
   border-width: medium;
 }
 
 /* COLLECTION NAME START */
 #collection-name-gridarea-id {
-  background-color: #808a80;
+  background-color: var(--bg);
   grid-area: collection-name-gridarea-id;
   min-width: 0;
   padding-left: 5px;
@@ -66,7 +66,7 @@ body {
 #collection-control-buttons-gridarea-id {
   display: inline-block;
   grid-area: collection-control-buttons-gridarea-id;
-  background-color: #808a80;
+  background-color: var(--bg);
   min-height: 0;
   display: flex;
   flex-direction: row;
@@ -117,7 +117,7 @@ body {
 
 /* COLLECTION PROFILE IMAGE START */
 #collection-profile-image-gridarea-id {
-  background-color: #808a80;
+  background-color: var(--bg);
   grid-area: collection-profile-image-gridarea-id;
   overflow-y: hidden;
   display: grid;
@@ -125,8 +125,8 @@ body {
   grid-template-rows: 1fr 10fr;
   box-sizing: border-box;
   grid-template-areas:
-    "collection-profile-image-button-div-id"
-    "collection-profile-image-display-div-id";
+    'collection-profile-image-button-div-id'
+    'collection-profile-image-display-div-id';
 }
 #collection-profile-image-display-div-id {
   grid-area: collection-profile-image-display-div-id;
@@ -157,20 +157,20 @@ body {
 
 /* COLLECTION NAV BAR ANNOTATION ID START */
 #collection-annotations-gridarea-id {
-  background-color: #808a80;
+  background-color: var(--bg);
   grid-area: collection-annotations-gridarea-id;
   min-height: 0; /*  essential for the auto height be disabled and stop it expanding */
 
   display: grid;
   grid-template-rows: 1fr 15fr;
   grid-template-areas:
-    "collection-image-annotation-navbar-div-id"
-    "collection-image-annotation-mode-div-id";
+    'collection-image-annotation-navbar-div-id'
+    'collection-image-annotation-mode-div-id';
 }
 #collection-image-annotation-navbar-div-id {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  grid-template-areas: "collection-image-annotation-navbar-description-button-id   collection-image-annotation-navbar-emotion-button-id   collection-image-annotation-navbar-meme-button-id";
+  grid-template-areas: 'collection-image-annotation-navbar-description-button-id   collection-image-annotation-navbar-emotion-button-id   collection-image-annotation-navbar-meme-button-id';
 }
 #collection-image-annotation-navbar-description-button-id {
   grid-area: collection-image-annotation-navbar-description-button-id;
@@ -199,10 +199,10 @@ body {
   grid-template-rows: 20fr 3fr 2fr 4fr;
   box-sizing: border-box;
   grid-template-areas:
-    "collection-image-annotation-description-textarea-div-id     collection-image-annotation-description-textarea-div-id"
-    "collection-image-annotation-description-save-button-div-id    collection-image-annotation-description-save-button-div-id"
-    "collection-description-annotation-hashtags-label-div-id     collection-description-annotation-hashtags-label-div-id"
-    "collection-description-annotation-hashtags-div-id            collection-description-annotation-hashtags-div-id";
+    'collection-image-annotation-description-textarea-div-id     collection-image-annotation-description-textarea-div-id'
+    'collection-image-annotation-description-save-button-div-id    collection-image-annotation-description-save-button-div-id'
+    'collection-description-annotation-hashtags-label-div-id     collection-description-annotation-hashtags-label-div-id'
+    'collection-description-annotation-hashtags-div-id            collection-description-annotation-hashtags-div-id';
 }
 #collection-image-annotation-description-textarea-div-id {
   grid-area: collection-image-annotation-description-textarea-div-id;
@@ -251,7 +251,7 @@ body {
   white-space: nowrap;
   display: inline-block;
   height: 100%;
-  background-color: #808a80;
+  background-color: var(--bg);
   font-weight: bold;
   font-size: 2.5vh;
 }
@@ -261,7 +261,7 @@ body {
   font-size: 3.25vmin;
 }
 #collection-description-annotation-hashtags-div-id {
-  background-color: #808a80;
+  background-color: var(--bg);
   grid-area: collection-description-annotation-hashtags-div-id;
   display: flex;
   align-items: center;
@@ -288,7 +288,7 @@ body {
 
 /* emotions div start */
 #collection-image-annotation-emotions-div-id {
-  background-color: #808a80;
+  background-color: var(--bg);
   min-height: 0; /*  essential for the auto height be disabled and stop it expanding */
 
   height: 100%;
@@ -297,8 +297,8 @@ body {
   grid-template-rows: 11fr 2fr;
   box-sizing: border-box;
   grid-template-areas:
-    "collection-image-annotation-emotions-labels-show-div-id"
-    "collection-image-annotation-emotions-new-entry-div-id";
+    'collection-image-annotation-emotions-labels-show-div-id'
+    'collection-image-annotation-emotions-new-entry-div-id';
 }
 #collection-image-annotation-emotions-labels-show-div-id {
   grid-area: collection-image-annotation-emotions-labels-show-div-id;
@@ -344,8 +344,8 @@ body {
   grid-template-columns: 1fr 1fr;
   box-sizing: border-box;
   grid-template-areas:
-    "collection-image-annotation-emotions-new-entry-emotion-textlabel-div-id   collection-image-annotation-emotions-new-entry-emotion-value-range-div-id"
-    "collection-image-annotation-emotions-new-entry-emotion-button-div-id      collection-image-annotation-emotions-save-button-div-id";
+    'collection-image-annotation-emotions-new-entry-emotion-textlabel-div-id   collection-image-annotation-emotions-new-entry-emotion-value-range-div-id'
+    'collection-image-annotation-emotions-new-entry-emotion-button-div-id      collection-image-annotation-emotions-save-button-div-id';
 }
 #collection-image-annotation-emotions-new-entry-emotion-textlabel-div-id {
   grid-area: collection-image-annotation-emotions-new-entry-emotion-textlabel-div-id;
@@ -419,7 +419,7 @@ body {
 
 /* memes div start */
 #collection-image-annotation-memes-div-id {
-  background-color: #808a80;
+  background-color: var(--bg);
   min-height: 0; /*  essential for the auto height be disabled and stop it expanding */
   height: 100%;
   padding: 4px;
@@ -432,8 +432,8 @@ body {
   grid-template-columns: 1fr 1fr;
   box-sizing: border-box;
   grid-template-areas:
-    "collection-image-annotation-memes-images-show-div-id             collection-image-annotation-memes-images-show-div-id"
-    "collection-image-annotation-memes-new-memes-add-button-div-id    collection-image-annotation-memes-save-changes-button-div-id";
+    'collection-image-annotation-memes-images-show-div-id             collection-image-annotation-memes-images-show-div-id'
+    'collection-image-annotation-memes-new-memes-add-button-div-id    collection-image-annotation-memes-save-changes-button-div-id';
 }
 
 #collection-image-annotation-memes-images-show-div-id {
@@ -516,13 +516,13 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ad2021;
+  background-color: var(--warning);
   -webkit-transition: 0.4s;
   transition: 0.4s;
 }
 .slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 75%;
   width: 26px;
   left: 4px;
@@ -532,10 +532,10 @@ body {
   transition: 0.4s;
 }
 input:checked + .slider {
-  background-color: #1884ff;
+  background-color: var(--info);
 }
 input:focus + .slider {
-  box-shadow: 0 0 1px #1884ff;
+  box-shadow: 0 0 1px var(--info);
 }
 input:checked + .slider:before {
   -webkit-transform: translateX(26px);
@@ -577,7 +577,7 @@ input:checked + .slider:before {
 
 #collection-images-gallery-gridarea-id {
   grid-area: collection-images-gallery-gridarea-id;
-  background-color: #808a80;
+  background-color: var(--info);
 
   min-height: 0; /*  essential for the auto height be disabled and stop it expanding */
   height: 100%;
@@ -591,8 +591,8 @@ input:checked + .slider:before {
   grid-template-columns: 1fr 1fr;
   box-sizing: border-box;
   grid-template-areas:
-    "collections-images-gallery-grid-images-div-id     collections-images-gallery-grid-images-div-id"
-    "collections-images-gallery-grid-button-addimages-div-id    collections-images-gallery-grid-button-savechanges-div-id";
+    'collections-images-gallery-grid-images-div-id     collections-images-gallery-grid-images-div-id'
+    'collections-images-gallery-grid-button-addimages-div-id    collections-images-gallery-grid-button-savechanges-div-id';
 }
 #collections-images-gallery-grid-button-addimages-div-id {
   grid-area: collections-images-gallery-grid-button-addimages-div-id;
@@ -722,9 +722,6 @@ input:checked + .slider:before {
   object-position: center;
 } */
 
-
-
-
 #pdf-btns-div-id {
   position: fixed;
   z-index: 100;
@@ -732,7 +729,7 @@ input:checked + .slider:before {
   display: flex;
   justify-content: center;
   align-items: center;
-  
+
   transform: translate(-50%, -50%);
   left: 50%;
 }

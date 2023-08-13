@@ -14,9 +14,9 @@ body {
   width: 100vw;
   box-sizing: border-box;
   grid-template-areas:
-    "navbar-area1    navbar-area2   navbar-area3   navbar-area4"
-    "center-area1    center-area2   center-area3   center-area4"
-    "bottom-area1    bottom-area2   botton-area3   bottom-area4";
+    'navbar-area1    navbar-area2   navbar-area3   navbar-area4'
+    'center-area1    center-area2   center-area3   center-area4'
+    'bottom-area1    bottom-area2   botton-area3   bottom-area4';
 }
 
 /* NAVBAR START */
@@ -26,9 +26,9 @@ body {
   min-width: 0;
   display: grid;
   grid-template-columns: repeat(9, 1fr);
-  grid-template-areas: " . . navbar-button1-id navbar-button2-id navbar-button3-id navbar-button4-id navbar-button5-id . . ";
+  grid-template-areas: ' . . navbar-button1-id navbar-button2-id navbar-button3-id navbar-button4-id navbar-button5-id . . ';
 
-  background-color: #808a80;
+  background-color: var(--bg);
 }
 #navbar-button1-id {
   grid-area: navbar-button1-id;
@@ -64,8 +64,8 @@ body {
   min-height: 0;
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-areas: "center";
-  background-color: #941894;
+  grid-template-areas: 'center';
+  background-color: var(--warning-600);
 }
 
 /* STEP1 START */
@@ -76,9 +76,9 @@ body {
   display: grid;
   grid-template-rows: 1fr 5fr;
   grid-template-areas:
-    "top"
-    "bottom";
-  background-color: #808a80;
+    'top'
+    'bottom';
+  background-color: var(--bg);
 }
 #collection-name-div-id {
   grid-area: top;
@@ -89,8 +89,8 @@ body {
   padding-top: 8px;
   grid-template-rows: 2fr 6fr;
   grid-template-areas:
-    "nameLabel"
-    "nameTextArea";
+    'nameLabel'
+    'nameTextArea';
 }
 #collection-name-label-id {
   grid-area: nameLabel;
@@ -118,9 +118,9 @@ body {
   display: grid;
   grid-template-rows: 1fr 14fr;
   grid-template-areas:
-    "button"
-    "profileImage";
-  background-color: #808a80;
+    'button'
+    'profileImage';
+  background-color: var(--bg);
 }
 #profile-image-select-button-div-id {
   grid-area: button;
@@ -139,7 +139,8 @@ body {
   min-height: 0;
   min-width: 0;
 }
-#profile-image-display-id, .vid1 {
+#profile-image-display-id,
+.vid1 {
   height: 99999px;
   object-fit: contain;
   max-height: 100%;
@@ -204,8 +205,8 @@ body {
   height: 100%;
   display: grid;
   grid-template-columns: 11fr 7fr;
-  grid-template-areas: "left  right";
-  background-color: #808a80;
+  grid-template-areas: 'left  right';
+  background-color: var(--bg);
 }
 #step2-gallery-choose-div-id {
   grid-area: left;
@@ -214,9 +215,9 @@ body {
   display: grid;
   grid-template-rows: 2fr 2fr 22fr;
   grid-template-areas:
-    " galleryLabel "
-    " chooseButtons "
-    " galleryDisplay ";
+    ' galleryLabel '
+    ' chooseButtons '
+    ' galleryDisplay ';
   margin: 5px;
 }
 #step2-gallerychoose-label-div-id {
@@ -328,13 +329,13 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ad2021;
+  background-color: var(--warning);
   -webkit-transition: 0.4s;
   transition: 0.4s;
 }
 .slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 75%;
   width: 26px;
   left: 4px;
@@ -344,10 +345,10 @@ body {
   transition: 0.4s;
 }
 input:checked + .slider {
-  background-color: #1884ff;
+  background-color: var(--info);
 }
 input:focus + .slider {
-  box-shadow: 0 0 1px #1884ff;
+  box-shadow: 0 0 1px var(--info);
 }
 input:checked + .slider:before {
   -webkit-transform: translateX(26px);
@@ -375,10 +376,10 @@ input:checked + .slider:before {
   display: grid;
   grid-template-rows: 1fr 2fr 12fr 1fr;
   grid-template-areas:
-    " . "
-    " name "
-    " profileimage "
-    " . ";
+    ' . '
+    ' name '
+    ' profileimage '
+    ' . ';
   margin: 5px;
 }
 #step2-name-div-id {
@@ -418,8 +419,8 @@ input:checked + .slider:before {
   height: 100%;
   display: grid;
   grid-template-columns: 11fr 7fr;
-  grid-template-areas: "left  right";
-  background-color: #808a80;
+  grid-template-areas: 'left  right';
+  background-color: var(--bg);
 }
 #step3-description-div-id {
   grid-area: left;
@@ -428,8 +429,8 @@ input:checked + .slider:before {
   display: grid;
   grid-template-rows: 2fr 22fr;
   grid-template-areas:
-    " descriptionLabel "
-    " descriptionTextArea ";
+    ' descriptionLabel '
+    ' descriptionTextArea ';
   margin: 10px;
 }
 #step3-description-label-div-id {
@@ -455,10 +456,10 @@ input:checked + .slider:before {
   display: grid;
   grid-template-rows: 1fr 2fr 12fr 1fr;
   grid-template-areas:
-    " . "
-    " name "
-    " profileimage "
-    " . ";
+    ' . '
+    ' name '
+    ' profileimage '
+    ' . ';
   margin: 5px;
 }
 #step3-name-div-id {
@@ -498,8 +499,8 @@ input:checked + .slider:before {
   height: 100%;
   display: grid;
   grid-template-columns: 11fr 7fr;
-  grid-template-areas: "left  right";
-  background-color: #808a80;
+  grid-template-areas: 'left  right';
+  background-color: var(--bg);
 }
 #step4-emotion-div-id {
   grid-area: left;
@@ -508,9 +509,9 @@ input:checked + .slider:before {
   display: grid;
   grid-template-rows: 2fr 22fr 1fr;
   grid-template-areas:
-    " emotionLabel "
-    " emotionEntry "
-    " . ";
+    ' emotionLabel '
+    ' emotionEntry '
+    ' . ';
   margin: 10px;
 }
 #step4-emotion-label-div-id {
@@ -531,8 +532,8 @@ input:checked + .slider:before {
   grid-template-rows: 11fr 2fr;
   box-sizing: border-box;
   grid-template-areas:
-    "collection-image-annotation-emotions-labels-show-div-id"
-    "collection-image-annotation-emotions-new-entry-div-id";
+    'collection-image-annotation-emotions-labels-show-div-id'
+    'collection-image-annotation-emotions-new-entry-div-id';
 }
 #collection-image-annotation-emotions-labels-show-div-id {
   grid-area: collection-image-annotation-emotions-labels-show-div-id;
@@ -575,8 +576,8 @@ input:checked + .slider:before {
   grid-template-columns: 1fr 1fr;
   box-sizing: border-box;
   grid-template-areas:
-    "collection-image-annotation-emotions-new-entry-emotion-textlabel-div-id   collection-image-annotation-emotions-new-entry-emotion-value-range-div-id"
-    "collection-image-annotation-emotions-new-entry-emotion-button-div-id      collection-image-annotation-emotions-save-button-div-id";
+    'collection-image-annotation-emotions-new-entry-emotion-textlabel-div-id   collection-image-annotation-emotions-new-entry-emotion-value-range-div-id'
+    'collection-image-annotation-emotions-new-entry-emotion-button-div-id      collection-image-annotation-emotions-save-button-div-id';
 }
 #collection-image-annotation-emotions-new-entry-emotion-textlabel-div-id {
   grid-area: collection-image-annotation-emotions-new-entry-emotion-textlabel-div-id;
@@ -654,10 +655,10 @@ input:checked + .slider:before {
   display: grid;
   grid-template-rows: 1fr 2fr 12fr 1fr;
   grid-template-areas:
-    " . "
-    " name "
-    " profileimage "
-    " . ";
+    ' . '
+    ' name '
+    ' profileimage '
+    ' . ';
   margin: 5px;
 }
 #step4-name-div-id {
@@ -697,8 +698,8 @@ input:checked + .slider:before {
   height: 100%;
   display: grid;
   grid-template-columns: 11fr 7fr;
-  grid-template-areas: "left  right";
-  background-color: #808a80;
+  grid-template-areas: 'left  right';
+  background-color: var(--bg);
 }
 #step5-meme-div-id {
   grid-area: left;
@@ -707,9 +708,9 @@ input:checked + .slider:before {
   display: grid;
   grid-template-rows: 2fr 2fr 22fr;
   grid-template-areas:
-    " memeStepLabel "
-    " memeStepGalleryButtons "
-    " memeStepGallery ";
+    ' memeStepLabel '
+    ' memeStepGalleryButtons '
+    ' memeStepGallery ';
   margin: 10px;
 }
 #step5-meme-label-div-id {
@@ -800,10 +801,10 @@ input:checked + .slider:before {
   display: grid;
   grid-template-rows: 1fr 2fr 12fr 1fr;
   grid-template-areas:
-    " . "
-    " name "
-    " profileimage "
-    " . ";
+    ' . '
+    ' name '
+    ' profileimage '
+    ' . ';
   margin: 5px;
 }
 #step5-name-div-id {
@@ -842,9 +843,9 @@ input:checked + .slider:before {
   min-height: 0;
   display: grid;
   grid-template-columns: 1fr 2fr 2fr 8fr 2fr 1fr;
-  grid-template-areas: " . prev-button next-button . cancel-button . ";
+  grid-template-areas: ' . prev-button next-button . cancel-button . ';
 
-  background-color: #808a80;
+  background-color: var(--bg);
 }
 #creation-back-button-id {
   grid-area: prev-button;
