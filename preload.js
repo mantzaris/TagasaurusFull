@@ -16,8 +16,6 @@ const APP_NAME = 'tagasaurus';
 const INSTALLER_CONFIG = JSON.parse(FS.readFileSync(PATH.join(__dirname, 'config.json'), 'utf-8'));
 const { BUILD_INSTALLER } = INSTALLER_CONFIG;
 
-console.log(INSTALLER_CONFIG);
-
 function setupOSSpecificPaths() {
   switch (process.platform) {
     case 'linux':

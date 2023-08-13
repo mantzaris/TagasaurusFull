@@ -1,17 +1,11 @@
 const PATH = require('path');
 
-const { DB_MODULE, MAX_SAMPLE_COUNT_RECORDS } = require(PATH.join(
-  __dirname,
-  '..',
-  'constants',
-  'constants-code.js'
-)); //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const { DB_MODULE, MAX_SAMPLE_COUNT_RECORDS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js')); //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 //let number_of_records;
 let sample_num;
 
 async function Number_of_Tagging_Records() {
-  console.log(DB_MODULE);
   return await DB_MODULE.Number_of_Tagging_Records();
 }
 async function Tagging_Random_DB_Images(num_of_records) {
@@ -63,9 +57,7 @@ async function Display_Skill_Levels() {
     if (meme_counts > 0) {
       meme_connected_images = 1 + meme_connected_images;
     }
-    let non_empty_emotion = Object.values(record_tmp['taggingEmotions']).find(
-      (element) => element != '0'
-    );
+    let non_empty_emotion = Object.values(record_tmp['taggingEmotions']).find((element) => element != '0');
     if (non_empty_emotion != undefined) {
       emotion_stamped_images = 1 + emotion_stamped_images;
     }
@@ -73,53 +65,31 @@ async function Display_Skill_Levels() {
     let tagged_bool_num = +(non_empty_entry != undefined);
     let memes_bool_num = +(meme_counts > 0);
     let emotion_bool_num = +(non_empty_emotion != undefined);
-    images_scores_array.push(
-      (tagged_bool_num + memes_bool_num + emotion_bool_num) / 3
-    );
+    images_scores_array.push((tagged_bool_num + memes_bool_num + emotion_bool_num) / 3);
   }
 
   let tagged_percentage = 100 * (total_tagged_images / sample_num);
   let meme_connected_percentage = 100 * (meme_connected_images / sample_num);
-  let emotion_stamped_images_percentage =
-    100 * (emotion_stamped_images / sample_num);
+  let emotion_stamped_images_percentage = 100 * (emotion_stamped_images / sample_num);
   let scores_harmonic_mean = 100 * Harmonic_Mean(images_scores_array);
 
-  document.getElementById('tagging-score-id').innerHTML = `${Math.round(
-    tagged_percentage
-  )}%`;
-  document.getElementById('tagging-score-id').style.width = `${Math.round(
-    tagged_percentage
-  )}%`;
+  document.getElementById('tagging-score-id').innerHTML = `${Math.round(tagged_percentage)}%`;
+  document.getElementById('tagging-score-id').style.width = `${Math.round(tagged_percentage)}%`;
 
-  document.getElementById('emotion-score-id').innerHTML = `${Math.round(
-    emotion_stamped_images_percentage
-  )}%`;
-  document.getElementById('emotion-score-id').style.width = `${Math.round(
-    emotion_stamped_images_percentage
-  )}%`;
+  document.getElementById('emotion-score-id').innerHTML = `${Math.round(emotion_stamped_images_percentage)}%`;
+  document.getElementById('emotion-score-id').style.width = `${Math.round(emotion_stamped_images_percentage)}%`;
 
-  document.getElementById('meme-score-id').innerHTML = `${Math.round(
-    meme_connected_percentage
-  )}%`;
-  document.getElementById('meme-score-id').style.width = `${Math.round(
-    meme_connected_percentage
-  )}%`;
+  document.getElementById('meme-score-id').innerHTML = `${Math.round(meme_connected_percentage)}%`;
+  document.getElementById('meme-score-id').style.width = `${Math.round(meme_connected_percentage)}%`;
 
-  document.getElementById('awesome-score-id').innerHTML = `${Math.round(
-    scores_harmonic_mean
-  )}%`;
-  document.getElementById('awesome-score-id').style.width = `${Math.round(
-    scores_harmonic_mean
-  )}%`;
+  document.getElementById('awesome-score-id').innerHTML = `${Math.round(scores_harmonic_mean)}%`;
+  document.getElementById('awesome-score-id').style.width = `${Math.round(scores_harmonic_mean)}%`;
 }
 
 async function Init_Analytics() {
   let number_of_records = await Number_of_Tagging_Records();
-  console.log(number_of_records);
-  sample_num =
-    number_of_records < MAX_SAMPLE_COUNT_RECORDS
-      ? number_of_records
-      : MAX_SAMPLE_COUNT_RECORDS;
+
+  sample_num = number_of_records < MAX_SAMPLE_COUNT_RECORDS ? number_of_records : MAX_SAMPLE_COUNT_RECORDS;
   if (sample_num < 100) {
     sample_num = 100;
   } else if (sample_num > 500) {
