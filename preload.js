@@ -13,9 +13,7 @@ const APP_NAME = 'tagasaurus';
 
 //!!! XXX !!! manually set
 //const BUILD_INSTALLER = false; //process.env.npm_config_build_installer === 'true';
-const INSTALLER_CONFIG = JSON.parse(
-  FS.readFileSync(PATH.join(__dirname, 'config.json'), 'utf-8')
-);
+const INSTALLER_CONFIG = JSON.parse(FS.readFileSync(PATH.join(__dirname, 'config.json'), 'utf-8'));
 const { BUILD_INSTALLER } = INSTALLER_CONFIG;
 
 console.log(INSTALLER_CONFIG);
@@ -27,12 +25,7 @@ function setupOSSpecificPaths() {
     case 'win32':
       return PATH.join(process.env.APPDATA, APP_NAME);
     case 'darwin': //currently not available
-      return PATH.join(
-        process.env.HOME,
-        'Library',
-        'Application Support',
-        APP_NAME
-      );
+      return PATH.join(process.env.HOME, 'Library', 'Application Support', APP_NAME);
     default:
       return 'Unimplimented Path for OS: ' + process.platform;
   }
@@ -50,12 +43,7 @@ window.TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY, 'data'); //PATH.res
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 //DB INIT, sets the database and adds the obj ref to the window to not need to be loaded again
-window.DB_MODULE = require(PATH.join(
-  __dirname,
-  'AppCode',
-  'taga-DB',
-  'db-fns.js'
-));
+window.DB_MODULE = require(PATH.join(__dirname, 'AppCode', 'taga-DB', 'db-fns.js'));
 
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -94,41 +82,26 @@ async function Load_Face_Api_Model() {
 }
 Load_Face_Api_Model();
 
-async function Get_Image_Face_Descriptors_And_Expresssions_From_File(
-  imagePath
-) {
+async function Get_Image_Face_Descriptors_And_Expresssions_From_File(imagePath) {
   let img = document.createElement('img'); // Use DOM HTMLImageElement
   img.src = imagePath;
-  return await faceapi
-    .detectAllFaces(img)
-    .withFaceLandmarks()
-    .withFaceExpressions()
-    .withFaceDescriptors();
+  return await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceExpressions().withFaceDescriptors();
 }
-window.Get_Image_Face_Descriptors_And_Expresssions_From_File =
-  Get_Image_Face_Descriptors_And_Expresssions_From_File;
+window.Get_Image_Face_Descriptors_And_Expresssions_From_File = Get_Image_Face_Descriptors_And_Expresssions_From_File;
 
 async function Get_Image_Face_Expresssions_From_File(imagePath) {
   let img = document.createElement('img'); // Use DOM HTMLImageElement
   img.src = imagePath;
-  return await faceapi
-    .detectAllFaces(img)
-    .withFaceLandmarks()
-    .withFaceExpressions();
+  return await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceExpressions();
 }
-window.Get_Image_Face_Expresssions_From_File =
-  Get_Image_Face_Expresssions_From_File;
+window.Get_Image_Face_Expresssions_From_File = Get_Image_Face_Expresssions_From_File;
 
 async function Get_Image_Face_Descriptors_From_File(imagePath) {
   let img = document.createElement('img'); // Use DOM HTMLImageElement
   img.src = imagePath;
-  return await faceapi
-    .detectAllFaces(img)
-    .withFaceLandmarks()
-    .withFaceDescriptors();
+  return await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceDescriptors();
 }
-window.Get_Image_Face_Descriptors_From_File =
-  Get_Image_Face_Descriptors_From_File;
+window.Get_Image_Face_Descriptors_From_File = Get_Image_Face_Descriptors_From_File;
 window.faceapi = faceapi;
 
 //each descriptor is an 'object' not an array so that each dimension of the descriptor feature vector has a key pointing to the value
@@ -139,20 +112,14 @@ window.faceapi = faceapi;
 //(get face descriptors string, parse and then select to compare via euclidean distances)
 //distances are best at zero, so score on (1-dist)
 const FACE_DISTANCE_IMAGE = 0.67;
-async function Get_Descriptors_DistanceScore(
-  descriptors_reference,
-  descriptors_query
-) {
+async function Get_Descriptors_DistanceScore(descriptors_reference, descriptors_query) {
   let ref_faces_scores_array = new Array(descriptors_reference.length);
   for (let ref_ii = 0; ref_ii < descriptors_reference.length; ref_ii++) {
     let score_ref_face_ii = 0;
     for (let q_ii = 0; q_ii < descriptors_query.length; q_ii++) {
       let score_tmp = 0;
       //distance_tmp = faceapi.euclideanDistance( descriptors_reference[ref_ii].descriptor , descriptors_query[q_ii].descriptor )
-      let distance_tmp = faceapi.euclideanDistance(
-        descriptors_reference[ref_ii],
-        descriptors_query[q_ii]
-      );
+      let distance_tmp = faceapi.euclideanDistance(descriptors_reference[ref_ii], descriptors_query[q_ii]);
       if (distance_tmp < FACE_DISTANCE_IMAGE) {
         score_tmp = 2 ** (1 - 6 * distance_tmp) + 3;
         if (score_ref_face_ii < score_tmp) {
@@ -162,13 +129,9 @@ async function Get_Descriptors_DistanceScore(
     }
     ref_faces_scores_array[ref_ii] = score_ref_face_ii;
   }
-  let ref_faces_scores_total = ref_faces_scores_array.reduce(
-    (p, c) => p + c,
-    0
-  );
+  let ref_faces_scores_total = ref_faces_scores_array.reduce((p, c) => p + c, 0);
   let nonzeros_total = ref_faces_scores_array.filter((el) => el != 0).length;
-  let full_set_bonus =
-    (nonzeros_total / descriptors_reference.length) * ref_faces_scores_total;
+  let full_set_bonus = (nonzeros_total / descriptors_reference.length) * ref_faces_scores_total;
   ref_faces_scores_total += full_set_bonus;
   return ref_faces_scores_total;
 }
@@ -181,11 +144,7 @@ window.Get_Descriptors_DistanceScore = Get_Descriptors_DistanceScore;
 const DECODE_GIF = require('decode-gif');
 const MAX_FRAMES_FULL_SAMPLE_GIF = 1 * 10 ** 2; //if number of frames less than this process each frame
 const MAX_TIME_BETWEEN_SAMPLES_GIF = 1000; //maximum number of milliseconds between samples
-async function Get_Image_Face_Expresssions_From_GIF(
-  imagePath,
-  get_emotions = false,
-  get_only_emotions = false
-) {
+async function Get_Image_Face_Expresssions_From_GIF(imagePath, get_emotions = false, get_only_emotions = false) {
   let { frames, width, height } = await DECODE_GIF(FS.readFileSync(imagePath));
   let gif_face_descriptors = [];
   let emotions_total = {};
@@ -196,35 +155,19 @@ async function Get_Image_Face_Expresssions_From_GIF(
     let frame_tmp = frames[frame_ind];
     let time_current = frame_tmp.timeCode; //time in milliseconds
     timecode_diff = time_current - time_tmp_prev;
-    if (
-      frames.length <= MAX_FRAMES_FULL_SAMPLE_GIF ||
-      Math.random() < timecode_diff / MAX_TIME_BETWEEN_SAMPLES_GIF
-    ) {
+    if (frames.length <= MAX_FRAMES_FULL_SAMPLE_GIF || Math.random() < timecode_diff / MAX_TIME_BETWEEN_SAMPLES_GIF) {
       let image_tmp = await new ImageData(frame_tmp.data, width, height);
       let img = Imagedata_To_Image(image_tmp);
       if (get_emotions == false) {
-        res = await faceapi
-          .detectAllFaces(img)
-          .withFaceLandmarks()
-          .withFaceDescriptors();
+        res = await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceDescriptors();
       } else if (get_only_emotions == false) {
-        res = await faceapi
-          .detectAllFaces(img)
-          .withFaceLandmarks()
-          .withFaceExpressions()
-          .withFaceDescriptors();
+        res = await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceExpressions().withFaceDescriptors();
       } else {
-        res = await faceapi
-          .detectAllFaces(img)
-          .withFaceLandmarks()
-          .withFaceExpressions();
+        res = await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceExpressions();
       }
       if (get_only_emotions == false) {
         let descriptors_array_tmp = Get_Face_Descriptors_Arrays(res);
-        gif_face_descriptors = Push_New_Face_Descriptors(
-          gif_face_descriptors,
-          descriptors_array_tmp
-        );
+        gif_face_descriptors = Push_New_Face_Descriptors(gif_face_descriptors, descriptors_array_tmp);
       }
 
       if (get_emotions == true) {
@@ -243,8 +186,7 @@ async function Get_Image_Face_Expresssions_From_GIF(
     return { faceDescriptors: null, faceEmotions: emotions_total };
   }
 }
-window.Get_Image_Face_Expresssions_From_GIF =
-  Get_Image_Face_Expresssions_From_GIF;
+window.Get_Image_Face_Expresssions_From_GIF = Get_Image_Face_Expresssions_From_GIF;
 
 //provide the base set of face descriptors (already known) and the -new- set of face descriptors as a nested array
 //add them to the base set if they are different enough so we get a new array with all the novel unique faces
@@ -261,10 +203,7 @@ function Push_New_Face_Descriptors(base_faces, descriptors_query) {
       min_dist_tmp = 10;
 
       for (let ref_ii = 0; ref_ii < base_faces.length; ref_ii++) {
-        distance_tmp = faceapi.euclideanDistance(
-          base_faces[ref_ii],
-          descriptors_query[q_ii]
-        );
+        distance_tmp = faceapi.euclideanDistance(base_faces[ref_ii], descriptors_query[q_ii]);
         if (distance_tmp <= min_dist_tmp) {
           min_dist_tmp = distance_tmp;
         }
@@ -301,9 +240,7 @@ function Get_Face_Descriptors_Arrays(super_res) {
   if (super_res.length > 0) {
     for (let face_ii = 0; face_ii < super_res.length; face_ii++) {
       //each descriptor is an 'object' not an array so that each dimension of the descriptor feature vector has a key pointing to the value but we just use the values that are needed to compute the 'distace' between descriptors later faceapi.euclideanDistance( aa[0] , aa[1] ), faceapi.euclideanDistance( JSON.parse(res5[2].faceDescriptors)[0] , JSON.parse(res5[2].faceDescriptors)[2] ) (get face descriptors string, parse and then select to compare via euclidean distances)
-      faces_descriptors_array_tmp[face_ii] = Object.values(
-        super_res[face_ii].descriptor
-      );
+      faces_descriptors_array_tmp[face_ii] = Object.values(super_res[face_ii].descriptor);
     }
   }
   return faces_descriptors_array_tmp;
@@ -311,9 +248,9 @@ function Get_Face_Descriptors_Arrays(super_res) {
 window.Get_Face_Descriptors_Arrays = Get_Face_Descriptors_Arrays;
 
 function Face_Emotion_Aggregator(prev_emotions, super_res) {
-  //console.log('in the new face emotions!')
+  //
   for (let face_ii = 0; face_ii < super_res.length; face_ii++) {
-    //console.log('super_res[face_ii].expressions = ', super_res[face_ii].expressions)
+    //
     for (let [key, value] of Object.entries(super_res[face_ii].expressions)) {
       if (prev_emotions[key] == undefined) {
         //add emotion and value
@@ -326,7 +263,7 @@ function Face_Emotion_Aggregator(prev_emotions, super_res) {
       }
     }
   }
-  //console.log('prev_emotions',prev_emotions)
+  //
 }
 window.Face_Emotion_Aggregator = Face_Emotion_Aggregator;
 
@@ -334,25 +271,14 @@ window.Face_Emotion_Aggregator = Face_Emotion_Aggregator;
 //go through each frame sequentially and include descriptors of only relatively novel faces
 //add a new descriptor if the distance to the rest is small
 //have to get a sample rate for the frames sampled
-async function Get_Image_FaceApi_From_VIDEO(
-  imagePath,
-  get_emotions = false,
-  get_only_emotions = false
-) {
-  let frames = await extractFramesFromVideo(
-    imagePath,
-    get_emotions,
-    get_only_emotions
-  );
+async function Get_Image_FaceApi_From_VIDEO(imagePath, get_emotions = false, get_only_emotions = false) {
+  let frames = await extractFramesFromVideo(imagePath, get_emotions, get_only_emotions);
   let emotions_total = {};
   let video_face_descriptors = [];
   frames.forEach((frame_res) => {
     if (get_only_emotions == false) {
       let descriptors_array_tmp = Get_Face_Descriptors_Arrays(frame_res);
-      video_face_descriptors = Push_New_Face_Descriptors(
-        video_face_descriptors,
-        descriptors_array_tmp
-      );
+      video_face_descriptors = Push_New_Face_Descriptors(video_face_descriptors, descriptors_array_tmp);
     }
     if (get_emotions == true) {
       Face_Emotion_Aggregator(emotions_total, frame_res);
@@ -364,11 +290,7 @@ async function Get_Image_FaceApi_From_VIDEO(
 window.Get_Image_FaceApi_From_VIDEO = Get_Image_FaceApi_From_VIDEO;
 
 let interval = 1; // 1 / 1 //fps;
-async function extractFramesFromVideo(
-  videoUrl,
-  get_emotions = false,
-  get_only_emotions = false
-) {
+async function extractFramesFromVideo(videoUrl, get_emotions = false, get_only_emotions = false) {
   return new Promise(async (resolve) => {
     // fully download it first (no buffering):
     let videoBlob = await fetch(videoUrl).then((r) => r.blob());
@@ -385,7 +307,7 @@ async function extractFramesFromVideo(
     });
 
     video.addEventListener('loadeddata', async function () {
-      //console.log('in loaded data')
+      //
       let canvas = document.createElement('canvas');
       let context = canvas.getContext('2d');
       let [w, h] = [video.videoWidth, video.videoHeight];
@@ -408,21 +330,11 @@ async function extractFramesFromVideo(
         photo.setAttribute('src', data);
 
         if (get_emotions == false) {
-          res = faceapi
-            .detectAllFaces(photo)
-            .withFaceLandmarks()
-            .withFaceDescriptors();
+          res = faceapi.detectAllFaces(photo).withFaceLandmarks().withFaceDescriptors();
         } else if (get_only_emotions == true) {
-          res = faceapi
-            .detectAllFaces(photo)
-            .withFaceLandmarks()
-            .withFaceExpressions();
+          res = faceapi.detectAllFaces(photo).withFaceLandmarks().withFaceExpressions();
         } else {
-          res = faceapi
-            .detectAllFaces(photo)
-            .withFaceLandmarks()
-            .withFaceExpressions()
-            .withFaceDescriptors();
+          res = faceapi.detectAllFaces(photo).withFaceLandmarks().withFaceExpressions().withFaceDescriptors();
         }
 
         frames.push(res);
@@ -438,40 +350,21 @@ async function extractFramesFromVideo(
   });
 }
 
-//console.log('in preload after face set up')
+//
 //---------<<<<<<<<<<<<<<<<<<<<<<
-
-//console.log(`in preload before require`)
-//console.log('proces env ',process.env)
-//console.log('proces env.home ',process.env.HOME)
-
-// const PATH = require('path');
-// const USER_DATA_PATH = PATH.join(process.env.HOME,'.config','tagasaurus')
-// //console.log(`USER_DATA_PATH=`,USER_DATA_PATH)
-
-// window.USER_DATA_PATH = USER_DATA_PATH
-// contextBridge.exposeInMainWorld("GLOBALS", {
-//   USER_DATA_PATH
-// });
-
 //img.src = URL.createObjectURL(new Blob(tmp1,{type: 'image/png' }))  //imagePath
 // setTimeout(async ()=> {
-//   console.log('time out!')
+//
 //   let {frames,width,height} = DECODE_GIF(FS.readFileSync('/home/resort/Downloads/AHandJD.gif'));
-//   console.log('/home/resort/Downloads/AHandJD.gif width',width)
-//   console.log('frames ', frames[0].data)
 //   let tmp1 = frames[0].data // uint8clampedarray
 //   let image_tmp = await new ImageData(tmp1,width,height)
-//   console.log('image_tmp',image_tmp)
 //   let img = Imagedata_To_Image(image_tmp)
 //   // var img = document.createElement('img'); // Use DOM HTMLImageElement
 //   // img.src = '/home/resort/Downloads/AHandJD.gif'
 //   const res = await faceapi.detectAllFaces(img).
 //                                         withFaceLandmarks().
 //                                         withFaceExpressions()
-//   console.log('res = ', res)
 // },4000)
-
 //
 // window.addEventListener('DOMContentLoaded', () => {
 //   const replaceText = (selector, text) => {
