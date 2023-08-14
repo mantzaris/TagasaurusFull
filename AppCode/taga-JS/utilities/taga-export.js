@@ -80,7 +80,7 @@ async function Export_Media_Files(path_chosen) {
       return console.error(err);
     }
     // else {
-    //     console.log('data copy success!');
+    //
     //     alert("successfully exported")
     // }
   });
@@ -152,7 +152,6 @@ async function Export_ND_JSON(path_chosen) {
   let iter_meme_collection = await Collection_MEME_DB_Iterator();
   let collection_meme_record_tmp = await iter_meme_collection();
   while (collection_meme_record_tmp != undefined) {
-    //console.log(`collection_meme_record_tmp = `,collection_meme_record_tmp)
     let content = JSON.stringify(collection_meme_record_tmp);
     content += '\n';
     FS.appendFile(PATH.join(path_chosen.filePath, 'ndJSONs', 'COLLECTIONS-MEMES.ndjson'), content, (err) => {
@@ -161,37 +160,3 @@ async function Export_ND_JSON(path_chosen) {
     collection_meme_record_tmp = await iter_meme_collection();
   }
 }
-
-// //put the annotation data to disk for the user's chosen folder
-// function Write_Export_Data(file_path,db_rows){
-//     //write the json data out to the folder
-//     file_name_data = PATH2.sep + 'TagasaurusAnnotations.json'
-//     FS.writeFileSync( file_path+file_name_data, JSON.stringify(db_rows) );
-//     //now copy the files as well to a new 'images' directory
-//     FS.mkdirSync( file_path + PATH2.sep + 'images');
-//     FSE.copy( TAGA_IMAGE_DIRECTORY, file_path + PATH2.sep + 'images', err => {
-//         if (err){ return console.error(err) }
-//         else { console.log('folder copy success!') }
-//     })
-//     console.log("finished writing the annotations json file and copying images folder")
-// }
-
-// await COLLECTION_DB_MODULE.Create_Db() //sets a global variable in the module to hold the DB for access
-// db_entities = COLLECTION_DB_MODULE.Get_DB()
-// idb_labels = COLLECTION_DB_MODULE.Get_Entity_DB_labels()
-// ENTITY_OBJSTORE_NAME = idb_labels.ENTITY_OBJSTORE_NAME
-
-// all_entity_Objects = [];
-
-// var transaction = db_entities.transaction(ENTITY_OBJSTORE_NAME, 'readwrite')
-// var objectStore = transaction.objectStore(ENTITY_OBJSTORE_NAME);
-// objectStore.openCursor().onsuccess = function(event) {
-//     var cursor = event.target.result;
-//     if(cursor) {
-//         value = cursor.value
-//         all_entity_Objects.push(value)
-//         cursor.continue();
-//     } else { //enters when the cursor has completed
-//         //console.log(all_entity_Objects)
-//     }
-// };

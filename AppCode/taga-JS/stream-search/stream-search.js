@@ -34,7 +34,6 @@ return_from_stream_btn3.onclick = () => {
 let stream_selection = 'keywords-only';
 selection_description.innerText = keywords_only_description;
 selection_set.onchange = () => {
-  //console.log(`new selection is = ${selection_set.value}`)
   if (selection_set.value == 'keywords-only') {
     selection_description.innerText = keywords_only_description;
   } else if (selection_set.value == 'keywords-images') {
@@ -85,7 +84,6 @@ ipcRenderer.invoke('getCaptureID').then((sources) => {
   src.value = 'webcam';
   selection_sources.appendChild(src);
   for (const source of sources) {
-    //console.log(source)
     const src = document.createElement('option');
     src.innerHTML = source.name;
     src.value = source.id;
@@ -97,7 +95,7 @@ ipcRenderer.invoke('getCaptureID').then((sources) => {
 
 webcam_selection_btn.onclick = async () => {
   media_source = selection_sources.value;
-  //console.log(media_source)
+
   Init();
   // face_threshold = document.getElementById("mlAccuracy").value
   // if( face_threshold < 10) { face_threshold = 10 }
@@ -181,7 +179,7 @@ function Stop_Stream_Search() {
 
 async function Set_Stream() {
   stream_ok = false;
-  //console.log(media_source)
+
   const video_setup =
     'webcam' == media_source
       ? true
@@ -195,7 +193,7 @@ async function Set_Stream() {
             maxHeight: 720,
           },
         };
-  //console.log(video_setup)
+
   try {
     stream = await navigator.mediaDevices.getUserMedia({
       video: video_setup,
@@ -377,7 +375,6 @@ async function Stream_Search_Run() {
     images_div.innerHTML = '';
     images_html = 'Images: <br>';
     for (const image of face_including_images) {
-      //console.log(`face image = ${image}`)
       images_html += `
                             <div class="image-thumbnail-div">
                                 <img class="image-thumbnail" id="" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${image}" title="view" alt="img" />
@@ -390,7 +387,6 @@ async function Stream_Search_Run() {
     memes_div.innerHTML = '';
     memes_html = 'Memes: <br>';
     for (const meme of face_including_memes) {
-      //console.log(`face image = ${image}`)
       memes_html += `
                             <div class="meme-thumbnail-div">
                                 <img class="meme-thumbnail" id="" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme}" title="view" alt="meme" />
@@ -433,13 +429,11 @@ async function Stream_Search_Run() {
         face_keywords.push(...annotation_obj_tmp['taggingTags']); //add to the keywords
         face_including_images.push(annotation_obj_tmp['fileName']); //add images related to the face
         face_including_memes.push(...annotation_obj_tmp['taggingMemeChoices']); //add memes related to the face
-        //console.log(face_keywords)
       }
     }
     //check for the face being recently seen that can ADD to the new just discovered keywords (updates the keywords directly)
     await Faces_Short_Memory(ref_face_tmp_descriptor);
 
-    //console.log(face_keywords)
     if (face_keywords.length > 0) {
       //face matches were found
       face_found = true;
@@ -519,7 +513,6 @@ async function Stream_Search_Run() {
     //reduce the time for each memory on a loop and remove those out of time
     for (const [ind, memory] of faces_short_memories.entries()) {
       faces_short_memories[ind].memory_time -= 10000; //take time off of that memory
-      //console.log({faces_short_memories})
     }
     faces_short_memories = faces_short_memories.filter((memory, i) => memory.memory_time > 0); //keep those with memory time
   }

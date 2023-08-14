@@ -29,7 +29,7 @@ async function Copy_Non_Taga_Files(result, dir_pics, Get_Tagging_Hash_From_DB) {
     let file_path = file_paths[ii];
 
     let ft_res = await fileType.fromFile(file_path);
-    //console.log({ft_res})
+
     if (ft_res == undefined) continue;
     else if (!Check_Allowed_FileTypes(ft_res.mime)) continue;
 
@@ -59,8 +59,6 @@ exports.Copy_Non_Taga_Files = Copy_Non_Taga_Files;
 
 //this function exists even in the 'tagging-controller-main.js' file and needs to be refactored to be only here
 function Return_File_Hash(image_file_path) {
-  //console.log(image_file_path)
-  //console.log(HASH_TYPE)
   let HASH_SUM_SHA256 = CRYPTO.createHash(HASH_TYPE);
   HASH_SUM_SHA256.update(FS.readFileSync(image_file_path));
   return HASH_SUM_SHA256.digest('hex');

@@ -8,7 +8,6 @@ const IPC_Renderer3 = require('electron').ipcRenderer;
 // const PATH3 = require('path');
 const DATABASE3 = require('better-sqlite3');
 
-//console.log(`${PATH.join(USER_DATA_PATH,'TagasaurusFiles','data')}`)
 const { MY_FILE_HELPER } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js')); // require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 const DB_destination = require(PATH.join(__dirname, 'taga-DB', 'db-fns.js')); // require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'db-fns.js');
 const TAGA_DATA_destination = PATH.join(USER_DATA_PATH, 'TagasaurusFiles', 'data'); // PATH.resolve(TAGA_FILES_DIRECTORY,'data');
@@ -82,7 +81,6 @@ async function Import_Collections_Records_Info_Migrate() {
   let iter_collection_import = await Import_Collections_Image_DB_Iterator();
   let record_collection_import_tmp = await iter_collection_import();
   while (record_collection_import_tmp != undefined) {
-    //console.log(`record_collection_import_tmp = ${JSON.stringify(record_collection_import_tmp)}`)
     let collection_dest_record_tmp = await DB_destination.Get_Collection_Record_From_DB(record_collection_import_tmp.collectionName);
     if (collection_dest_record_tmp == undefined) {
       //collection is not in the destination db so 'insert'
@@ -203,7 +201,7 @@ async function Import_Records_DB_Info_Migrate() {
       for (let meme_filename_tmp of record_import_tmp['taggingMemeChoices']) {
         //record_import_tmp["taggingMemeChoices"].forEach(async meme_filename_tmp => {
         let meme_filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(meme_filename_tmp);
-        //console.log(`meme_filename_change_record_tmp = ${JSON.stringify(meme_filename_change_record_tmp)}`)
+
         tmp_meme_filenames.push(meme_filename_change_record_tmp.fileNameNew);
       } //)
       record_import_tmp['taggingMemeChoices'] = tmp_meme_filenames;
@@ -246,7 +244,7 @@ async function Import_Records_DB_Info_Migrate() {
       for (let meme_filename_orig_tmp of record_import_tmp['taggingMemeChoices']) {
         //record_import_tmp["taggingMemeChoices"].forEach(async meme_filename_orig_tmp => {
         let meme_filename_change_record_tmp = await GET_NAME_CHANGE_STMT.get(meme_filename_orig_tmp);
-        //console.log(`meme_filename_change_record_tmp = ${JSON.stringify(meme_filename_change_record_tmp)}`)
+
         tmp_meme_filenames.push(meme_filename_change_record_tmp.fileNameNew);
       } //)
       record_dest_tmp['taggingMemeChoices'] = [...new Set(record_dest_tmp['taggingMemeChoices'].concat(tmp_meme_filenames))];
@@ -268,7 +266,6 @@ async function Import_FileName_Changes_Table_Fill() {
   let iter_import = await Import_Tagging_Image_DB_Iterator();
   let record_import_tmp = await iter_import();
   while (record_import_tmp != undefined) {
-    //console.log(`record_import_tmp = ${JSON.stringify(record_import_tmp)}`)
     //get the record filename and hash to check if present or not
     let filename_tmp_import = record_import_tmp.fileName;
     let filehash_tmp_import = record_import_tmp.fileHash;

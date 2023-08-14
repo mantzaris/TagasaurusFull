@@ -77,7 +77,7 @@ async function Auto_Fill_Emotions(super_res, file_annotation_obj) {
 //actions for the AUTO-FILL emotions button being pressed, populate
 document.getElementById(`auto-fill-emotions-button-id`).onclick = async function () {
   const ft_res = current_image_annotation['fileType'];
-  //console.log('ft_res = ', ft_res)
+
   if (ft_res == 'image') {
     if (ft_res == 'gif') {
       let { faceDescriptors, faceEmotions } = await Get_Image_Face_Expresssions_From_GIF(
@@ -104,15 +104,11 @@ document.getElementById(`auto-fill-emotions-button-id`).onclick = async function
 //default_auto_fill_emotions = document.getElementById(`auto-fill-emotions-check-box-id`).checked
 document.getElementById(`auto-fill-emotions-check-box-id`).addEventListener('change', function () {
   if (this.checked) {
-    //console.log("Checkbox is checked..");
     default_auto_fill_emotions = true;
   } else {
-    //console.log("Checkbox is not checked..");
     default_auto_fill_emotions = false;
   }
 });
-
-//console.log(`auto_fill_user_value ${auto_fill_user_value}`)
 
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS START>>>
 async function Step_Get_Annotation(filename, step) {
@@ -180,7 +176,6 @@ async function Display_Image() {
   let center_gallery_element;
   let ft_res = current_image_annotation['fileType'];
 
-  //console.log('ft_res in Display Image = ', ft_res)
   // if( ft_res.mime.includes('pdf') == false ) {
   //     //IPC_RENDERER.send('closePDF')
   // }
@@ -278,7 +273,6 @@ function Description_Hashtags_Display_Fill() {
 //EMOTION STUFF START>>>
 //populate the emotion value view with emotional values
 async function Emotion_Display_Fill() {
-  //console.log('current_image_annotation',current_image_annotation)
   let emotion_div = document.getElementById('emotion-collectionlist-div-id');
   let emotion_keys = Object.keys(current_image_annotation['taggingEmotions']);
   let emotion_html_tmp = '';
@@ -342,7 +336,7 @@ async function Meme_View_Fill() {
     if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true) {
       const ft_res = (await Get_Tagging_Annotation_From_DB(file)).fileType;
       //let type = ( ft_res.mime.includes("image") ) ? 'img' : 'video'
-      //console.log('ft_res.mime in meme view',ft_res.mime)
+
       let content_html;
       if (ft_res == 'image') {
         content_html = `<img class="memes-img-class" id="memes-image-img-id-${file}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file}" title="view" alt="meme" />`;
@@ -350,7 +344,6 @@ async function Meme_View_Fill() {
         content_html = `<video class="memes-img-class" id="memes-image-img-id-${file}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file}" controls muted />`;
       } else if (ft_res == 'pdf') {
         content_html = `<div id="memes-image-img-id-${file}" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="memes-img-class" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${file}</div>   </div>`;
-        //console.log('pdf view content', content_html)
       }
 
       meme_box.insertAdjacentHTML(
@@ -420,7 +413,6 @@ async function Meme_Image_Clicked(meme_file_name) {
     content_html = `<video class="memes-img-class" id="modal-meme-clicked-displayimg-id" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_file_name}" controls muted />`;
     clicked_meme_element.pause();
   } else if (node_type == 'DIV') {
-    //console.log()
     //content_html = `<div id="modal-meme-clicked-displayimg-id" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="memes-img-class" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${meme_file_name}</div>   </div>`
     const parent = document.createElement('div');
     //parent = "modal-meme-clicked-displayimg-id"
@@ -664,10 +656,9 @@ async function First_Display_Init() {
     Load_Default_Taga_Image();
   } else if (window.location.href.indexOf('fileName') > -1) {
     let tagging_name_param = window.location.search.split('=')[1];
-    //console.log('tagging_name_param = ', tagging_name_param)
+
     tagging_name_param = fromBinary(atob(tagging_name_param));
 
-    //console.log('tagging_name_param = ', tagging_name_param)
     current_image_annotation = await Get_Tagging_Annotation_From_DB(tagging_name_param);
     Load_State_Of_Image_IDB();
 
@@ -798,7 +789,7 @@ async function Load_New_Image(filename) {
     tagging_entry_tmp.fileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${filename}`);
 
     let hash_present = await Get_Tagging_Hash_From_DB(tagging_entry_tmp.fileHash);
-    //console.log("tagging_entry_tmp",tagging_entry_tmp)
+
     if (hash_present == undefined) {
       //emotion inference upon the default selected
 
@@ -809,7 +800,6 @@ async function Load_New_Image(filename) {
 
       tagging_entry_tmp['fileType'] = GetFileTypeFromMimeType(ft_res.mime);
 
-      //console.log('ft_res = ', ft_res)
       if (ft_res.mime.includes('image') == true) {
         if (ft_res.ext == 'gif') {
           if (default_auto_fill_emotions == true) {
@@ -819,7 +809,6 @@ async function Load_New_Image(filename) {
           } else {
             let { faceDescriptors } = await Get_Image_Face_Expresssions_From_GIF(PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp['fileName']));
             tagging_entry_tmp['faceDescriptors'] = faceDescriptors;
-            //console.log(`tagging_entry_tmp["faceDescriptors"] = `, tagging_entry_tmp["faceDescriptors"] )
           }
         } else {
           if (default_auto_fill_emotions == true) {
@@ -829,12 +818,9 @@ async function Load_New_Image(filename) {
           } else {
             let super_res = await Get_Image_Face_Descriptors_From_File(PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp['fileName']));
             tagging_entry_tmp['faceDescriptors'] = await Get_Face_Descriptors_Arrays(super_res);
-            //console.log(`tagging_entry_tmp["faceDescriptors"] = `, tagging_entry_tmp["faceDescriptors"] )
           }
         }
       } else if (ft_res.mime.includes('video') == true) {
-        //console.log("video type mime",tagging_entry_tmp)
-
         if (!(ft_res.mime.includes('mp4') || ft_res.mime.includes('mkv') || ft_res.mime.includes('mov'))) {
           // 'ffmpegDecode'
           let base_name = PATH.parse(tagging_entry_tmp['fileName']).name;
@@ -861,9 +847,7 @@ async function Load_New_Image(filename) {
           tagging_entry_tmp['faceDescriptors'] = video_face_descriptors;
         }
       } else if (ft_res.mime.includes('audio') == true) {
-        //console.log('ft_res.mime (in audio) = ', ft_res.mime)
         if (!(ft_res.mime.includes('mp3') || ft_res.mime.includes('wav') || ft_res.mime.includes('mpeg'))) {
-          //console.log('in audio about to convert')
           let base_name = PATH.parse(tagging_entry_tmp['fileName']).name;
           let output_name = base_name + '.mp3';
           await ipcRenderer.invoke('ffmpegDecode', {
@@ -884,16 +868,16 @@ async function Load_New_Image(filename) {
         //cannot handle this file type
         continue;
       }
-      //console.log("tagging_entry_tmp",tagging_entry_tmp)
+
       await Insert_Record_Into_DB(tagging_entry_tmp); //sqlite version
       tagging_entry = tagging_entry_tmp;
     } //else { //hash is present so set to load it
     //tagging_entry = tagging_entry_tmp;
-    //console.log('in the else')
+
     //}
   }
   processing_modal.style.display = 'none';
-  //console.log('tagging_entry',tagging_entry)
+
   if (tagging_entry != null) {
     current_image_annotation = tagging_entry;
     Load_State_Of_Image_IDB();
@@ -911,7 +895,6 @@ function addMouseOverIconSwitch(emotion_div) {
     image.addEventListener('mouseover', () => (image.src = CLOSE_ICON_RED));
     image.addEventListener('mouseout', () => (image.src = CLOSE_ICON_BLACK));
   }
-  //console.log('get ')
 }
 
 //drag and drop
@@ -924,15 +907,12 @@ function DraggingEvents() {
       return;
     }
     const { path } = ev.dataTransfer.files[0];
-    //console.log({path})
+
     Load_New_Image(path);
   });
   document.addEventListener('dragover', (ev) => {
     ev.preventDefault();
     ev.stopPropagation();
-    // for( const file of ev.dataTransfer.files ) {
-    //     console.log('file dropped',file)
-    // }
   });
 }
 
@@ -964,8 +944,6 @@ document.getElementById('load-webcam-input-button-id').onclick = async function 
   let record_video_btn = document.getElementById('capture-video-button-id');
   record_video_btn.onclick = record_video;
   let display_area_element = document.getElementById('modal-webcam-clicked-image-gridbox-id');
-  //console.log('display_area_element height = ', display_area_element.offsetHeight )
-  //console.log('display_area_element offsetWidth = ', display_area_element.offsetWidth )
 
   let width;
   let height;
@@ -1040,7 +1018,7 @@ document.getElementById('load-webcam-input-button-id').onclick = async function 
       context.drawImage(video, 0, 0, width, height);
 
       data = canvas.toDataURL('image/png');
-      //console.log('data = ', data)
+
       photo.setAttribute('src', data);
 
       select_capture_button.style.display = 'block';
@@ -1443,7 +1421,7 @@ async function Modal_Search_Entry(search_similar = false, search_obj_similar_tmp
 //search similar images to the current image annotation using the face recognition api
 async function Modal_Search_Similar() {
   //
-  //console.log("search similar!!")
+
   let search_obj_similar_tmp = JSON.parse(JSON.stringify(tagging_search_obj));
   search_obj_similar_tmp.emotions = current_image_annotation.taggingEmotions;
   search_obj_similar_tmp.searchTags = current_image_annotation.taggingTags;
@@ -1869,7 +1847,7 @@ document.body.addEventListener('mousedown', async (ev) => {
     if (save_modal_center_tagging.style.display == 'block') {
       if (ev.target.id == 'save-file-tagging-center') {
         // save button clicked from the tagging center modal,
-        //console.log('save tagging content!')
+
         const results = await IPC_RENDERER.invoke('dialog:saveFile');
         if (results.canceled == false) {
           const output_name = results.filePath;
@@ -1879,14 +1857,14 @@ document.body.addEventListener('mousedown', async (ev) => {
         save_modal_center_tagging.style.display = 'none';
       } else {
         // clicked but not on the button so get rid of the button
-        //console.log('NOT saving tagging content!')
+
         save_modal_center_tagging.style.display = 'none';
       }
     }
     if (save_modal_meme_tagging.style.display == 'block') {
       if (ev.target.id == 'save-file-tagging-modal-meme') {
         // save button clicked from the tagging center modal,
-        //console.log('save tagging content!')
+
         const results = await IPC_RENDERER.invoke('dialog:saveFile');
         if (results.canceled == false) {
           const output_name = results.filePath;
@@ -1900,7 +1878,7 @@ document.body.addEventListener('mousedown', async (ev) => {
         save_modal_meme_tagging.style.display = 'none';
       } else {
         // clicked but not on the button so get rid of the button
-        //console.log('NOT saving tagging content!')
+
         save_modal_meme_tagging.style.display = 'none';
       }
     }
@@ -1918,7 +1896,7 @@ document.body.addEventListener('mousedown', async (ev) => {
         recent_meme_thumbnail_context = '';
       } else {
         // clicked but not on the button so get rid of the button
-        //console.log('NOT saving tagging content!')
+
         save_meme_tagging.style.display = 'none';
         recent_meme_thumbnail_context = '';
       }
@@ -1926,115 +1904,3 @@ document.body.addEventListener('mousedown', async (ev) => {
   }
 });
 //END SAVING CONTENT (EXPORTING) RIGHT CLICK CONTENT <<<<<<<<<<<<<<
-
-// function rightClickModal_Center(divName,modalName,getFileName) {
-//     const centerDiv = document.getElementById(divName)
-//     const modal = document.getElementById(modalName)
-//     console.log(centerDiv,modal)
-
-//     centerDiv.addEventListener('contextmenu',(ev)=>{
-//         const positionX = ev.clientX
-//         const positionY = ev.clientY
-//         console.log('x = ', positionX, 'y = ', positionY)
-//         modal.style.display = 'block'
-//         modal.style.left = positionX + 'px'
-//         modal.style.top = positionY + 'px'
-//     })
-
-//     centerDiv.parentElement.addEventListener('mousedown', (ev) => {
-//         console.log('ev',ev)
-//         console.log('ev.target', ev.target)
-//         if( document.getElementById("modal-meme-clicked-top-id").style.display == 'none' ) {
-//             if(ev.button == 0) {
-//                 if(ev.target !== modal) {
-//                     let tmp = false
-//                     for( const child of modal.children ) {
-//                         if(ev.target == child) {
-//                             tmp = true
-//                         }
-//                     }
-//                     if(!tmp) modal.style.display = 'none'
-//                 }
-//             }
-//         }
-//     })
-//     document.body.addEventListener('mousedown', (ev) => {
-//         if(ev.button == 0) {
-//             if(ev.target !== modal) {
-//                 modal.style.display = 'none'
-//             }
-//         }
-//     })
-
-//     document.getElementById("save-file-tagging-center").addEventListener('click', async ()=>{
-//         modal.style.display = 'none'
-//         const results = await IPC_RENDERER.invoke('dialog:saveFile')
-//         console.log({results})
-//         if( results.canceled ) return
-//         const output_name = results.filePath
-//         const filename_current = getFileName()
-//         console.log({filename_current})
-//         //const filename_current = current_image_annotation.fileName
-//         FS.copyFileSync( filename_current, output_name, FS.constants.COPYFILE_EXCL)
-//         alert('saved file to download')
-//     })
-// }
-// //rightClickModal_Center("center-gallery-area-div-id","right-click-modal-tagging-center",() => PATH.join(TAGA_DATA_DIRECTORY,current_image_annotation.fileName) )
-
-// function rightClickModal_Meme(divName,modalName,getFileName) {
-//     const centerDiv = document.getElementById(divName)
-//     const modal = document.getElementById(modalName)
-//     console.log(centerDiv,modal)
-
-//     centerDiv.addEventListener('contextmenu',(ev)=>{
-//         const positionX = ev.clientX
-//         const positionY = ev.clientY
-//         console.log('x = ', positionX, 'y = ', positionY)
-//         modal.style.display = 'block'
-//         modal.style.left = positionX + 'px'
-//         modal.style.top = positionY + 'px'
-//     })
-
-//     centerDiv.parentElement.addEventListener('mousedown', (ev) => {
-//         console.log('ev',ev)
-//         console.log('ev.target', ev.target)
-//         if( document.getElementById("modal-meme-clicked-top-id").style.display !== 'none' ) {
-//             console.log('ahhh in the meme stuff.. :/')
-//             if(ev.button == 0) {
-//                 if(ev.target !== modal) {
-//                     let tmp = false
-//                     for( const child of modal.children ) {
-//                         if(ev.target == child) {
-//                             tmp = true
-//                         }
-//                     }
-//                     if(!tmp) modal.style.display = 'none'
-//                     console.log('anything really')
-//                 }
-//             }
-//         }
-//     })
-//     document.body.addEventListener('mousedown', (ev) => {
-//         if(ev.button == 0) {
-//             if(ev.target !== modal) {
-//                 modal.style.display = 'none'
-//             }
-//         }
-//     })
-
-//     document.getElementById("save-file-tagging-meme").addEventListener('click', async ()=>{
-//         modal.style.display = 'none'
-//         const results = await IPC_RENDERER.invoke('dialog:saveFile')
-//         console.log({results})
-//         if( results.canceled ) return
-//         const output_name = results.filePath
-//         const filename_current = getFileName()
-//         console.log({filename_current})
-//         //const filename_current = current_image_annotation.fileName
-//         FS.copyFileSync( filename_current, output_name, FS.constants.COPYFILE_EXCL)
-//         alert('saved file to download')
-//     })
-// }
-//rightClickModal_Meme("modal-meme-clicked-image-gridbox-id","right-click-modal-tagging-meme",
-//      () => PATH.join(TAGA_DATA_DIRECTORY,PATH.basename(document.getElementById("modal-meme-clicked-displayimg-id").src)) )
-//document.getElementById("modal-meme-clicked-displayimg-id").src

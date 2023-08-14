@@ -49,7 +49,6 @@ document.getElementById('get-recommended-button-id').onclick = function () {
 
 //only here is the face descriptors populated
 async function Super_Search() {
-  //console.log('in super search now')
   Set_Search_Obj_Tags();
 
   let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
@@ -62,7 +61,7 @@ async function Super_Search() {
 
     if (selected_images_type[img_ind] == 'stored') {
       let annotation_tmp = await Get_Tagging_Annotation_From_DB(selected_images[img_ind]);
-      //console.log('annotation_tmp', annotation_tmp)
+
       for (let ind = 0; ind < annotation_tmp.faceDescriptors.length; ind++) {
         faceDescriptors_search.push(annotation_tmp.faceDescriptors[ind]);
       }
@@ -105,8 +104,6 @@ async function Super_Search() {
   let tagging_db_iterator = await Tagging_Image_DB_Iterator();
   search_results = await SEARCH_MODULE.Image_Search_DB(super_search_obj, tagging_db_iterator, Get_Tagging_Annotation_From_DB, MAX_COUNT_SEARCH_RESULTS);
 
-  //console.log('search_results = ', search_results)
-
   let search_image_results_output = document.getElementById('top-results-div-id');
   search_image_results_output.innerHTML = '';
   let search_display_inner_tmp = '';
@@ -123,7 +120,6 @@ async function Super_Search() {
   //user presses an image to select it from the images section, add onclick event listener
   search_results.forEach((file) => {
     document.getElementById(`search-result-single-img-id-${file}`).onclick = function () {
-      //console.log('btoa(file) ',btoa(file) )
       window.location = 'tagging.html' + '?' + `fileName=${btoa(toBinary(file))}`;
     };
   });
@@ -178,8 +174,6 @@ document.getElementById('use-webcam-button-id').onclick = function () {
   let photo = document.getElementById('webcam-meme-clicked-displayimg-id');
 
   let display_area_element = document.getElementById('modal-meme-clicked-image-gridbox-id');
-  //console.log('display_area_element height = ', display_area_element.offsetHeight )
-  //console.log('display_area_element offsetWidth = ', display_area_element.offsetWidth )
 
   let width;
   let height;
@@ -246,7 +240,7 @@ document.getElementById('use-webcam-button-id').onclick = function () {
       context.drawImage(video, 0, 0, width, height);
 
       data = canvas.toDataURL('image/png');
-      //console.log('data = ', data)
+
       photo.setAttribute('src', data);
 
       select_capture_button.style.display = 'block';
@@ -328,14 +322,12 @@ async function Get_Select_Recommended() {
   //user presses an image to select it from the images section, add onclick event listener
   search_results_faces.forEach((file) => {
     document.getElementById(`recommened-check-box-id-${file}`).onclick = function () {
-      //console.log('check box clicked! file = ', file)
       Handle_Get_Recommended_Image_Checked(file);
     };
   });
 }
 
 async function Handle_Get_Recommended_Image_Checked(filename) {
-  //console.log('clicked on image selected recommended', filename)
   let index = search_results_recommended.indexOf(filename);
   if (index > -1) {
     // only splice array when item is found
@@ -368,7 +360,6 @@ async function Handle_Get_Recommended_Image_Checked(filename) {
   //user presses an image to select it from the images section, add onclick event listener
   search_results_recommended.forEach((file) => {
     document.getElementById(`recommened-check-box-id-${file}`).onclick = function () {
-      //console.log('check box clicked! file = ', file)
       Handle_Get_Recommended_Image_Checked(file);
     };
   });
@@ -418,7 +409,6 @@ async function Update_Selected_Images() {
   //user presses an image to select it from the images section, add onclick event listener
   selected_images.forEach((element, index) => {
     document.getElementById(`selected-check-box-id-${index}`).onclick = function () {
-      //console.log('check box >selected images< clicked! file = ', element)
       selected_images.splice(index, 1); // 2nd parameter means remove one item only
       selected_images_type.splice(index, 1);
       Update_Selected_Images();
@@ -444,7 +434,6 @@ document.getElementById('use-new-image-button-id').onclick = async function () {
 
     let ft_res = await fileType.fromFile(element);
     if (ft_res.mime.includes('video') == true) {
-      //console.log(ft_res)
       if (!(ft_res.mime.includes('mp4') || ft_res.mime.includes('mkv') || ft_res.mime.includes('mov'))) {
         element = await Handle_Unsupported_Video_Format(element);
       }
@@ -515,7 +504,6 @@ function addMouseOverIconSwitch(emotion_div) {
     image.addEventListener('mouseover', () => (image.src = CLOSE_ICON_RED));
     image.addEventListener('mouseout', () => (image.src = CLOSE_ICON_BLACK));
   }
-  //console.log('get ')
 }
 
 function Set_Search_Obj_Tags() {
@@ -531,5 +519,3 @@ function Set_Search_Obj_Tags() {
   search_unique_meme_search_terms = search_unique_meme_search_terms.filter((tag) => tag !== '');
   super_search_obj['searchMemeTags'] = search_unique_meme_search_terms;
 }
-
-//console.log(`howdy neighbor!`)
