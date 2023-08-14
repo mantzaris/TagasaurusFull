@@ -17,9 +17,7 @@ document.getElementById('stream-view3').style.display = 'none';
 const webcam_selection_btn = document.getElementById('continue-btn');
 const main_menu_btn = document.getElementById('main-menu-btn');
 const selection_set = document.getElementById('search-type');
-const selection_description = document.getElementById(
-  'stream-type-description'
-);
+const selection_description = document.getElementById('stream-type-description');
 const return_from_stream_btn1 = document.getElementById('return-stream-btn1');
 return_from_stream_btn1.onclick = () => {
   Stop_Stream_Search();
@@ -47,11 +45,7 @@ selection_set.onchange = () => {
   stream_selection = selection_set.value;
 };
 
-const {
-  DB_MODULE,
-  TAGA_DATA_DIRECTORY,
-  GENERAL_HELPER_FNS,
-} = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js')); // require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+const { DB_MODULE, TAGA_DATA_DIRECTORY, GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js')); // require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 async function Tagging_Image_DB_Iterator() {
   return DB_MODULE.Tagging_Image_DB_Iterator();
 }
@@ -211,9 +205,7 @@ async function Set_Stream() {
     video.play();
     stream_ok = true;
   } catch (e) {
-    console.log(
-      'An error occurred in the navigator.mediaDevices.getUserMedia: ' + e
-    );
+    console.log('An error occurred in the navigator.mediaDevices.getUserMedia: ' + e);
     alert('please connect webcam for this option');
     stream_ok = false;
   }
@@ -262,10 +254,7 @@ async function Stream_Search_Run() {
   let rect_face_array = []; //storing the each face detected for that run of the face detection api (rewrites itself each time to be fresh)
   let rect_face = { x: 0, y: 0, width: 0, height: 0, descriptor: [] }; //the outputs held from the faceapi run
   async function Detect_Faces() {
-    let detections = await faceapi
-      .detectAllFaces(photo)
-      .withFaceLandmarks()
-      .withFaceDescriptors(); //array of faces detected, majority of the time is spent on detections of the faces (face box)
+    let detections = await faceapi.detectAllFaces(photo).withFaceLandmarks().withFaceDescriptors(); //array of faces detected, majority of the time is spent on detections of the faces (face box)
     rect_face_array = []; //reset the array for the new faces
     for (const face of detections) {
       let { x, y, width, height } = face.detection.box; //face.box if only face boxes are detected but with detection.box if landmarks and descriptors are taken
@@ -295,10 +284,7 @@ async function Stream_Search_Run() {
         dist_min = 10 ** 6;
         for (const [ind, face_rect] of rect_face_array.entries()) {
           //get the index of the closest face rectangle to the selected face rectangle
-          let dist_tmp = Math.sqrt(
-            (face_rect.x - rect_face_selected.x) ** 2 +
-              (face_rect.y - rect_face_selected.y) ** 2
-          ); //find the min distance face and update the index for it
+          let dist_tmp = Math.sqrt((face_rect.x - rect_face_selected.x) ** 2 + (face_rect.y - rect_face_selected.y) ** 2); //find the min distance face and update the index for it
           if (dist_tmp < dist_min) {
             dist_min = dist_tmp;
             selected_face_ind = ind;
@@ -312,12 +298,7 @@ async function Stream_Search_Run() {
         rect_face_selected.height = rect_face_array[selected_face_ind].height;
 
         ctx.beginPath();
-        ctx.rect(
-          rect_face_selected.x,
-          rect_face_selected.y,
-          rect_face_selected.width,
-          rect_face_selected.height
-        );
+        ctx.rect(rect_face_selected.x, rect_face_selected.y, rect_face_selected.width, rect_face_selected.height);
         ctx.setLineDash([]);
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 6;
@@ -436,35 +417,17 @@ async function Stream_Search_Run() {
     if (rect_face_array.length == 0) {
       return;
     } //if no faces present skip/exit
-    let ref_face_tmp =
-      rect_face_array[Math.floor(Math.random() * rect_face_array.length)]; //get some random face to analyze
+    let ref_face_tmp = rect_face_array[Math.floor(Math.random() * rect_face_array.length)]; //get some random face to analyze
     let ref_face_tmp_descriptor = ref_face_tmp.descriptor; //get the face descriptor array
     let sample_filenames = await Tagging_Random_DB_Images(record_sample_num); //get the array of random filenames stored
     for (const filename_tmp of sample_filenames) {
       //test for similarity of face descriptors for each filename entry
-      let annotation_obj_tmp = await Get_Tagging_Annotation_From_DB(
-        filename_tmp
-      );
+      let annotation_obj_tmp = await Get_Tagging_Annotation_From_DB(filename_tmp);
 
       let face_descriptors_tmp = annotation_obj_tmp['faceDescriptors'];
       if (face_descriptors_tmp.length == 0) continue; //no face
 
-      // //check for the type of the file
-      // if (file_type_lookup.has(filename_tmp)) {
-      //   if (!file_type_lookup.get(filename_tmp)) continue;
-      // } else {
-      //   let ft_res = await fileType.fromFile(
-      //     PATH.join(TAGA_DATA_DIRECTORY, filename_tmp)
-      //   );
-      //   const usable = !ft_res.mime.includes('video');
-      //   file_type_lookup.set(filename_tmp, usable);
-      //   if (!usable) continue;
-      // }
-
-      let score_tmp = await Get_Descriptors_DistanceScore(
-        [ref_face_tmp_descriptor],
-        face_descriptors_tmp
-      ); //why is this not between 0 and 1 ??? !!!! xxx
+      let score_tmp = await Get_Descriptors_DistanceScore([ref_face_tmp_descriptor], face_descriptors_tmp); //why is this not between 0 and 1 ??? !!!! xxx
       if (score_tmp > face_threshold) {
         //why is this not between 0 and 1 ??? !!!! xxx
         face_keywords.push(...annotation_obj_tmp['taggingTags']); //add to the keywords
@@ -522,36 +485,23 @@ async function Stream_Search_Run() {
     let found_face = false;
     for (const [ind, memory] of faces_short_memories.entries()) {
       //loop through memories to see if this descriptor is present or not
-      let score_tmp = await Get_Descriptors_DistanceScore(
-        [ref_face_descriptor],
-        [memory.descriptor]
-      );
+      let score_tmp = await Get_Descriptors_DistanceScore([ref_face_descriptor], [memory.descriptor]);
       if (score_tmp > face_threshold) {
         //found a similar face so no new inclusion and accumulate keywords now and in memory
         found_face = true;
         faces_short_memories[ind].memory_time = memory_time; //refresh memory
         faces_short_memories[ind].keywords.push(...face_keywords); //merge the arrays
-        faces_short_memories[ind].keywords = [
-          ...new Set(faces_short_memories[ind].keywords),
-        ]; //get the unique of the merged
+        faces_short_memories[ind].keywords = [...new Set(faces_short_memories[ind].keywords)]; //get the unique of the merged
         face_keywords = faces_short_memories[ind].keywords; //update the current keyword list
         face_keywords = face_keywords.sort((a, b) => 0.5 - Math.random()); //shuffle
         faces_short_memories[ind].images.push(...face_including_images); //merge the arrays
-        faces_short_memories[ind].images = [
-          ...new Set(faces_short_memories[ind].images),
-        ]; //get the unique of the merged
+        faces_short_memories[ind].images = [...new Set(faces_short_memories[ind].images)]; //get the unique of the merged
         face_including_images = faces_short_memories[ind].images; //update the current images list
-        face_including_images = face_including_images.sort(
-          (a, b) => 0.5 - Math.random()
-        ); //shuffle
+        face_including_images = face_including_images.sort((a, b) => 0.5 - Math.random()); //shuffle
         faces_short_memories[ind].memes.push(...face_including_memes); //merge the arrays
-        faces_short_memories[ind].memes = [
-          ...new Set(faces_short_memories[ind].memes),
-        ]; //get the unique of the merged
+        faces_short_memories[ind].memes = [...new Set(faces_short_memories[ind].memes)]; //get the unique of the merged
         face_including_memes = faces_short_memories[ind].memes; //update the current memes list
-        face_including_memes = face_including_memes.sort(
-          (a, b) => 0.5 - Math.random()
-        ); //shuffle
+        face_including_memes = face_including_memes.sort((a, b) => 0.5 - Math.random()); //shuffle
       }
     }
     if (found_face == false) {
@@ -571,35 +521,8 @@ async function Stream_Search_Run() {
       faces_short_memories[ind].memory_time -= 10000; //take time off of that memory
       //console.log({faces_short_memories})
     }
-    faces_short_memories = faces_short_memories.filter(
-      (memory, i) => memory.memory_time > 0
-    ); //keep those with memory time
+    faces_short_memories = faces_short_memories.filter((memory, i) => memory.memory_time > 0); //keep those with memory time
   }
   memory_loss_interval = setInterval(Face_Short_Memory_Reduction, 15000);
   //END: memory
 }
-
-// function formatBytes(bytes, decimals = 2) {
-//   if (!+bytes) return '0 Bytes';
-
-//   const k = 1024;
-//   const dm = decimals < 0 ? 0 : decimals;
-//   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-
-//   const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-//   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
-// }
-// setInterval(
-//   () => console.log(formatBytes(performance.memory.usedJSHeapSize)),
-//   2000
-// );
-//END of stream search functionality view
-
-//     let ft_res = await fileType.fromFile( PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation["fileName"]) )
-//console.log('ft_res = ', ft_res)
-//    if( ft_res.mime.includes('image') == true ) {
-//const fileType = require('file-type');
-//    const display_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation["fileName"]}`
-//src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file}"
-//                content_html = `<img class="memes-img-class" id="memes-image-img-id-${file}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file}" title="view" alt="meme" />`

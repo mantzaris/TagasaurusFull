@@ -1,20 +1,12 @@
-
-
 .rc-modal {
-
-    padding: 1em 2em;
-    position: absolute;
-    display: none;
-    z-index: 200;
+  padding: 1em 2em;
+  position: absolute;
+  display: none;
+  z-index: 200;
 }
 
 .rc-modal > button {
-
-    display: block;
-    font-weight: bold;
-    font-size: 1.75vmin;
-
+  display: block;
+  font-weight: bold;
+  font-size: 1.75vmin;
 }
-
-
-

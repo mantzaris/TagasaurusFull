@@ -1,517 +1,511 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <title>Tagasaurus</title>
 
-<head>
+    <!-- The CSS variables common to the app -->
+    <link rel="stylesheet" href="../AppCode/taga-CSS/variables.css" />
 
-	<title>Tagasaurus</title>
+    <!-- general styles for buttons etc -->
+    <link rel="stylesheet" href="./taga-CSS/general-styles.css" />
 
-	<!-- The CSS variables common to the app -->
-	<link rel="stylesheet" href="../AppCode/taga-CSS/variables.css">
+    <!-- general style for the modal pop ups -->
+    <link rel="stylesheet" href="./taga-CSS/modal-general-style.css" />
 
-	<!-- general styles for buttons etc -->
-	<link rel="stylesheet" href="./taga-CSS/general-styles.css">
+    <!-- The main tagging UI style sheet -->
+    <link rel="stylesheet" href="./taga-CSS/tagging-CSS/tagging-main-ui.css" />
 
-	<!-- general style for the modal pop ups -->
-	<link rel="stylesheet" href="./taga-CSS/modal-general-style.css">
-	
-	<!-- The main tagging UI style sheet -->
-	<link rel="stylesheet" href="./taga-CSS/tagging-CSS/tagging-main-ui.css">
+    <!-- style sheet for the meme modal pop up to view the close up of the meme -->
+    <link rel="stylesheet" href="./taga-CSS/tagging-CSS/tagging-meme-image-click-modal.css" />
 
-	<!-- style sheet for the meme modal pop up to view the close up of the meme -->
-	<link rel="stylesheet" href="./taga-CSS/tagging-CSS/tagging-meme-image-click-modal.css">
+    <!-- style sheet for the search modal pop up to search for images and memes -->
+    <link rel="stylesheet" href="./taga-CSS/tagging-CSS/tagging-search-modal.css" />
 
-	<!-- style sheet for the search modal pop up to search for images and memes -->
-	<link rel="stylesheet" href="./taga-CSS/tagging-CSS/tagging-search-modal.css">
+    <!-- style sheet for the add meme search modal pop up to search to add memes -->
+    <link rel="stylesheet" href="./taga-CSS/tagging-CSS/tagging-add-memes-search-modal.css" />
 
-	<!-- style sheet for the add meme search modal pop up to search to add memes -->
-	<link rel="stylesheet" href="./taga-CSS/tagging-CSS/tagging-add-memes-search-modal.css">
+    <!-- style sheet for the processing message modal -->
+    <link rel="stylesheet" href="./taga-CSS/processing-message-modal.css" />
 
-	<!-- style sheet for the processing message modal -->
-	<link rel="stylesheet" href="./taga-CSS/processing-message-modal.css">
+    <!-- style sheet for the right click options modal -->
+    <link rel="stylesheet" href="./taga-CSS/right-click-modals.css" />
 
-	<!-- style sheet for the right click options modal -->
-	<link rel="stylesheet" href="./taga-CSS/right-click-modals.css">
-	
-	<!-- style sheet for the webcam input modal -->
-	<link rel="stylesheet" href="./taga-CSS/tagging-CSS/tagging-add-webcam-media-modal.css">
+    <!-- style sheet for the webcam input modal -->
+    <link rel="stylesheet" href="./taga-CSS/tagging-CSS/tagging-add-webcam-media-modal.css" />
 
-	<script src="./taga-JS/pdfjs/build/pdf.js" ></script>
-	
+    <script src="./taga-JS/pdfjs/build/pdf.js"></script>
 
-	<!-- something to do with security -->
-	<!-- <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';"> -->
-	
-</head>
+    <!-- something to do with security -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';"> -->
+  </head>
 
-<body>
+  <body>
+    <div id="tagging-screen-id">
+      <!-- EMOTIONS START -->
+      <div id="emotions-gridbox-id">
+        <!-- EMOTIONS Header Label -->
+        <div id="emotions-innerbox-label-id">
+          <span id="emotion-text-label-id">EMOTIONS</span>
+          <img id="emotion-icon-id" src="taga-ui-icons/emotion_icon.png" alt="emotions" />
+        </div>
 
-	<div id="tagging-screen-id">
+        <!-- EMOTIONS New Label Components -->
+        <div id="emotions-innerbox-newemotions-id">
+          <div id="emotions-new-entry-div-id">
+            <textarea
+              id="emotions-new-emotion-textarea-id"
+              placeholder="new emotion entry..."
+              name="emotion-new-emotion-textarea-name"
+              oninput="this.value = this.value.replace(/[ \n]/g,'')"
+            ></textarea>
+            <span id="emotion-text-range-value-label-left-id">0</span> <input id="new-emotion-range-id" type="range" min="0" max="100" value="0" />
+            <span id="emotion-text-range-value-label-right-id">100</span>
+            <button type="button" class="fun-button-blue" id="add-new-emotion-button-id">ADD EMOTION</button>
+          </div>
+          <div id="emotion-entry-spacer-div-id"></div>
+          <div id="auto-emotions-div-id">
+            <button type="button" class="fun-button-blue" id="auto-fill-emotions-button-id">AUTO-FILL</button>
+            <label id="auto-fill-emotions-check-box-label-id" for="auto-fill-emotions-check-box-id"> default </label>
+            <input type="checkbox" id="auto-fill-emotions-check-box-id" name="auto-fill-emotions-check-box-id" value="check-auto-emotions" />
+          </div>
+        </div>
 
-		<!-- EMOTIONS START -->
-		<div id="emotions-gridbox-id">
-			<!-- EMOTIONS Header Label -->
-			<div id="emotions-innerbox-label-id">
-				<span id="emotion-text-label-id">EMOTIONS</span>
-				<img id="emotion-icon-id" src="taga-ui-icons/emotion_icon.png" alt="emotions" />
-			</div>
-
-			<!-- EMOTIONS New Label Components -->
-			<div id="emotions-innerbox-newemotions-id">
-				<div id="emotions-new-entry-div-id">
-					<textarea id="emotions-new-emotion-textarea-id" placeholder="new emotion entry..."
-						name="emotion-new-emotion-textarea-name" oninput="this.value = this.value.replace(/[ \n]/g,'')"></textarea>
-					<span id="emotion-text-range-value-label-left-id">0</span> <input id="new-emotion-range-id" type="range"
-						min="0" max="100" value="0"> <span id="emotion-text-range-value-label-right-id">100</span>
-					<button type="button" class="fun-button-blue" id="add-new-emotion-button-id">ADD EMOTION</button>
-				</div>
-				<div id="emotion-entry-spacer-div-id"></div>
-				<div id="auto-emotions-div-id">
-					<button type="button" class="fun-button-blue" id="auto-fill-emotions-button-id">AUTO-FILL</button>
-					<label id="auto-fill-emotions-check-box-label-id" for="auto-fill-emotions-check-box-id"> default </label>
-					<input type="checkbox" id="auto-fill-emotions-check-box-id" name="auto-fill-emotions-check-box-id" value="check-auto-emotions">
-				</div>
-			</div>
-
-			<!-- EMOTIONS Values List -->
-			<div id="emotions-innerbox-displayemotions-id">
-				<div id="emotion-collectionlist-div-id">
-					<!-- <div class="emotion-list-class" id="emotion-entry-div-id-good">
+        <!-- EMOTIONS Values List -->
+        <div id="emotions-innerbox-displayemotions-id">
+          <div id="emotion-collectionlist-div-id">
+            <!-- <div class="emotion-list-class" id="emotion-entry-div-id-good">
 						<img class="emotion-delete-icon-class" id="emotion-delete-button-id-good" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
 							onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" alt="emotions" title="remove"  />
 						<span class="emotion-label-view-class" id="emotion-id-label-view-name-good">good</span>
 						<input id="emotion-range-id-good" type="range" min="0" max="100" value="0">
-					</div> -->					
-				</div>
-			</div>
+					</div> -->
+          </div>
+        </div>
+      </div>
+      <!-- EMOTIONS END -->
 
-		</div>
-		<!-- EMOTIONS END -->
+      <!-- CENTER START -->
+      <div id="center-gridbox-id">
+        <div id="center-button-area-div-id">
+          <button class="center-buttons fun-button-blue" type="button" id="search-images-button-id">Search</button>
+          <button class="center-buttons fun-button-blue" type="button" id="load-new-image-button-id">Load New</button>
+          <button class="center-buttons fun-button-blue" type="button" id="load-webcam-input-button-id">Use Webcam</button>
+          <button class="center-buttons fun-button-red" type="button" id="delete-image-button-id">Delete</button>
+          <button class="center-buttons fun-button-blue" type="button" id="return-to-main-button-id">Main Menu</button>
+        </div>
 
+        <div id="center-lower-button-area-div-id">
+          <button class="center-lower-buttons fun-button-blue" type="button" id="left-gallery-image-button-id">< < < Prev</button>
+          <button class="center-lower-buttons fun-button-blue" type="button" id="right-gallery-image-button-id">Next > > ></button>
+        </div>
 
-		<!-- CENTER START -->
-		<div id="center-gridbox-id">
-			
-			<div id="center-button-area-div-id">
-				<button class="center-buttons fun-button-blue" type="button" id="search-images-button-id">Search</button>
-				<button class="center-buttons fun-button-blue" type="button" id="load-new-image-button-id">Load New</button>
-				<button class="center-buttons fun-button-blue" type="button" id="load-webcam-input-button-id">Use Webcam</button>
-				<button class="center-buttons fun-button-red" type="button" id="delete-image-button-id">Delete</button>
-				<button class="center-buttons fun-button-blue" type="button" id="return-to-main-button-id">Main Menu</button>
-			</div>
+        <div id="center-gallery-area-div-id">
+          <img id="center-gallery-image-id" src="" alt="main image" />
+          <!-- ../Taga.png -->
+          <!-- <video id="center-gallery-video-id" src=""></video> -->
+        </div>
+      </div>
+      <!-- CENTER END -->
 
-			<div id="center-lower-button-area-div-id">
-				<button class="center-lower-buttons fun-button-blue" type="button" id="left-gallery-image-button-id"> < < < Prev </button>
-				<button class="center-lower-buttons fun-button-blue" type="button" id="right-gallery-image-button-id">  Next > > > </button>
-			</div>
-			
-			<div id="center-gallery-area-div-id">
+      <!-- DESCRIPTION START -->
+      <div id="description-gridbox-id">
+        <div id="description-label-div-gridarea-textentry-id">
+          <span id="description-text-label-id">DESCRIPTION</span>
+        </div>
 
-				<img id="center-gallery-image-id" src="" alt="main image" />   <!-- ../Taga.png -->
-				<!-- <video id="center-gallery-video-id" src=""></video> -->
-				
-			</div>
+        <div id="description-div-gridarea-textentry-id">
+          <textarea id="description-textarea-id" placeholder="image description entry..." name="description-textarea-name"></textarea>
+        </div>
 
-		</div>
-		<!-- CENTER END -->
-		
-		
-		<!-- DESCRIPTION START -->
-		<div id="description-gridbox-id">
-			
-			<div id="description-label-div-gridarea-textentry-id">
-				<span id="description-text-label-id">DESCRIPTION</span>
-			</div>
-			
-			<div id="description-div-gridarea-textentry-id">
-				<textarea id="description-textarea-id" placeholder="image description entry..."
-						name="description-textarea-name"></textarea>
-			</div>
+        <div id="buttons-div-gridarea-textentry-id">
+          <button type="button" class="fun-button-blue" id="save-button-id">SAVE CHANGES</button>
+          <button type="button" class="fun-button-red" id="reset-button-id">RESET</button>
+        </div>
+      </div>
+      <!-- DESCRIPTION END -->
 
-			<div id="buttons-div-gridarea-textentry-id">
-				<button type="button" class="fun-button-blue" id="save-button-id">SAVE CHANGES</button>
-				<button type="button" class="fun-button-red" id="reset-button-id">RESET</button>
-			</div>
+      <!-- MEMES START -->
+      <div id="memes-gridbox-id">
+        <!-- MEMES Header Label -->
+        <div id="memes-innerbox-label-id">
+          <span id="memes-text-label-id">MEMES</span>
+          <img id="memes-icon-id" src="taga-ui-icons/memes_icon.png" alt="memes" />
+        </div>
 
-		</div>
-		<!-- DESCRIPTION END -->
-		
-		
-		<!-- MEMES START -->
-		<div id="memes-gridbox-id">
-			<!-- MEMES Header Label -->
-			<div id="memes-innerbox-label-id">
-				<span id="memes-text-label-id">MEMES</span>
-				<img id="memes-icon-id" src="taga-ui-icons/memes_icon.png" alt="memes" />
-			</div>
+        <!-- MEMES Add New Meme Button -->
+        <div id="memes-innerbox-newmemes">
+          <button type="button" class="fun-button-blue" id="add-new-memes-button-id">ADD MEMES</button>
+        </div>
 
-			<!-- MEMES Add New Meme Button -->
-			<div id="memes-innerbox-newmemes">
-				<button type="button" class="fun-button-blue" id="add-new-memes-button-id">ADD MEMES</button>
-			</div>
-			
-			<!-- MEMES Container Scroller -->
-			<div id="memes-innerbox-displaymemes-id" contenteditable="true">
-
-				<!-- <label class="memeswitch" title="deselect / keep" >   <input id="meme-toggle-id-Taga.png" type="checkbox" checked="true"> <span class="slider"></span>   </label>
+        <!-- MEMES Container Scroller -->
+        <div id="memes-innerbox-displaymemes-id" contenteditable="true">
+          <!-- <label class="memeswitch" title="deselect / keep" >   <input id="meme-toggle-id-Taga.png" type="checkbox" checked="true"> <span class="slider"></span>   </label>
 				<div class="memes-img-div-class" id="memes-image-div-id-Taga.png" >
 					<img class="memes-img-class" id="memes-image-img-id-Taga.png" src="images/Taga.png" title="view" alt="memes" />
 				</div> -->
+        </div>
+      </div>
+      <!-- MEMES END -->
 
-			</div>
+      <!-- HASHTAGS START -->
+      <div id="hashtags-gridbox-id">
+        <!-- HASHTAGS Header Label -->
+        <div id="hashtags-innerbox-label-id">
+          <span id="hashtags-text-label-id">HASHTAGS</span>
+          <img id="hashtags-icon-id" src="taga-ui-icons/HashtagGreen.png" alt="hashtags" />
+        </div>
 
-		</div>
-		<!-- MEMES END -->
-		
-
-		<!-- HASHTAGS START -->
-		<div id="hashtags-gridbox-id">
-			
-			<!-- HASHTAGS Header Label -->
-			<div id="hashtags-innerbox-label-id">
-				<span id="hashtags-text-label-id">HASHTAGS</span>
-				<img id="hashtags-icon-id" src="taga-ui-icons/HashtagGreen.png" alt="hashtags" />
-			</div>	
-
-			<!-- HASHTAGS Container Scroller -->
-			<div id="hashtags-innerbox-displayhashtags-id" contenteditable="true">
-				<!-- <ul id="hashtag-list-id">
+        <!-- HASHTAGS Container Scroller -->
+        <div id="hashtags-innerbox-displayhashtags-id" contenteditable="true">
+          <!-- <ul id="hashtag-list-id">
 					<li> <img id="hashtags-icon-id" src="taga-ui-icons/HashtagGreen.png" alt="hashtags"/> tag1</li> 
 				</ul> -->
-			</div>
+        </div>
+      </div>
+      <!-- HASHTAGS END -->
+    </div>
 
-		</div>
-		<!-- HASHTAGS END -->
+    <!-- ------------------------- -->
+    <!-- MODALS BEGIN -->
 
-	</div>
+    <!-- MODAL TAGGING SEARCH IMAGES START -->
+    <div id="search-modal-click-top-id" class="modal-top-class">
+      <!-- MEME MODAL CLOSE -->
+      <img
+        class="modal-close-button-class"
+        id="modal-search-close-exit-view-button-id"
+        onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+        onmouseout="this.src='taga-ui-icons/CloseBlack.png';"
+        src="taga-ui-icons/CloseBlack.png"
+        title="close"
+      />
+      <!-- Modal content container -->
+      <div class="modal-content-container">
+        <div id="modal-search-top-grid-div-id">
+          <!-- search button -->
+          <div id="modal-search-main-button-container-div-id">
+            <button type="button" class="fun-button-blue" id="modal-search-main-button-id">SEARCH CUSTOM</button>
+            <button type="button" class="fun-button-blue" id="modal-search-similar-button-id">SEARCH SIMILAR</button>
+            <button type="button" class="fun-button-red" id="modal-search-main-reset-button-id">RESET</button>
+          </div>
 
+          <!-- image tag entry -->
+          <div id="modal-search-tag-entry-container-div-id">
+            <span id="modal-search-tag-label-id"> Tag list: </span>
+            <div id="modal-search-tag-textarea-entry-div-id">
+              <textarea
+                id="modal-search-tag-textarea-entry-id"
+                placeholder="enter image #tags to search for"
+                name="search-modal-tag-textarea"
+                oninput="this.value = this.value.replace(/\n/g,'')"
+              ></textarea>
+            </div>
+          </div>
 
-	<!-- ------------------------- -->
-	<!-- MODALS BEGIN -->
+          <!-- search meme tag entry start -->
+          <div id="modal-search-meme-tag-entry-top-div-id">
+            <span id="modal-search-meme-tag-label-id"> Meme Tag list: </span>
+            <div id="modal-search-meme-tag-textarea-entry-div-id">
+              <textarea
+                id="modal-search-meme-tag-textarea-entry-id"
+                placeholder="enter meme #tags connected to image search"
+                name="search-modal-meme-tag-textarea"
+                oninput="this.value = this.value.replace(/\n/g,'')"
+              ></textarea>
+            </div>
+          </div>
+          <!-- search meme tag entry start -->
 
-	<!-- MODAL TAGGING SEARCH IMAGES START -->
-	<div id="search-modal-click-top-id" class="modal-top-class">
-		<!-- MEME MODAL CLOSE -->
-		<img class="modal-close-button-class" id="modal-search-close-exit-view-button-id" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
-							onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
-		<!-- Modal content container -->
-		<div class="modal-content-container">
-			<div id="modal-search-top-grid-div-id">
+          <!-- add emotion/value entry -->
+          <div id="modal-search-emotion-entry-top-div-id">
+            <!-- <div id="grid-emotion-area-1-id"></div> -->
+            <button type="button" class="fun-button-blue" id="modal-search-emotion-entry-button-id">INCLUDE EMOTION</button>
+            <!-- </div> -->
 
-				<!-- search button -->
-				<div id="modal-search-main-button-container-div-id">
-					<button type="button" class="fun-button-blue" id="modal-search-main-button-id">SEARCH CUSTOM</button>
-					<button type="button" class="fun-button-blue" id="modal-search-similar-button-id">SEARCH SIMILAR</button>
-					<button type="button" class="fun-button-red" id="modal-search-main-reset-button-id">RESET</button>
-				</div>
+            <!-- <div id="grid-emotion-area-2-id"> -->
+            <div id="modal-search-emotion-label-and-value-entry-container-div-id">
+              <textarea
+                list="emotion-recommend"
+                id="modal-search-emotion-label-value-textarea-entry-id"
+                placeholder="emotion label"
+                name="search-modal-emotion-tag-textarea"
+                oninput="this.value = this.value.replace(/[ \n]/g,'')"
+              ></textarea>
+              <input id="modal-search-emotion-value-range-entry-id" type="range" min="0" max="100" value="0" />
+            </div>
+            <!-- </div> -->
 
-				<!-- image tag entry -->				
-				<div id="modal-search-tag-entry-container-div-id">
-					<span id="modal-search-tag-label-id">
-						Tag list:
-					</span>
-					<div id="modal-search-tag-textarea-entry-div-id">
-						<textarea id="modal-search-tag-textarea-entry-id" placeholder="enter image #tags to search for"
-							name="search-modal-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')"></textarea>
-					</div>
-				</div>
-
-				<!-- search meme tag entry start -->
-				<div id="modal-search-meme-tag-entry-top-div-id">
-					<span id="modal-search-meme-tag-label-id">
-						Meme Tag list:
-					</span>
-					<div id="modal-search-meme-tag-textarea-entry-div-id">
-						<textarea id="modal-search-meme-tag-textarea-entry-id" placeholder="enter meme #tags connected to image search"
-							name="search-modal-meme-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')"></textarea>
-					</div>
-				</div>
-				<!-- search meme tag entry start -->
-				
-				<!-- add emotion/value entry -->
-				<div id="modal-search-emotion-entry-top-div-id">
-
-					<!-- <div id="grid-emotion-area-1-id"></div> -->
-					<button type="button" class="fun-button-blue" id="modal-search-emotion-entry-button-id">INCLUDE EMOTION</button>
-					<!-- </div> -->
-
-					<!-- <div id="grid-emotion-area-2-id"> -->
-					<div id="modal-search-emotion-label-and-value-entry-container-div-id">
-						<textarea list="emotion-recommend" id="modal-search-emotion-label-value-textarea-entry-id" placeholder="emotion label"
-								name="search-modal-emotion-tag-textarea" oninput="this.value = this.value.replace(/[ \n]/g,'')"></textarea>
-						<input id="modal-search-emotion-value-range-entry-id" type="range" min="0" max="100" value="0">
-					</div>
-					<!-- </div> -->
-
-					<!-- <div id="grid-emotion-area-3-id"> -->
-					<div id="modal-search-emotion-label-value-display-container-div-id">
-						
-						<!-- <span id="modal-search-emotion-label-value-span-id-EMOTIONKEY" style="white-space:nowrap">
+            <!-- <div id="grid-emotion-area-3-id"> -->
+            <div id="modal-search-emotion-label-value-display-container-div-id">
+              <!-- <span id="modal-search-emotion-label-value-span-id-EMOTIONKEY" style="white-space:nowrap">
 							<img class="modal-search-emotion-remove-button-class" id="modal-search-emotion-remove-button-id-EMOTIONKEY" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
 								onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
 							(emotion1,10)
 						</span>  -->
-						
-					</div>
-					<!-- </div> -->
-				</div> 
-				
+            </div>
+            <!-- </div> -->
+          </div>
 
-				<!-- IMAGE SEARCH RESULTS START -->
-				<div id="modal-search-images-results-display-id">
-					<div id="modal-search-images-results-button-div-id">
-						<label id="modal-search-meme-tag-label-id" >Select Image</label>
-						<!-- <button type="button" class="fun-button-blue" id="modal-search-images-results-select-images-order-button-id">Select Image</button> -->
-					</div>
-					<div id="modal-search-images-memes-results-button-div-id">
-						<label id="modal-search-meme-tag-label-id" >Select Related Meme</label>
-						<!-- <button type="button" class="fun-button-blue" id="modal-search-images-results-select-meme-images-order-button-id">Select Related Meme</button> -->
-					</div>
-					<!-- for the image annotation matches -->
-					<div id="modal-search-images-results-grid-div-area-id">						
-						<!-- <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-Taga.png" >
+          <!-- IMAGE SEARCH RESULTS START -->
+          <div id="modal-search-images-results-display-id">
+            <div id="modal-search-images-results-button-div-id">
+              <label id="modal-search-meme-tag-label-id">Select Image</label>
+              <!-- <button type="button" class="fun-button-blue" id="modal-search-images-results-select-images-order-button-id">Select Image</button> -->
+            </div>
+            <div id="modal-search-images-memes-results-button-div-id">
+              <label id="modal-search-meme-tag-label-id">Select Related Meme</label>
+              <!-- <button type="button" class="fun-button-blue" id="modal-search-images-results-select-meme-images-order-button-id">Select Related Meme</button> -->
+            </div>
+            <!-- for the image annotation matches -->
+            <div id="modal-search-images-results-grid-div-area-id">
+              <!-- <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-Taga.png" >
 							<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-Taga.png" src="images/Taga.png" title="view" alt="memes" />
 						</div> -->
-					</div>
-					<!-- for the meme images matches -->
-					<div id="modal-search-meme-images-results-grid-div-area-id">
-						<!-- <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-Taga.png" >
+            </div>
+            <!-- for the meme images matches -->
+            <div id="modal-search-meme-images-results-grid-div-area-id">
+              <!-- <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-Taga.png" >
 							<img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-meme-image-img-id-Taga.png" src="images/Taga.png" title="view" alt="memes" />
 						</div> -->
-					</div>
-				</div>
-				<!-- IMAGE SEARCH RESULTS END -->
+            </div>
+          </div>
+          <!-- IMAGE SEARCH RESULTS END -->
+        </div>
+      </div>
+    </div>
+    <!-- MODAL TAGGING SEARCH IMAGES END -->
 
-			</div>			
-		</div>
-	</div>
-	<!-- MODAL TAGGING SEARCH IMAGES END -->
+    <!-- MODAL TAGGING MEME ADDITION SEARCH IMAGES START -->
+    <div id="search-add-memes-modal-click-top-id" class="modal-top-class">
+      <!-- MEME MODAL CLOSE -->
+      <img
+        class="modal-close-button-class"
+        id="modal-search-add-memes-close-exit-view-button-id"
+        onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+        onmouseout="this.src='taga-ui-icons/CloseBlack.png';"
+        src="taga-ui-icons/CloseBlack.png"
+        title="close"
+      />
+      <!-- Modal content container -->
+      <div class="modal-content-container">
+        <div id="modal-search-add-memes-top-grid-div-id">
+          <!-- search button -->
+          <div id="modal-search-add-memes-main-button-container-div-id">
+            <button type="button" class="fun-button-blue" id="modal-search-add-memes-main-button-id">SEARCH BUTTON</button>
+            <button type="button" class="fun-button-red" id="modal-search-add-memes-reset-button-id">RESET FIELDS</button>
+          </div>
 
+          <!-- image tag entry -->
+          <div id="modal-search-add-memes-tag-entry-container-div-id">
+            <span id="modal-search-add-memes-tag-label-id"> Tag list: </span>
+            <div id="modal-search-add-memes-tag-textarea-entry-div-id">
+              <textarea
+                id="modal-search-add-memes-tag-textarea-entry-id"
+                placeholder="image #tags"
+                name="search-modal-tag-textarea"
+                oninput="this.value = this.value.replace(/\n/g,'')"
+              ></textarea>
+            </div>
+          </div>
 
+          <!-- search meme tag entry start -->
+          <div id="modal-search-add-memes-tag-entry-top-div-id">
+            <span id="modal-search-add-memes-tag-label-id"> Meme Tags: </span>
+            <div id="modal-search-add-memes-tag-textarea-memes-entry-div-id">
+              <textarea
+                id="modal-search-add-memes-tag-textarea-memes-entry-id"
+                placeholder="meme #tags connected to image"
+                name="search-modal-meme-tag-textarea"
+                oninput="this.value = this.value.replace(/\n/g,'')"
+              ></textarea>
+            </div>
+          </div>
+          <!-- search meme tag entry start -->
 
-	<!-- MODAL TAGGING MEME ADDITION SEARCH IMAGES START -->
-	<div id="search-add-memes-modal-click-top-id" class="modal-top-class">
-		<!-- MEME MODAL CLOSE -->
-		<img class="modal-close-button-class" id="modal-search-add-memes-close-exit-view-button-id" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
-							onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
-		<!-- Modal content container -->
-		<div class="modal-content-container">
-			<div id="modal-search-add-memes-top-grid-div-id">
+          <!-- add emotion/value entry -->
+          <div id="modal-search-add-memes-emotion-entry-top-div-id">
+            <div id="grid-emotion-area-1-id">
+              <button type="button" class="fun-button-blue" id="modal-search-add-memes-emotion-entry-button-id">+</button>
+            </div>
 
-				<!-- search button -->
-				<div id="modal-search-add-memes-main-button-container-div-id">
-					<button type="button" class="fun-button-blue" id="modal-search-add-memes-main-button-id">SEARCH BUTTON</button>
-					<button type="button" class="fun-button-red" id="modal-search-add-memes-reset-button-id">RESET FIELDS</button>
-				</div>
+            <div id="grid-emotion-area-2-id">
+              <div id="modal-search-add-memes-emotion-label-and-value-entry-container-div-id">
+                <textarea
+                  list="emotion-recommend"
+                  id="modal-search-add-memes-emotion-label-value-textarea-entry-id"
+                  placeholder="emotion label"
+                  name="search-modal-emotion-tag-textarea"
+                  oninput="this.value = this.value.replace(/[ \n]/g,'')"
+                ></textarea>
+                <input id="modal-search-add-memes-emotion-value-range-entry-id" type="range" min="0" max="100" value="0" />
+              </div>
+            </div>
 
-				<!-- image tag entry -->
-				<div id="modal-search-add-memes-tag-entry-container-div-id">
-					<span id="modal-search-add-memes-tag-label-id">
-						Tag list:
-					</span>
-					<div id="modal-search-add-memes-tag-textarea-entry-div-id">
-						<textarea id="modal-search-add-memes-tag-textarea-entry-id" placeholder="image #tags"
-							name="search-modal-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')"></textarea>
-					</div>
-				</div>
+            <div id="grid-emotion-area-1-idb">
+              <button type="button" class="fun-button-blue" id="modal-search-add-memes-emotion-meme-entry-button-id">+</button>
+            </div>
 
-				<!-- search meme tag entry start -->
-				<div id="modal-search-add-memes-tag-entry-top-div-id">
-					<span id="modal-search-add-memes-tag-label-id">
-						Meme Tags:
-					</span>
-					<div id="modal-search-add-memes-tag-textarea-memes-entry-div-id">
-						<textarea id="modal-search-add-memes-tag-textarea-memes-entry-id" placeholder="meme #tags connected to image"
-							name="search-modal-meme-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')"></textarea>
-					</div>
-				</div>
-				<!-- search meme tag entry start -->
-				
-				<!-- add emotion/value entry -->
-				<div id="modal-search-add-memes-emotion-entry-top-div-id">
-
-					<div id="grid-emotion-area-1-id">
-						<button type="button" class="fun-button-blue" id="modal-search-add-memes-emotion-entry-button-id">+</button>
-					</div>
-
-					<div id="grid-emotion-area-2-id">
-						<div id="modal-search-add-memes-emotion-label-and-value-entry-container-div-id">
-							<textarea list="emotion-recommend" id="modal-search-add-memes-emotion-label-value-textarea-entry-id" placeholder="emotion label"
-									name="search-modal-emotion-tag-textarea" oninput="this.value = this.value.replace(/[ \n]/g,'')"></textarea>
-							<input id="modal-search-add-memes-emotion-value-range-entry-id" type="range" min="0" max="100" value="0">
-						</div>
-					</div>
-					
-					<div id="grid-emotion-area-1-idb">
-						<button type="button" class="fun-button-blue" id="modal-search-add-memes-emotion-meme-entry-button-id">+</button>
-					</div>
-
-					<div id="grid-emotion-area-2-idb">
-						<div id="modal-search-add-memes-emotion-meme-label-and-value-entry-container-div-id">
-							<textarea list="emotion-recommend" id="modal-search-add-memes-emotion-meme-label-value-textarea-entry-id" placeholder="meme emotion label"
-									name="search-modal-emotion-tag-textarea" oninput="this.value = this.value.replace(/[ \n]/g,'')"></textarea>
-							<input id="modal-search-add-memes-emotion-meme-value-range-entry-id" type="range" min="0" max="100" value="0">
-						</div>
-					</div>
-					<!-- the emotion label and value tuples displayed for the images of the search -->
-					<div id="grid-emotion-area-3-id">
-						<div id="modal-search-add-memes-emotion-label-value-display-container-div-id">
-							<!-- <span id="modal-search-add-memes-emotion-label-value-span-id-EMOTIONKEY" style="white-space:nowrap">
+            <div id="grid-emotion-area-2-idb">
+              <div id="modal-search-add-memes-emotion-meme-label-and-value-entry-container-div-id">
+                <textarea
+                  list="emotion-recommend"
+                  id="modal-search-add-memes-emotion-meme-label-value-textarea-entry-id"
+                  placeholder="meme emotion label"
+                  name="search-modal-emotion-tag-textarea"
+                  oninput="this.value = this.value.replace(/[ \n]/g,'')"
+                ></textarea>
+                <input id="modal-search-add-memes-emotion-meme-value-range-entry-id" type="range" min="0" max="100" value="0" />
+              </div>
+            </div>
+            <!-- the emotion label and value tuples displayed for the images of the search -->
+            <div id="grid-emotion-area-3-id">
+              <div id="modal-search-add-memes-emotion-label-value-display-container-div-id">
+                <!-- <span id="modal-search-add-memes-emotion-label-value-span-id-EMOTIONKEY" style="white-space:nowrap">
 								<img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-remove-button-id-EMOTIONKEY" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
 									onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
 								(Emotion1,10)
 							</span> -->
-						</div>
-					</div>
-					<!-- the emotion label and value tuples displayed for the MEMES of the images of the search -->
-					<div id="grid-emotion-area-3-idb">
-						<div id="modal-search-add-memes-emotion-meme-label-value-display-container-div-id">
-							<!-- <span id="modal-search-add-memes-emotion-meme-label-value-span-id-EMOTIONKEY" style="white-space:nowrap">
+              </div>
+            </div>
+            <!-- the emotion label and value tuples displayed for the MEMES of the images of the search -->
+            <div id="grid-emotion-area-3-idb">
+              <div id="modal-search-add-memes-emotion-meme-label-value-display-container-div-id">
+                <!-- <span id="modal-search-add-memes-emotion-meme-label-value-span-id-EMOTIONKEY" style="white-space:nowrap">
 								<img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-meme-remove-button-id-EMOTIONKEY" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
 									onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
 								(emotion1,10)
 							</span> -->
-						</div>
-					</div>
+              </div>
+            </div>
+          </div>
 
-				</div>
-
-				<!-- IMAGE SEARCH RESULTS START -->
-				<div id="modal-search-add-memes-images-results-display-id">
-					<div id="modal-search-add-memes-images-results-button-div-id">
-						<button type="button" class="fun-button-blue" id="modal-search-add-memes-images-results-select-images-order-button-id">Select Toggled Images as Memes</button>
-					</div>
-					<!-- <div id="modal-search-images-memes-results-button-div-id">
+          <!-- IMAGE SEARCH RESULTS START -->
+          <div id="modal-search-add-memes-images-results-display-id">
+            <div id="modal-search-add-memes-images-results-button-div-id">
+              <button type="button" class="fun-button-blue" id="modal-search-add-memes-images-results-select-images-order-button-id">
+                Select Toggled Images as Memes
+              </button>
+            </div>
+            <!-- <div id="modal-search-images-memes-results-button-div-id">
 						<button type="button" id="modal-search-images-results-select-meme-images-order-button-id">Select Related Meme Image Order</button>
 					</div> -->
 
-					<div id="modal-search-add-memes-images-results-grid-div-area-id">						
-						<!-- <label class="add-memes-memeswitch" title="deselect / include" >   
+            <div id="modal-search-add-memes-images-results-grid-div-area-id">
+              <!-- <label class="add-memes-memeswitch" title="deselect / include" >   
 							<input id="add-memes-images-toggle-id-Taga.png" type="checkbox" > 
 							<span class="add-memes-slider"></span>   
 						</label>
 						<div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-Taga.png" >
 							<img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-image-img-id-Taga.png" src="images/Taga.png" title="view" alt="memes" />
 						</div> -->
-					</div>
-					<div id="modal-search-add-memes-meme-images-results-grid-div-area-id">
-						<!-- <label class="add-memes-memeswitch" title="deselect / include" >   
+            </div>
+            <div id="modal-search-add-memes-meme-images-results-grid-div-area-id">
+              <!-- <label class="add-memes-memeswitch" title="deselect / include" >   
 							<input id="add-memes-meme-toggle-id-Taga.png" type="checkbox" > 
 							<span class="add-memes-slider"></span>   
 						</label>
 						<div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-Taga.png" >
 							<img class="modal-image-search-add-memes-result-single-image-img-obj-class" id="modal-image-search-add-memes-result-single-meme-image-img-id-Taga.png" src="images/Taga.png" title="view" alt="memes" />
 						</div> -->
-					</div>
-				</div>
-				<!-- IMAGE SEARCH RESULTS END -->
+            </div>
+          </div>
+          <!-- IMAGE SEARCH RESULTS END -->
+        </div>
+      </div>
+    </div>
+    <!-- MODAL TAGGING MEME ADDITION SEARCH IMAGES END -->
 
-			</div>			
-		</div>
-	</div>
-	<!-- MODAL TAGGING MEME ADDITION SEARCH IMAGES END -->
+    <!-- MODAL MEME IMAGE CLICK START -->
+    <div id="modal-meme-clicked-top-id" class="modal-top-class">
+      <!-- MEME MODAL CLOSE -->
+      <img
+        class="modal-close-button-class"
+        id="modal-meme-clicked-close-button-id"
+        onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+        onmouseout="this.src='taga-ui-icons/CloseBlack.png';"
+        src="taga-ui-icons/CloseBlack.png"
+        title="close"
+      />
+      <!-- Modal content container -->
+      <div class="modal-content-container">
+        <div id="modal-meme-clicked-grid-container-id">
+          <div id="modal-meme-clicked-tag-list-div-container-id">
+            <!-- Tags: #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde  -->
+          </div>
+          <div id="modal-meme-clicked-emotion-list-div-container-id">
+            <!-- Emotions: ('good':123), ('bad',321),('good':123), ('bad',321),('good':123), ('bad',321),('good':123), ('bad',321),('good':123), ('bad',321),('good':123), ('bad',321) -->
+          </div>
+          <div id="modal-meme-clicked-image-gridbox-id">
+            <img id="modal-meme-clicked-displayimg-id" src="" title="meme" alt="meme" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- MODAL MEME IMAGE CLICK END -->
 
+    <!-- START MODAL FOR PROCESSING MESSAGE THAT USER INPUT IS NOT ALLOWED -->
 
-	<!-- MODAL MEME IMAGE CLICK START -->
-	<div id="modal-meme-clicked-top-id" class="modal-top-class">
-		<!-- MEME MODAL CLOSE -->
-		<img class="modal-close-button-class" id="modal-meme-clicked-close-button-id" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
-							onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
-		<!-- Modal content container -->
-		<div class="modal-content-container">
-			<div id="modal-meme-clicked-grid-container-id">
-				<div id="modal-meme-clicked-tag-list-div-container-id">
-					<!-- Tags: #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde  -->
-				</div>
-				<div id="modal-meme-clicked-emotion-list-div-container-id">
-					<!-- Emotions: ('good':123), ('bad',321),('good':123), ('bad',321),('good':123), ('bad',321),('good':123), ('bad',321),('good':123), ('bad',321),('good':123), ('bad',321) -->
-				</div>
-				<div id="modal-meme-clicked-image-gridbox-id">
-					<img id="modal-meme-clicked-displayimg-id" src="" title="meme" alt="meme" />
-				</div>
-			</div>
-		</div>
-	
-	</div>
-	<!-- MODAL MEME IMAGE CLICK END -->
+    <div id="processing-notice-modal-top-div-id" class="processing-notice-modal-top-div-class">
+      <div id="processing-notice-modal-content-div-id" class="processing-notice-modal-content-div-class">
+        <div class="spinner"></div>
 
+        PROCESSING...
+      </div>
+    </div>
 
-	<!-- START MODAL FOR PROCESSING MESSAGE THAT USER INPUT IS NOT ALLOWED -->
+    <!-- END MODAL FOR PROCESSING MESSAGE THAT USER INPUT IS NOT ALLOWED -->
 
-	<div id="processing-notice-modal-top-div-id" class="processing-notice-modal-top-div-class">
-		
-		<div id="processing-notice-modal-content-div-id" class="processing-notice-modal-content-div-class">
-			<div class="spinner"></div> 
-			
-			PROCESSING...
-		</div>
+    <!-- START DIV FOR THE RIGHT CLICK EVENTS -->
+    <div id="right-click-modal-tagging-center" class="rc-modal">
+      <button id="save-file-tagging-center">save file</button>
+    </div>
+    <div id="right-click-modal-tagging-meme" class="rc-modal">
+      <button id="save-file-tagging-modal-meme">save file</button>
+    </div>
+    <div id="right-click-tagging-meme" class="rc-modal">
+      <button id="save-file-tagging-meme">save file</button>
+    </div>
 
-	</div>
+    <!-- END DIV FOR THE RIGHT CLICK EVENTS -->
 
-	<!-- END MODAL FOR PROCESSING MESSAGE THAT USER INPUT IS NOT ALLOWED -->
+    <!-- MODAL FOR THE WEBCAM INPUTS -->
+    <div id="modal-webcam-clicked-top-id" class="modal-top-class">
+      <!-- MEME MODAL CLOSE -->
+      <img
+        class="modal-close-button-class"
+        id="modal-webcam-clicked-close-button-id"
+        onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+        onmouseout="this.src='taga-ui-icons/CloseBlack.png';"
+        src="taga-ui-icons/CloseBlack.png"
+        title="close"
+      />
+      <!-- Modal content container -->
+      <div class="modal-content-container">
+        <div id="modal-webcam-clicked-grid-container-id">
+          <div id="modal-webcam-clicked-tag-list-div-container-id">
+            <!-- Tags: #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde  -->
+            <button style="display: none" class="fun-button-blue" id="back-capture-button-id">STREAM AGAIN</button>
+            <button class="fun-button-blue" id="capture-button-id">CAPTURE IMAGE (space bar)</button>
+            <button class="fun-button-blue" id="capture-video-button-id">RECORD VIDEO</button>
+            <button class="fun-button-blue" style="display: none" id="stop-video-button-id">FINISH RECORDING</button>
+            <button class="fun-button-blue" style="display: none" id="cancel-video-button-id">CANCEL</button>
+            <button class="fun-button-blue" id="select-capture-button-id" style="display: none">SELECT IMAGE</button>
+          </div>
 
-	<!-- START DIV FOR THE RIGHT CLICK EVENTS -->
-	<div id="right-click-modal-tagging-center" class="rc-modal">
-		<button id="save-file-tagging-center">
-			save file
-		</button>
-	</div>
-	<div id="right-click-modal-tagging-meme" class="rc-modal">
-		<button id="save-file-tagging-modal-meme">
-			save file
-		</button>
-	</div>
-	<div id="right-click-tagging-meme" class="rc-modal">
-		<button id="save-file-tagging-meme">
-			save file
-		</button>
-	</div>
+          <div id="modal-webcam-clicked-image-gridbox-id">
+            <canvas style="display: none" id="canvas-webcam-id"> </canvas>
+            <img style="display: none" id="webcam-webcam-clicked-displayimg-id" src="" title="" alt="" />
 
-	<!-- END DIV FOR THE RIGHT CLICK EVENTS -->
+            <video src="" id="webcam-video-id"></video>
+          </div>
+        </div>
+      </div>
+    </div>
 
+    <!-- MODALS FINISH -->
+    <!-- ------------------------- -->
+  </body>
 
-	<!-- MODAL FOR THE WEBCAM INPUTS -->
-	<div id="modal-webcam-clicked-top-id" class="modal-top-class">
-		<!-- MEME MODAL CLOSE -->
-		<img class="modal-close-button-class" id="modal-webcam-clicked-close-button-id" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
-							onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
-		<!-- Modal content container -->
-		<div class="modal-content-container">
-			<div id="modal-webcam-clicked-grid-container-id">
-				<div id="modal-webcam-clicked-tag-list-div-container-id">
-					<!-- Tags: #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde  -->
-					<button style="display: none;" class="fun-button-blue" id="back-capture-button-id"> STREAM AGAIN </button>
-					<button class="fun-button-blue" id="capture-button-id"> CAPTURE IMAGE (space bar) </button>
-					<button class="fun-button-blue" id="capture-video-button-id"> RECORD VIDEO </button>
-					<button class="fun-button-blue" style="display: none;" id="stop-video-button-id"> FINISH RECORDING</button>
-					<button class="fun-button-blue" style="display: none;" id="cancel-video-button-id"> CANCEL </button>
-					<button class="fun-button-blue" id="select-capture-button-id" style="display: none;"> SELECT IMAGE  </button>
-				</div>
-				
-				<div id="modal-webcam-clicked-image-gridbox-id">
-	
-					<canvas style="display: none;" id="canvas-webcam-id">  </canvas>
-					<img style="display: none;" id="webcam-webcam-clicked-displayimg-id" src="" title="" alt="" />
-	
-					<video src="" id="webcam-video-id" >  </video>   
-											
-									
-				</div>
-			</div>
-		</div>
-	
-	</div>
-
-
-
-	<!-- MODALS FINISH -->
-	<!-- ------------------------- -->
-
-
-</body>
-
-<script src="./taga-JS/tagging/tagging-controller-main.js"></script>
-<!-- <script src="./taga-JS/utilities/general-helper-fns.js"></script> -->
-
-
-
+  <script src="./taga-JS/tagging/tagging-controller-main.js"></script>
+  <!-- <script src="./taga-JS/utilities/general-helper-fns.js"></script> -->
 </html>

@@ -1,51 +1,46 @@
-
 ## This application presents for users a way of uniquely annotating a locally stored collection of images.
 
 A key feature is that emotions are stored by the user's explicit input over a set of values for a set of different emotions. This is in contrast to many models where emoticons represent a small set of specific emotions a user must choose from rather than _tune_. Another key feature is the ability for any image to become a meme of another image. Collections of images with memes for a collection can also be made. The user has the ability to search through images and collections based upon the annotation information overlaps, and also find relevant memes through the use of a search on the bi-partite graph. That is 'which images are memes to images with such criteria?'
 
-
 # Downloads
 
-## Windows 
+## Windows
 
-- Zip (unzip and run the executable file):  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.3.0/tagasaurus-1.3.0-win.zip) sha256 hash: 0c9c600c63d6fe4d51be2e0c5a7080e1c16d2f55f6c1e9e7c5b2d7751f1e8791
+- Zip (unzip and run the executable file): [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.3.0/tagasaurus-1.3.0-win.zip) sha256 hash: 0c9c600c63d6fe4d51be2e0c5a7080e1c16d2f55f6c1e9e7c5b2d7751f1e8791
 
 ## Linux
 
-- Debian/Ubuntu (.deb, run with dpkg -i):  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.3.0/tagasaurus_1.3.0_amd64.deb) sha256 hash: 3db56148b4da8db8308c80842eebea4eaf2ad85764679e21fc4ed2b60d5b4b7f
+- Debian/Ubuntu (.deb, run with dpkg -i): [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.3.0/tagasaurus_1.3.0_amd64.deb) sha256 hash: 3db56148b4da8db8308c80842eebea4eaf2ad85764679e21fc4ed2b60d5b4b7f
 
-- Fedora/RHEL (.rpm):  [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.3.0/tagasaurus-1.3.0.x86_64.rpm) sha256 hash: 56d6e56f722f1f502188434f4f15145e9fbd273d4150a2f1213e2f22107dff0e
+- Fedora/RHEL (.rpm): [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.3.0/tagasaurus-1.3.0.x86_64.rpm) sha256 hash: 56d6e56f722f1f502188434f4f15145e9fbd273d4150a2f1213e2f22107dff0e
 
 - Linux Zip: [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.3.0/tagasaurus-1.3.0.zip) sha256 hash: 086e35399ba14ce51839d438de336ea8573842edf3583a8b268ad1fd545af13c
-
 
 ## Using Tagasaurus
 
 - The main menu lists the main actions to take and some scores to track the % of the images have been tagged or not.
-- New images can be loaded into the app when you go into the *tagging* page. The uploaded images then live in the taga space so they persist when deleted from their original position.
+- New images can be loaded into the app when you go into the _tagging_ page. The uploaded images then live in the taga space so they persist when deleted from their original position.
 - The tagging phase allows you to add text, emotions and memes (which are other images and any image can become a meme for another image).
-- Collection can be produced but in this page new images cannot be imported; only during tagging. A collection creation wizard helps a user produce a collection. 
-- Searching allows you to find a rank of relevant images based upon the overlap of the annotations with the search criteria. The searching also finds images which are memes for the criteria you searched for. When searching for memes to add this works in the opposite direction. Eg. when searching for a meme you may ask which are the memes relevant to images with this criteria (success kid with happy celebrations in the meme bar and parties/weddings in the image bar).The opposite question can be asked when looking for the criteria of the success kid with the images associated with it.  
+- Collection can be produced but in this page new images cannot be imported; only during tagging. A collection creation wizard helps a user produce a collection.
+- Searching allows you to find a rank of relevant images based upon the overlap of the annotations with the search criteria. The searching also finds images which are memes for the criteria you searched for. When searching for memes to add this works in the opposite direction. Eg. when searching for a meme you may ask which are the memes relevant to images with this criteria (success kid with happy celebrations in the meme bar and parties/weddings in the image bar).The opposite question can be asked when looking for the criteria of the success kid with the images associated with it.
 - If an image is not in the main focus you can click on it to bring it to focus in a modal.
-- To back-up your annotations you can export all the data which copies over all the files, database (sqlite3) and produces a text based set of files with the annotation data (for analytics). This can be re-imported later on or given to another taga user to 'import'. Upon imported if the same images are present a 'merge' of the data is produced. Same for the collections where the gallery is appended. 
-- Updating if you delete the app and then re-install another version (or same version) your data should be there. But you can export and then re-import just to be certain that you don't lose your annotation information. 
+- To back-up your annotations you can export all the data which copies over all the files, database (sqlite3) and produces a text based set of files with the annotation data (for analytics). This can be re-imported later on or given to another taga user to 'import'. Upon imported if the same images are present a 'merge' of the data is produced. Same for the collections where the gallery is appended.
+- Updating if you delete the app and then re-install another version (or same version) your data should be there. But you can export and then re-import just to be certain that you don't lose your annotation information.
 - Version 1.1.0 onwards allows the user to apply ML that will auto populate the emotions based upon facial expressions and do facial recognition in the searches (from images and video).
 - Version 1.2.0 onwards allows a user to import media of Video, Audio and PDF. Linux users can use a script in the folder which remounts a vFAT formated external media with exec permissions.
-
 
 ## Scope
 
 This is developed using ElectronJS
 
-It is hoped that the flat level GUI will be intuitive. The welcome screen presents the options to tag images, create entities and also export the data. Tagging individual images involves the user loading in images and providing manually insterted annotations. The entity creation process has a similar workflow with the ability to group together images as a collective entity under the new label that is user provided. Representative images are chosen for the collectives. A wizard is there to assist in the creation of the entities. The export facility produces a JSON with all the image file annotations and entity collection information, with a directory of all the image resources used. 
+It is hoped that the flat level GUI will be intuitive. The welcome screen presents the options to tag images, create entities and also export the data. Tagging individual images involves the user loading in images and providing manually insterted annotations. The entity creation process has a similar workflow with the ability to group together images as a collective entity under the new label that is user provided. Representative images are chosen for the collectives. A wizard is there to assist in the creation of the entities. The export facility produces a JSON with all the image file annotations and entity collection information, with a directory of all the image resources used.
 
-Annotations of image taggings involve inputing a textual description from which 'tags' are then produced, then emotional values along different dimensions are taken from the user and there are image links (also known as memes) which the user can choose from. For tagging images, the user is not required to insert any specific information, but for the entity creation there are requirements. When creating an entity via the wizard if there is missing information which is required a notification is presented with a message. 
+Annotations of image taggings involve inputing a textual description from which 'tags' are then produced, then emotional values along different dimensions are taken from the user and there are image links (also known as memes) which the user can choose from. For tagging images, the user is not required to insert any specific information, but for the entity creation there are requirements. When creating an entity via the wizard if there is missing information which is required a notification is presented with a message.
 
-The purpose is to streamline the annotation process with the necessary emotional granulatiry required for training ML. This tool is expected to allow teams to produce datasets as training and validation datasets where the annotations are easily organized. 
-
-
+The purpose is to streamline the annotation process with the necessary emotional granulatiry required for training ML. This tool is expected to allow teams to produce datasets as training and validation datasets where the annotations are easily organized.
 
 If you use this work in an academic publication, please use the references:
+
 ```
 Mantzaris AV, Pandohie R, Hopwood M, Pho P, Ehling D.
 "Tagasaurus, a tool to assist manual image tagging and the creation of image collections"
@@ -53,9 +48,9 @@ Mantzaris AV, Pandohie R, Hopwood M, Pho P, Ehling D.
 ```
 
 ```
-Mantzaris AV, Pandohie R, Hopwood M, Pho P, Ehling D, Walker TG. 
+Mantzaris AV, Pandohie R, Hopwood M, Pho P, Ehling D, Walker TG.
 "Introducing Tagasaurus, an Approach to Reduce Cognitive Fatigue from Long-Term Interface Usage When Storing Descriptions and Impressions from Photographs."
-Technologies. 2021; 9(3):45. https://doi.org/10.3390/technologies9030045 
+Technologies. 2021; 9(3):45. https://doi.org/10.3390/technologies9030045
 ```
 
 ![tagging](/TagasaurusReflections/screenshot1.png)
@@ -64,7 +59,6 @@ Technologies. 2021; 9(3):45. https://doi.org/10.3390/technologies9030045
 
 ![collections](/TagasaurusReflections/screenshot3.png)
 
-
 Connect on the social
 
 - https://twitter.com/Tagasaurus_app
@@ -72,7 +66,6 @@ Connect on the social
 - https://www.facebook.com/TagasaurusApp/
 
 ### (**Check out cool comic books and more from the author Vasexandros at [amazon](https://www.amazon.com/Vasexandros/e/B010RI6W0G%3Fref=dbs_a_mng_rwt_scns_share)**)
-
 
 <!---
 

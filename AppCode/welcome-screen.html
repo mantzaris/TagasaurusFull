@@ -1,112 +1,103 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-
+  <head>
     <title>Tagasaurus</title>
 
     <!-- The CSS variables common to the app -->
-    <link rel="stylesheet" href="../AppCode/taga-CSS/variables.css">
+    <link rel="stylesheet" href="../AppCode/taga-CSS/variables.css" />
 
-	<!-- The general cross app style sheet for things like button design -->
-	<link rel="stylesheet" href="../AppCode/taga-CSS/welcome-screen-CSS/welcome-screen-main-ui.css">
-    
     <!-- The general cross app style sheet for things like button design -->
-	<link rel="stylesheet" href="../AppCode/taga-CSS/general-styles.css">
+    <link rel="stylesheet" href="../AppCode/taga-CSS/welcome-screen-CSS/welcome-screen-main-ui.css" />
+
+    <!-- The general cross app style sheet for things like button design -->
+    <link rel="stylesheet" href="../AppCode/taga-CSS/general-styles.css" />
 
     <!-- style sheet for the processing message modal -->
-    <link rel="stylesheet" href="./taga-CSS/processing-message-modal.css">
+    <link rel="stylesheet" href="./taga-CSS/processing-message-modal.css" />
 
-    <meta charset="UTF-8" http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+    <meta charset="UTF-8" http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+  </head>
 
-</head>
-
-<body>
-
+  <body>
     <div id="welcome-screen-body-div-id">
-        
-        <div id="title-div-id">
-            Tagasaurus
-        </div>
+      <div id="title-div-id">Tagasaurus</div>
 
-        <!-- https://www.geeksforgeeks.org/how-to-create-a-progress-bar-using-html-and-css/ -->
-        
-        <div id="skill-bars-div-id">
+      <!-- https://www.geeksforgeeks.org/how-to-create-a-progress-bar-using-html-and-css/ -->
 
-            <div class="score-grid-div-class" id="tagging-score-div-id">
-                TAGGED #
-                <div class="skill-bar-div-class">
-                    <div class="skill" id="tagging-score-id"></div>
-                </div>
-            </div>
-            <div class="score-grid-div-class" id="emotion-score-div-id">
-                WITH EMOTIONS *
-                <div class="skill-bar-div-class">
-                    <div class="skill" id="emotion-score-id"></div>
-                </div>
-            </div>
-            <div class="score-grid-div-class" id="meme-score-div-id">
-                MEME CONNECTED ->
-                <div class="skill-bar-div-class">
-                    <div class="skill " id="meme-score-id"></div>
-                </div>
-            </div>
-            <div class="score-grid-div-class" id="awesome-score-div-id">
-                AWESOMENESS SCORE
-                <div class="skill-bar-div-class">
-                    <div class="skill " id="awesome-score-id"></div>
-                </div>
-            </div>
+      <div id="skill-bars-div-id">
+        <div class="score-grid-div-class" id="tagging-score-div-id">
+          TAGGED #
+          <div class="skill-bar-div-class">
+            <div class="skill" id="tagging-score-id"></div>
+          </div>
+        </div>
+        <div class="score-grid-div-class" id="emotion-score-div-id">
+          WITH EMOTIONS *
+          <div class="skill-bar-div-class">
+            <div class="skill" id="emotion-score-id"></div>
+          </div>
+        </div>
+        <div class="score-grid-div-class" id="meme-score-div-id">
+          MEME CONNECTED ->
+          <div class="skill-bar-div-class">
+            <div class="skill" id="meme-score-id"></div>
+          </div>
+        </div>
+        <div class="score-grid-div-class" id="awesome-score-div-id">
+          AWESOMENESS SCORE
+          <div class="skill-bar-div-class">
+            <div class="skill" id="awesome-score-id"></div>
+          </div>
+        </div>
+      </div>
 
-        </div>
-
-
-        <div id="tagging-button-div-id">
-            <button onclick="window.location.href='./tagging.html'" type="button" class="fun-button-blue main-screen-button-styles" id="tagging-button-id">TAGGING</button>
-        </div>
-        <br>
-        <div id="collection-button-div-id">
-            <button onclick="window.location.href='./collections.html'" type="button" class="fun-button-blue main-screen-button-styles" id="collections-button-id">COLLECTIONS</button>
-        </div>
-        <br>
-        <div id="super-search-button-div-id">
-            <button onclick="window.location.href='./super-search.html'" type="button" class="fun-button-blue main-screen-button-styles" id="super-search-button-id">SUPER SEARCH</button>
-        </div>
-        <div id="stream-search-button-div-id">
-            <button onclick="window.location.href='./stream-search.html'" type="button" class="fun-button-blue main-screen-button-styles" id="stream-search-button-id">STREAM SEARCH</button>
-        </div>
-        <br>
-        <div id="export-button-div-id">
-            <button onclick="window.location.href='./export.html'" type="button" class="fun-button-blue main-screen-button-styles" id="export-button-id">EXPORT TAGA DATA</button>
-            <!-- <button onclick="Export_User_Annotation_Data()" type="button" class="fun-button-blue main-screen-button-styles" id="export-button-id">EXPORT TAGA DATA</button> -->
-        </div>
-        <div id="import-button-div-id">
-            <button onclick="Import_User_Annotation_Data()" type="button" class="fun-button-blue main-screen-button-styles" id="import-button-id">IMPORT TAGA DATASET</button>
-        </div>
-        <div id="support-button-div-id">
-            <button onclick="window.location.href='./support.html'" type="button" class="fun-button-blue main-screen-button-styles" id="support-button-id">LINKS</button>
-        </div>
-    
+      <div id="tagging-button-div-id">
+        <button onclick="window.location.href='./tagging.html'" type="button" class="fun-button-blue main-screen-button-styles" id="tagging-button-id">TAGGING</button>
+      </div>
+      <br />
+      <div id="collection-button-div-id">
+        <button onclick="window.location.href='./collections.html'" type="button" class="fun-button-blue main-screen-button-styles" id="collections-button-id">
+          COLLECTIONS
+        </button>
+      </div>
+      <br />
+      <div id="super-search-button-div-id">
+        <button onclick="window.location.href='./super-search.html'" type="button" class="fun-button-blue main-screen-button-styles" id="super-search-button-id">
+          SUPER SEARCH
+        </button>
+      </div>
+      <div id="stream-search-button-div-id">
+        <button onclick="window.location.href='./stream-search.html'" type="button" class="fun-button-blue main-screen-button-styles" id="stream-search-button-id">
+          STREAM SEARCH
+        </button>
+      </div>
+      <br />
+      <div id="export-button-div-id">
+        <button onclick="window.location.href='./export.html'" type="button" class="fun-button-blue main-screen-button-styles" id="export-button-id">
+          EXPORT TAGA DATA
+        </button>
+        <!-- <button onclick="Export_User_Annotation_Data()" type="button" class="fun-button-blue main-screen-button-styles" id="export-button-id">EXPORT TAGA DATA</button> -->
+      </div>
+      <div id="import-button-div-id">
+        <button onclick="Import_User_Annotation_Data()" type="button" class="fun-button-blue main-screen-button-styles" id="import-button-id">IMPORT TAGA DATASET</button>
+      </div>
+      <div id="support-button-div-id">
+        <button onclick="window.location.href='./support.html'" type="button" class="fun-button-blue main-screen-button-styles" id="support-button-id">LINKS</button>
+      </div>
     </div>
 
     <div id="processing-notice-modal-top-div-id" class="processing-notice-modal-top-div-class">
-		<div id="processing-notice-modal-content-div-id" class="processing-notice-modal-content-div-class">
-			<div class="spinner"></div> 
-			
-			PROCESSING...
-		</div>
-    </div>
-    
+      <div id="processing-notice-modal-content-div-id" class="processing-notice-modal-content-div-class">
+        <div class="spinner"></div>
 
+        PROCESSING...
+      </div>
+    </div>
 
     <script src="./taga-JS/utilities/db-analytics.js"></script>
     <!-- <script src="./taga-JS/utilities/taga-export.js"></script> -->
     <script src="./taga-JS/utilities/taga-import.js"></script>
 
     <!-- <script src="../faceTest.js"> </script> -->
-    
-
-</body>
-
+  </body>
 </html>
-

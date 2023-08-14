@@ -1,10 +1,7 @@
 const ft = require('file-type');
 const PATH = require('path');
 
-async function GetFileTypeFromFileName(
-  filename,
-  data_directory = TAGA_DATA_DIRECTORY
-) {
+async function GetFileTypeFromFileName(filename, data_directory = TAGA_DATA_DIRECTORY) {
   let ft_res = await ft.fromFile(PATH.join(data_directory, filename));
 
   if (ft_res == undefined) {
@@ -32,3 +29,16 @@ function GetFileTypeFromMimeType(mime) {
   return null;
 }
 exports.GetFileTypeFromMimeType = GetFileTypeFromMimeType;
+
+async function GetFileTypeFromFilePath(filepath) {
+  let ft_res = await ft.fromFile(filepath);
+
+  if (ft_res == undefined) {
+    return null;
+  }
+
+  const mime = ft_res.mime;
+
+  return GetFileTypeFromMimeType;
+}
+exports.GetFileTypeFromFilePath = GetFileTypeFromFilePath;

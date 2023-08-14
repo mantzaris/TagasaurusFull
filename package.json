@@ -28,7 +28,7 @@
     "rebuild": "npm run clean && npm install && npm rebuild && electron-rebuild",
     "dev": "electron .",
     "build": "electron-builder $OSTARGETS",
-    "format": "npx prettier --write ."
+    "format": "npx prettier --write ./AppCode/"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
@@ -62,11 +62,13 @@
       "!README.md",
       "!.vscode",
       "!.prettierrc.json",
-      "!tgdev.sh"      
+      "!tgdev.sh"
     ],
     "linux": {
       "icon": "Assets/taga-icon/TagaIcon512x512.png",
-      "asarUnpack": ["LinuxRunOnExternalMedia/**"],
+      "asarUnpack": [
+        "LinuxRunOnExternalMedia/**"
+      ],
       "maintainer": "mantzaris",
       "category": "utility"
     },

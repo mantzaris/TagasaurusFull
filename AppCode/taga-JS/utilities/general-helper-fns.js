@@ -3,12 +3,7 @@ const fileType = require('file-type');
 const VIDEO_IDENTIFIER = 'video-element';
 exports.VIDEO_IDENTIFIER = VIDEO_IDENTIFIER;
 
-async function Create_Media_Thumbnail(
-  file_key,
-  class_name,
-  id_tmp,
-  provide_path = true
-) {
+async function Create_Media_Thumbnail(file_key, class_name, id_tmp, provide_path = true) {
   //class_name = `modal-image-search-add-memes-result-single-image-img-obj-class`
   if (provide_path) {
     file_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}`;
@@ -16,7 +11,7 @@ async function Create_Media_Thumbnail(
     file_path = file_key;
   }
   let ft_res = await fileType.fromFile(file_path);
-  console.log('ft res = ', ft_res);
+
   let type = 'meme';
   if (ft_res.mime.includes('image') == true) {
     return `<img class="${class_name}" id="${id_tmp}" src="${file_path}" title="view" alt="${type}" />`;

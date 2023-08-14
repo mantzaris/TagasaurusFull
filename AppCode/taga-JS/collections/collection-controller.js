@@ -576,14 +576,15 @@ async function Show_Collection() {
 }
 async function Update_Profile_Image() {
   let file_path = PATH.join(TAGA_DATA_DIRECTORY, current_collection_obj.collectionImage);
-  let ft_res = await fileType.fromFile(file_path);
+  let ft_res = (await Get_Tagging_Annotation_From_DB(current_collection_obj.collectionImage)).fileType;
+
   //let node_type = ( ft_res.mime.includes("image") ) ? 'IMG' : 'VIDEO'
   let content_html;
-  if (ft_res.mime.includes('image')) {
+  if (ft_res == 'image') {
     content_html = `<img id="collection-profile-image-img-id" src="${file_path}" title="view" alt="collection-profile-image"/>`;
-  } else if (ft_res.mime.includes('video')) {
+  } else if (ft_res == 'video' || ft_res == 'audio') {
     content_html = `<video class="${GENERAL_HELPER_FNS.VIDEO_IDENTIFIER}" id="collection-profile-image-img-id" src="${file_path}" controls muted />`;
-  } else if (ft_res.mime.includes('pdf')) {
+  } else if (ft_res == 'pdf') {
     content_html = `<div id="collection-profile-image-img-id" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${current_collection_obj.collectionImage}</div>   </div>`;
   }
   //
