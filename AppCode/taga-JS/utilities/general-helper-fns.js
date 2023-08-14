@@ -1,4 +1,6 @@
 const fileType = require('file-type');
+const PATH = require('path');
+const { GetFileTypeFromFilePath } = require(PATH.join(__dirname, 'files.js'));
 
 const VIDEO_IDENTIFIER = 'video-element';
 exports.VIDEO_IDENTIFIER = VIDEO_IDENTIFIER;
@@ -10,12 +12,13 @@ async function Create_Media_Thumbnail(file_key, class_name, id_tmp, provide_path
   } else {
     file_path = file_key;
   }
-  let ft_res = await fileType.fromFile(file_path);
+
+  let ft_res = await GetFileTypeFromFilePath(file_path);
 
   let type = 'meme';
-  if (ft_res.mime.includes('image') == true) {
+  if (ft_res == 'image') {
     return `<img class="${class_name}" id="${id_tmp}" src="${file_path}" title="view" alt="${type}" />`;
-  } else if (ft_res.mime.includes('pdf') == true) {
+  } else if (ft_res == 'pdf') {
     return `<div id="${id_tmp}" style="display:flex;align-items:center" >  <img class="${class_name}" style="max-width:30%;" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${file_key}</div>   </div>`;
   } else {
     //cannot handle this file type

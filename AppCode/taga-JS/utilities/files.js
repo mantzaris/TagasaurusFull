@@ -39,6 +39,6 @@ async function GetFileTypeFromFilePath(filepath) {
 
   const mime = ft_res.mime;
 
-  return GetFileTypeFromMimeType;
+  return GetFileTypeFromMimeType(mime);
 }
 exports.GetFileTypeFromFilePath = GetFileTypeFromFilePath;
