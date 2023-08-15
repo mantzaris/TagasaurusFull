@@ -26,7 +26,7 @@ if (BUILD_INSTALLER) {
 }
 
 const APP_PATH = app.getAppPath();
-const TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY, 'data'); //where the media files get stored
+const TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY, 'files'); //where the media files get stored
 //const USER_DATA_PATH = app.getPath('documents')
 
 const MY_FILE_HELPER = require(PATH.join(__dirname, 'AppCode', 'taga-JS', 'utilities', 'copy-new-file-helper.js')); //PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'copy-new-file-helper.js') //require('./myJS/copy-new-file-helper.js')
@@ -34,7 +34,7 @@ const MY_FILE_HELPER = require(PATH.join(__dirname, 'AppCode', 'taga-JS', 'utili
 const DATABASE = require('better-sqlite3');
 //const { build } = require('electron-builder');
 let DB;
-DB_FILE_NAME = 'mainTagasaurusDB.db';
+DB_FILE_NAME = 'TagasaurusDB.db';
 
 //good to print at the start
 console.log(`APP_PATH = ${APP_PATH}`);

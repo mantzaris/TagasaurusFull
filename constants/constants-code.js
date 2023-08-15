@@ -4,7 +4,7 @@ const TAGA_FILES_DIRECTORY = PATH.join(USER_DATA_PATH, 'TagasaurusFiles'); //PAT
 exports.TAGA_FILES_DIRECTORY = TAGA_FILES_DIRECTORY;
 
 //where the images are to be stored and retrieved by the app
-const TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY, 'data'); //PATH.resolve(TAGA_FILES_DIRECTORY,'data');
+const TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY, 'files'); //PATH.resolve(TAGA_FILES_DIRECTORY,'data');
 exports.TAGA_DATA_DIRECTORY = TAGA_DATA_DIRECTORY;
 
 //module functions for DB connectivity

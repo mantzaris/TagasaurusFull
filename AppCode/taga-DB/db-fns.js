@@ -7,7 +7,7 @@ const FS = require('fs');
 const DATABASE = require('better-sqlite3');
 const { GetFileTypeFromFileName } = require(PATH.join(__dirname, '..', 'taga-JS', 'utilities', 'files.js'));
 
-const DB_FILE_NAME = 'mainTagasaurusDB.db';
+const DB_FILE_NAME = 'TagasaurusDB.db';
 const TAGGING_TABLE_NAME = 'TAGGING';
 const TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
 const COLLECTIONS_TABLE_NAME = 'COLLECTIONS';
