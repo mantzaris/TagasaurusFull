@@ -264,7 +264,8 @@ ipcMain.handle('dialog:tagging-new-file-select', async (event, args) => {
 });
 //for the ability to save a data export
 ipcMain.handle('dialog:export', async (_, args) => {
-  const result = dialog.showSaveDialog({
+  const result = dialog.showOpenDialog({
+    properties: ['openDirectory'],
     title: 'Enter Folder Name to Create',
     defaultPath: app.getPath('downloads'),
   });

@@ -1,16 +1,16 @@
-//module functions for DB connectivity
-//FNS_DB = require('./myJS/db-access-module.js');
-//TAGGING_DB_MODULE = require('./myJS/tagging-db-fns.js');
-
 const IPC_Renderer = require('electron').ipcRenderer;
 
 const FS = require('fs');
 const PATH = require('path');
 const FSE = require('fs-extra');
-const { addListener } = require('process');
+const { shell } = require('electron');
+
+const archiver = require('archiver');
 
 const { TAGA_DATA_DIRECTORY, TAGA_FILES_DIRECTORY } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js')); // require(PATH2.resolve()+PATH2.sep+'constants'+PATH2.sep+'constants-code.js');
 //const DB_MODULE = require(PATH2.join(__dirname,'taga-DB','db-fns.js')) // require(PATH2.resolve()+PATH2.sep+'AppCode'+PATH2.sep+'taga-DB'+PATH2.sep+'db-fns.js');
+
+const EXPORT_NAME = 'TagasaurusFiles.zip';
 
 async function Tagging_Image_DB_Iterator() {
   return await DB_MODULE.Tagging_Image_DB_Iterator();
@@ -27,136 +27,120 @@ async function Collection_IMAGE_DB_Iterator() {
 async function Collection_MEME_DB_Iterator() {
   return await DB_MODULE.Collection_MEME_DB_Iterator();
 }
+async function Get_All_Tagging_Records_From_DB() {
+  return await DB_MODULE.Get_All_Tagging_Records_From_DB();
+}
 
 let export_button = document.getElementById('export-button-id');
-let media_files_checkbox = document.getElementById('media-files-checkbox');
-let sql_db_checkbox = document.getElementById('sql-db-checkbox');
-let ndjson_checkbox = document.getElementById('ndjson-checkbox');
 
-export_button.onclick = () => {
-  if (media_files_checkbox.checked || sql_db_checkbox.checked || ndjson_checkbox.checked) {
-    const save_promise = IPC_Renderer.invoke('dialog:export');
-    save_promise.then(async function (path_chosen) {
-      //get ready to export data
-      if (path_chosen.canceled == false) {
-        let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
-        processing_modal.style.display = 'flex';
+export_button.onclick = async () => {
+  const path_chosen = await IPC_Renderer.invoke('dialog:export');
 
-        //create the directory for the export
-        if (!FS.existsSync(path_chosen.filePath)) {
-          FS.mkdirSync(path_chosen.filePath);
-        }
+  //get ready to export data
+  if (path_chosen.canceled == false) {
+    let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
+    processing_modal.style.display = 'flex';
 
-        //export media files
-        if (media_files_checkbox.checked) {
-          if (!FS.existsSync(PATH.join(path_chosen.filePath, 'data'))) {
-            FS.mkdirSync(PATH.join(path_chosen.filePath, 'data'));
-          }
-          Export_Media_Files(path_chosen);
-        }
+    const destination = PATH.join(path_chosen.filePaths[0], EXPORT_NAME);
 
-        //export the sqlite db file
-        if (sql_db_checkbox.checked) {
-          Export_SQLite_DB(path_chosen);
-        }
+    const tagging = await GenerateTaggingExportJSON();
+    const memes = await GenerateTaggingMemesExportJSON();
 
-        //export ndjson files of the db tables
-        if (ndjson_checkbox.checked) {
-          Export_ND_JSON(path_chosen);
-        }
-
-        processing_modal.style.display = 'none';
-        alert('export success');
-      }
+    const archive = archiver('zip', {
+      zlib: {
+        level: 9,
+      },
     });
-  } else {
-    alert('please select something to export');
+
+    archive.append(tagging, {
+      name: 'tagging.json',
+    });
+
+    archive.append(memes, {
+      name: 'memes.json',
+    });
+
+    archive.directory(TAGA_DATA_DIRECTORY, 'files');
+
+    const output = FS.createWriteStream(destination);
+    output.on('close', () => {
+      console.log(`bytes written: ${archive.pointer()} bytes`);
+    });
+    output.on('finish', () => {
+      processing_modal.style.display = 'none';
+      shell.showItemInFolder(destination);
+      alert('export success');
+    });
+
+    output.on('error', (err) => {
+      console.error(err);
+      processing_modal.style.display = 'none';
+      alert(`error: ${err}`);
+    });
+
+    archive.pipe(output);
+    await archive.finalize();
   }
 };
 
-async function Export_Media_Files(path_chosen) {
-  FSE.copy(TAGA_DATA_DIRECTORY, PATH.join(path_chosen.filePath, 'data'), (err) => {
-    if (err) {
-      return console.error(err);
+async function GenerateTaggingExportJSON() {
+  const all_tagging = await Get_All_Tagging_Records_From_DB();
+
+  const tagging = new Array(all_tagging.length);
+
+  let i = 0;
+  for (const { faceDescriptors, fileHash, fileName, fileType, taggingEmotions, taggingRawDescription, taggingTags, taggingMemeChoices } of all_tagging) {
+    const entry = {
+      _id: fileHash,
+      file_name: fileName,
+      file_type: fileType,
+      raw_description: taggingRawDescription,
+      tags: [],
+      emotions: {},
+      file_size: 0,
+      meme_choices: [],
+      face_clusters: [],
+      face_descriptors: [],
+    };
+
+    entry.tags = JSON.parse(taggingTags);
+
+    let parsed_emotions = JSON.parse(taggingEmotions);
+    for (const [k, v] of Object.entries(parsed_emotions)) {
+      entry.emotions[k] = parseFloat(v);
     }
-    // else {
-    //
-    //     alert("successfully exported")
-    // }
-  });
+
+    entry.file_size = FS.statSync(PATH.join(TAGA_DATA_DIRECTORY, fileName)).size;
+
+    const meme_filenames = JSON.parse(taggingMemeChoices);
+    entry.meme_choices = await DB_MODULE.Get_Hashes_From_FileNames(meme_filenames);
+
+    entry.face_descriptors = JSON.parse(faceDescriptors);
+
+    tagging[i++] = entry;
+  }
+
+  return JSON.stringify(tagging, null, 2);
 }
 
-async function Export_SQLite_DB(path_chosen) {
-  FS.copyFileSync(
-    PATH.join(TAGA_FILES_DIRECTORY, 'mainTagasaurusDB.db'),
-    PATH.join(path_chosen.filePath, 'IMPORT-THIS-FILE-TAGA-EXPORTED-DB.db'),
-    FS.constants.COPYFILE_EXCL
-  );
-}
+async function GenerateTaggingMemesExportJSON() {
+  const all_tagging_memes = await DB_MODULE.Get_All_TaggingMeme_Records_From_DB();
 
-async function Export_ND_JSON(path_chosen) {
-  if (!FS.existsSync(PATH.join(path_chosen.filePath, 'ndJSONs'))) {
-    FS.mkdirSync(PATH.join(path_chosen.filePath, 'ndJSONs'));
+  const memes = new Array(all_tagging_memes.length);
+
+  let i = 0;
+  for (const { memeFileName, fileType, fileNames } of all_tagging_memes) {
+    let entry = {
+      _id: '',
+      connected_to: [],
+      file_type: fileType,
+    };
+
+    entry._id = (await DB_MODULE.Get_Tagging_Record_From_DB(memeFileName)).fileHash;
+    entry.connected_to = await DB_MODULE.Get_Hashes_From_FileNames(JSON.parse(fileNames));
+
+    memes[i++] = entry;
   }
 
-  let res = FS.openSync(PATH.join(path_chosen.filePath, 'ndJSONs', 'TAGGING.ndjson'), 'w');
-  let iter_tagging = await Tagging_Image_DB_Iterator();
-  let tagging_record_tmp = await iter_tagging();
-  while (tagging_record_tmp != undefined) {
-    tagging_record_tmp['tableName'] = 'TAGGING';
-    let content = JSON.stringify(tagging_record_tmp);
-    content += '\n';
-    FS.appendFile(PATH.join(path_chosen.filePath, 'ndJSONs', 'TAGGING.ndjson'), content, (err) => {
-      if (err) console.log(err);
-    });
-    tagging_record_tmp = await iter_tagging();
-  }
-  //export tagging meme image records
-  res = FS.openSync(PATH.join(path_chosen.filePath, 'ndJSONs', 'TAGGING-MEMES.ndjson'), 'w');
-  let iter_tagging_meme = await Tagging_MEME_Image_DB_Iterator();
-  let tagging_meme_record_tmp = await iter_tagging_meme();
-  while (tagging_meme_record_tmp != undefined) {
-    let content = JSON.stringify(tagging_meme_record_tmp);
-    content += '\n';
-    FS.appendFile(PATH.join(path_chosen.filePath, 'ndJSONs', 'TAGGING-MEMES.ndjson'), content, (err) => {
-      if (err) console.log(err);
-    });
-    tagging_meme_record_tmp = await iter_tagging_meme();
-  }
-  //export collection records to json as well
-  res = FS.openSync(PATH.join(path_chosen.filePath, 'ndJSONs', 'COLLECTIONS.ndjson'), 'w');
-  let iter_collection = await Collection_DB_Iterator();
-  let collection_record_tmp = await iter_collection();
-  while (collection_record_tmp != undefined) {
-    let content = JSON.stringify(collection_record_tmp);
-    content += '\n';
-    FS.appendFile(PATH.join(path_chosen.filePath, 'ndJSONs', 'COLLECTIONS.ndjson'), content, (err) => {
-      if (err) console.log(err);
-    });
-    collection_record_tmp = await iter_collection();
-  }
-  //export image collection records to json as well (the image and collection memberships)
-  res = FS.openSync(PATH.join(path_chosen.filePath, 'ndJSONs', 'COLLECTIONS-IMAGES.ndjson'), 'w');
-  let iter_image_collection = await Collection_IMAGE_DB_Iterator();
-  let collection_image_record_tmp = await iter_image_collection();
-  while (collection_image_record_tmp != undefined) {
-    let content = JSON.stringify(collection_image_record_tmp);
-    content += '\n';
-    FS.appendFile(PATH.join(path_chosen.filePath, 'ndJSONs', 'COLLECTIONS-IMAGES.ndjson'), content, (err) => {
-      if (err) console.log(err);
-    });
-    collection_image_record_tmp = await iter_image_collection();
-  }
-  //export meme collection records to json as well (the meme and collection memberships)
-  res = FS.openSync(PATH.join(path_chosen.filePath, 'ndJSONs', 'COLLECTIONS-MEMES.ndjson'), 'w');
-  let iter_meme_collection = await Collection_MEME_DB_Iterator();
-  let collection_meme_record_tmp = await iter_meme_collection();
-  while (collection_meme_record_tmp != undefined) {
-    let content = JSON.stringify(collection_meme_record_tmp);
-    content += '\n';
-    FS.appendFile(PATH.join(path_chosen.filePath, 'ndJSONs', 'COLLECTIONS-MEMES.ndjson'), content, (err) => {
-      if (err) console.log(err);
-    });
-    collection_meme_record_tmp = await iter_meme_collection();
-  }
+  return JSON.stringify(memes, null, 2);
 }

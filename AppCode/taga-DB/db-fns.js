@@ -19,10 +19,12 @@ const TAGA_FILES_DIRECTORY = PATH.join(USER_DATA_PATH, 'TagasaurusFiles'); //PAT
 const DB = new DATABASE(PATH.join(TAGA_FILES_DIRECTORY, DB_FILE_NAME), {}); //new DATABASE(TAGA_FILES_DIRECTORY+PATH.sep+DB_FILE_NAME, { verbose: console.log }) //verbose: console.log }); //open db in that directory
 
 //TAGGING START>>>
+
 const GET_FILENAME_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE fileName=?`); //!!! use the index
 const GET_RECORD_FROM_HASH_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE fileHash=?`); //!!! use the index
 const GET_HASH_TAGGING_STMT = DB.prepare(`SELECT fileHash FROM ${TAGGING_TABLE_NAME} WHERE fileHash=?`); //!!! use the index
 const GET_RECORD_FROM_ROWID_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE ROWID=?`);
+
 const INSERT_TAGGING_STMT = DB.prepare(
   `INSERT INTO ${TAGGING_TABLE_NAME} (fileName, fileHash, fileType, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 );
@@ -97,6 +99,20 @@ async function Step_Get_Annotation(filename, step) {
   return Get_Obj_Fields_From_Record(record);
 }
 exports.Step_Get_Annotation = Step_Get_Annotation;
+
+//fn to get all the annotations in the tagging table
+async function Get_All_Tagging_Records_From_DB() {
+  return DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME}`).all();
+}
+exports.Get_All_Tagging_Records_From_DB = Get_All_Tagging_Records_From_DB;
+
+async function Get_Hashes_From_FileNames(filenames) {
+  const placeholders = filenames.map((_) => '?').join(', ');
+  const stmt = DB.prepare(`SELECT fileHash FROM ${TAGGING_TABLE_NAME} WHERE fileName IN (${placeholders})`);
+  return stmt.all(...filenames).map((r) => r.fileHash);
+  //return filenames.flatMap((name) => stmt.all(name).map((row) => row.fileHash));
+}
+exports.Get_Hashes_From_FileNames = Get_Hashes_From_FileNames;
 
 //fn to get the annotation record for an image by key_type of rowid or filename
 async function Get_Tagging_Record_From_DB(filename) {
@@ -253,6 +269,13 @@ async function Get_Tagging_MEME_Record_From_DB(filename) {
   return row_obj;
 }
 exports.Get_Tagging_MEME_Record_From_DB = Get_Tagging_MEME_Record_From_DB;
+
+//fn to get all the annotations in the tagging meme table
+async function Get_All_TaggingMeme_Records_From_DB() {
+  return DB.prepare(`SELECT * FROM ${TAGGING_MEME_TABLE_NAME}`).all();
+}
+exports.Get_All_TaggingMeme_Records_From_DB = Get_All_TaggingMeme_Records_From_DB;
+
 // provide the image being tagged and the before and after meme array and there will be an update to the meme table
 async function Update_Tagging_MEME_Connections(fileName, current_image_memes, new_image_memes) {
   // get the right difference ([1,2,3] diff -> [1,3,4] => [4]) and from [4] include/add this imagefilename in the array: diff2 = b.filter(x => !a.includes(x));
