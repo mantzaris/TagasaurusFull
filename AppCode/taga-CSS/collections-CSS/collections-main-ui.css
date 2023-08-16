@@ -577,7 +577,7 @@ input:checked + .slider:before {
 
 #collection-images-gallery-gridarea-id {
   grid-area: collection-images-gallery-gridarea-id;
-  background-color: var(--info);
+  background-color: var(--bg);
 
   min-height: 0; /*  essential for the auto height be disabled and stop it expanding */
   height: 100%;

@@ -10,7 +10,7 @@ const archiver = require('archiver');
 const { TAGA_DATA_DIRECTORY, TAGA_FILES_DIRECTORY } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js')); // require(PATH2.resolve()+PATH2.sep+'constants'+PATH2.sep+'constants-code.js');
 //const DB_MODULE = require(PATH2.join(__dirname,'taga-DB','db-fns.js')) // require(PATH2.resolve()+PATH2.sep+'AppCode'+PATH2.sep+'taga-DB'+PATH2.sep+'db-fns.js');
 
-const EXPORT_NAME = 'TagasaurusFiles.zip';
+const EXPORT_NAME = 'DesktopTagasaurusExport.zip';
 
 async function Tagging_Image_DB_Iterator() {
   return await DB_MODULE.Tagging_Image_DB_Iterator();
@@ -45,6 +45,9 @@ export_button.onclick = async () => {
 
     const tagging = await GenerateTaggingExportJSON();
     const memes = await GenerateTaggingMemesExportJSON();
+    const collections = await GenerateCollectionExportJSON();
+    const collection_memes = await GenerateCollectionMemesExportJSON();
+    const collection_galleries = await GenerateCollectionGalleryExportJSON();
 
     const archive = archiver('zip', {
       zlib: {
@@ -58,6 +61,18 @@ export_button.onclick = async () => {
 
     archive.append(memes, {
       name: 'memes.json',
+    });
+
+    archive.append(collections, {
+      name: 'collections.json',
+    });
+
+    archive.append(collection_memes, {
+      name: 'collection_memes.json',
+    });
+
+    archive.append(collection_galleries, {
+      name: 'collection_galleries.json',
     });
 
     archive.directory(TAGA_DATA_DIRECTORY, 'files');
@@ -143,4 +158,85 @@ async function GenerateTaggingMemesExportJSON() {
   }
 
   return JSON.stringify(memes, null, 2);
+}
+
+async function GenerateCollectionExportJSON() {
+  const db_entries = DB_MODULE.Get_All_Collections();
+  const collections = new Array(db_entries.length);
+
+  let i = 0;
+  for (const {
+    collectionName,
+    collectionImage,
+    collectionGalleryFiles,
+    collectionDescription,
+    collectionDescriptionTags,
+    collectionEmotions,
+    collectionMemes,
+  } of db_entries) {
+    let entry = {
+      name: collectionName,
+      thumbnail: '',
+      gallery: [],
+      description: collectionDescription,
+      tags: [],
+      memes: [],
+      emotions: {},
+    };
+
+    entry.thumbnail = (await DB_MODULE.Get_Tagging_Record_From_DB(collectionImage)).fileHash;
+    entry.gallery = await DB_MODULE.Get_Hashes_From_FileNames(JSON.parse(collectionGalleryFiles));
+    entry.tags = JSON.parse(collectionDescriptionTags);
+    entry.memes = await DB_MODULE.Get_Hashes_From_FileNames(JSON.parse(collectionMemes));
+
+    for (const [k, v] of Object.entries(JSON.parse(collectionEmotions))) {
+      entry.emotions[k] = parseFloat(v);
+    }
+
+    collections[i++] = entry;
+  }
+
+  return JSON.stringify(collections, null, 2);
+}
+
+async function GenerateCollectionMemesExportJSON() {
+  const db_entries = await DB_MODULE.Get_All_Collection_Memes();
+  const collection_memes = new Array(db_entries.length);
+
+  let i = 0;
+  //(collectionMemeFileName TEXT, collectionNames TEXT)
+  for (const { collectionMemeFileName, collectionNames } of db_entries) {
+    let entry = {
+      _id: '',
+      collection_names: [],
+    };
+
+    entry._id = (await DB_MODULE.Get_Tagging_Record_From_DB(collectionMemeFileName)).fileHash;
+    entry.collection_names = JSON.parse(collectionNames);
+
+    collection_memes[i++] = entry;
+  }
+
+  return JSON.stringify(collection_memes, null, 2);
+}
+
+async function GenerateCollectionGalleryExportJSON() {
+  const db_entries = await DB_MODULE.Get_All_Collection_Galleries();
+  const collection_galleries = new Array(db_entries.length);
+
+  //(collectionGalleryFileName TEXT, collectionNames TEXT)
+  let i = 0;
+  for (const { collectionGalleryFileName, collectionNames } of db_entries) {
+    let entry = {
+      _id: '',
+      collection_names: [],
+    };
+
+    entry._id = (await DB_MODULE.Get_Tagging_Record_From_DB(collectionGalleryFileName)).fileHash;
+    entry.collection_names = JSON.parse(collectionNames);
+
+    collection_galleries[i++] = entry;
+  }
+
+  return JSON.stringify(collection_galleries, null, 2);
 }

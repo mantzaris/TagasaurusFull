@@ -12,7 +12,7 @@ const TAGGING_TABLE_NAME = 'TAGGING';
 const TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
 const COLLECTIONS_TABLE_NAME = 'COLLECTIONS';
 const COLLECTION_MEME_TABLE_NAME = 'COLLECTIONMEMES';
-const COLLECTION_GALLERY_TABLE_NAME = 'COLLECTIONFILESET';
+const COLLECTION_GALLERY_TABLE_NAME = 'COLLECTIONGALLERY';
 
 const TAGA_FILES_DIRECTORY = PATH.join(USER_DATA_PATH, 'TagasaurusFiles'); //PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles')
 //set up the DB to use
@@ -395,6 +395,11 @@ let rowid_max_collection;
 let rowid_min_collection;
 let record_num_collection;
 
+function Get_All_Collections() {
+  return DB.prepare(`SELECT * FROM ${COLLECTIONS_TABLE_NAME}`).all();
+}
+exports.Get_All_Collections = Get_All_Collections;
+
 //get the number of records in the collections DB table
 async function Number_of_Collection_Records() {
   let res = GET_COLLECTION_ROW_COUNT.get();
@@ -517,6 +522,11 @@ const DELETE_COLLECTION_MEME_TABLE_ENTRY_STMT = DB.prepare(`DELETE FROM ${COLLEC
 const UPDATE_FILENAME_MEME_TABLE_COLLECTION_STMT = DB.prepare(`UPDATE ${COLLECTION_MEME_TABLE_NAME} SET collectionNames=? WHERE collectionMemeFileName=?`);
 const INSERT_MEME_TABLE_COLLECTION_STMT = DB.prepare(`INSERT INTO ${COLLECTION_MEME_TABLE_NAME} (collectionMemeFileName, collectionNames) VALUES (?, ?)`);
 
+async function Get_All_Collection_Memes() {
+  return DB.prepare(`SELECT * FROM ${COLLECTION_MEME_TABLE_NAME}`).all();
+}
+exports.Get_All_Collection_Memes = Get_All_Collection_Memes;
+
 async function Insert_Collection_MEME_Record_From_DB(record) {
   await INSERT_MEME_TABLE_COLLECTION_STMT.run(record.collectionMemeFileName, JSON.stringify(record.collectionNames));
 }
@@ -601,6 +611,11 @@ const INSERT_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT = DB.prepare(
   `INSERT INTO ${COLLECTION_GALLERY_TABLE_NAME} (collectionGalleryFileName, collectionNames) VALUES (?, ?)`
 );
 const DELETE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT = DB.prepare(`DELETE FROM ${COLLECTION_GALLERY_TABLE_NAME} WHERE collectionGalleryFileName=?`);
+
+async function Get_All_Collection_Galleries() {
+  return await DB.prepare(`SELECT * FROM ${COLLECTION_GALLERY_TABLE_NAME}`).all();
+}
+exports.Get_All_Collection_Galleries = Get_All_Collection_Galleries;
 
 async function Insert_Collection_IMAGE_Record_From_DB(record) {
   await INSERT_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.run(record.collectionGalleryFileName, JSON.stringify(collectionNames));
