@@ -36,7 +36,7 @@ if (BUILD_INSTALLER) {
 }
 
 window.TAGA_FILES_DIRECTORY = PATH.join(USER_DATA_PATH, 'TagasaurusFiles'); //PATH.join(PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles');
-window.TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY, 'data'); //PATH.resolve(TAGA_FILES_DIRECTORY,'data');
+window.TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY, 'files'); //PATH.resolve(TAGA_FILES_DIRECTORY,'data');
 
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 

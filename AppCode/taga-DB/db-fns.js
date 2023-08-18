@@ -31,6 +31,9 @@ const INSERT_TAGGING_STMT = DB.prepare(
 const UPDATE_FILENAME_TAGGING_STMT = DB.prepare(
   `UPDATE ${TAGGING_TABLE_NAME} SET fileName=?, fileHash=?, fileType=?, taggingRawDescription=?, taggingTags=?, taggingEmotions=?, taggingMemeChoices=?, faceDescriptors=? WHERE fileName=?`
 );
+const UPDATE_TAGGING_BY_FILEHASH_STMT = DB.prepare(
+  `UPDATE ${TAGGING_TABLE_NAME} SET fileName=?, fileHash=?, fileType=?, taggingRawDescription=?, taggingTags=?, taggingEmotions=?, taggingMemeChoices=?, faceDescriptors=? WHERE fileHash=?`
+);
 const DELETE_FILENAME_TAGGING_STMT = DB.prepare(`DELETE FROM ${TAGGING_TABLE_NAME} WHERE fileName=?`);
 
 const GET_TAGGING_ROWID_FROM_FILENAME_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE fileName=?;`);
@@ -189,6 +192,22 @@ async function Update_Tagging_Annotation_DB(tagging_obj) {
 }
 exports.Update_Tagging_Annotation_DB = Update_Tagging_Annotation_DB;
 
+//update the tagging annotation object in the DB by fileHash
+async function Update_Tagging_Annotation_by_fileHash_DB(tagging_obj) {
+  let info = await UPDATE_TAGGING_BY_FILEHASH_STMT.run(
+    tagging_obj.fileName,
+    tagging_obj.fileHash,
+    tagging_obj.fileType,
+    tagging_obj.taggingRawDescription,
+    JSON.stringify(tagging_obj.taggingTags),
+    JSON.stringify(tagging_obj.taggingEmotions),
+    JSON.stringify(tagging_obj.taggingMemeChoices),
+    JSON.stringify(tagging_obj.faceDescriptors),
+    tagging_obj.fileHash
+  );
+}
+exports.Update_Tagging_Annotation_by_fileHash_DB = Update_Tagging_Annotation_by_fileHash_DB;
+
 async function Delete_Tagging_Annotation_DB(filename) {
   let info = await DELETE_FILENAME_TAGGING_STMT.run(filename);
   await Set_Max_Min_Rowid();
@@ -275,6 +294,11 @@ async function Get_All_TaggingMeme_Records_From_DB() {
   return DB.prepare(`SELECT * FROM ${TAGGING_MEME_TABLE_NAME}`).all();
 }
 exports.Get_All_TaggingMeme_Records_From_DB = Get_All_TaggingMeme_Records_From_DB;
+
+async function Update_Tagging_Meme_Entry(entry) {
+  await UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT.run(JSON.stringify(entry.fileNames), entry.fileName);
+}
+exports.Update_Tagging_Meme_Entry = Update_Tagging_Meme_Entry;
 
 // provide the image being tagged and the before and after meme array and there will be an update to the meme table
 async function Update_Tagging_MEME_Connections(fileName, current_image_memes, new_image_memes) {

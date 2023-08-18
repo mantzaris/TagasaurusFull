@@ -6,18 +6,11 @@ const IPC_Renderer3 = require('electron').ipcRenderer;
 
 // const FS3 = require('fs');
 // const PATH3 = require('path');
-//const DATABASE3 = require('better-sqlite3');
-const PATH = require('path');
-const { DB_MODULE } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js')); //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
-
-const ft = require('file-type');
-const extract = require('extract-zip');
-const { existsSync, mkdirSync, readFileSync } = require('fs-extra');
-const { copyFileSync } = require('fs');
+const DATABASE3 = require('better-sqlite3');
 
 const { MY_FILE_HELPER } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js')); // require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 const DB_destination = require(PATH.join(__dirname, 'taga-DB', 'db-fns.js')); // require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'db-fns.js');
-const TAGA_DATA_destination = PATH.join(USER_DATA_PATH, 'TagasaurusFiles', 'files'); // PATH.resolve(TAGA_FILES_DIRECTORY,'data');
+const TAGA_DATA_destination = PATH.join(USER_DATA_PATH, 'TagasaurusFiles', 'data'); // PATH.resolve(TAGA_FILES_DIRECTORY,'data');
 
 const IMPORT_DELIM = '::imported::';
 const contains_DELIM_Str_End = (str) => str.search(IMPORT_DELIM) == str.length - IMPORT_DELIM.length;
@@ -37,178 +30,45 @@ let COLLECTION_GALLERY_TABLE_NAME = 'COLLECTIONGALLERY';
 //table to hold the intermediate filename changes for the merge so that the importing file names get changed if needed
 let IMPORT_TABLE_NAME_CHANGES = 'NAMECHANGES';
 
-let import_button = document.getElementById('import-button-id');
-import_button.onclick = Import_User_Annotation_Data;
-
 //functionality for the export of all the information, init() function
 //called at the start from the user
 async function Import_User_Annotation_Data() {
-  const path_chosen = await IPC_Renderer3.invoke('dialog:importDB');
+  const save_promise = IPC_Renderer3.invoke('dialog:importDB');
+  save_promise.then(async function (path_chosen) {
+    //create a db from the import path
+    if (path_chosen.canceled == false) {
+      let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
+      processing_modal.style.display = 'flex';
 
-  //create a db from the import path
-  if (path_chosen.canceled) return;
+      DB_import_path = path_chosen.filePaths[0];
+      DB_import_data = PATH.join(DB_import_path, '..', 'data', PATH.sep);
+      DB_import = await new DATABASE3(DB_import_path, {}); //verbose: console.log }); //open db in that directory
+      //begin to ingest the data from the db into the user's directory and DB
+      let res = await Start_Check_DB_Tables();
+      if (res == -1) {
+        console.log(`problem after checking import tables so interrupting`);
+        return;
+      }
+      //check presence of the filename change table
+      res = await Import_Filename_Change_Table_SetUp();
+      if (res == -1) {
+        console.log(`problem after import filename changes table`);
+        return;
+      } else {
+        console.log(`name changes table ready and can accept the new file names for the merge`);
+      }
+      //now find the new names for the files, that is the file name they should have when copied over
+      await Import_FileName_Changes_Table_Fill();
+      //now migrate the information from import db to destination db using the
+      await Import_Records_DB_Info_Migrate();
+      //now migrate the collections list from the import db to the destination DB
+      await Import_Collections_Records_Info_Migrate();
 
-  let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
-  processing_modal.style.display = 'flex';
+      processing_modal.style.display = 'none';
 
-  DB_import_path = path_chosen.filePaths[0];
-  const ft_res = await ft.fromFile(DB_import_path);
-
-  if (!ft_res.mime.includes('zip')) return (processing_modal.style.display = 'none');
-
-  const temp_dir = PATH.join(USER_DATA_PATH, 'TagasaurusFiles', 'temp');
-
-  try {
-    if (!existsSync(temp_dir)) mkdirSync(temp_dir);
-
-    await extract(DB_import_path, {
-      dir: temp_dir,
-    });
-  } catch (e) {
-    console.log(e);
-    alert('something went wrong, cannot extract specified file');
-    return (processing_modal.style.display = 'none');
-  }
-
-  let tagging_import;
-  let meme_import;
-
-  try {
-    const tagging = readFileSync(PATH.join(temp_dir, 'tagging.json'), 'utf-8');
-    const memes = readFileSync(PATH.join(temp_dir, 'memes.json'), 'utf-8');
-
-    tagging_import = JSON.parse(tagging);
-    meme_import = JSON.parse(memes);
-  } catch (e) {
-    console.log(e);
-    alert('could not read tagging.json and/or memes.json in import');
-    return (processing_modal.style.display = 'none');
-  }
-
-  const tagging_names_map = new Map();
-  const file_hash_to_name_map = new Map();
-
-  //loop to fill maps of names and hashes
-  for (const incoming of tagging_import) {
-    const { _id, file_name } = incoming;
-
-    const existing_record = await DB_MODULE.Get_Record_With_Tagging_Hash_From_DB(_id);
-
-    if (existing_record) {
-      tagging_names_map.set(existing_record.fileName, existing_record.fileName);
-      file_hash_to_name_map.set(existing_record.fileHash, existing_record.fileName);
-      continue;
+      alert('successfully imported');
     }
-
-    const existing_record_with_filename = await DB_MODULE.Get_Tagging_Record_From_DB(file_name);
-
-    if (existing_record_with_filename) {
-      incoming.file_name = basename(file_name, extname(file_name)) + crypto.randomUUID() + extname(file_name);
-    }
-
-    tagging_names_map.set(file_name, incoming.file_name);
-    file_hash_to_name_map.set(incoming._id, incoming.file_name);
-  }
-
-  for (const incoming of tagging_import) {
-    let { _id, meme_choices, emotions, raw_description, file_name } = incoming;
-
-    const existing_record = await DB_MODULE.Get_Record_With_Tagging_Hash_From_DB(_id);
-
-    meme_choices = incoming.meme_choices.map((m) => file_hash_to_name_map.get(m));
-    incoming.meme_choices = meme_choices;
-
-    if (existing_record) {
-      existing_record.taggingMemeChoices = RelatedMemesMerge(existing_record.taggingMemeChoices, meme_choices);
-      existing_record.taggingEmotions = AverageEmotions(existing_record.taggingEmotions, emotions);
-      existing_record.taggingRawDescription = DescriptionMerge(existing_record.taggingRawDescription, raw_description);
-
-      await DB_MODULE.Update_Tagging_Annotation_by_fileHash_DB(existing_record);
-      console.log(existing_record);
-      continue;
-    }
-
-    const existing_record_with_filename = await DB_MODULE.Get_Tagging_Record_From_DB(file_name);
-
-    if (existing_record_with_filename) {
-      incoming.file_name = basename(file_name, extname(file_name)) + crypto.randomUUID() + extname(file_name);
-    }
-
-    copyFileSync(PATH.join(temp_dir, 'files', file_name), PATH.join(TAGA_DATA_destination, incoming.file_name));
-
-    await DB_MODULE.Insert_Record_Into_DB(TranslateEntryFromSnakeCase(incoming));
-    console.log(TranslateEntryFromSnakeCase(incoming));
-  }
-
-  for (const incoming_meme of meme_import) {
-    const { _id, file_type, connected_to } = incoming_meme;
-
-    const existing_record = await DB_MODULE.Get_Tagging_MEME_Record_From_DB(file_hash_to_name_map.get(_id));
-    incoming_meme.connected_to = connected_to.map((m) => file_hash_to_name_map.get(m));
-
-    if (existing_record) {
-      existing_record.fileNames = RelatedMemesMerge(incoming_meme.connected_to, existing_record.fileNames);
-      await DB_MODULE.Update_Tagging_Meme_Entry(existing_record);
-      continue;
-    }
-
-    await DB_MODULE.Insert_Meme_Tagging_Entry(TranslateMemeTaggingSnakeCase(incoming_meme));
-  }
-
-  //remove the temp folder after the collections are done IF COLLECTIONS EXIST
-
-  processing_modal.style.display = 'none';
-  alert('successfully imported');
-}
-
-function TranslateMemeTaggingSnakeCase({ _id, file_type, connected_to }) {
-  return (new_entry = {
-    memeFileName: file_hash_to_name_map.get(_id),
-    fileType: file_type,
-    fileNames: connected_to,
   });
-}
-
-function TranslateEntryFromSnakeCase({ _id, meme_choices, tags, emotions, raw_description, file_name, file_type, descriptors }) {
-  return (new_entry = {
-    fileName: file_name,
-    fileHash: _id,
-    fileType: file_type,
-    taggingRawDescription: raw_description,
-    taggingTags: tags,
-    taggingEmotions: emotions,
-    taggingMemeChoices: meme_choices,
-    faceDescriptors: descriptors,
-  });
-}
-
-function DescriptionMerge(orig, incoming) {
-  return `${orig} :[imported]: ${incoming}`;
-}
-
-function RelatedMemesMerge(orig, incoming) {
-  return [...new Set([...orig, ...incoming])];
-}
-
-function AverageEmotions(emotions_orig, emotions_new) {
-  const emotions = {};
-
-  for (const [name, val] of Object.entries(emotions_orig)) {
-    if (emotions_new[name]) {
-      const avg = (val + emotions_new[name]) / 2;
-      emotions[name] = avg;
-      delete emotions_new[name];
-      continue;
-    }
-
-    emotions[name] = val;
-  }
-
-  for (const [name, val] of Object.entries(emotions_new)) {
-    emotions[name] = val;
-  }
-
-  return emotions;
 }
 
 //go through all the import collections and see if the name exists in the destination or not
