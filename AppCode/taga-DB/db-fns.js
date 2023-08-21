@@ -556,6 +556,10 @@ async function Insert_Collection_MEME_Record_From_DB(record) {
 }
 exports.Insert_Collection_MEME_Record_From_DB = Insert_Collection_MEME_Record_From_DB;
 
+async function Update_Collection_MEMES(record) {
+  await UPDATE_FILENAME_MEME_TABLE_COLLECTION_STMT.run(JSON.stringify(record.collectionNames), record.collectionMemeFileName);
+}
+exports.Update_Collection_MEMES = Update_Collection_MEMES;
 //when a collection adds a meme filename the table which holds the meme filename to collections table each needs to update
 //so that each holds that collection name (registers that membership)
 //pass in the collection name and then original meme array of file names, and then the new array of collection meme filenames
@@ -662,6 +666,11 @@ function Get_Obj_Fields_From_Collection_IMAGE_Record(record) {
   record.collectionNames = JSON.parse(record.collectionNames);
   return record;
 }
+
+async function Update_Collection_GALLERY(record) {
+  await UPDATE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT.run(JSON.stringify(record.collectionNames), record.collectionGalleryFileName);
+}
+exports.Update_Collection_GALLERY = Update_Collection_GALLERY;
 
 async function Update_Collection_IMAGE_Connections(collectionName, current_collection_images, new_collection_images) {
   // get the right difference ([1,2,3] diff -> [1,3,4] => [4]) and from [4] include/add this imagefilename in the array: diff2 = b.filter(x => !a.includes(x));

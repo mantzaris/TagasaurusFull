@@ -13,7 +13,7 @@ const { DB_MODULE } = require(PATH.join(__dirname, '..', 'constants', 'constants
 const ft = require('file-type');
 const extract = require('extract-zip');
 const { existsSync, mkdirSync, readFileSync } = require('fs-extra');
-const { copyFileSync } = require('fs');
+const { copyFileSync, rmdirSync } = require('fs');
 
 const { MY_FILE_HELPER } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js')); // require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 const DB_destination = require(PATH.join(__dirname, 'taga-DB', 'db-fns.js')); // require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'db-fns.js');
@@ -59,7 +59,17 @@ async function Import_User_Annotation_Data() {
   const temp_dir = PATH.join(USER_DATA_PATH, 'TagasaurusFiles', 'temp');
 
   try {
-    if (!existsSync(temp_dir)) mkdirSync(temp_dir);
+    console.log(`temp_dir exists ? = ${existsSync(temp_dir)}`);
+    if (existsSync(temp_dir)) {
+      rmdirSync(temp_dir, {
+        recursive: true,
+        force: true,
+      });
+      console.log('removed tempdir');
+      console.log(`temp_dir exists ? = ${existsSync(temp_dir)}`);
+    }
+    mkdirSync(temp_dir);
+    console.log(`temp_dir exists ? = ${existsSync(temp_dir)}`);
 
     await extract(DB_import_path, {
       dir: temp_dir,
@@ -78,6 +88,8 @@ async function Import_User_Annotation_Data() {
     const memes = readFileSync(PATH.join(temp_dir, 'memes.json'), 'utf-8');
 
     tagging_import = JSON.parse(tagging);
+    console.log(`initial tagging_import ----`);
+    console.log(tagging_import);
     meme_import = JSON.parse(memes);
   } catch (e) {
     console.log(e);
@@ -103,41 +115,44 @@ async function Import_User_Annotation_Data() {
     const existing_record_with_filename = await DB_MODULE.Get_Tagging_Record_From_DB(file_name);
 
     if (existing_record_with_filename) {
-      incoming.file_name = basename(file_name, extname(file_name)) + crypto.randomUUID() + extname(file_name);
+      incoming.file_name = PATH.basename(file_name, PATH.extname(file_name)) + crypto.randomUUID() + PATH.extname(file_name);
     }
 
     tagging_names_map.set(file_name, incoming.file_name);
     file_hash_to_name_map.set(incoming._id, incoming.file_name);
   }
 
+  console.log(tagging_import);
   for (const incoming of tagging_import) {
-    let { _id, meme_choices, emotions, raw_description, file_name } = incoming;
+    let { _id, meme_choices, emotions, raw_description, file_name, tags } = incoming;
 
     const existing_record = await DB_MODULE.Get_Record_With_Tagging_Hash_From_DB(_id);
 
     meme_choices = incoming.meme_choices.map((m) => file_hash_to_name_map.get(m));
     incoming.meme_choices = meme_choices;
-
+    console.log(existing_record, file_name);
     if (existing_record) {
       existing_record.taggingMemeChoices = RelatedMemesMerge(existing_record.taggingMemeChoices, meme_choices);
       existing_record.taggingEmotions = AverageEmotions(existing_record.taggingEmotions, emotions);
       existing_record.taggingRawDescription = DescriptionMerge(existing_record.taggingRawDescription, raw_description);
+      existing_record.taggingTags = TagMerge(existing_record.taggingTags, tags);
 
       await DB_MODULE.Update_Tagging_Annotation_by_fileHash_DB(existing_record);
-      console.log(existing_record);
+
       continue;
     }
 
     const existing_record_with_filename = await DB_MODULE.Get_Tagging_Record_From_DB(file_name);
+    console.log(incoming.file_name, file_name);
 
     if (existing_record_with_filename) {
-      incoming.file_name = basename(file_name, extname(file_name)) + crypto.randomUUID() + extname(file_name);
+      incoming.file_name = PATH.basename(file_name, PATH.extname(file_name)) + crypto.randomUUID() + PATH.extname(file_name);
     }
+    console.log(incoming.file_name, file_name);
 
     copyFileSync(PATH.join(temp_dir, 'files', file_name), PATH.join(TAGA_DATA_destination, incoming.file_name));
 
     await DB_MODULE.Insert_Record_Into_DB(TranslateEntryFromSnakeCase(incoming));
-    console.log(TranslateEntryFromSnakeCase(incoming));
   }
 
   for (const incoming_meme of meme_import) {
@@ -155,7 +170,101 @@ async function Import_User_Annotation_Data() {
     await DB_MODULE.Insert_Meme_Tagging_Entry(TranslateMemeTaggingSnakeCase(incoming_meme));
   }
 
-  //remove the temp folder after the collections are done IF COLLECTIONS EXIST
+  let collection_import;
+  let collection_memes_import;
+  let collection_gallery_import;
+  let handle_collections = false;
+  try {
+    const collections = readFileSync(PATH.join(temp_dir, 'collections.json'), 'utf-8');
+    const collection_memes = readFileSync(PATH.join(temp_dir, 'collection_memes.json'), 'utf-8');
+    const collection_gallery = readFileSync(PATH.join(temp_dir, 'collection_galleries.json'), 'utf-8');
+
+    collection_import = JSON.parse(collections);
+    collection_memes_import = JSON.parse(collection_memes);
+    collection_gallery_import = JSON.parse(collection_gallery);
+
+    handle_collections = true;
+  } catch (e) {
+    console.log(e);
+    alert('could not find files related to collections in import');
+  }
+
+  if (handle_collections) {
+    for (const incoming of collection_import) {
+      const { name, thumbnail, gallery, description, tags, memes, emotions } = incoming;
+      const existing_collection = await DB_MODULE.Get_Collection_Record_From_DB(name);
+      const thumbnail_filename = file_hash_to_name_map.get(thumbnail);
+      const gallery_filenames = gallery.map((i) => file_hash_to_name_map.get(i));
+      const memes_filenames = memes.map((i) => file_hash_to_name_map.get(i));
+
+      if (existing_collection) {
+        existing_collection.collectionMemes = RelatedMemesMerge(existing_collection.collectionMemes, memes_filenames);
+        existing_collection.collectionGalleryFiles = RelatedMemesMerge(existing_collection.collectionGalleryFiles, gallery_filenames);
+        existing_collection.collectionEmotions = AverageEmotions(existing_collection.collectionEmotions, emotions);
+        existing_collection.collectionDescription = DescriptionMerge(existing_collection.collectionDescription, description);
+        existing_collection.collectionDescriptionTags = TagMerge(existing_collection.collectionDescriptionTags, tags);
+
+        await DB_MODULE.Update_Collection_Record_In_DB(existing_collection);
+        continue;
+      }
+
+      const entry = {
+        collectionName: name,
+        collectionImage: thumbnail_filename,
+        collectionGalleryFiles: gallery_filenames,
+        collectionDescription: description,
+        collectionDescriptionTags: tags,
+        collectionEmotions: emotions,
+        collectionMemes: memes_filenames,
+      };
+
+      await DB_MODULE.Insert_Collection_Record_Into_DB(entry);
+    }
+
+    for (const incoming of collection_memes_import) {
+      const { _id, collection_names } = incoming;
+      const file_name = file_hash_to_name_map.get(_id);
+      const entry_orig = await DB_MODULE.Get_Collection_MEME_Record_From_DB(file_name);
+
+      if (entry_orig) {
+        entry_orig.collectionNames = RelatedMemesMerge(entry_orig.collectionNames, collection_names);
+        await DB_MODULE.Update_Collection_MEMES(entry_orig);
+        continue;
+      }
+
+      const entry = {
+        collectionMemeFileName: file_name,
+        collectionNames: collection_names,
+      };
+
+      await DB_MODULE.Insert_Collection_MEME_Record_From_DB(entry);
+    }
+
+    for (const incoming of collection_gallery_import) {
+      const { _id, collection_names } = incoming;
+      const file_name = file_hash_to_name_map.get(_id);
+      const entry_orig = await DB_MODULE.Get_Collection_IMAGE_Record_From_DB(file_name);
+
+      if (entry_orig) {
+        entry_orig.collectionNames = RelatedMemesMerge(entry_orig.collectionNames, collection_names);
+        await DB_MODULE.Update_Collection_GALLERY(entry_orig);
+        continue;
+      }
+
+      const entry = {
+        collectionGalleryFileName: file_name,
+        collectionNames: collection_names,
+      };
+
+      await DB_MODULE.Insert_Collection_IMAGE_Record_From_DB(entry);
+    }
+  }
+
+  //remove the temp folder after done
+  rmdirSync(temp_dir, {
+    recursive: true,
+    force: true,
+  });
 
   processing_modal.style.display = 'none';
   alert('successfully imported');
@@ -182,6 +291,10 @@ function TranslateEntryFromSnakeCase({ _id, meme_choices, tags, emotions, raw_de
   });
 }
 
+function TagMerge(orig, incoming) {
+  return [...new Set([...orig, ...incoming])];
+}
+
 function DescriptionMerge(orig, incoming) {
   return `${orig} :[imported]: ${incoming}`;
 }
@@ -193,24 +306,34 @@ function RelatedMemesMerge(orig, incoming) {
 function AverageEmotions(emotions_orig, emotions_new) {
   const emotions = {};
 
-  for (const [name, val] of Object.entries(emotions_orig)) {
-    if (emotions_new[name]) {
-      const avg = (val + emotions_new[name]) / 2;
-      emotions[name] = avg;
-      delete emotions_new[name];
-      continue;
-    }
+  // Clone emotions_new to avoid mutating the original object
+  const emotions_new_clone = { ...emotions_new };
 
-    emotions[name] = val;
+  for (const [name, v] of Object.entries(emotions_orig)) {
+    const val = parseFloat(v);
+
+    if (emotions_new_clone[name] !== undefined) {
+      const newVal = parseFloat(emotions_new_clone[name]);
+      if (!isNaN(newVal)) {
+        const avg = (val + newVal) / 2;
+        emotions[name] = avg;
+        delete emotions_new_clone[name];
+      } else {
+        emotions[name] = val;
+      }
+    } else {
+      emotions[name] = val;
+    }
   }
 
-  for (const [name, val] of Object.entries(emotions_new)) {
-    emotions[name] = val;
+  for (const [name, val] of Object.entries(emotions_new_clone)) {
+    emotions[name] = parseFloat(val);
   }
 
   return emotions;
 }
 
+/////////////////////////////////////////////////
 //go through all the import collections and see if the name exists in the destination or not
 //if not do an insert, if the name exists the annotation information needs to be merged
 //iter = await Import_Collections_Image_DB_Iterator()' and 'rr = await iter()'
