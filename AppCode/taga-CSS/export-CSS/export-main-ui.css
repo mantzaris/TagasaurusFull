@@ -43,6 +43,7 @@ body {
   align-items: center; /* Vertically center */
 }
 
+#import-button-id,
 #export-button-id,
 #mainmenu-button-id {
   font-size: 3.5vmin;
