@@ -1,12 +1,5 @@
-//module functions for DB connectivity
-//FNS_DB = require('./myJS/db-access-module.js');
-//TAGGING_DB_MODULE = require('./myJS/tagging-db-fns.js');
-
 const IPC_Renderer3 = require('electron').ipcRenderer;
 
-// const FS3 = require('fs');
-// const PATH3 = require('path');
-//const DATABASE3 = require('better-sqlite3');
 const PATH = require('path');
 const { DB_MODULE } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js')); //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
@@ -15,28 +8,10 @@ const extract = require('extract-zip');
 const { existsSync, mkdirSync, readFileSync } = require('fs-extra');
 const { copyFileSync, rmdirSync } = require('fs');
 const EventEmitter = require('events');
-
-const { MY_FILE_HELPER } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js')); // require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
-const DB_destination = require(PATH.join(__dirname, 'taga-DB', 'db-fns.js')); // require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'db-fns.js');
 const TAGA_DATA_destination = PATH.join(USER_DATA_PATH, 'TagasaurusFiles', 'files'); // PATH.resolve(TAGA_FILES_DIRECTORY,'data');
-
-const IMPORT_DELIM = '::imported::';
-const contains_DELIM_Str_End = (str) => str.search(IMPORT_DELIM) == str.length - IMPORT_DELIM.length;
 
 //db path that holds the import db
 let DB_import_path = '';
-//db path that holds the data for the import db
-let DB_import_data = '';
-
-let DB_import = '';
-
-let TAGGING_TABLE_NAME = 'TAGGING';
-let TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
-let COLLECTIONS_TABLE_NAME = 'COLLECTIONS';
-let COLLECTION_MEME_TABLE_NAME = 'COLLECTIONMEMES';
-let COLLECTION_GALLERY_TABLE_NAME = 'COLLECTIONGALLERY';
-//table to hold the intermediate filename changes for the merge so that the importing file names get changed if needed
-let IMPORT_TABLE_NAME_CHANGES = 'NAMECHANGES';
 
 let import_button = document.getElementById('import-button-id');
 import_button.onclick = Import_User_Annotation_Data;
@@ -59,22 +34,22 @@ async function Import_User_Annotation_Data() {
   DB_import_path = path_chosen.filePaths[0];
   const ft_res = await ft.fromFile(DB_import_path);
 
-  if (!ft_res.mime.includes('zip')) return (processing_modal.style.display = 'none');
+  if (!ft_res.mime.includes('zip')) {
+    alert('expected imported file format was not a zip');
+    return (processing_modal.style.display = 'none');
+  }
 
   temp_dir = PATH.join(USER_DATA_PATH, 'TagasaurusFiles', 'temp');
 
   try {
-    console.log(`temp_dir exists ? = ${existsSync(temp_dir)}`);
     if (existsSync(temp_dir)) {
       rmdirSync(temp_dir, {
         recursive: true,
         force: true,
       });
-      console.log('removed tempdir');
-      console.log(`temp_dir exists ? = ${existsSync(temp_dir)}`);
     }
+
     mkdirSync(temp_dir);
-    console.log(`temp_dir exists ? = ${existsSync(temp_dir)}`);
 
     await extract(DB_import_path, {
       dir: temp_dir,
@@ -87,15 +62,13 @@ async function Import_User_Annotation_Data() {
 
   const ev = new EventEmitter();
 
-  ev.once('ready', ImportStuff);
+  ev.once('ready', HandleImport);
 
   try {
     const tagging = readFileSync(PATH.join(temp_dir, 'tagging.json'), 'utf-8');
     const memes = readFileSync(PATH.join(temp_dir, 'memes.json'), 'utf-8');
 
     tagging_import = JSON.parse(tagging);
-    console.log(`initial tagging_import ----`);
-    console.log(tagging_import);
     meme_import = JSON.parse(memes);
   } catch (e) {
     console.log(e);
@@ -106,7 +79,7 @@ async function Import_User_Annotation_Data() {
   }
 }
 
-async function ImportStuff() {
+async function HandleImport() {
   const tagging_names_map = new Map();
   const file_hash_to_name_map = new Map();
 
@@ -132,7 +105,6 @@ async function ImportStuff() {
     file_hash_to_name_map.set(incoming._id, file_rename);
   }
 
-  console.log(tagging_import);
   for (const incoming of tagging_import) {
     let { _id, meme_choices, emotions, raw_description, tags } = incoming;
 
@@ -161,7 +133,7 @@ async function ImportStuff() {
   }
 
   for (const incoming_meme of meme_import) {
-    const { _id, file_type, connected_to } = incoming_meme;
+    const { _id, connected_to } = incoming_meme;
 
     const existing_record = await DB_MODULE.Get_Tagging_MEME_Record_From_DB(file_hash_to_name_map.get(_id));
     incoming_meme.connected_to = connected_to.map((m) => file_hash_to_name_map.get(m));
@@ -339,6 +311,27 @@ function AverageEmotions(emotions_orig, emotions_new) {
 }
 
 /////////////////////////////////////////////////
+
+//const contains_DELIM_Str_End = (str) => str.search(IMPORT_DELIM) == str.length - IMPORT_DELIM.length;
+// /const IMPORT_DELIM = '::imported::';
+
+//db path that holds the data for the import db
+// let DB_import_data = '';
+
+// let DB_import = '';
+
+// const { MY_FILE_HELPER } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js')); // require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+// const DB_destination = require(PATH.join(__dirname, 'taga-DB', 'db-fns.js')); // require(PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-DB'+PATH.sep+'db-fns.js');
+
+// let TAGGING_TABLE_NAME = 'TAGGING';
+// let TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
+// let COLLECTIONS_TABLE_NAME = 'COLLECTIONS';
+// let COLLECTION_MEME_TABLE_NAME = 'COLLECTIONMEMES';
+// let COLLECTION_GALLERY_TABLE_NAME = 'COLLECTIONGALLERY';
+// //table to hold the intermediate filename changes for the merge so that the importing file names get changed if needed
+
+// let IMPORT_TABLE_NAME_CHANGES = 'NAMECHANGES';
+
 //go through all the import collections and see if the name exists in the destination or not
 //if not do an insert, if the name exists the annotation information needs to be merged
 //iter = await Import_Collections_Image_DB_Iterator()' and 'rr = await iter()'
