@@ -45,7 +45,7 @@
     "@tensorflow/tfjs-node": "^4.1.0",
     "@vladmandic/face-api": "^1.7.7",
     "archiver": "^5.3.1",
-    "better-sqlite3": "^8.5.0",
+    "better-sqlite3": "^8.5.2",
     "decode-gif": "^1.0.1",
     "dotenv": "^16.0.3",
     "electron-pdf-window": "^1.0.12",
