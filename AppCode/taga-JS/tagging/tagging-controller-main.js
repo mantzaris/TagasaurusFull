@@ -29,6 +29,7 @@ let TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
   taggingEmotions: { good: '0', bad: '0' },
   taggingMemeChoices: [],
   faceDescriptors: [],
+  faceClusters: [],
 };
 
 //holds current annotation obj
@@ -869,6 +870,46 @@ async function Load_New_Image(filename) {
         continue;
       }
 
+      const MIN_CLUSTER_DIST_SCORE = 0.6;
+      if (tagging_entry_tmp.faceDescriptors.length > 0) {
+        const clusters = (await DB_MODULE.Get_All_FaceClusters()).map((c) => {
+          return {
+            ...c,
+            avgDescriptor: JSON.parse(c.avgDescriptor),
+            relatedFaces: JSON.parse(c.relatedFaces),
+          };
+        });
+
+        const parent_cluster_ids = [];
+
+        for (const descriptor of tagging_entry_tmp.faceDescriptors) {
+          const related_clusters = clusters.filter((c) => {
+            console.log(c.avgDescriptor);
+            console.log(descriptor);
+            const score = Get_Descriptors_DistanceScore(c.avgDescriptor, descriptor) / 10;
+            console.log(score);
+            return score >= 0; //MIN_CLUSTER_DIST_SCORE;
+          });
+
+          if (related_clusters.length == 0) {
+            const cluster_rowid = await CreateFaceCluster(descriptor, tagging_entry_tmp.fileHash);
+            parent_cluster_ids.push(cluster_rowid);
+            continue;
+          }
+
+          for (let i = 0; i < related_clusters.length; i++) {
+            related_clusters[i].relatedFaces[tagging_entry_tmp.fileHash] = descriptor;
+            const descriptors_inside_cluster = Array.from(Object.values(related_clusters[i].relatedFaces));
+            related_clusters[i].avgDescriptor = ComputeAvgFaceDescriptor(descriptors_inside_cluster);
+            await DB_MODULE.Update_FaceCluster_ROWID(related_clusters[i].avgDescriptor, related_clusters[i].relatedFaces, related_clusters[i].ROWID);
+          }
+        }
+
+        const unique_cluster_ids = [...new Set(parent_cluster_ids)];
+
+        tagging_entry_tmp.faceClusters = unique_cluster_ids;
+      }
+
       await Insert_Record_Into_DB(tagging_entry_tmp); //sqlite version
       tagging_entry = tagging_entry_tmp;
     } //else { //hash is present so set to load it
@@ -883,6 +924,29 @@ async function Load_New_Image(filename) {
     Load_State_Of_Image_IDB();
   }
   //New_Image_Display( 0 );
+}
+
+async function CreateFaceCluster(descriptor, _id) {
+  const related_faces = {};
+  related_faces[_id] = descriptor;
+  await DB_MODULE.Insert_FaceCluster(descriptor, related_faces);
+  const rowid = await DB_MODULE.Get_Last_Rowid();
+
+  return rowid;
+}
+
+function ComputeAvgFaceDescriptor(descriptors) {
+  let avg = new Float32Array(descriptors[0]);
+
+  for (let v = 0; v < avg.length; v++) {
+    let avg_vert = 0;
+    for (let f = 0; f < descriptors.length; f++) {
+      avg_vert += descriptors[f][v];
+    }
+    avg[v] = avg_vert / descriptors.length;
+  }
+
+  return avg;
 }
 //SAVING, LOADING, DELETING, ETC END<<<
 

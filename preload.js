@@ -110,6 +110,7 @@ window.faceapi = faceapi;
 //(get face descriptors string, parse and then select to compare via euclidean distances)
 //distances are best at zero, so score on (1-dist)
 const FACE_DISTANCE_IMAGE = 0.67;
+window.FACE_DISTANCE_IMAGE = FACE_DISTANCE_IMAGE;
 async function Get_Descriptors_DistanceScore(descriptors_reference, descriptors_query) {
   let ref_faces_scores_array = new Array(descriptors_reference.length);
   for (let ref_ii = 0; ref_ii < descriptors_reference.length; ref_ii++) {

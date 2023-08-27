@@ -78,6 +78,7 @@ const TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
 const COLLECTIONS_TABLE_NAME = 'COLLECTIONS';
 const COLLECTION_MEME_TABLE_NAME = 'COLLECTIONMEMES';
 const COLLECTION_GALLERY_TABLE_NAME = 'COLLECTIONGALLERY';
+const FACECLUSTERS_TABLE_NAME = 'FACECLUSTERS';
 
 async function Init() {
   console.log(`about to make directory or not of ${TAGA_FILES_DIRECTORY}`);
@@ -102,7 +103,7 @@ async function Init() {
     STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${TAGGING_TABLE_NAME}
                     (fileName TEXT, fileHash TEXT, fileType TEXT, taggingRawDescription TEXT,
                             taggingTags TEXT, taggingEmotions TEXT, taggingMemeChoices TEXT,
-                            faceDescriptors TEXT)`);
+                            faceDescriptors TEXT, faceClusters TEXT)`);
     STMT.run();
     //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
     let STMT_index1 = DB.prepare(` CREATE UNIQUE INDEX fileName_index ON ${TAGGING_TABLE_NAME} (fileName); `);
@@ -120,6 +121,7 @@ async function Init() {
       taggingEmotions: { good: '0', bad: '0' },
       taggingMemeChoices: [],
       faceDescriptors: [],
+      faceClusters: [],
     };
     let taga_source_path = PATH.join(APP_PATH, 'Taga.png'); //PATH.resolve()+PATH.sep+'Taga.png';
     if (FS.existsSync(PATH.join(TAGA_DATA_DIRECTORY, 'Taga.png')) == false) {
@@ -131,7 +133,7 @@ async function Init() {
     tagging_entry.fileType = 'image';
 
     INSERT_TAGGING_STMT = DB.prepare(
-      `INSERT INTO ${TAGGING_TABLE_NAME} (fileName, fileHash, fileType, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO ${TAGGING_TABLE_NAME} (fileName, fileHash, fileType, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors, faceClusters) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
     );
     let info = INSERT_TAGGING_STMT.run(
       tagging_entry.fileName,
@@ -141,7 +143,8 @@ async function Init() {
       JSON.stringify(tagging_entry.taggingTags),
       JSON.stringify(tagging_entry.taggingEmotions),
       JSON.stringify(tagging_entry.taggingMemeChoices),
-      JSON.stringify(tagging_entry.faceDescriptors)
+      JSON.stringify(tagging_entry.faceDescriptors),
+      JSON.stringify(tagging_entry.faceClusters)
     );
 
     //extra images
@@ -188,7 +191,8 @@ async function Init() {
         JSON.stringify(tagging_entry.taggingTags),
         JSON.stringify(tagging_entry.taggingEmotions),
         JSON.stringify(tagging_entry.taggingMemeChoices),
-        JSON.stringify(tagging_entry.faceDescriptors)
+        JSON.stringify(tagging_entry.faceDescriptors),
+        JSON.stringify(tagging_entry.faceClusters)
       );
     }
   }
@@ -244,6 +248,18 @@ async function Init() {
   } else {
     //
   }
+
+  //Create the faceclusters table which holds the face descriptors cluster membership
+  let faceclusters_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${FACECLUSTERS_TABLE_NAME}'; `);
+  let faceclusters_table_exists_res = faceclusters_table_exists_stmt.get();
+  if (faceclusters_table_exists_res['count(*)'] == 0) {
+    //
+    let STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${FACECLUSTERS_TABLE_NAME} (avgDescriptor TEXT, relatedFaces TEXT)`);
+    STMT.run(); //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
+  } else {
+    //
+  }
+
   //DB SET UP END<<<
 
   createWindow();

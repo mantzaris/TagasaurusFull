@@ -13,6 +13,7 @@ const TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
 const COLLECTIONS_TABLE_NAME = 'COLLECTIONS';
 const COLLECTION_MEME_TABLE_NAME = 'COLLECTIONMEMES';
 const COLLECTION_GALLERY_TABLE_NAME = 'COLLECTIONGALLERY';
+const FACECLUSTERS_TABLE_NAME = 'FACECLUSTERS';
 
 const TAGA_FILES_DIRECTORY = PATH.join(USER_DATA_PATH, 'TagasaurusFiles'); //PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles')
 //set up the DB to use
@@ -26,13 +27,13 @@ const GET_HASH_TAGGING_STMT = DB.prepare(`SELECT fileHash FROM ${TAGGING_TABLE_N
 const GET_RECORD_FROM_ROWID_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE ROWID=?`);
 
 const INSERT_TAGGING_STMT = DB.prepare(
-  `INSERT INTO ${TAGGING_TABLE_NAME} (fileName, fileHash, fileType, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+  `INSERT INTO ${TAGGING_TABLE_NAME} (fileName, fileHash, fileType, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors, faceClusters) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
 );
 const UPDATE_FILENAME_TAGGING_STMT = DB.prepare(
-  `UPDATE ${TAGGING_TABLE_NAME} SET fileName=?, fileHash=?, fileType=?, taggingRawDescription=?, taggingTags=?, taggingEmotions=?, taggingMemeChoices=?, faceDescriptors=? WHERE fileName=?`
+  `UPDATE ${TAGGING_TABLE_NAME} SET fileName=?, fileHash=?, fileType=?, taggingRawDescription=?, taggingTags=?, taggingEmotions=?, taggingMemeChoices=?, faceDescriptors=?, faceClusters=? WHERE fileName=?`
 );
 const UPDATE_TAGGING_BY_FILEHASH_STMT = DB.prepare(
-  `UPDATE ${TAGGING_TABLE_NAME} SET fileName=?, fileHash=?, fileType=?, taggingRawDescription=?, taggingTags=?, taggingEmotions=?, taggingMemeChoices=?, faceDescriptors=? WHERE fileHash=?`
+  `UPDATE ${TAGGING_TABLE_NAME} SET fileName=?, fileHash=?, fileType=?, taggingRawDescription=?, taggingTags=?, taggingEmotions=?, taggingMemeChoices=?, faceDescriptors=?, faceClusters=? WHERE fileHash=?`
 );
 const DELETE_FILENAME_TAGGING_STMT = DB.prepare(`DELETE FROM ${TAGGING_TABLE_NAME} WHERE fileName=?`);
 
@@ -156,6 +157,7 @@ function Get_Obj_Fields_From_Record(record) {
   record.taggingEmotions = JSON.parse(record.taggingEmotions);
   record.taggingMemeChoices = JSON.parse(record.taggingMemeChoices);
   record.faceDescriptors = JSON.parse(record.faceDescriptors);
+  record.faceClusters = JSON.parse(record.faceClusters);
   return record;
 }
 
@@ -170,7 +172,8 @@ async function Insert_Record_Into_DB(tagging_obj) {
     JSON.stringify(tagging_obj.taggingTags),
     JSON.stringify(tagging_obj.taggingEmotions),
     JSON.stringify(tagging_obj.taggingMemeChoices),
-    JSON.stringify(tagging_obj.faceDescriptors)
+    JSON.stringify(tagging_obj.faceDescriptors),
+    JSON.stringify(tagging_obj.faceClusters)
   );
   await Set_Max_Min_Rowid();
 }
@@ -187,6 +190,7 @@ async function Update_Tagging_Annotation_DB(tagging_obj) {
     JSON.stringify(tagging_obj.taggingEmotions),
     JSON.stringify(tagging_obj.taggingMemeChoices),
     JSON.stringify(tagging_obj.faceDescriptors),
+    JSON.stringify(tagging_obj.faceClusters),
     tagging_obj.fileName
   );
 }
@@ -203,6 +207,7 @@ async function Update_Tagging_Annotation_by_fileHash_DB(tagging_obj) {
     JSON.stringify(tagging_obj.taggingEmotions),
     JSON.stringify(tagging_obj.taggingMemeChoices),
     JSON.stringify(tagging_obj.faceDescriptors),
+    JSON.stringify(tagging_obj.faceClusters),
     tagging_obj.fileHash
   );
 }
@@ -840,6 +845,40 @@ function Get_MEME_Collection_Obj_Fields_From_Record(record) {
   return record;
 }
 
+//FACECLUSTERS stuff const FACECLUSTERS_TABLE_NAME = 'FACECLUSTERS';
+const GET_ALL_FACECLUSTERS_STMT = DB.prepare(`SELECT ROWID, * FROM ${FACECLUSTERS_TABLE_NAME}`);
+const INSERT_FACECLUSTER_STMT = DB.prepare(`INSERT INTO ${FACECLUSTERS_TABLE_NAME} (avgDescriptor, relatedFaces ) VALUES (?, ?)`);
+const DELETE_EMPTY_FACECLUSTER_STMT = DB.prepare(`DELETE FROM ${FACECLUSTERS_TABLE_NAME} WHERE relatedFaces=?`);
+const UPDATE_FACECLUSTER_STMT = DB.prepare(`UPDATE ${FACECLUSTERS_TABLE_NAME} SET avgDescriptor=?, relatedFaces=? WHERE ROWID=?`);
+
+const GET_LAST_ROWID_STMT = DB.prepare(`SELECT last_insert_rowid()`);
+
+async function Get_All_FaceClusters() {
+  return await GET_ALL_FACECLUSTERS_STMT.all();
+}
+exports.Get_All_FaceClusters = Get_All_FaceClusters;
+
+async function Get_Last_Rowid() {
+  return await GET_LAST_ROWID_STMT.get();
+}
+exports.Get_Last_Rowid = Get_Last_Rowid;
+
+async function Insert_FaceCluster(avgDescriptor, relatedFaces) {
+  const res = await INSERT_FACECLUSTER_STMT.run(JSON.stringify(avgDescriptor), JSON.stringify(relatedFaces));
+
+  return res.lastInsertRowid;
+}
+exports.Insert_FaceCluster = Insert_FaceCluster;
+
+async function Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, ROWID) {
+  await UPDATE_FACECLUSTER_STMT.run(avgDescriptor, relatedFaces, ROWID);
+}
+exports.Update_FaceCluster_ROWID = Update_FaceCluster_ROWID;
+
+async function Delete_All_Empty_FaceClusters() {
+  await DELETE_EMPTY_FACECLUSTER_STMT.run(JSON.stringify([]));
+}
+exports.Delete_All_Empty_FaceClusters = Delete_All_Empty_FaceClusters;
 //COLLECTION SEARCH RELATED FNs END<<<
 
 //!!! make call to this when image is deleted from tagging to update collection meme table !!!
