@@ -423,7 +423,7 @@ async function Stream_Search_Run() {
       let face_descriptors_tmp = annotation_obj_tmp['faceDescriptors'];
       if (face_descriptors_tmp.length == 0) continue; //no face
 
-      let score_tmp = await Get_Descriptors_DistanceScore([ref_face_tmp_descriptor], face_descriptors_tmp); //why is this not between 0 and 1 ??? !!!! xxx
+      let score_tmp = Get_Descriptors_DistanceScore([ref_face_tmp_descriptor], face_descriptors_tmp); //why is this not between 0 and 1 ??? !!!! xxx
       if (score_tmp > face_threshold) {
         //why is this not between 0 and 1 ??? !!!! xxx
         face_keywords.push(...annotation_obj_tmp['taggingTags']); //add to the keywords
@@ -479,7 +479,7 @@ async function Stream_Search_Run() {
     let found_face = false;
     for (const [ind, memory] of faces_short_memories.entries()) {
       //loop through memories to see if this descriptor is present or not
-      let score_tmp = await Get_Descriptors_DistanceScore([ref_face_descriptor], [memory.descriptor]);
+      let score_tmp = Get_Descriptors_DistanceScore([ref_face_descriptor], [memory.descriptor]);
       if (score_tmp > face_threshold) {
         //found a similar face so no new inclusion and accumulate keywords now and in memory
         found_face = true;

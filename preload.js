@@ -111,7 +111,7 @@ window.faceapi = faceapi;
 //distances are best at zero, so score on (1-dist)
 const FACE_DISTANCE_IMAGE = 0.67;
 window.FACE_DISTANCE_IMAGE = FACE_DISTANCE_IMAGE;
-async function Get_Descriptors_DistanceScore(descriptors_reference, descriptors_query) {
+function Get_Descriptors_DistanceScore(descriptors_reference, descriptors_query) {
   let ref_faces_scores_array = new Array(descriptors_reference.length);
   for (let ref_ii = 0; ref_ii < descriptors_reference.length; ref_ii++) {
     let score_ref_face_ii = 0;
@@ -132,6 +132,7 @@ async function Get_Descriptors_DistanceScore(descriptors_reference, descriptors_
   let nonzeros_total = ref_faces_scores_array.filter((el) => el != 0).length;
   let full_set_bonus = (nonzeros_total / descriptors_reference.length) * ref_faces_scores_total;
   ref_faces_scores_total += full_set_bonus;
+
   return ref_faces_scores_total;
 }
 window.Get_Descriptors_DistanceScore = Get_Descriptors_DistanceScore;

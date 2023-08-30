@@ -871,7 +871,7 @@ async function Insert_FaceCluster(avgDescriptor, relatedFaces) {
 exports.Insert_FaceCluster = Insert_FaceCluster;
 
 async function Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, ROWID) {
-  await UPDATE_FACECLUSTER_STMT.run(avgDescriptor, relatedFaces, ROWID);
+  await UPDATE_FACECLUSTER_STMT.run(JSON.stringify(Array.from(avgDescriptor)), JSON.stringify(relatedFaces), ROWID);
 }
 exports.Update_FaceCluster_ROWID = Update_FaceCluster_ROWID;
 

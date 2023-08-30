@@ -79,7 +79,7 @@ async function Image_Scoring(search_obj, image_tagging_annotation_obj_tmp, Get_T
   //get the scores for the facial recognition 'search_obj' is our reference image descriptor data
   let face_recognition_score = 0;
   if ('faceDescriptors' in search_obj && search_obj.faceDescriptors.length != 0 && image_tagging_annotation_obj_tmp.faceDescriptors.length != 0) {
-    face_recognition_score = await Get_Descriptors_DistanceScore(search_obj.faceDescriptors, image_tagging_annotation_obj_tmp.faceDescriptors);
+    face_recognition_score = Get_Descriptors_DistanceScore(search_obj.faceDescriptors, image_tagging_annotation_obj_tmp.faceDescriptors);
   }
   let total_image_match_score = tags_overlap_score + emotion_overlap_score + meme_tag_overlap_score + face_recognition_score;
   return total_image_match_score;
@@ -158,7 +158,7 @@ async function Meme_Image_Scoring(search_obj, image_tagging_meme_annotation_obj_
 
   let face_recognition_score = 0;
   if ('faceDescriptors' in search_obj && search_obj.faceDescriptors.length != 0 && record_tmp.faceDescriptors.length != 0) {
-    face_recognition_score = await Get_Descriptors_DistanceScore(search_obj.faceDescriptors, record_tmp.faceDescriptors);
+    face_recognition_score = Get_Descriptors_DistanceScore(search_obj.faceDescriptors, record_tmp.faceDescriptors);
   }
 
   let meme_score = meme_tag_overlap_score + emotion_overlap_score + tag_img_overlap_score + face_recognition_score; //+ meme_length_score
