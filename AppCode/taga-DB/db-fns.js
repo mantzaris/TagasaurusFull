@@ -853,6 +853,22 @@ const UPDATE_FACECLUSTER_STMT = DB.prepare(`UPDATE ${FACECLUSTERS_TABLE_NAME} SE
 
 const GET_LAST_ROWID_STMT = DB.prepare(`SELECT last_insert_rowid()`);
 
+async function Get_FaceClusters_From_IDS(ids) {
+  const placeholders = ids.map(() => '?').join(',');
+  let res = DB.prepare(`SELECT ROWID, * FROM ${FACECLUSTERS_TABLE_NAME} WHERE ${FACECLUSTERS_TABLE_NAME}.ROWID IN (${placeholders})`).all(...ids);
+  return res.map((r) => {
+    return { ...r, avgDescriptor: JSON.parse(r.avgDescriptor), relatedFaces: JSON.parse(r.relatedFaces) };
+  });
+}
+exports.Get_FaceClusters_From_IDS = Get_FaceClusters_From_IDS;
+
+async function Delete_FaceClusters_By_IDS(ids) {
+  const placeholders = ids.map(() => '?').join(',');
+  let res = DB.prepare(`DELETE FROM ${FACECLUSTERS_TABLE_NAME} WHERE ${FACECLUSTERS_TABLE_NAME}.ROWID IN (${placeholders})`).run(...ids);
+  return res;
+}
+exports.Delete_FaceClusters_By_IDS = Delete_FaceClusters_By_IDS;
+
 async function Get_All_FaceClusters() {
   return await GET_ALL_FACECLUSTERS_STMT.all();
 }
@@ -864,7 +880,7 @@ async function Get_Last_Rowid() {
 exports.Get_Last_Rowid = Get_Last_Rowid;
 
 async function Insert_FaceCluster(avgDescriptor, relatedFaces) {
-  const res = await INSERT_FACECLUSTER_STMT.run(JSON.stringify(avgDescriptor), JSON.stringify(relatedFaces));
+  const res = await INSERT_FACECLUSTER_STMT.run(JSON.stringify(Array.from(avgDescriptor)), JSON.stringify(relatedFaces));
 
   return res.lastInsertRowid;
 }

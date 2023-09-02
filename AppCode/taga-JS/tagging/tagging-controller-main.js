@@ -744,6 +744,9 @@ async function Delete_Image() {
   await Handle_Delete_Collection_IMAGE_references(current_image_annotation.fileName);
   await Handle_Delete_Collection_MEME_references(current_image_annotation.fileName);
 
+  // delete face clusters which reference this image
+  await Handle_Delete_FileFrom_Cluster();
+
   let records_remaining = await Number_of_Tagging_Records();
   if (records_remaining == 1) {
     await Delete_Tagging_Annotation_DB(current_image_annotation.fileName);
@@ -755,6 +758,38 @@ async function Delete_Image() {
     await Delete_Tagging_Annotation_DB(prev_tmp);
   }
 }
+
+async function Handle_Delete_FileFrom_Cluster() {
+  if (current_image_annotation.faceDescriptors.length == 0) return;
+
+  const face_clusters = await DB_MODULE.Get_FaceClusters_From_IDS(current_image_annotation.faceClusters);
+
+  const empty_clusters = [];
+  const updated_clusters = [];
+
+  for (let i = 0; i < face_clusters.length; i++) {
+    let cluster = face_clusters[i];
+
+    delete cluster.relatedFaces[current_image_annotation.fileHash];
+    let remaining_related_faces = Object.values(cluster.relatedFaces);
+
+    if (remaining_related_faces.length == 0) {
+      empty_clusters.push(cluster.rowid);
+      continue;
+    }
+
+    const avg = ComputeAvgFaceDescriptor(remaining_related_faces);
+    cluster.avgDescriptor = avg;
+    updated_clusters.push(cluster);
+  }
+
+  if (empty_clusters.length > 0) await DB_MODULE.Delete_FaceClusters_By_IDS(empty_clusters);
+
+  for (const { rowid, avgDescriptor, relatedFaces } of updated_clusters) {
+    await DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, rowid);
+  }
+}
+
 //dialog window explorer to select new images to import, and calls the functions to update the view
 //checks whether the directory of the images is the taga image folder and if so returns
 async function Load_New_Image(filename) {
@@ -870,8 +905,10 @@ async function Load_New_Image(filename) {
         continue;
       }
 
-      const MIN_CLUSTER_DIST_SCORE = 0.66;
+      //face cluster insertion code
+      const MIN_CLUSTER_DIST_SCORE = 0.64;
       if (tagging_entry_tmp.faceDescriptors.length > 0) {
+        // TODO: replace with an iterator on clusters to not hold all in memory at same time
         const clusters = (await DB_MODULE.Get_All_FaceClusters()).map((c) => {
           return {
             ...c,
@@ -880,36 +917,35 @@ async function Load_New_Image(filename) {
           };
         });
 
-        const parent_cluster_ids = [];
+        const parent_cluster_row_ids = [];
 
         for (const descriptor of tagging_entry_tmp.faceDescriptors) {
           const related_clusters = clusters.filter((c) => {
             score = Get_Descriptors_DistanceScore([c.avgDescriptor], [descriptor]) / 10;
+
             return score >= MIN_CLUSTER_DIST_SCORE;
           });
 
           if (related_clusters.length == 0) {
-            console.log('creating new face cluster');
-            const cluster_rowid = await CreateFaceCluster(descriptor, tagging_entry_tmp.fileHash);
-            parent_cluster_ids.push(cluster_rowid);
+            const cluster = await CreateFaceCluster(descriptor, tagging_entry_tmp.fileHash);
+            parent_cluster_row_ids.push(cluster.rowid);
+            clusters.push(cluster);
             continue;
           }
 
-          console.log(related_clusters);
           for (let i = 0; i < related_clusters.length; i++) {
             related_clusters[i].relatedFaces[tagging_entry_tmp.fileHash] = [descriptor]; //should descriptor be nested or flat?
             const descriptors_inside_cluster = Object.values(related_clusters[i].relatedFaces).flatMap((a) => a);
             related_clusters[i].avgDescriptor = ComputeAvgFaceDescriptor(descriptors_inside_cluster);
             await DB_MODULE.Update_FaceCluster_ROWID(related_clusters[i].avgDescriptor, related_clusters[i].relatedFaces, related_clusters[i].rowid);
+            parent_cluster_row_ids.push(related_clusters[i].rowid);
           }
         }
 
-        const unique_cluster_ids = [...new Set(parent_cluster_ids)];
-
+        const unique_cluster_ids = [...new Set(parent_cluster_row_ids)];
         tagging_entry_tmp.faceClusters = unique_cluster_ids;
       }
-
-      await Insert_Record_Into_DB(tagging_entry_tmp); //sqlite version
+      await Insert_Record_Into_DB(tagging_entry_tmp);
       tagging_entry = tagging_entry_tmp;
     } //else { //hash is present so set to load it
     //tagging_entry = tagging_entry_tmp;
@@ -925,10 +961,11 @@ async function Load_New_Image(filename) {
   //New_Image_Display( 0 );
 }
 
-async function CreateFaceCluster(descriptor, _id) {
-  const related_faces = {};
-  related_faces[_id] = [descriptor];
-  return await DB_MODULE.Insert_FaceCluster(descriptor, related_faces);
+async function CreateFaceCluster(avgDescriptor, fileHash) {
+  const relatedFaces = {};
+  relatedFaces[fileHash] = [avgDescriptor];
+  const rowid = await DB_MODULE.Insert_FaceCluster(avgDescriptor, relatedFaces); //returns rowid for the new record
+  return { rowid, relatedFaces, avgDescriptor };
 }
 
 function ComputeAvgFaceDescriptor(descriptors) {
