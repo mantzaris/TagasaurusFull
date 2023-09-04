@@ -5,6 +5,7 @@ const fileType = require('file-type');
 const IPC_RENDERER = require('electron').ipcRenderer;
 const { ipcRenderer } = require('electron');
 
+const { CreateTaggingEntryCluster, ComputeAvgFaceDescriptor } = require(PATH.join(__dirname, 'taga-JS', 'utilities', 'cluster.js'));
 const { GetFileTypeFromFileName, GetFileTypeFromMimeType } = require(PATH.join(__dirname, 'taga-JS', 'utilities', 'files.js'));
 const { domainToUnicode } = require('url');
 const { parse } = require('path/posix');
@@ -673,7 +674,7 @@ async function First_Display_Init() {
 //init method to run upon loading
 First_Display_Init();
 
-//const decoded = atob(encoded);const original = fromBinary(decoded);console.log(original);
+//const decoded = atob(encoded);const original = fromBinary(decoded);
 function fromBinary(binary) {
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < bytes.length; i++) {
@@ -728,6 +729,7 @@ async function Load_Default_Taga_Image() {
   tagging_entry.fileName = 'Taga.png';
   tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
   tagging_entry.fileType = await GetFileTypeFromFileName(tagging_entry.fileName);
+  tagging_entry.faceClusters = [];
   //for taga no emotion inference is needed but done for consistency
 
   await Insert_Record_Into_DB(tagging_entry); //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
@@ -771,7 +773,8 @@ async function Handle_Delete_FileFrom_Cluster() {
     let cluster = face_clusters[i];
 
     delete cluster.relatedFaces[current_image_annotation.fileHash];
-    let remaining_related_faces = Object.values(cluster.relatedFaces);
+
+    let remaining_related_faces = Object.values(cluster.relatedFaces).flatMap((v) => v);
 
     if (remaining_related_faces.length == 0) {
       empty_clusters.push(cluster.rowid);
@@ -906,45 +909,8 @@ async function Load_New_Image(filename) {
       }
 
       //face cluster insertion code
-      const MIN_CLUSTER_DIST_SCORE = 0.64;
-      if (tagging_entry_tmp.faceDescriptors.length > 0) {
-        // TODO: replace with an iterator on clusters to not hold all in memory at same time
-        const clusters = (await DB_MODULE.Get_All_FaceClusters()).map((c) => {
-          return {
-            ...c,
-            avgDescriptor: JSON.parse(c.avgDescriptor),
-            relatedFaces: JSON.parse(c.relatedFaces),
-          };
-        });
+      tagging_entry_tmp = await CreateTaggingEntryCluster(tagging_entry_tmp);
 
-        const parent_cluster_row_ids = [];
-
-        for (const descriptor of tagging_entry_tmp.faceDescriptors) {
-          const related_clusters = clusters.filter((c) => {
-            score = Get_Descriptors_DistanceScore([c.avgDescriptor], [descriptor]) / 10;
-
-            return score >= MIN_CLUSTER_DIST_SCORE;
-          });
-
-          if (related_clusters.length == 0) {
-            const cluster = await CreateFaceCluster(descriptor, tagging_entry_tmp.fileHash);
-            parent_cluster_row_ids.push(cluster.rowid);
-            clusters.push(cluster);
-            continue;
-          }
-
-          for (let i = 0; i < related_clusters.length; i++) {
-            related_clusters[i].relatedFaces[tagging_entry_tmp.fileHash] = [descriptor]; //should descriptor be nested or flat?
-            const descriptors_inside_cluster = Object.values(related_clusters[i].relatedFaces).flatMap((a) => a);
-            related_clusters[i].avgDescriptor = ComputeAvgFaceDescriptor(descriptors_inside_cluster);
-            await DB_MODULE.Update_FaceCluster_ROWID(related_clusters[i].avgDescriptor, related_clusters[i].relatedFaces, related_clusters[i].rowid);
-            parent_cluster_row_ids.push(related_clusters[i].rowid);
-          }
-        }
-
-        const unique_cluster_ids = [...new Set(parent_cluster_row_ids)];
-        tagging_entry_tmp.faceClusters = unique_cluster_ids;
-      }
       await Insert_Record_Into_DB(tagging_entry_tmp);
       tagging_entry = tagging_entry_tmp;
     } //else { //hash is present so set to load it
@@ -961,25 +927,6 @@ async function Load_New_Image(filename) {
   //New_Image_Display( 0 );
 }
 
-async function CreateFaceCluster(avgDescriptor, fileHash) {
-  const relatedFaces = {};
-  relatedFaces[fileHash] = [avgDescriptor];
-  const rowid = await DB_MODULE.Insert_FaceCluster(avgDescriptor, relatedFaces); //returns rowid for the new record
-  return { rowid, relatedFaces, avgDescriptor };
-}
-
-function ComputeAvgFaceDescriptor(descriptors) {
-  const avg = new Float32Array(descriptors[0].length);
-
-  for (let offset = 0; offset < avg.length; offset++) {
-    let sum = 0;
-    for (let vi = 0; vi < descriptors.length; vi++) {
-      sum += descriptors[vi][offset];
-    }
-    avg[offset] = sum / descriptors.length;
-  }
-  return avg;
-}
 //SAVING, LOADING, DELETING, ETC END<<<
 
 //utility for the adding the mouse hover icon events in the mouseovers for the emotions

@@ -3,6 +3,8 @@ const IPC_Renderer3 = require('electron').ipcRenderer;
 const PATH = require('path');
 const { DB_MODULE } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js')); //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
+const { CreateTaggingEntryCluster } = require(PATH.join(__dirname, 'taga-JS', 'utilities', 'cluster.js'));
+
 const ft = require('file-type');
 const extract = require('extract-zip');
 const { existsSync, mkdirSync, readFileSync } = require('fs-extra');
@@ -129,7 +131,11 @@ async function HandleImport() {
     copyFileSync(PATH.join(temp_dir, 'files', incoming.file_name), PATH.join(TAGA_DATA_destination, file_name));
     incoming.file_name = file_name;
 
-    await DB_MODULE.Insert_Record_Into_DB(TranslateEntryFromSnakeCase(incoming));
+    let tagging_entry = TranslateEntryFromSnakeCase(incoming);
+
+    tagging_entry = await CreateTaggingEntryCluster(tagging_entry);
+
+    await DB_MODULE.Insert_Record_Into_DB(tagging_entry);
   }
 
   for (const incoming_meme of meme_import) {
@@ -255,7 +261,7 @@ function TranslateMemeTaggingSnakeCase({ _id, file_type, connected_to }) {
   });
 }
 
-function TranslateEntryFromSnakeCase({ _id, meme_choices, tags, emotions, raw_description, file_name, file_type, descriptors }) {
+function TranslateEntryFromSnakeCase({ _id, meme_choices, tags, emotions, raw_description, file_name, file_type, face_descriptors }) {
   return (new_entry = {
     fileName: file_name,
     fileHash: _id,
@@ -264,7 +270,7 @@ function TranslateEntryFromSnakeCase({ _id, meme_choices, tags, emotions, raw_de
     taggingTags: tags,
     taggingEmotions: emotions,
     taggingMemeChoices: meme_choices,
-    faceDescriptors: descriptors,
+    faceDescriptors: face_descriptors,
   });
 }
 

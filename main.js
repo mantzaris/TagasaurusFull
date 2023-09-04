@@ -111,92 +111,8 @@ async function Init() {
     let STMT_index2 = DB.prepare(` CREATE UNIQUE INDEX imageFileHash_index ON ${TAGGING_TABLE_NAME} (fileHash); `);
     STMT_index2.run();
 
-    //also add a default tagging object to avoid errors at start up
-    let TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
-      fileName: '',
-      fileHash: '',
-      fileType: '',
-      taggingRawDescription: '',
-      taggingTags: [],
-      taggingEmotions: { good: '0', bad: '0' },
-      taggingMemeChoices: [],
-      faceDescriptors: [],
-      faceClusters: [],
-    };
-    let taga_source_path = PATH.join(APP_PATH, 'Taga.png'); //PATH.resolve()+PATH.sep+'Taga.png';
-    if (FS.existsSync(PATH.join(TAGA_DATA_DIRECTORY, 'Taga.png')) == false) {
-      FS.copyFileSync(taga_source_path, PATH.join(TAGA_DATA_DIRECTORY, 'Taga.png'), FS.constants.COPYFILE_EXCL);
-    }
-    let tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
-    tagging_entry.fileName = 'Taga.png';
-    tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash(PATH.join(TAGA_DATA_DIRECTORY, 'Taga.png')); //`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
-    tagging_entry.fileType = 'image';
-
-    INSERT_TAGGING_STMT = DB.prepare(
-      `INSERT INTO ${TAGGING_TABLE_NAME} (fileName, fileHash, fileType, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors, faceClusters) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    );
-    let info = INSERT_TAGGING_STMT.run(
-      tagging_entry.fileName,
-      tagging_entry.fileHash,
-      tagging_entry.fileType,
-      tagging_entry.taggingRawDescription,
-      JSON.stringify(tagging_entry.taggingTags),
-      JSON.stringify(tagging_entry.taggingEmotions),
-      JSON.stringify(tagging_entry.taggingMemeChoices),
-      JSON.stringify(tagging_entry.faceDescriptors),
-      JSON.stringify(tagging_entry.faceClusters)
-    );
-
-    //extra images
-    file_names_description_obj = {
-      'Antikythera.jpg': 'Ancient Greek Technology, the  - Antikythera mechanism - from 100 to 200 B.C., an example of an ancient Analogue Computer',
-      'TagzParrot.jpg': 'A Macaw parrot flying! (from Wikipedia, user Lviatour https://commons.wikimedia.org/wiki/User:Lviatour)',
-      'TheKakapo.jpg': 'A Kakapo parrot, from the book A History of the Birds of New Zealand by Walter Lawry Buller, published in 1873',
-      'YoungJamesClerkMaxwell.jpg':
-        "Scottish scientist, James Clerk Maxwell. His discoveries changed the world (statistical mechanics, maxwell's equations, control theory and many more)",
-      'TE1_cover.jpg': 'Front and Back cover of the comic Book, Totem Eclipse (episode 1) by Vasexandros, Makis and Paul Regklis. (on Amazon)',
-      'TE3_Fcover.jpg': 'Front cover of the awesome comic Book, Totem Eclipse (episode 3) by Vasexandros, Makis and Paul Regklis. Find it on Amazon!',
-      'TE4_Fcover.jpg':
-        'Front cover of the comic Book, Totem Eclipse (episode 4) by Vasexandros, Makis and Paul Regklis. (USA  https://www.amazon.com/dp/B086PLNK4B/ref=cm_sw_r_tw_dp_GB2TTR9A4NFMP1CFRSTE )',
-      'TE5_Fcover.png': 'Front cover of the comic Book, Totem Eclipse (episode 5) by Vasexandros, Makis and Paul Regklis',
-      'TheLabor2sample.png': 'The Second of Labor of Hercules by Vasexandros, and Paul Regklis (on Amazon)',
-      'TheLaborsOfHerculesAHerosGuide.png':
-        'The Labors of Hercules by Vasexandros and Paul Regklis  (USA https://www.amazon.com/dp/B0977P9NV2/ref=cm_sw_r_tw_dp_ZE67RVGAEAR0ZK9ZM5BX ) ',
-      'TheLaborsOfHerculesAHerosGuideFRONTBACK.png':
-        'great book, The Labors of Hercules by Vasexandros and Paul Regklis  (USA https://www.amazon.com/dp/B0977P9NV2/ref=cm_sw_r_tw_dp_ZE67RVGAEAR0ZK9ZM5BX )',
-      'TheCats.jpg': 'Examples of cats (borrowed from Wikipedia picture by user; https://commons.wikimedia.org/wiki/User:Alvesgaspar',
-      'AristarchusOfSamos.jpg':
-        'mathematician Aristarchus of Samos Island in Ancient Greece, in the 3rd century B.C. with calculations of the relative sizes of the Sun, Earth and Moon',
-      'ShannonAndMouse.png': 'Claude Shannon (established Information theory), experimenting with a mechanical mouse names Theseus',
-      'JamesWebbSpaceTelescope.jpg': 'The James Webb Telescope looks so different. Maybe new discoveries are made with it! Cool',
-    };
-
-    for (let [f_name, description_tmp] of Object.entries(file_names_description_obj)) {
-      let new_filename = f_name;
-      let tmp_path = PATH.join(APP_PATH, 'Assets', 'InitPics', new_filename);
-
-      FS.copyFileSync(tmp_path, PATH.join(TAGA_DATA_DIRECTORY, new_filename), FS.constants.COPYFILE_EXCL);
-      tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
-
-      tagging_entry.fileType = await GetFileTypeFromFileName(new_filename, TAGA_DATA_DIRECTORY);
-
-      tagging_entry.fileName = new_filename;
-      tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash(PATH.join(TAGA_DATA_DIRECTORY, new_filename));
-      tagging_entry.taggingRawDescription = description_tmp;
-      info = INSERT_TAGGING_STMT.run(
-        tagging_entry.fileName,
-        tagging_entry.fileHash,
-        tagging_entry.fileType,
-        tagging_entry.taggingRawDescription,
-        JSON.stringify(tagging_entry.taggingTags),
-        JSON.stringify(tagging_entry.taggingEmotions),
-        JSON.stringify(tagging_entry.taggingMemeChoices),
-        JSON.stringify(tagging_entry.faceDescriptors),
-        JSON.stringify(tagging_entry.faceClusters)
-      );
-    }
+    //await PopulateDefaultTaggingEntries();
   }
-
   //check to see if the TAGGING MEME table exists
   let tagging_meme_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${TAGGING_MEME_TABLE_NAME}'; `);
   let tagging_meme_table_exists_res = tagging_meme_table_exists_stmt.get();
@@ -263,6 +179,93 @@ async function Init() {
   //DB SET UP END<<<
 
   createWindow();
+}
+
+async function PopulateDefaultTaggingEntries() {
+  //also add a default tagging object to avoid errors at start up
+  let TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
+    fileName: '',
+    fileHash: '',
+    fileType: '',
+    taggingRawDescription: '',
+    taggingTags: [],
+    taggingEmotions: { good: '0', bad: '0' },
+    taggingMemeChoices: [],
+    faceDescriptors: [],
+    faceClusters: [],
+  };
+  let taga_source_path = PATH.join(APP_PATH, 'Taga.png'); //PATH.resolve()+PATH.sep+'Taga.png';
+  if (FS.existsSync(PATH.join(TAGA_DATA_DIRECTORY, 'Taga.png')) == false) {
+    FS.copyFileSync(taga_source_path, PATH.join(TAGA_DATA_DIRECTORY, 'Taga.png'), FS.constants.COPYFILE_EXCL);
+  }
+  let tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
+  tagging_entry.fileName = 'Taga.png';
+  tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash(PATH.join(TAGA_DATA_DIRECTORY, 'Taga.png')); //`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
+  tagging_entry.fileType = 'image';
+
+  INSERT_TAGGING_STMT = DB.prepare(
+    `INSERT INTO ${TAGGING_TABLE_NAME} (fileName, fileHash, fileType, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors, faceClusters) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  );
+  let info = INSERT_TAGGING_STMT.run(
+    tagging_entry.fileName,
+    tagging_entry.fileHash,
+    tagging_entry.fileType,
+    tagging_entry.taggingRawDescription,
+    JSON.stringify(tagging_entry.taggingTags),
+    JSON.stringify(tagging_entry.taggingEmotions),
+    JSON.stringify(tagging_entry.taggingMemeChoices),
+    JSON.stringify(tagging_entry.faceDescriptors),
+    JSON.stringify(tagging_entry.faceClusters)
+  );
+
+  //extra images
+  file_names_description_obj = {
+    'Antikythera.jpg': 'Ancient Greek Technology, the  - Antikythera mechanism - from 100 to 200 B.C., an example of an ancient Analogue Computer',
+    'TagzParrot.jpg': 'A Macaw parrot flying! (from Wikipedia, user Lviatour https://commons.wikimedia.org/wiki/User:Lviatour)',
+    'TheKakapo.jpg': 'A Kakapo parrot, from the book A History of the Birds of New Zealand by Walter Lawry Buller, published in 1873',
+    'YoungJamesClerkMaxwell.jpg':
+      "Scottish scientist, James Clerk Maxwell. His discoveries changed the world (statistical mechanics, maxwell's equations, control theory and many more)",
+    'TE1_cover.jpg': 'Front and Back cover of the comic Book, Totem Eclipse (episode 1) by Vasexandros, Makis and Paul Regklis. (on Amazon)',
+    'TE3_Fcover.jpg': 'Front cover of the awesome comic Book, Totem Eclipse (episode 3) by Vasexandros, Makis and Paul Regklis. Find it on Amazon!',
+    'TE4_Fcover.jpg':
+      'Front cover of the comic Book, Totem Eclipse (episode 4) by Vasexandros, Makis and Paul Regklis. (USA  https://www.amazon.com/dp/B086PLNK4B/ref=cm_sw_r_tw_dp_GB2TTR9A4NFMP1CFRSTE )',
+    'TE5_Fcover.png': 'Front cover of the comic Book, Totem Eclipse (episode 5) by Vasexandros, Makis and Paul Regklis',
+    'TheLabor2sample.png': 'The Second of Labor of Hercules by Vasexandros, and Paul Regklis (on Amazon)',
+    'TheLaborsOfHerculesAHerosGuide.png':
+      'The Labors of Hercules by Vasexandros and Paul Regklis  (USA https://www.amazon.com/dp/B0977P9NV2/ref=cm_sw_r_tw_dp_ZE67RVGAEAR0ZK9ZM5BX ) ',
+    'TheLaborsOfHerculesAHerosGuideFRONTBACK.png':
+      'great book, The Labors of Hercules by Vasexandros and Paul Regklis  (USA https://www.amazon.com/dp/B0977P9NV2/ref=cm_sw_r_tw_dp_ZE67RVGAEAR0ZK9ZM5BX )',
+    'TheCats.jpg': 'Examples of cats (borrowed from Wikipedia picture by user; https://commons.wikimedia.org/wiki/User:Alvesgaspar',
+    'AristarchusOfSamos.jpg':
+      'mathematician Aristarchus of Samos Island in Ancient Greece, in the 3rd century B.C. with calculations of the relative sizes of the Sun, Earth and Moon',
+    'ShannonAndMouse.png': 'Claude Shannon (established Information theory), experimenting with a mechanical mouse names Theseus',
+    'JamesWebbSpaceTelescope.jpg': 'The James Webb Telescope looks so different. Maybe new discoveries are made with it! Cool',
+  };
+
+  for (let [f_name, description_tmp] of Object.entries(file_names_description_obj)) {
+    let new_filename = f_name;
+    let tmp_path = PATH.join(APP_PATH, 'Assets', 'InitPics', new_filename);
+
+    FS.copyFileSync(tmp_path, PATH.join(TAGA_DATA_DIRECTORY, new_filename), FS.constants.COPYFILE_EXCL);
+    tagging_entry = JSON.parse(JSON.stringify(TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION)); //clone the default obj
+
+    tagging_entry.fileType = await GetFileTypeFromFileName(new_filename, TAGA_DATA_DIRECTORY);
+
+    tagging_entry.fileName = new_filename;
+    tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash(PATH.join(TAGA_DATA_DIRECTORY, new_filename));
+    tagging_entry.taggingRawDescription = description_tmp;
+    info = INSERT_TAGGING_STMT.run(
+      tagging_entry.fileName,
+      tagging_entry.fileHash,
+      tagging_entry.fileType,
+      tagging_entry.taggingRawDescription,
+      JSON.stringify(tagging_entry.taggingTags),
+      JSON.stringify(tagging_entry.taggingEmotions),
+      JSON.stringify(tagging_entry.taggingMemeChoices),
+      JSON.stringify(tagging_entry.faceDescriptors),
+      JSON.stringify(tagging_entry.faceClusters)
+    );
+  }
 }
 
 //FILE SELECTION DIALOGUE WINDOWS START>>>
