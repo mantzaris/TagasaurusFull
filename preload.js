@@ -102,6 +102,11 @@ async function Get_Image_Face_Descriptors_From_File(imagePath) {
 window.Get_Image_Face_Descriptors_From_File = Get_Image_Face_Descriptors_From_File;
 window.faceapi = faceapi;
 
+async function Get_Image_Face_Descriptors_And_Expresssions_From_HTML_Image(img) {
+  return await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceExpressions().withFaceDescriptors();
+}
+window.Get_Image_Face_Descriptors_And_Expresssions_From_HTML_Image = Get_Image_Face_Descriptors_And_Expresssions_From_HTML_Image;
+
 //each descriptor is an 'object' not an array so that each dimension of the descriptor feature vector has a key pointing to the value
 //but we just use the values that are needed to
 //parameters are always arrays of arrays and not faceapi objects
