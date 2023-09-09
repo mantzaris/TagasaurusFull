@@ -704,17 +704,40 @@ async function Save_Image_Annotation_Changes() {
   }
   //handle textual description, process for tag words
   let rawDescription = document.getElementById('description-textarea-id').value;
-  let processed_tag_word_list = DESCRIPTION_PROCESS_MODULE.process_description(rawDescription);
+  let new_tags = DESCRIPTION_PROCESS_MODULE.process_description(rawDescription);
+  let original_tags = current_image_annotation.taggingTags;
+  const keyword_additions = new_tags.filter((item) => !original_tags.includes(item));
+  const keyword_subtractions = original_tags.filter((item) => !new_tags.includes(item));
+
+  const clusters = await DB_MODULE.Get_FaceClusters_From_IDS(current_image_annotation.faceClusters);
+
+  for (let i = 0; i < clusters.length; i++) {
+    console.log(clusters[i]);
+    for (const k of keyword_additions) {
+      clusters[i].keywords[k] = (clusters[i].keywords[k] || 0) + 1;
+    }
+    console.log(keyword_additions, keyword_subtractions);
+    for (const k of keyword_subtractions) {
+      clusters[i].keywords[k] = (clusters[i].keywords[k] || 1) - 1;
+      if (clusters[i].keywords[k] == 0) delete clusters[i].keywords[k];
+    }
+
+    const { rowid, avgDescriptor, relatedFaces, keywords, images, memes } = clusters[i];
+
+    await DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, memes, rowid);
+  }
+
   //change the object fields accordingly
   //new_record.fileName = image_name;
   current_image_annotation.taggingMemeChoices = meme_switch_booleans;
   current_image_annotation.taggingRawDescription = rawDescription;
-  current_image_annotation.taggingTags = processed_tag_word_list;
+  current_image_annotation.taggingTags = new_tags;
   for (var key of Object.keys(current_image_annotation['taggingEmotions'])) {
     current_image_annotation['taggingEmotions'][key] = document.getElementById('emotion-range-id-' + key).value;
   }
   await Update_Tagging_Annotation_DB(current_image_annotation);
   await Update_Tagging_MEME_Connections(current_image_annotation.fileName, current_memes, meme_switch_booleans);
+
   Load_State_Of_Image_IDB(); //TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_annotations)
 }
 //load the default image, typically called to avoid having nothing in the DB but can be deleted later on
@@ -783,13 +806,26 @@ async function Handle_Delete_FileFrom_Cluster() {
 
     const avg = ComputeAvgFaceDescriptor(remaining_related_faces);
     cluster.avgDescriptor = avg;
+
+    for (const k of current_image_annotation.taggingTags) {
+      cluster.keywords[k] = (cluster.keywords[k] || 1) - 1;
+      if (cluster.keywords[k] == 0) delete cluster.keywords[k];
+    }
+
+    for (const m of current_image_annotation.taggingMemeChoices) {
+      cluster.memes[m] = (cluster.memes[m] || 1) - 1;
+      if (cluster.memes[m] == 0) delete cluster.memes[m];
+    }
+
+    cluster.images = cluster.images.filter((i) => i != current_image_annotation.fileHash);
+
     updated_clusters.push(cluster);
   }
 
   if (empty_clusters.length > 0) await DB_MODULE.Delete_FaceClusters_By_IDS(empty_clusters);
 
-  for (const { rowid, avgDescriptor, relatedFaces } of updated_clusters) {
-    await DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, rowid);
+  for (const { rowid, avgDescriptor, relatedFaces, keywords, images, memes } of updated_clusters) {
+    await DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, memes, rowid);
   }
 }
 

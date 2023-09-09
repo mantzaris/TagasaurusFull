@@ -2,6 +2,8 @@ const { ipcRenderer } = require('electron');
 const PATH = require('path');
 const fileType = require('file-type');
 
+const { DB_MODULE } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
+
 let mode;
 let kind = 'webcam';
 
@@ -21,6 +23,8 @@ let clusters = new Map();
 let keywords = [];
 let images = [];
 let memes = [];
+
+let keyword_div;
 
 const stream_constraints = {
   video: {
@@ -75,14 +79,20 @@ selection_set.onchange = () => {
     selection_description.innerText = keywords_only_description;
     video_el = document.getElementById('inputVideo1');
     canvas_el = document.getElementById('overlay1');
+
+    keyword_div = document.getElementById('keyword-display1-div');
   } else if (selection_set.value == 'keywords-images') {
     selection_description.innerText = keywords_images_description;
     video_el = document.getElementById('inputVideo2');
     canvas_el = document.getElementById('overlay2');
+
+    keyword_div = document.getElementById('keyword-display1-div');
   } else if (selection_set.value == 'keywords-images-memes') {
     selection_description.innerText = keywords_images_memes_description;
     video_el = document.getElementById('inputVideo3');
     canvas_el = document.getElementById('overlay3');
+
+    keyword_div = document.getElementById('keyword-display1-div');
   }
   stream_selection = selection_set.value;
 };
@@ -191,18 +201,10 @@ async function GetMediaStream(source) {
 }
 
 async function PullTaggingClusters() {
-  console.error('pulling tagging data');
-  return;
+  const face_clusters = await DB_MODULE.Get_All_FaceClusters();
 
-  const res = await fetch('/app/tagging/clusters/?onlyimages=true');
-
-  if (!res.ok) {
-    throw new Error('could not request face clusters');
-  }
-
-  const face_clusters = await res.json();
   for (const face_cluster of face_clusters) {
-    clusters.set(face_cluster._id, face_cluster);
+    clusters.set(face_cluster.rowid, face_cluster);
   }
 }
 
@@ -243,26 +245,36 @@ async function MainLoop() {
 async function UpdateSearchResults() {
   let best_score = -1;
   let best_cluster_id = null;
-  console.log(rect_face_selected);
+
   if (rect_face_selected.descriptor.length == 128) {
     for (const [cluster_id, cluster] of clusters) {
-      const score = GetDescriptorsDistanceScore([cluster.avg_descriptor], [rect_face_selected.descriptor]);
-      if (score > best_score) {
+      const score = Get_Descriptors_DistanceScore([cluster.avgDescriptor], [rect_face_selected.descriptor]);
+
+      if (score > best_score && score > 0) {
         best_cluster_id = cluster_id;
         best_score = score;
       }
     }
 
     if (best_cluster_id == null) {
-      keywords = images = memes = [];
+      console.log('baz');
+      Display_Keywords();
+      keywords = ['apple', 'bat'];
+      images = memes = [];
       return;
     }
-
+    console.log('best_cluster_id', best_cluster_id);
     const best_cluster = clusters.get(best_cluster_id);
 
     keywords = best_cluster.keywords;
     images = best_cluster.images;
     memes = best_cluster.memes;
+  }
+
+  if (keywords.length > 0) {
+    //} && selection_set.value in ['keywords', 'keywords-images', 'keywords-images-memes']) {
+    console.log('about to keyword display');
+    Display_Keywords();
   }
 }
 
@@ -277,6 +289,7 @@ async function DrawDescriptors() {
         selected_face_ind = Math.floor(Math.random() * rect_face_array.length);
         rect_face_selected.descriptor = rect_face_array[selected_face_ind].descriptor;
         switched_face_time_stamp = Date.now();
+
         await UpdateSearchResults();
       } else {
         //draw the selected box for which keywords exist
@@ -343,4 +356,17 @@ async function Detect_Faces() {
     rect_face_array.push(rect_face_tmp); //add this face to the array of faces to draw boxes over
   }
   detect_faces_time_stamp = Date.now();
+}
+
+function Display_Keywords() {
+  keyword_div.innerHTML = '';
+  let keywords_html = 'Keywords: <br>';
+  for (const keyword of keywords) {
+    keywords_html += `
+                          <div class="keyword">
+                              ${keyword}
+                          </div>
+                          `;
+  }
+  keyword_div.innerHTML = keywords_html;
 }

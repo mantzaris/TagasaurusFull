@@ -116,10 +116,10 @@ async function HandleImport() {
     incoming.meme_choices = meme_choices;
 
     if (existing_record) {
-      existing_record.taggingMemeChoices = RelatedMemesMerge(existing_record.taggingMemeChoices, meme_choices);
+      existing_record.taggingMemeChoices = MergeArrays(existing_record.taggingMemeChoices, meme_choices);
       existing_record.taggingEmotions = AverageEmotions(existing_record.taggingEmotions, emotions);
       existing_record.taggingRawDescription = DescriptionMerge(existing_record.taggingRawDescription, raw_description);
-      existing_record.taggingTags = TagMerge(existing_record.taggingTags, tags);
+      existing_record.taggingTags = MergeArrays(existing_record.taggingTags, tags);
 
       await DB_MODULE.Update_Tagging_Annotation_by_fileHash_DB(existing_record);
 
@@ -145,7 +145,7 @@ async function HandleImport() {
     incoming_meme.connected_to = connected_to.map((m) => file_hash_to_name_map.get(m));
 
     if (existing_record) {
-      existing_record.fileNames = RelatedMemesMerge(incoming_meme.connected_to, existing_record.fileNames);
+      existing_record.fileNames = MergeArrays(incoming_meme.connected_to, existing_record.fileNames);
       await DB_MODULE.Update_Tagging_Meme_Entry(existing_record);
       continue;
     }
@@ -181,11 +181,11 @@ async function HandleImport() {
       const memes_filenames = memes.map((i) => file_hash_to_name_map.get(i));
 
       if (existing_collection) {
-        existing_collection.collectionMemes = RelatedMemesMerge(existing_collection.collectionMemes, memes_filenames);
-        existing_collection.collectionGalleryFiles = RelatedMemesMerge(existing_collection.collectionGalleryFiles, gallery_filenames);
+        existing_collection.collectionMemes = MergeArrays(existing_collection.collectionMemes, memes_filenames);
+        existing_collection.collectionGalleryFiles = MergeArrays(existing_collection.collectionGalleryFiles, gallery_filenames);
         existing_collection.collectionEmotions = AverageEmotions(existing_collection.collectionEmotions, emotions);
         existing_collection.collectionDescription = DescriptionMerge(existing_collection.collectionDescription, description);
-        existing_collection.collectionDescriptionTags = TagMerge(existing_collection.collectionDescriptionTags, tags);
+        existing_collection.collectionDescriptionTags = MergeArrays(existing_collection.collectionDescriptionTags, tags);
 
         await DB_MODULE.Update_Collection_Record_In_DB(existing_collection);
         continue;
@@ -210,7 +210,7 @@ async function HandleImport() {
       const entry_orig = await DB_MODULE.Get_Collection_MEME_Record_From_DB(file_name);
 
       if (entry_orig) {
-        entry_orig.collectionNames = RelatedMemesMerge(entry_orig.collectionNames, collection_names);
+        entry_orig.collectionNames = MergeArrays(entry_orig.collectionNames, collection_names);
         await DB_MODULE.Update_Collection_MEMES(entry_orig);
         continue;
       }
@@ -229,7 +229,7 @@ async function HandleImport() {
       const entry_orig = await DB_MODULE.Get_Collection_IMAGE_Record_From_DB(file_name);
 
       if (entry_orig) {
-        entry_orig.collectionNames = RelatedMemesMerge(entry_orig.collectionNames, collection_names);
+        entry_orig.collectionNames = MergeArrays(entry_orig.collectionNames, collection_names);
         await DB_MODULE.Update_Collection_GALLERY(entry_orig);
         continue;
       }
@@ -274,16 +274,12 @@ function TranslateEntryFromSnakeCase({ _id, meme_choices, tags, emotions, raw_de
   });
 }
 
-function TagMerge(orig, incoming) {
+function MergeArrays(orig, incoming) {
   return [...new Set([...orig, ...incoming])];
 }
 
 function DescriptionMerge(orig, incoming) {
   return `${orig} :[imported]: ${incoming}`;
-}
-
-function RelatedMemesMerge(orig, incoming) {
-  return [...new Set([...orig, ...incoming])];
 }
 
 function AverageEmotions(emotions_orig, emotions_new) {

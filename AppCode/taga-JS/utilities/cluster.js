@@ -5,13 +5,7 @@ const MIN_CLUSTER_DIST_SCORE = 0.64;
 async function CreateTaggingEntryCluster(tagging_entry) {
   if (tagging_entry.faceDescriptors.length > 0) {
     // TODO: replace with an iterator on clusters to not hold all in memory at same time
-    const clusters = (await DB_MODULE.Get_All_FaceClusters()).map((c) => {
-      return {
-        ...c,
-        avgDescriptor: JSON.parse(c.avgDescriptor),
-        relatedFaces: JSON.parse(c.relatedFaces),
-      };
-    });
+    const clusters = await DB_MODULE.Get_All_FaceClusters();
 
     const parent_cluster_row_ids = [];
 
@@ -23,7 +17,7 @@ async function CreateTaggingEntryCluster(tagging_entry) {
       });
 
       if (related_clusters.length == 0) {
-        const cluster = await CreateFaceCluster(descriptor, tagging_entry.fileHash);
+        const cluster = await CreateFaceCluster(descriptor, tagging_entry.fileHash, tagging_entry.taggingTags, tagging_entry.taggingMemeChoices);
         parent_cluster_row_ids.push(cluster.rowid);
         clusters.push(cluster);
         continue;
@@ -32,8 +26,37 @@ async function CreateTaggingEntryCluster(tagging_entry) {
       for (let i = 0; i < related_clusters.length; i++) {
         related_clusters[i].relatedFaces[tagging_entry.fileHash] = [descriptor];
         const descriptors_inside_cluster = Object.values(related_clusters[i].relatedFaces).flatMap((a) => a);
+        related_clusters[i].images = MergeArrays(related_clusters[i].images, [tagging_entry.fileHash]);
+
+        for (const k of tagging_entry.taggingTags) {
+          if (k in related_clusters[i].keywords) {
+            related_clusters[i].keywords[k] += 1;
+            continue;
+          }
+
+          related_clusters[i].keywords[k] = 1;
+        }
+
+        for (const m of tagging_entry.taggingMemeChoices) {
+          if (m in related_clusters[i].memes) {
+            related_clusters[i].memes[m] += 1;
+            continue;
+          }
+
+          related_clusters[i].memes[m] = 1;
+        }
+
+        //const keywords_inside_cluster = Object.values()
         related_clusters[i].avgDescriptor = ComputeAvgFaceDescriptor(descriptors_inside_cluster);
-        await DB_MODULE.Update_FaceCluster_ROWID(related_clusters[i].avgDescriptor, related_clusters[i].relatedFaces, related_clusters[i].rowid);
+
+        await DB_MODULE.Update_FaceCluster_ROWID(
+          related_clusters[i].avgDescriptor,
+          related_clusters[i].relatedFaces,
+          related_clusters[i].keywords,
+          related_clusters[i].images,
+          related_clusters[i].memes,
+          related_clusters[i].rowid
+        );
         parent_cluster_row_ids.push(related_clusters[i].rowid);
       }
     }
@@ -46,10 +69,22 @@ async function CreateTaggingEntryCluster(tagging_entry) {
 }
 exports.CreateTaggingEntryCluster = CreateTaggingEntryCluster;
 
-async function CreateFaceCluster(avgDescriptor, fileHash) {
+async function CreateFaceCluster(avgDescriptor, fileHash, tags, meme_incoming) {
   const relatedFaces = {};
+  const keywords = {};
+  const memes = {};
+
+  for (const k of tags) {
+    keywords[k] = 1;
+  }
+
+  for (const m of meme_incoming) {
+    memes[m] = 1;
+  }
+
   relatedFaces[fileHash] = [avgDescriptor];
-  const rowid = await DB_MODULE.Insert_FaceCluster(avgDescriptor, relatedFaces); //returns rowid for the new record
+
+  const rowid = await DB_MODULE.Insert_FaceCluster(avgDescriptor, relatedFaces, keywords, [fileHash], memes); //returns rowid for the new record
   return { rowid, relatedFaces, avgDescriptor };
 }
 
@@ -67,3 +102,7 @@ function ComputeAvgFaceDescriptor(descriptors) {
   return avg;
 }
 exports.ComputeAvgFaceDescriptor = ComputeAvgFaceDescriptor;
+
+function MergeArrays(orig, incoming) {
+  return [...new Set([...orig, ...incoming])];
+}

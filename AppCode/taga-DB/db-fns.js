@@ -847,9 +847,9 @@ function Get_MEME_Collection_Obj_Fields_From_Record(record) {
 
 //FACECLUSTERS stuff const FACECLUSTERS_TABLE_NAME = 'FACECLUSTERS';
 const GET_ALL_FACECLUSTERS_STMT = DB.prepare(`SELECT ROWID, * FROM ${FACECLUSTERS_TABLE_NAME}`);
-const INSERT_FACECLUSTER_STMT = DB.prepare(`INSERT INTO ${FACECLUSTERS_TABLE_NAME} (avgDescriptor, relatedFaces ) VALUES (?, ?)`);
+const INSERT_FACECLUSTER_STMT = DB.prepare(`INSERT INTO ${FACECLUSTERS_TABLE_NAME} (avgDescriptor, relatedFaces, keywords, images, memes ) VALUES (?, ?, ?, ?, ?)`);
 const DELETE_EMPTY_FACECLUSTER_STMT = DB.prepare(`DELETE FROM ${FACECLUSTERS_TABLE_NAME} WHERE relatedFaces=?`);
-const UPDATE_FACECLUSTER_STMT = DB.prepare(`UPDATE ${FACECLUSTERS_TABLE_NAME} SET avgDescriptor=?, relatedFaces=? WHERE ROWID=?`);
+const UPDATE_FACECLUSTER_STMT = DB.prepare(`UPDATE ${FACECLUSTERS_TABLE_NAME} SET avgDescriptor=?, relatedFaces=?, keywords=?, images=?, memes=? WHERE ROWID=?`);
 
 const GET_LAST_ROWID_STMT = DB.prepare(`SELECT last_insert_rowid()`);
 
@@ -857,7 +857,14 @@ async function Get_FaceClusters_From_IDS(ids) {
   const placeholders = ids.map(() => '?').join(',');
   let res = DB.prepare(`SELECT ROWID, * FROM ${FACECLUSTERS_TABLE_NAME} WHERE ${FACECLUSTERS_TABLE_NAME}.ROWID IN (${placeholders})`).all(...ids);
   return res.map((r) => {
-    return { ...r, avgDescriptor: JSON.parse(r.avgDescriptor), relatedFaces: JSON.parse(r.relatedFaces) };
+    return {
+      ...r,
+      avgDescriptor: JSON.parse(r.avgDescriptor),
+      relatedFaces: JSON.parse(r.relatedFaces),
+      keywords: JSON.parse(r.keywords),
+      images: JSON.parse(r.images),
+      memes: JSON.parse(r.memes),
+    };
   });
 }
 exports.Get_FaceClusters_From_IDS = Get_FaceClusters_From_IDS;
@@ -870,7 +877,16 @@ async function Delete_FaceClusters_By_IDS(ids) {
 exports.Delete_FaceClusters_By_IDS = Delete_FaceClusters_By_IDS;
 
 async function Get_All_FaceClusters() {
-  return await GET_ALL_FACECLUSTERS_STMT.all();
+  return await GET_ALL_FACECLUSTERS_STMT.all().map((c) => {
+    return {
+      ...c,
+      avgDescriptor: JSON.parse(c.avgDescriptor),
+      relatedFaces: JSON.parse(c.relatedFaces),
+      keywords: JSON.parse(c.keywords),
+      images: JSON.parse(c.images),
+      memes: JSON.parse(c.memes),
+    };
+  });
 }
 exports.Get_All_FaceClusters = Get_All_FaceClusters;
 
@@ -879,15 +895,28 @@ async function Get_Last_Rowid() {
 }
 exports.Get_Last_Rowid = Get_Last_Rowid;
 
-async function Insert_FaceCluster(avgDescriptor, relatedFaces) {
-  const res = await INSERT_FACECLUSTER_STMT.run(JSON.stringify(Array.from(avgDescriptor)), JSON.stringify(relatedFaces));
+async function Insert_FaceCluster(avgDescriptor, relatedFaces, keywords, images, memes) {
+  const res = await INSERT_FACECLUSTER_STMT.run(
+    JSON.stringify(Array.from(avgDescriptor)),
+    JSON.stringify(relatedFaces),
+    JSON.stringify(keywords),
+    JSON.stringify(images),
+    JSON.stringify(memes)
+  );
 
   return res.lastInsertRowid;
 }
 exports.Insert_FaceCluster = Insert_FaceCluster;
 
-async function Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, ROWID) {
-  await UPDATE_FACECLUSTER_STMT.run(JSON.stringify(Array.from(avgDescriptor)), JSON.stringify(relatedFaces), ROWID);
+async function Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, memes, ROWID) {
+  await UPDATE_FACECLUSTER_STMT.run(
+    JSON.stringify(Array.from(avgDescriptor)),
+    JSON.stringify(relatedFaces),
+    JSON.stringify(keywords),
+    JSON.stringify(images),
+    JSON.stringify(memes),
+    ROWID
+  );
 }
 exports.Update_FaceCluster_ROWID = Update_FaceCluster_ROWID;
 
