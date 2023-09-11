@@ -688,55 +688,61 @@ function fromBinary(binary) {
   return result;
 }
 
-//SAVING, LOADING, DELETING, ETC START>>>
-//process image for saving including the text to tags (Called from the html Save button)
-async function Save_Image_Annotation_Changes() {
-  //save meme changes
-  let current_memes = current_image_annotation.taggingMemeChoices;
-  let meme_switch_booleans = []; //meme selection toggle switch check boxes
-  for (var ii = 0; ii < current_memes.length; ii++) {
-    if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${current_memes[ii]}`) == true) {
-      let meme_boolean_tmp = document.getElementById(`meme-toggle-id-${current_memes[ii]}`).checked;
-      if (meme_boolean_tmp == true) {
-        meme_switch_booleans.push(current_memes[ii]);
-      }
-    }
-  }
-  //handle textual description, process for tag words
-  let rawDescription = document.getElementById('description-textarea-id').value;
-  let new_tags = DESCRIPTION_PROCESS_MODULE.process_description(rawDescription);
-  let original_tags = current_image_annotation.taggingTags;
-  const keyword_additions = new_tags.filter((item) => !original_tags.includes(item));
-  const keyword_subtractions = original_tags.filter((item) => !new_tags.includes(item));
+async function Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags }, fileName, clustersIDS) {
+  const keyword_additions = newTags.filter((item) => !origTags.includes(item));
+  const keyword_subtractions = origTags.filter((item) => !newTags.includes(item));
 
-  const clusters = await DB_MODULE.Get_FaceClusters_From_IDS(current_image_annotation.faceClusters);
+  const clusters = await DB_MODULE.Get_FaceClusters_From_IDS(clustersIDS);
 
   for (let i = 0; i < clusters.length; i++) {
-    console.log(clusters[i]);
     for (const k of keyword_additions) {
       clusters[i].keywords[k] = (clusters[i].keywords[k] || 0) + 1;
     }
-    console.log(keyword_additions, keyword_subtractions);
+
     for (const k of keyword_subtractions) {
       clusters[i].keywords[k] = (clusters[i].keywords[k] || 1) - 1;
       if (clusters[i].keywords[k] == 0) delete clusters[i].keywords[k];
     }
 
-    const { rowid, avgDescriptor, relatedFaces, keywords, images, memes } = clusters[i];
+    const { rowid, avgDescriptor, relatedFaces, keywords, images } = clusters[i];
 
-    await DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, memes, rowid);
+    await DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, rowid);
   }
+}
+
+//SAVING, LOADING, DELETING, ETC START>>>
+//process image for saving including the text to tags (Called from the html Save button)
+async function Save_Image_Annotation_Changes() {
+  const { fileName, faceClusters } = current_image_annotation;
+
+  //save meme changes
+  let visible_memes = current_image_annotation.taggingMemeChoices;
+  let newMemes = []; //meme selection toggle switch check boxes
+  for (var ii = 0; ii < visible_memes.length; ii++) {
+    if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${visible_memes[ii]}`) == true) {
+      let meme_boolean_tmp = document.getElementById(`meme-toggle-id-${visible_memes[ii]}`).checked;
+      if (meme_boolean_tmp == true) {
+        newMemes.push(visible_memes[ii]);
+      }
+    }
+  }
+  //handle textual description, process for tag words
+  let rawDescription = document.getElementById('description-textarea-id').value;
+  let newTags = DESCRIPTION_PROCESS_MODULE.process_description(rawDescription);
+  let origTags = current_image_annotation.taggingTags;
+
+  await Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags }, fileName, faceClusters);
 
   //change the object fields accordingly
   //new_record.fileName = image_name;
-  current_image_annotation.taggingMemeChoices = meme_switch_booleans;
+  current_image_annotation.taggingMemeChoices = newMemes;
   current_image_annotation.taggingRawDescription = rawDescription;
-  current_image_annotation.taggingTags = new_tags;
+  current_image_annotation.taggingTags = newTags;
   for (var key of Object.keys(current_image_annotation['taggingEmotions'])) {
     current_image_annotation['taggingEmotions'][key] = document.getElementById('emotion-range-id-' + key).value;
   }
   await Update_Tagging_Annotation_DB(current_image_annotation);
-  await Update_Tagging_MEME_Connections(current_image_annotation.fileName, current_memes, meme_switch_booleans);
+  await Update_Tagging_MEME_Connections(fileName, visible_memes, newMemes);
 
   Load_State_Of_Image_IDB(); //TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_annotations)
 }
@@ -812,11 +818,6 @@ async function Handle_Delete_FileFrom_Cluster() {
       if (cluster.keywords[k] == 0) delete cluster.keywords[k];
     }
 
-    for (const m of current_image_annotation.taggingMemeChoices) {
-      cluster.memes[m] = (cluster.memes[m] || 1) - 1;
-      if (cluster.memes[m] == 0) delete cluster.memes[m];
-    }
-
     cluster.images = cluster.images.filter((i) => i != current_image_annotation.fileHash);
 
     updated_clusters.push(cluster);
@@ -824,8 +825,8 @@ async function Handle_Delete_FileFrom_Cluster() {
 
   if (empty_clusters.length > 0) await DB_MODULE.Delete_FaceClusters_By_IDS(empty_clusters);
 
-  for (const { rowid, avgDescriptor, relatedFaces, keywords, images, memes } of updated_clusters) {
-    await DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, memes, rowid);
+  for (const { rowid, avgDescriptor, relatedFaces, keywords, images } of updated_clusters) {
+    await DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, rowid);
   }
 }
 
@@ -1653,13 +1654,15 @@ async function Add_New_Meme() {
   //user presses it after the fields have been entered to search the images to then add memes
   //after the search is done and user has made the meme selection (or not) and they are to be added to the current annotation object
   document.getElementById('modal-search-add-memes-images-results-select-images-order-button-id').onclick = async function () {
-    let memes_current = current_image_annotation.taggingMemeChoices;
+    let origMemes = current_image_annotation.taggingMemeChoices;
+    const { fileName, faceClusters } = current_image_annotation;
+
     //meme selection switch check boxes
     //!!!simplify by getting the checked meme list and then append and get unique array
     // the list will be from the
     let meme_switch_booleans = [];
     for (let ii = 0; ii < meme_search_results.length; ii++) {
-      if (memes_current.includes(meme_search_results[ii]) == false && current_image_annotation.fileName != meme_search_results[ii]) {
+      if (origMemes.includes(meme_search_results[ii]) == false && fileName != meme_search_results[ii]) {
         //exclude memes already present
         let meme_boolean_tmp1 = document.getElementById(`add-memes-images-toggle-id-${meme_search_results[ii]}`).checked;
         if (meme_boolean_tmp1 == true) {
@@ -1668,7 +1671,7 @@ async function Add_New_Meme() {
       }
     }
     for (let ii = 0; ii < meme_search_meme_results.length; ii++) {
-      if (memes_current.includes(meme_search_meme_results[ii]) == false && current_image_annotation.fileName != meme_search_meme_results[ii]) {
+      if (origMemes.includes(meme_search_meme_results[ii]) == false && fileName != meme_search_meme_results[ii]) {
         //exclude memes already present
         let meme_boolean_tmp2 = document.getElementById(`add-memes-meme-toggle-id-${meme_search_meme_results[ii]}`).checked;
         if (meme_boolean_tmp2 == true) {
@@ -1676,10 +1679,11 @@ async function Add_New_Meme() {
         }
       }
     }
-    await Update_Tagging_MEME_Connections(current_image_annotation.fileName, JSON.parse(JSON.stringify(memes_current)), JSON.parse(JSON.stringify(meme_switch_booleans)));
+    await Update_Tagging_MEME_Connections(fileName, JSON.parse(JSON.stringify(origMemes)), JSON.parse(JSON.stringify(meme_switch_booleans)));
     meme_switch_booleans.push(...current_image_annotation.taggingMemeChoices);
     current_image_annotation.taggingMemeChoices = [...new Set(meme_switch_booleans)]; //add a 'unique' set of memes as the 'new Set' has unique contents
     await Update_Tagging_Annotation_DB(current_image_annotation);
+
     Load_State_Of_Image_IDB();
 
     const search_res_children = document.getElementById('modal-search-add-memes-images-results-grid-div-area-id').children;

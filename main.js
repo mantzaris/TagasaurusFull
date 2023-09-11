@@ -170,7 +170,7 @@ async function Init() {
   let faceclusters_table_exists_res = faceclusters_table_exists_stmt.get();
   if (faceclusters_table_exists_res['count(*)'] == 0) {
     //
-    let STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${FACECLUSTERS_TABLE_NAME} (avgDescriptor TEXT, relatedFaces TEXT, keywords TEXT, images TEXT, memes TEXT)`);
+    let STMT = DB.prepare(`CREATE TABLE IF NOT EXISTS ${FACECLUSTERS_TABLE_NAME} (avgDescriptor TEXT, relatedFaces TEXT, keywords TEXT, images TEXT)`);
     STMT.run(); //function for adding an index to the tagging table: //CREATE UNIQUE INDEX column_index ON table (column); //
   } else {
     //
