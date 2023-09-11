@@ -118,6 +118,17 @@ async function Get_Hashes_From_FileNames(filenames) {
 }
 exports.Get_Hashes_From_FileNames = Get_Hashes_From_FileNames;
 
+async function Get_Memes_From_FileNames(filenames) {
+  const placeholders = filenames.map((_) => '?').join(', ');
+  const stmt = DB.prepare(`SELECT taggingMemeChoices FROM ${TAGGING_TABLE_NAME} WHERE fileName IN (${placeholders})`);
+  return stmt
+    .all(...filenames)
+    .map((r) => JSON.parse(r.taggingMemeChoices))
+    .flatMap((a) => a);
+  //return filenames.flatMap((name) => stmt.all(name).map((row) => row.fileHash));
+}
+exports.Get_Memes_From_FileNames = Get_Memes_From_FileNames;
+
 //fn to get the annotation record for an image by key_type of rowid or filename
 async function Get_Tagging_Record_From_DB(filename) {
   let row_obj = await GET_FILENAME_TAGGING_STMT.get(filename);

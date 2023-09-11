@@ -4,10 +4,8 @@ const fileType = require('file-type');
 
 const { DB_MODULE } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
 
-let mode;
 let kind = 'webcam';
 
-const fps = 3; //how often we run the face detection
 let media_source;
 let video_el = document.getElementById('inputVideo1');
 let canvas_el = document.getElementById('overlay1');
@@ -72,7 +70,12 @@ return_from_stream_btn3.onclick = () => {
   Stop_Stream_Search();
 };
 
-let stream_selection = 'keywords-only';
+const selection_mode = {
+  keywords: true,
+  images: false,
+  memes: false,
+};
+
 selection_description.innerText = keywords_only_description;
 selection_set.onchange = () => {
   if (selection_set.value == 'keywords-only') {
@@ -81,28 +84,30 @@ selection_set.onchange = () => {
     canvas_el = document.getElementById('overlay1');
 
     keyword_div = document.getElementById('keyword-display1-div');
+    selection_mode.keywords = true;
   } else if (selection_set.value == 'keywords-images') {
     selection_description.innerText = keywords_images_description;
     video_el = document.getElementById('inputVideo2');
     canvas_el = document.getElementById('overlay2');
 
     keyword_div = document.getElementById('keyword-display1-div');
+    selection_mode.keywords = selection_mode.images = true;
   } else if (selection_set.value == 'keywords-images-memes') {
     selection_description.innerText = keywords_images_memes_description;
     video_el = document.getElementById('inputVideo3');
     canvas_el = document.getElementById('overlay3');
 
     keyword_div = document.getElementById('keyword-display1-div');
+    selection_mode.keywords = selection_mode.images = selection_mode.memes = true;
   }
-  stream_selection = selection_set.value;
 };
 
 function StartScreen() {
-  if (selection_set.value == 'keywords-only') {
+  if (selection_mode.keywords && !selection_mode.images && !selection_mode.memes) {
     Keywords_Only_Start();
-  } else if (selection_set.value == 'keywords-images') {
+  } else if (selection_mode.keywords && selection_mode.images && !selection_mode.memes) {
     Keywords_Images_Start();
-  } else if (selection_set.value == 'keywords-images-memes') {
+  } else if (selection_mode.keywords && selection_mode.images && selection_mode.memes) {
     Keywords_Images_Memes_Start();
   }
 }
@@ -110,26 +115,26 @@ function StartScreen() {
 function Keywords_Only_Start() {
   document.getElementById('selection-screen').style.display = 'none';
   document.getElementById('stream-view1').style.display = 'grid';
-  video = document.getElementById('inputVideo1');
+  video_el = document.getElementById('inputVideo1');
   keyword_div = document.getElementById('keyword-display1-div');
-  canvas = document.getElementById('overlay1');
+  canvas_el = document.getElementById('overlay1');
 }
 function Keywords_Images_Start() {
   document.getElementById('selection-screen').style.display = 'none';
   document.getElementById('stream-view2').style.display = 'grid';
-  video = document.getElementById('inputVideo2');
+  video_el = document.getElementById('inputVideo2');
   keyword_div = document.getElementById('keyword-display2-div');
   images_div = document.getElementById('images-display2-div');
-  canvas = document.getElementById('overlay2');
+  canvas_el = document.getElementById('overlay2');
 }
 function Keywords_Images_Memes_Start() {
   document.getElementById('selection-screen').style.display = 'none';
   document.getElementById('stream-view3').style.display = 'grid';
-  video = document.getElementById('inputVideo3');
+  video_el = document.getElementById('inputVideo3');
   keyword_div = document.getElementById('keyword-display3-div');
   images_div = document.getElementById('images-display3-div');
   memes_div = document.getElementById('memes-display3-div');
-  canvas = document.getElementById('overlay3');
+  canvas_el = document.getElementById('overlay3');
 }
 
 ipcRenderer.invoke('getCaptureID').then((sources) => {
@@ -184,9 +189,9 @@ main_menu_btn.onclick = () => {
 
 //user returns to stream search menu from the running search stream and needs to change the view and stop the stream
 function Stop_Stream_Search() {
-  stream.getTracks().forEach(function (track) {
-    track.stop();
-  });
+  // stream?.getTracks().forEach(function (track) {
+  //   track.stop();
+  // });
 
   window.location.reload();
 }
@@ -204,6 +209,12 @@ async function PullTaggingClusters() {
   const face_clusters = await DB_MODULE.Get_All_FaceClusters();
 
   for (const face_cluster of face_clusters) {
+    if (selection_mode.memes) {
+      const memes = await DB_MODULE.Get_Memes_From_FileNames(face_cluster.images);
+
+      face_cluster.memes = memes;
+    } else face_cluster.memes = [];
+
     clusters.set(face_cluster.rowid, face_cluster);
   }
 }
@@ -257,25 +268,22 @@ async function UpdateSearchResults() {
     }
 
     if (best_cluster_id == null) {
-      console.log('baz');
       Display_Keywords();
-      keywords = ['apple', 'bat'];
-      images = memes = [];
+      keywords = images = memes = [];
       return;
     }
-    console.log('best_cluster_id', best_cluster_id);
+
     const best_cluster = clusters.get(best_cluster_id);
 
-    keywords = best_cluster.keywords;
+    keywords = Object.keys(best_cluster.keywords);
     images = best_cluster.images;
     memes = best_cluster.memes;
   }
 
-  if (keywords.length > 0) {
-    //} && selection_set.value in ['keywords', 'keywords-images', 'keywords-images-memes']) {
-    console.log('about to keyword display');
-    Display_Keywords();
-  }
+  Display_Keywords();
+
+  Display_Images_Found();
+  Display_Memes_Found();
 }
 
 async function DrawDescriptors() {
@@ -361,6 +369,7 @@ async function Detect_Faces() {
 function Display_Keywords() {
   keyword_div.innerHTML = '';
   let keywords_html = 'Keywords: <br>';
+
   for (const keyword of keywords) {
     keywords_html += `
                           <div class="keyword">
@@ -368,5 +377,39 @@ function Display_Keywords() {
                           </div>
                           `;
   }
+
   keyword_div.innerHTML = keywords_html;
+}
+
+function Display_Images_Found() {
+  if (!selection_mode.images) return;
+
+  images_div.innerHTML = '';
+  images_html = 'Images: <br>';
+
+  for (const image of images) {
+    images_html += `
+                          <div class="image-thumbnail-div">
+                              <img class="image-thumbnail" id="" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${image}" title="view" alt="img" />
+                          </div>
+                          `;
+  }
+
+  images_div.innerHTML = images_html;
+}
+function Display_Memes_Found() {
+  if (!selection_mode.memes) return;
+
+  memes_div.innerHTML = '';
+  memes_html = 'Memes: <br>';
+
+  for (const meme of memes) {
+    memes_html += `
+                          <div class="meme-thumbnail-div">
+                              <img class="meme-thumbnail" id="" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme}" title="view" alt="meme" />
+                          </div>
+                          `;
+  }
+
+  memes_div.innerHTML = memes_html;
 }
