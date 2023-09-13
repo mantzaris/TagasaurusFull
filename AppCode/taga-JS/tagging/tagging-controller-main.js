@@ -688,7 +688,7 @@ function fromBinary(binary) {
   return result;
 }
 
-async function Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags }, fileName, clustersIDS) {
+async function Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags }, clustersIDS) {
   const keyword_additions = newTags.filter((item) => !origTags.includes(item));
   const keyword_subtractions = origTags.filter((item) => !newTags.includes(item));
 
@@ -731,7 +731,7 @@ async function Save_Image_Annotation_Changes() {
   let newTags = DESCRIPTION_PROCESS_MODULE.process_description(rawDescription);
   let origTags = current_image_annotation.taggingTags;
 
-  await Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags }, fileName, faceClusters);
+  await Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags }, faceClusters);
 
   //change the object fields accordingly
   //new_record.fileName = image_name;
@@ -818,7 +818,7 @@ async function Handle_Delete_FileFrom_Cluster() {
       if (cluster.keywords[k] == 0) delete cluster.keywords[k];
     }
 
-    cluster.images = cluster.images.filter((i) => i != current_image_annotation.fileHash);
+    delete cluster.images[current_image_annotation.fileName];
 
     updated_clusters.push(cluster);
   }

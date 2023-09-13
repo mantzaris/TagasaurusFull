@@ -17,7 +17,7 @@ async function CreateTaggingEntryCluster(tagging_entry) {
       });
 
       if (related_clusters.length == 0) {
-        const cluster = await CreateFaceCluster(descriptor, tagging_entry.fileName, tagging_entry.taggingTags, tagging_entry.taggingMemeChoices);
+        const cluster = await CreateFaceCluster(descriptor, tagging_entry.fileName, tagging_entry.taggingTags, tagging_entry.fileType);
         parent_cluster_row_ids.push(cluster.rowid);
         clusters.push(cluster);
         continue;
@@ -26,7 +26,7 @@ async function CreateTaggingEntryCluster(tagging_entry) {
       for (let i = 0; i < related_clusters.length; i++) {
         related_clusters[i].relatedFaces[tagging_entry.fileName] = [descriptor];
         const descriptors_inside_cluster = Object.values(related_clusters[i].relatedFaces).flatMap((a) => a);
-        related_clusters[i].images = MergeArrays(related_clusters[i].images, [tagging_entry.fileName]);
+        related_clusters[i].images[tagging_entry.fileName] = tagging_entry.fileType;
 
         for (const k of tagging_entry.taggingTags) {
           if (k in related_clusters[i].keywords) {
@@ -35,15 +35,6 @@ async function CreateTaggingEntryCluster(tagging_entry) {
           }
 
           related_clusters[i].keywords[k] = 1;
-        }
-
-        for (const m of tagging_entry.taggingMemeChoices) {
-          if (m in related_clusters[i].memes) {
-            related_clusters[i].memes[m] += 1;
-            continue;
-          }
-
-          related_clusters[i].memes[m] = 1;
         }
 
         //const keywords_inside_cluster = Object.values()
@@ -68,17 +59,19 @@ async function CreateTaggingEntryCluster(tagging_entry) {
 }
 exports.CreateTaggingEntryCluster = CreateTaggingEntryCluster;
 
-async function CreateFaceCluster(avgDescriptor, fileName, tags) {
+async function CreateFaceCluster(avgDescriptor, fileName, tags, fileType) {
   const relatedFaces = {};
   const keywords = {};
+  const images = {};
 
   for (const k of tags) {
     keywords[k] = 1;
   }
 
   relatedFaces[fileName] = [avgDescriptor];
+  images[fileName] = fileType;
 
-  const rowid = await DB_MODULE.Insert_FaceCluster(avgDescriptor, relatedFaces, keywords, [fileName]); //returns rowid for the new record
+  const rowid = await DB_MODULE.Insert_FaceCluster(avgDescriptor, relatedFaces, keywords, images); //returns rowid for the new record
   return { rowid, relatedFaces, avgDescriptor };
 }
 

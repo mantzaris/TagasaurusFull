@@ -156,8 +156,10 @@ ipcRenderer.invoke('getCaptureID').then((sources) => {
 webcam_selection_btn.onclick = async () => {
   try {
     await PullTaggingClusters();
+    kind = selection_sources.value;
 
     media_source = await GetMediaStream(kind);
+    console.log(media_source);
     video_el.srcObject = media_source;
     video_el.play();
     video_el.style.display = 'none';
@@ -198,17 +200,40 @@ function Stop_Stream_Search() {
 //END: INIT STUFF
 
 async function GetMediaStream(source) {
-  if (source == 'screen') {
-    return await navigator.mediaDevices.getDisplayMedia(stream_constraints);
-  }
-  //webcam option
-  return await navigator.mediaDevices.getUserMedia(stream_constraints);
+  console.log(source);
+  const video_setup =
+    'webcam' == source
+      ? true
+      : {
+          mandatory: {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            frameRate: { ideal: 16, max: 24 },
+            chromeMediaSource: 'desktop',
+            chromeMediaSourceId: source,
+            minWidth: 1280,
+            maxWidth: 1280,
+            minHeight: 720,
+            maxHeight: 720,
+          },
+        };
+
+  return await navigator.mediaDevices.getUserMedia({
+    video: video_setup,
+    audio: false,
+  });
 }
 
 async function PullTaggingClusters() {
   const face_clusters = await DB_MODULE.Get_All_FaceClusters();
 
   for (const face_cluster of face_clusters) {
+    for (const [fileName, fileType] of Object.entries(face_cluster.images)) {
+      if (fileType != 'image' && fileType != 'gif') {
+        delete face_cluster.images[fileName];
+      }
+    }
+
     if (selection_mode.memes) {
       const memes = await DB_MODULE.Get_Memes_From_FileNames(face_cluster.images);
 
@@ -276,7 +301,7 @@ async function UpdateSearchResults() {
     const best_cluster = clusters.get(best_cluster_id);
 
     keywords = Object.keys(best_cluster.keywords);
-    images = best_cluster.images;
+    images = Object.keys(best_cluster.images);
     memes = best_cluster.memes;
   }
 
