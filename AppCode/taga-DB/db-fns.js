@@ -118,6 +118,19 @@ async function Get_Hashes_From_FileNames(filenames) {
 }
 exports.Get_Hashes_From_FileNames = Get_Hashes_From_FileNames;
 
+async function Get_Tagging_ClusterIDS_From_FileNames(filenames) {
+  const placeholders = filenames.map((_) => '?').join(', ');
+  const stmt = DB.prepare(`SELECT faceClusters FROM ${TAGGING_TABLE_NAME} WHERE fileName IN (${placeholders})`);
+
+  const ids = stmt
+    .all(...filenames)
+    .map((r) => JSON.parse(r.faceClusters))
+    .flatMap((c) => c);
+  return [...new Set(ids)];
+  //return filenames.flatMap((name) => stmt.all(name).map((row) => row.fileHash));
+}
+exports.Get_Tagging_ClusterIDS_From_FileNames = Get_Tagging_ClusterIDS_From_FileNames;
+
 async function Get_Memes_From_FileNames(filenames) {
   const placeholders = filenames.map((_) => '?').join(', ');
   const stmt = DB.prepare(`SELECT taggingMemeChoices FROM ${TAGGING_TABLE_NAME} WHERE fileName IN (${placeholders})`);
@@ -865,6 +878,8 @@ const UPDATE_FACECLUSTER_STMT = DB.prepare(`UPDATE ${FACECLUSTERS_TABLE_NAME} SE
 const GET_LAST_ROWID_STMT = DB.prepare(`SELECT last_insert_rowid()`);
 
 async function Get_FaceClusters_From_IDS(ids) {
+  if (ids.length == 0) return [];
+
   const placeholders = ids.map(() => '?').join(',');
   let res = DB.prepare(`SELECT ROWID, * FROM ${FACECLUSTERS_TABLE_NAME} WHERE ${FACECLUSTERS_TABLE_NAME}.ROWID IN (${placeholders})`).all(...ids);
   return res.map((r) => {
@@ -887,15 +902,33 @@ async function Delete_FaceClusters_By_IDS(ids) {
 exports.Delete_FaceClusters_By_IDS = Delete_FaceClusters_By_IDS;
 
 async function Get_All_FaceClusters() {
-  return await GET_ALL_FACECLUSTERS_STMT.all().map((c) => {
-    return {
-      ...c,
-      avgDescriptor: JSON.parse(c.avgDescriptor),
-      relatedFaces: JSON.parse(c.relatedFaces),
-      keywords: JSON.parse(c.keywords),
-      images: JSON.parse(c.images),
-    };
-  });
+  const allClusters = await GET_ALL_FACECLUSTERS_STMT.all();
+  console.log(allClusters);
+
+  const tmp = [];
+
+  for (let i = 0; i < allClusters.length; i++) {
+    const c = allClusters[i];
+    console.log('before tt', JSON.parse(c.images));
+    const tt = {};
+    tt.avgDescriptor = JSON.parse(c.avgDescriptor);
+    tt.relatedFaces = JSON.parse(c.relatedFaces);
+    tt.keywords = JSON.parse(c.keywords);
+    tt.images = JSON.parse(c.images);
+    tmp.push(tt);
+  }
+
+  console.log('tmp', tmp);
+
+  // const tmp = allClusters.map((c) => {
+  //   const tt = {};
+  //   tt.avgDescriptor = JSON.parse(c.avgDescriptor);
+  //   tt.relatedFaces = JSON.parse(c.relatedFaces);
+  //   tt.keywords = JSON.parse(c.keywords);
+  //   tt.images = JSON.parse(c.images);
+  //   return JSON.parse(JSON.stringify(tt));
+  // });
+  return JSON.stringify(tmp);
 }
 exports.Get_All_FaceClusters = Get_All_FaceClusters;
 

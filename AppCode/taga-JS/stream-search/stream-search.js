@@ -155,11 +155,9 @@ ipcRenderer.invoke('getCaptureID').then((sources) => {
 
 webcam_selection_btn.onclick = async () => {
   try {
-    await PullTaggingClusters();
     kind = selection_sources.value;
 
     media_source = await GetMediaStream(kind);
-    console.log(media_source);
     video_el.srcObject = media_source;
     video_el.play();
     video_el.style.display = 'none';
@@ -174,6 +172,7 @@ webcam_selection_btn.onclick = async () => {
         if (!streaming) {
           SetUpVideo();
           streaming = true;
+          await PullTaggingClusters();
           await MainLoop();
         }
       },
@@ -181,7 +180,7 @@ webcam_selection_btn.onclick = async () => {
     );
   } catch (e) {
     console.error(e);
-    Stop_Stream_Search();
+    //Stop_Stream_Search();
   }
 };
 
@@ -200,7 +199,6 @@ function Stop_Stream_Search() {
 //END: INIT STUFF
 
 async function GetMediaStream(source) {
-  console.log(source);
   const video_setup =
     'webcam' == source
       ? true
@@ -225,20 +223,16 @@ async function GetMediaStream(source) {
 }
 
 async function PullTaggingClusters() {
-  const face_clusters = await DB_MODULE.Get_All_FaceClusters();
+  const wtf = await DB_MODULE.Get_All_FaceClusters();
+  console.log('wtf', wtf);
+  console.log('JSON.parse(wtf)', JSON.parse(wtf));
 
-  for (const face_cluster of face_clusters) {
+  for (const face_cluster of wtf) {
     for (const [fileName, fileType] of Object.entries(face_cluster.images)) {
       if (fileType != 'image' && fileType != 'gif') {
         delete face_cluster.images[fileName];
       }
     }
-
-    if (selection_mode.memes) {
-      const memes = await DB_MODULE.Get_Memes_From_FileNames(face_cluster.images);
-
-      face_cluster.memes = memes;
-    } else face_cluster.memes = [];
 
     clusters.set(face_cluster.rowid, face_cluster);
   }
@@ -302,7 +296,7 @@ async function UpdateSearchResults() {
 
     keywords = Object.keys(best_cluster.keywords);
     images = Object.keys(best_cluster.images);
-    memes = best_cluster.memes;
+    memes = Object.values(best_cluster.images).flatMap((a) => a.memes);
   }
 
   Display_Keywords();

@@ -17,7 +17,7 @@ async function CreateTaggingEntryCluster(tagging_entry) {
       });
 
       if (related_clusters.length == 0) {
-        const cluster = await CreateFaceCluster(descriptor, tagging_entry.fileName, tagging_entry.taggingTags, tagging_entry.fileType);
+        const cluster = await CreateFaceCluster(descriptor, tagging_entry.fileName, tagging_entry.taggingTags, tagging_entry.fileType, tagging_entry.taggingMemeChoices);
         parent_cluster_row_ids.push(cluster.rowid);
         clusters.push(cluster);
         continue;
@@ -26,7 +26,10 @@ async function CreateTaggingEntryCluster(tagging_entry) {
       for (let i = 0; i < related_clusters.length; i++) {
         related_clusters[i].relatedFaces[tagging_entry.fileName] = [descriptor];
         const descriptors_inside_cluster = Object.values(related_clusters[i].relatedFaces).flatMap((a) => a);
-        related_clusters[i].images[tagging_entry.fileName] = tagging_entry.fileType;
+        related_clusters[i].images[tagging_entry.fileName] = {
+          fileType: tagging_entry.fileType,
+          memes: tagging_entry.taggingMemeChoices,
+        };
 
         for (const k of tagging_entry.taggingTags) {
           if (k in related_clusters[i].keywords) {
@@ -59,7 +62,7 @@ async function CreateTaggingEntryCluster(tagging_entry) {
 }
 exports.CreateTaggingEntryCluster = CreateTaggingEntryCluster;
 
-async function CreateFaceCluster(avgDescriptor, fileName, tags, fileType) {
+async function CreateFaceCluster(avgDescriptor, fileName, tags, fileType, memes) {
   const relatedFaces = {};
   const keywords = {};
   const images = {};
@@ -69,7 +72,10 @@ async function CreateFaceCluster(avgDescriptor, fileName, tags, fileType) {
   }
 
   relatedFaces[fileName] = [avgDescriptor];
-  images[fileName] = fileType;
+  images[fileName] = {
+    fileType,
+    memes,
+  };
 
   const rowid = await DB_MODULE.Insert_FaceCluster(avgDescriptor, relatedFaces, keywords, images); //returns rowid for the new record
   return { rowid, relatedFaces, avgDescriptor };
