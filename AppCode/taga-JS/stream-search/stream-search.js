@@ -434,6 +434,7 @@ function Display_Memes_Found() {
   memes_div.innerHTML = '';
   memes_html = 'Memes: <br>';
 
+  // TODO: filter on filetype?..
   for (const meme of memes) {
     memes_html += `
                           <div class="meme-thumbnail-div">
