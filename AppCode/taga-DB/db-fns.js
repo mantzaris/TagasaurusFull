@@ -903,32 +903,17 @@ exports.Delete_FaceClusters_By_IDS = Delete_FaceClusters_By_IDS;
 
 async function Get_All_FaceClusters() {
   const allClusters = await GET_ALL_FACECLUSTERS_STMT.all();
-  console.log(allClusters);
-
-  const tmp = [];
 
   for (let i = 0; i < allClusters.length; i++) {
     const c = allClusters[i];
-    console.log('before tt', JSON.parse(c.images));
-    const tt = {};
-    tt.avgDescriptor = JSON.parse(c.avgDescriptor);
-    tt.relatedFaces = JSON.parse(c.relatedFaces);
-    tt.keywords = JSON.parse(c.keywords);
-    tt.images = JSON.parse(c.images);
-    tmp.push(tt);
+    c.avgDescriptor = JSON.parse(c.avgDescriptor);
+    c.relatedFaces = JSON.parse(c.relatedFaces);
+    c.keywords = JSON.parse(c.keywords);
+
+    c.images = JSON.parse(c.images);
   }
 
-  console.log('tmp', tmp);
-
-  // const tmp = allClusters.map((c) => {
-  //   const tt = {};
-  //   tt.avgDescriptor = JSON.parse(c.avgDescriptor);
-  //   tt.relatedFaces = JSON.parse(c.relatedFaces);
-  //   tt.keywords = JSON.parse(c.keywords);
-  //   tt.images = JSON.parse(c.images);
-  //   return JSON.parse(JSON.stringify(tt));
-  // });
-  return JSON.stringify(tmp);
+  return allClusters;
 }
 exports.Get_All_FaceClusters = Get_All_FaceClusters;
 

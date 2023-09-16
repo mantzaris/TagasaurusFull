@@ -222,19 +222,31 @@ async function GetMediaStream(source) {
   });
 }
 
+//     if (fileType != 'image' && fileType != 'gif') {
+//       delete face_cluster.images[fileName];
+//     }
 async function PullTaggingClusters() {
-  const wtf = await DB_MODULE.Get_All_FaceClusters();
-  console.log('wtf', wtf);
-  console.log('JSON.parse(wtf)', JSON.parse(wtf));
+  const all_face_clusters = await DB_MODULE.Get_All_FaceClusters();
+  console.log('all_face_clusters', all_face_clusters);
 
-  for (const face_cluster of wtf) {
-    for (const [fileName, fileType] of Object.entries(face_cluster.images)) {
-      if (fileType != 'image' && fileType != 'gif') {
+  for (const face_cluster of all_face_clusters) {
+    for (const [fileName, fileTypeAndMemes] of Object.entries(face_cluster.images)) {
+      console.log('fileName', fileName);
+      console.log('fileType', fileTypeAndMemes);
+      if (fileTypeAndMemes.fileType != 'image' && fileTypeAndMemes.fileType != 'gif') {
         delete face_cluster.images[fileName];
+        // TODO: should we skip the memes if this is not an image???
+        continue;
       }
-    }
 
-    clusters.set(face_cluster.rowid, face_cluster);
+      if (!face_cluster.memes) face_cluster.memes = [];
+
+      if (selection_mode.memes) {
+        face_cluster.memes = [...face_cluster.memes, ...fileTypeAndMemes.memes];
+      }
+
+      clusters.set(face_cluster.rowid, face_cluster);
+    }
   }
 }
 
@@ -296,7 +308,7 @@ async function UpdateSearchResults() {
 
     keywords = Object.keys(best_cluster.keywords);
     images = Object.keys(best_cluster.images);
-    memes = Object.values(best_cluster.images).flatMap((a) => a.memes);
+    memes = [...new Set(Object.values(best_cluster.images).flatMap((a) => a.memes))];
   }
 
   Display_Keywords();
