@@ -2,7 +2,7 @@ const { ipcRenderer } = require('electron');
 const PATH = require('path');
 const fileType = require('file-type');
 
-const { DB_MODULE } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
+const { DB_MODULE, GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
 
 let kind = 'webcam';
 
@@ -311,10 +311,11 @@ async function UpdateSearchResults() {
     memes = [...new Set(Object.values(best_cluster.images).flatMap((a) => a.memes))];
   }
 
+  Remove_Thumbnail_Events();
   Display_Keywords();
-
   Display_Images_Found();
   Display_Memes_Found();
+  Create_Thumbnail_Events();
 }
 
 async function DrawDescriptors() {
@@ -412,6 +413,33 @@ function Display_Keywords() {
   keyword_div.innerHTML = keywords_html;
 }
 
+let thumbnail_div_listeners = [];
+
+function Remove_Thumbnail_Events() {
+  for (const remove_listener of thumbnail_div_listeners) {
+    remove_listener();
+  }
+
+  thumbnail_div_listeners = [];
+}
+
+function Create_Thumbnail_Events() {
+  const thumbnail_divs = document.getElementsByClassName('thumbnail-with-goto');
+
+  for (const thumbnail_div of thumbnail_divs) {
+    const handler = () => {
+      const filename = thumbnail_div.dataset.filename;
+      GENERAL_HELPER_FNS.Goto_Tagging_Entry(filename);
+    };
+
+    thumbnail_div.addEventListener('click', handler);
+
+    thumbnail_div_listeners.push(() => {
+      thumbnail_div.removeEventListener('click', handler);
+    });
+  }
+}
+
 function Display_Images_Found() {
   if (!selection_mode.images) return;
 
@@ -420,8 +448,8 @@ function Display_Images_Found() {
 
   for (const image of images) {
     images_html += `
-                          <div class="image-thumbnail-div">
-                              <img class="image-thumbnail" id="" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${image}" title="view" alt="img" />
+                          <div class="image-thumbnail-div thumbnail-with-goto" data-filename="${image}">
+                              <img class="image-thumbnail"  src="${TAGA_DATA_DIRECTORY}${PATH.sep}${image}" title="view" alt="img" />
                           </div>
                           `;
   }
@@ -437,7 +465,7 @@ function Display_Memes_Found() {
   // TODO: filter on filetype?..
   for (const meme of memes) {
     memes_html += `
-                          <div class="meme-thumbnail-div">
+                          <div class="meme-thumbnail-div thumbnail-with-goto">
                               <img class="meme-thumbnail" id="" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme}" title="view" alt="meme" />
                           </div>
                           `;
