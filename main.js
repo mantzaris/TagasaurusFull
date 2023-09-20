@@ -111,7 +111,7 @@ async function Init() {
     let STMT_index2 = DB.prepare(` CREATE UNIQUE INDEX imageFileHash_index ON ${TAGGING_TABLE_NAME} (fileHash); `);
     STMT_index2.run();
 
-    //await PopulateDefaultTaggingEntries();
+    await PopulateDefaultTaggingEntries();
   }
   //check to see if the TAGGING MEME table exists
   let tagging_meme_table_exists_stmt = DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${TAGGING_MEME_TABLE_NAME}'; `);
