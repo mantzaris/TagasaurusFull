@@ -17,9 +17,10 @@
     "documenter",
     "photos",
     "comments",
+    "memes",
     "emoticons",
     "sentiment",
-    "hastags"
+    "hastags"  
   ],
   "main": "main.js",
   "postinstall": "electron-builder install-app-deps",
