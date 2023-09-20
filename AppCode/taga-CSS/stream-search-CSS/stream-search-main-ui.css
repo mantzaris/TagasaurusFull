@@ -225,3 +225,7 @@ body {
 .separator {
   height: 5vh;
 }
+
+.thumbnail-with-goto {
+  cursor: pointer;
+}

@@ -688,7 +688,7 @@ function fromBinary(binary) {
   return result;
 }
 
-async function Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags }, clustersIDS) {
+async function Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags, fileName, newMemes }, clustersIDS) {
   const keyword_additions = newTags.filter((item) => !origTags.includes(item));
   const keyword_subtractions = origTags.filter((item) => !newTags.includes(item));
 
@@ -703,6 +703,8 @@ async function Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags }, cl
       clusters[i].keywords[k] = (clusters[i].keywords[k] || 1) - 1;
       if (clusters[i].keywords[k] == 0) delete clusters[i].keywords[k];
     }
+
+    clusters[i].images[fileName].memes = newMemes;
 
     const { rowid, avgDescriptor, relatedFaces, keywords, images } = clusters[i];
 
@@ -731,7 +733,7 @@ async function Save_Image_Annotation_Changes() {
   let newTags = DESCRIPTION_PROCESS_MODULE.process_description(rawDescription);
   let origTags = current_image_annotation.taggingTags;
 
-  await Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags }, faceClusters);
+  await Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags, fileName, newMemes }, faceClusters);
 
   //change the object fields accordingly
   //new_record.fileName = image_name;
@@ -765,6 +767,9 @@ async function Load_Default_Taga_Image() {
 }
 //delete image from user choice
 async function Delete_Image() {
+  // delete face clusters which reference this image
+  await Handle_Delete_FileFrom_Cluster();
+
   if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation.fileName}`) == true) {
     FS.unlinkSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation.fileName}`);
   }
@@ -774,9 +779,6 @@ async function Delete_Image() {
 
   await Handle_Delete_Collection_IMAGE_references(current_image_annotation.fileName);
   await Handle_Delete_Collection_MEME_references(current_image_annotation.fileName);
-
-  // delete face clusters which reference this image
-  await Handle_Delete_FileFrom_Cluster();
 
   let records_remaining = await Number_of_Tagging_Records();
   if (records_remaining == 1) {
@@ -791,8 +793,6 @@ async function Delete_Image() {
 }
 
 async function Handle_Delete_FileFrom_Cluster() {
-  if (current_image_annotation.faceDescriptors.length == 0) return;
-
   const face_clusters = await DB_MODULE.Get_FaceClusters_From_IDS(current_image_annotation.faceClusters);
 
   const empty_clusters = [];
@@ -827,6 +827,20 @@ async function Handle_Delete_FileFrom_Cluster() {
 
   for (const { rowid, avgDescriptor, relatedFaces, keywords, images } of updated_clusters) {
     await DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, rowid);
+  }
+
+  const { fileNames } = await DB_MODULE.Get_Tagging_MEME_Record_From_DB(current_image_annotation.fileName);
+  const cluster_ids = await DB_MODULE.Get_Tagging_ClusterIDS_From_FileNames(fileNames);
+  const clusters = await DB_MODULE.Get_FaceClusters_From_IDS(cluster_ids);
+
+  for (let i = 0; i < clusters.length; i++) {
+    for (const [filename, data] of Object.entries(clusters[i].images)) {
+      console.log(filename, data);
+      clusters[i].images[filename].memes = data.memes.filter((filename) => filename != current_image_annotation.fileName);
+
+      const { rowid, avgDescriptor, relatedFaces, keywords, images } = clusters[i];
+      await DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, rowid);
+    }
   }
 }
 
@@ -1655,7 +1669,7 @@ async function Add_New_Meme() {
   //after the search is done and user has made the meme selection (or not) and they are to be added to the current annotation object
   document.getElementById('modal-search-add-memes-images-results-select-images-order-button-id').onclick = async function () {
     let origMemes = current_image_annotation.taggingMemeChoices;
-    const { fileName, faceClusters } = current_image_annotation;
+    const { fileName, faceClusters, taggingTags, fileType } = current_image_annotation;
 
     //meme selection switch check boxes
     //!!!simplify by getting the checked meme list and then append and get unique array
@@ -1683,6 +1697,11 @@ async function Add_New_Meme() {
     meme_switch_booleans.push(...current_image_annotation.taggingMemeChoices);
     current_image_annotation.taggingMemeChoices = [...new Set(meme_switch_booleans)]; //add a 'unique' set of memes as the 'new Set' has unique contents
     await Update_Tagging_Annotation_DB(current_image_annotation);
+
+    await Update_Cluster_For_Updated_TaggingEntry(
+      { newTags: taggingTags, origTags: taggingTags, fileName, newMemes: current_image_annotation.taggingMemeChoices },
+      faceClusters
+    );
 
     Load_State_Of_Image_IDB();
 

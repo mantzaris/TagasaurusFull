@@ -2,7 +2,7 @@ const { ipcRenderer } = require('electron');
 const PATH = require('path');
 const fileType = require('file-type');
 
-const { DB_MODULE } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
+const { DB_MODULE, GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
 
 let kind = 'webcam';
 
@@ -155,11 +155,9 @@ ipcRenderer.invoke('getCaptureID').then((sources) => {
 
 webcam_selection_btn.onclick = async () => {
   try {
-    await PullTaggingClusters();
     kind = selection_sources.value;
 
     media_source = await GetMediaStream(kind);
-    console.log(media_source);
     video_el.srcObject = media_source;
     video_el.play();
     video_el.style.display = 'none';
@@ -174,6 +172,7 @@ webcam_selection_btn.onclick = async () => {
         if (!streaming) {
           SetUpVideo();
           streaming = true;
+          await PullTaggingClusters();
           await MainLoop();
         }
       },
@@ -181,7 +180,7 @@ webcam_selection_btn.onclick = async () => {
     );
   } catch (e) {
     console.error(e);
-    Stop_Stream_Search();
+    //Stop_Stream_Search();
   }
 };
 
@@ -200,7 +199,6 @@ function Stop_Stream_Search() {
 //END: INIT STUFF
 
 async function GetMediaStream(source) {
-  console.log(source);
   const video_setup =
     'webcam' == source
       ? true
@@ -224,23 +222,31 @@ async function GetMediaStream(source) {
   });
 }
 
+//     if (fileType != 'image' && fileType != 'gif') {
+//       delete face_cluster.images[fileName];
+//     }
 async function PullTaggingClusters() {
-  const face_clusters = await DB_MODULE.Get_All_FaceClusters();
+  const all_face_clusters = await DB_MODULE.Get_All_FaceClusters();
+  console.log('all_face_clusters', all_face_clusters);
 
-  for (const face_cluster of face_clusters) {
-    for (const [fileName, fileType] of Object.entries(face_cluster.images)) {
-      if (fileType != 'image' && fileType != 'gif') {
+  for (const face_cluster of all_face_clusters) {
+    for (const [fileName, fileTypeAndMemes] of Object.entries(face_cluster.images)) {
+      console.log('fileName', fileName);
+      console.log('fileType', fileTypeAndMemes);
+      if (fileTypeAndMemes.fileType != 'image' && fileTypeAndMemes.fileType != 'gif') {
         delete face_cluster.images[fileName];
+        // TODO: should we skip the memes if this is not an image???
+        continue;
       }
+
+      if (!face_cluster.memes) face_cluster.memes = [];
+
+      if (selection_mode.memes) {
+        face_cluster.memes = [...face_cluster.memes, ...fileTypeAndMemes.memes];
+      }
+
+      clusters.set(face_cluster.rowid, face_cluster);
     }
-
-    if (selection_mode.memes) {
-      const memes = await DB_MODULE.Get_Memes_From_FileNames(face_cluster.images);
-
-      face_cluster.memes = memes;
-    } else face_cluster.memes = [];
-
-    clusters.set(face_cluster.rowid, face_cluster);
   }
 }
 
@@ -302,13 +308,14 @@ async function UpdateSearchResults() {
 
     keywords = Object.keys(best_cluster.keywords);
     images = Object.keys(best_cluster.images);
-    memes = best_cluster.memes;
+    memes = [...new Set(Object.values(best_cluster.images).flatMap((a) => a.memes))];
   }
 
+  Remove_Thumbnail_Events();
   Display_Keywords();
-
   Display_Images_Found();
   Display_Memes_Found();
+  Create_Thumbnail_Events();
 }
 
 async function DrawDescriptors() {
@@ -406,6 +413,33 @@ function Display_Keywords() {
   keyword_div.innerHTML = keywords_html;
 }
 
+let thumbnail_div_listeners = [];
+
+function Remove_Thumbnail_Events() {
+  for (const remove_listener of thumbnail_div_listeners) {
+    remove_listener();
+  }
+
+  thumbnail_div_listeners = [];
+}
+
+function Create_Thumbnail_Events() {
+  const thumbnail_divs = document.getElementsByClassName('thumbnail-with-goto');
+
+  for (const thumbnail_div of thumbnail_divs) {
+    const handler = () => {
+      const filename = thumbnail_div.dataset.filename;
+      GENERAL_HELPER_FNS.Goto_Tagging_Entry(filename);
+    };
+
+    thumbnail_div.addEventListener('click', handler);
+
+    thumbnail_div_listeners.push(() => {
+      thumbnail_div.removeEventListener('click', handler);
+    });
+  }
+}
+
 function Display_Images_Found() {
   if (!selection_mode.images) return;
 
@@ -414,8 +448,8 @@ function Display_Images_Found() {
 
   for (const image of images) {
     images_html += `
-                          <div class="image-thumbnail-div">
-                              <img class="image-thumbnail" id="" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${image}" title="view" alt="img" />
+                          <div class="image-thumbnail-div thumbnail-with-goto" data-filename="${image}">
+                              <img class="image-thumbnail"  src="${TAGA_DATA_DIRECTORY}${PATH.sep}${image}" title="view" alt="img" />
                           </div>
                           `;
   }
@@ -428,9 +462,10 @@ function Display_Memes_Found() {
   memes_div.innerHTML = '';
   memes_html = 'Memes: <br>';
 
+  // TODO: filter on filetype?..
   for (const meme of memes) {
     memes_html += `
-                          <div class="meme-thumbnail-div">
+                          <div class="meme-thumbnail-div thumbnail-with-goto">
                               <img class="meme-thumbnail" id="" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme}" title="view" alt="meme" />
                           </div>
                           `;
