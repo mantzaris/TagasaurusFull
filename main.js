@@ -15,7 +15,7 @@ app.commandLine.appendSwitch('enable-features', 'SharedArrayBuffer');
 
 //const BUILD_INSTALLER = false; //process.env.build_installer === 'true';
 const INSTALLER_CONFIG = JSON.parse(FS.readFileSync(PATH.join(__dirname, 'config.json'), 'utf-8'));
-const { BUILD_INSTALLER } = INSTALLER_CONFIG;
+const { BUILD_INSTALLER, DEBUG_BUILD } = INSTALLER_CONFIG;
 
 let TAGA_FILES_DIRECTORY;
 if (BUILD_INSTALLER) {
@@ -61,7 +61,7 @@ function createWindow() {
       nodeIntegrationInWorker: true,
       webgl: true,
       allowRunningInsecureContent: true,
-      devTools: !app.isPackaged,
+      devTools: DEBUG_BUILD,
     },
   }); //devTools: !app.isPackaged,
   //LOAD THE STARTING .html OF THE APP->

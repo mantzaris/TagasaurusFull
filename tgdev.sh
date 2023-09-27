@@ -1,5 +1,6 @@
 #!/bin/bash
 BUILD_INSTALLER=true
+DEBUG_BUILD=true
 
 # Check dependencies
 check_dependency() {
@@ -13,7 +14,7 @@ check_dependency npx
 #########
 
 set_config(){
-    echo "{ \"BUILD_INSTALLER\": $BUILD_INSTALLER }" > config.json
+    echo "{ \"BUILD_INSTALLER\": $BUILD_INSTALLER, \"DEBUG_BUILD\": $DEBUG_BUILD }" > config.json
 }
 
 if [ "$1" == "run" ]; then
@@ -25,7 +26,7 @@ if [ "$1" == "run" ]; then
     exit 0
 
 elif [ "$1" == "pack" ]; then
-
+    DEBUG_BUILD=false
     echo "cleaning dependencies"
     npm run rebuild
 
@@ -60,15 +61,17 @@ elif [ "$1" == "pack" ]; then
 
     elif [[ "$OSTYPE" == "cygwin" ]] || [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "win32" ]]; then
 
-        echo "building windows nsis"
-        set_config
-        npx cross-env OSTARGETS="--win=nsis" npm run build
-
         echo "building windows zip"
         BUILD_INSTALLER=false
         set_config
-        npx cross-env OSTARGETS="--win=zip" npm run build
-        
+
+        npm run build-win-zip
+
+        BUILD_INSTALLER=true
+        echo "building windows nsis"
+        set_config
+        npm run build-win-nsis
+
     else
         echo "unsupported OS" # Unknown.
     fi
@@ -86,41 +89,3 @@ else
     echo "expected argument 'run' | 'pack' | 'clean' | 'rebuild' "
 fi
 
-
-# So that the linux run on USB is at top level 
-    # # Extract the ZIP file
-    # unzip dist/yourApp-linux-x64.zip -d dist/tempDir
-
-    # # Copy the directory within the extracted contents
-    # cp -r dist/tempDir/resources/app.asar.unpacked/yourDirectory dist/tempDir/destinationDirectory
-
-    # # Recreate the ZIP file with the modified contents
-    # cd dist/tempDir
-    # zip -r ../yourApp-linux-x64-modified.zip .
-    # cd -
-
-    # # Clean up: remove the extracted contents and the original ZIP
-    # rm -r dist/tempDir
-    # rm dist/yourApp-linux-x64.zip
-
-
-
-#    npx cross-env BUILD_INSTALLER=true npm run dev
-
-# if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-#     npx cross-env BUILD_INSTALLER=true npm run dev #how can I pass OS targets here?
-#     OSTARGETS="--linux=deb rpm"  npm run build --build_installer=true 
-#     OSTARGETS="--linux=zip"  npm run build --build_installer=false 
-
-# elif [ [ "$OSTYPE" == "cygwin" ] || [ "$OSTYPE" == "msys" ] || [ "$OSTYPE" == "win32" ] ]; then
-#     npm run rebuild
-#     npm run build-win-portable --build_installer=false
-#     npm run build-win-installer --build_installer=true
-# else
-#     echo "unsupported OS"# Unknown.
-# fi
-
-
-# LINUXTARGETS="[\"zip\"]"  BUILD_EXECUTABLE=true npm run build
-# echo "first executable complete"
-# LINUXTARGETS="[\"deb\", \"rpm\"]"   BUILD_EXECUTABLE=false npm run build

@@ -29,7 +29,9 @@
     "rebuild": "npm run clean && npm install && npm rebuild && electron-rebuild",
     "dev": "electron .",
     "build": "electron-builder $OSTARGETS",
-    "format": "npx prettier --write ./AppCode/"
+    "format": "npx prettier --write ./AppCode/",
+    "build-win-nsis": "electron-builder --win=nsis",
+    "build-win-zip": "electron-builder --win=zip"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",

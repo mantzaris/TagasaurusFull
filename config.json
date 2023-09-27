@@ -1,1 +1,1 @@
-{ "BUILD_INSTALLER": false }
+{ "BUILD_INSTALLER": false, "DEBUG_BUILD": false }
