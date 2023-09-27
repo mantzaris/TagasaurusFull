@@ -1,20 +1,16 @@
 ## This application presents for users a way of uniquely annotating a locally stored collection of images.
 
-A key feature is that emotions are stored by the user's explicit input over a set of values for a set of different emotions. This is in contrast to many models where emoticons represent a small set of specific emotions a user must choose from rather than _tune_. Another key feature is the ability for any image to become a meme of another image. Collections of images with memes for a collection can also be made. The user has the ability to search through images and collections based upon the annotation information overlaps, and also find relevant memes through the use of a search on the bi-partite graph. That is 'which images are memes to images with such criteria?'
+A key feature is that emotions are stored by the user's explicit input over a set of values for a set of different emotions. This is in contrast to many models where emoticons represent a small set of specific emotions a user must choose from rather than _tune_. Another key feature is the ability for any image to become a meme of another image. Collections of images with memes for a collection can also be made. The user has the ability to search through images and collections based upon the annotation information overlaps, and also find relevant memes through the use of a search on the bi-partite graph. That is 'which images are memes to images with such criteria?'. The current version 1.4.0 is now compatible with the webapp (www.tagyourplanet.com) where data can be exported and imported between those apps and from different platforms.
 
 # Downloads
 
 ## Windows
 
-- Zip (unzip and run the executable file): [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.3.0/tagasaurus-1.3.0-win.zip) sha256 hash: 0c9c600c63d6fe4d51be2e0c5a7080e1c16d2f55f6c1e9e7c5b2d7751f1e8791
+- Zip (unzip and run the executable file): [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.3.0/tagasaurus-1.4.0-win.zip) sha256 hash: e732bfb1977d60bf68aa0bfe9c422ae20a14ea992b56744216e14649cde77b71
 
 ## Linux
 
-- Debian/Ubuntu (.deb, run with dpkg -i): [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.3.0/tagasaurus_1.3.0_amd64.deb) sha256 hash: 3db56148b4da8db8308c80842eebea4eaf2ad85764679e21fc4ed2b60d5b4b7f
-
-- Fedora/RHEL (.rpm): [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.3.0/tagasaurus-1.3.0.x86_64.rpm) sha256 hash: 56d6e56f722f1f502188434f4f15145e9fbd273d4150a2f1213e2f22107dff0e
-
-- Linux Zip: [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.3.0/tagasaurus-1.3.0.zip) sha256 hash: 086e35399ba14ce51839d438de336ea8573842edf3583a8b268ad1fd545af13c
+- Linux Zip: [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.4.0/tagasaurus-1.4.0.zip) sha256 hash: f0ad3754e14128452f260fa6ae6677e4d2a687bf354b5220a58600c27cbad474
 
 ## Using Tagasaurus
 
@@ -28,6 +24,7 @@ A key feature is that emotions are stored by the user's explicit input over a se
 - Updating if you delete the app and then re-install another version (or same version) your data should be there. But you can export and then re-import just to be certain that you don't lose your annotation information.
 - Version 1.1.0 onwards allows the user to apply ML that will auto populate the emotions based upon facial expressions and do facial recognition in the searches (from images and video).
 - Version 1.2.0 onwards allows a user to import media of Video, Audio and PDF. Linux users can use a script in the folder which remounts a vFAT formated external media with exec permissions.
+- Users can export their data and have it imported from another Tagasaurus desktop application or the webapp at tagyourplanet.com
 
 ## Scope
 
