@@ -34,8 +34,8 @@ document.querySelectorAll('.pause-btn').forEach((btn) => {
 let outline_face_not_in_focus = false; //don't outline and highlight faces that are not being investigated
 let rect_face_selected = { x: 0, y: 0, width: 0, height: 0, descriptor: [] }; //holds the selected face which descriptors focus on in this cycle
 let detect_faces_time_stamp = Date.now();
-const detect_faces_interval = 250;
-const switch_face_interval = 3000;
+const detect_faces_interval = 300;
+const switch_face_interval = 4000;
 let switched_face_time_stamp = Date.now();
 
 let rect_face_array = []; //storing the each face detected for that run of the face detection api (rewrites itself each time to be fresh)
@@ -226,12 +226,10 @@ async function GetMediaStream(source) {
 //     }
 async function PullTaggingClusters() {
   const all_face_clusters = await DB_MODULE.Get_All_FaceClusters();
-  console.log('all_face_clusters', all_face_clusters);
+  //console.log('all_face_clusters', all_face_clusters);
 
   for (const face_cluster of all_face_clusters) {
     for (const [fileName, fileTypeAndMemes] of Object.entries(face_cluster.images)) {
-      console.log('fileName', fileName);
-      console.log('fileType', fileTypeAndMemes);
       if (fileTypeAndMemes.fileType != 'image' && fileTypeAndMemes.fileType != 'gif') {
         delete face_cluster.images[fileName];
         // TODO: should we skip the memes if this is not an image???
@@ -340,16 +338,41 @@ async function DrawDescriptors() {
 
         await UpdateSearchResults();
       } else {
-        //draw the selected box for which keywords exist
-        let dist_min = 10 ** 6;
-        for (const [ind, face_rect] of rect_face_array.entries()) {
-          //get the index of the closest face rectangle to the selected face rectangle
-          let dist_tmp = Math.sqrt((face_rect.x - rect_face_selected.x) ** 2 + (face_rect.y - rect_face_selected.y) ** 2); //find the min distance face and update the index for it
-          if (dist_tmp < dist_min) {
-            dist_min = dist_tmp;
-            selected_face_ind = ind;
+        let most_relevant_face_ind = -1;
+        let most_relevant_face_score = -1;
+
+        if (rect_face_selected.descriptor.length == 128) {
+          for (let i = 0; i < rect_face_array.length; i++) {
+            let possible_match = rect_face_array[i];
+            let expected_face = rect_face_selected;
+
+            const score = Get_Descriptors_DistanceScore([possible_match.descriptor], [expected_face.descriptor]);
+
+            if (score > most_relevant_face_score && score > FACE_DISTANCE_IMAGE) {
+              most_relevant_face_score = score;
+              most_relevant_face_ind = i;
+            }
           }
-        }
+
+          selected_face_ind = most_relevant_face_ind;
+
+          if (most_relevant_face_ind == -1) {
+            selected_face_ind = Math.floor(Math.random() * rect_face_array.length);
+            rect_face_selected.descriptor = rect_face_array[selected_face_ind].descriptor;
+            switched_face_time_stamp = Date.now();
+            await UpdateSearchResults();
+          }
+        } else return;
+        //draw the selected box for which keywords exist
+        // let dist_min = 10 ** 6;
+        // for (const [ind, face_rect] of rect_face_array.entries()) {
+        //   //get the index of the closest face rectangle to the selected face rectangle
+        //   let dist_tmp = Math.sqrt((face_rect.x - rect_face_selected.x) ** 2 + (face_rect.y - rect_face_selected.y) ** 2); //find the min distance face and update the index for it
+        //   if (dist_tmp < dist_min) {
+        //     dist_min = dist_tmp;
+        //     selected_face_ind = ind;
+        //   }
+        // }
       }
       //update the position of the box for the rect_face_selected which the DB was focused on
 
