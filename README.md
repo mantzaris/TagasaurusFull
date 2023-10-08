@@ -6,11 +6,11 @@ A key feature is that emotions are stored by the user's explicit input over a se
 
 ## Windows
 
-- Zip (unzip and run the executable file): [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.3.0/tagasaurus-1.4.0-win.zip) sha256 hash: e732bfb1977d60bf68aa0bfe9c422ae20a14ea992b56744216e14649cde77b71
+- Zip (unzip and run the executable file): [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.4.0/tagasaurus-1.4.0-win.zip) sha256 hash: e732bfb1977d60bf68aa0bfe9c422ae20a14ea992b56744216e14649cde77b71
 
 ## Linux
 
-- Linux Zip: [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.4.0/tagasaurus-1.4.0.zip) sha256 hash: f0ad3754e14128452f260fa6ae6677e4d2a687bf354b5220a58600c27cbad474
+- Linux Zip: [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.4.0/tagasaurus-1.4.0-Linux.zip) sha256 hash: f0ad3754e14128452f260fa6ae6677e4d2a687bf354b5220a58600c27cbad474
 
 ## Using Tagasaurus
 
