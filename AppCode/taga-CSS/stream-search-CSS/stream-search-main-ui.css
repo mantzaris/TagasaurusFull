@@ -112,6 +112,12 @@ body {
   height: 100%;
   font-size: 3.5vmin;
 }
+
+.pause-btn {
+  height: 100%;
+  font-size: 3.5vmin;
+}
+
 #keyword-display2-div {
   grid-area: keyword-display2-div;
   height: 100%;

@@ -1,6 +1,5 @@
 const { ipcRenderer } = require('electron');
 const PATH = require('path');
-const fileType = require('file-type');
 
 const { DB_MODULE, GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
 
@@ -16,6 +15,7 @@ let width = 0;
 let height = 0;
 let stream_ok = false;
 let selection_sources;
+let stream_paused = false;
 
 let clusters = new Map();
 let keywords = [];
@@ -24,13 +24,12 @@ let memes = [];
 
 let keyword_div;
 
-const stream_constraints = {
-  video: {
-    width: { ideal: 1280 },
-    height: { ideal: 720 },
-    frameRate: { ideal: 10, max: 16 },
-  },
-};
+document.querySelectorAll('.pause-btn').forEach((btn) => {
+  btn.onclick = () => {
+    stream_paused = !stream_paused;
+    btn.innerText = stream_paused ? 'Resume' : 'Freeze';
+  };
+});
 
 let outline_face_not_in_focus = false; //don't outline and highlight faces that are not being investigated
 let rect_face_selected = { x: 0, y: 0, width: 0, height: 0, descriptor: [] }; //holds the selected face which descriptors focus on in this cycle
@@ -262,6 +261,10 @@ function SetUpVideo() {
 }
 
 function Take_Picture() {
+  if (stream_paused) {
+    return;
+  }
+
   canvas_el.width = width;
   canvas_el.height = height;
   ctx.drawImage(video_el, 0, 0, width, height);
@@ -326,6 +329,11 @@ async function DrawDescriptors() {
     let selected_face_ind = -1; //index for which face is that focused on with keywords
     if (rect_face_array.length > 0) {
       if (Date.now() - switched_face_time_stamp > switch_face_interval) {
+        if (stream_paused) {
+          switched_face_time_stamp = Date.now();
+          return;
+        }
+
         selected_face_ind = Math.floor(Math.random() * rect_face_array.length);
         rect_face_selected.descriptor = rect_face_array[selected_face_ind].descriptor;
         switched_face_time_stamp = Date.now();
@@ -372,7 +380,7 @@ async function DrawDescriptors() {
         } //ignore the selected face so that it stays as solid stroke and the rest as dashed
         ctx.beginPath();
         ctx.rect(face_rect.x, face_rect.y, face_rect.width, face_rect.height);
-        ctx.strokeStyle = 'red';
+        ctx.strokeStyle = 'blue';
         ctx.setLineDash([16, 14]); //dashes are 5px and spaces are 3px
         ctx.lineWidth = 3;
         ctx.stroke();
