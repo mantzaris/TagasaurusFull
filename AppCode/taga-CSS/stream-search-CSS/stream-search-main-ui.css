@@ -160,6 +160,7 @@ body {
     'keyword-display3-div stream-view3-video images-display3-div'
     'keyword-display3-div stream-view3-video memes-display3-div';
 }
+
 #stream-btns-div3 {
   grid-area: stream-btns-div3;
   display: flex;
@@ -200,6 +201,10 @@ body {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+.canvas-wrapper {
+  overflow: overlay;
 }
 
 .keyword {

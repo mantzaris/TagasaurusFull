@@ -16,6 +16,7 @@ let height = 0;
 let stream_ok = false;
 let selection_sources;
 let stream_paused = false;
+let homing_mode = false;
 
 let clusters = new Map();
 let keywords = [];
@@ -23,13 +24,6 @@ let images = [];
 let memes = [];
 
 let keyword_div;
-
-document.querySelectorAll('.pause-btn').forEach((btn) => {
-  btn.onclick = () => {
-    stream_paused = !stream_paused;
-    btn.innerText = stream_paused ? 'Resume' : 'Freeze';
-  };
-});
 
 let outline_face_not_in_focus = false; //don't outline and highlight faces that are not being investigated
 let rect_face_selected = { x: 0, y: 0, width: 0, height: 0, descriptor: [] }; //holds the selected face which descriptors focus on in this cycle
@@ -74,6 +68,38 @@ const selection_mode = {
   images: false,
   memes: false,
 };
+
+document.querySelectorAll('.pause-btn').forEach((btn) => {
+  btn.onclick = () => {
+    stream_paused = !stream_paused;
+    btn.innerText = stream_paused ? 'Resume' : 'Freeze';
+  };
+});
+
+document.querySelectorAll('.stream-search-canvas').forEach((canvas) => {
+  canvas.onclick = (event) => {
+    const px = Math.floor(event.offsetX);
+    const py = Math.floor(event.offsetY);
+    const { x, y, width, height } = rect_face_selected;
+
+    if (isPointInsideBox(px, py, x, y, width, height)) {
+      homing_mode = !homing_mode;
+    }
+  };
+});
+
+window.addEventListener('resize', ResizeCanvas);
+window.addEventListener('orientationchange', ResizeCanvas);
+
+function isPointInsideBox(x, y, bx, by, width, height) {
+  // Check if x is within the horizontal bounds of the box
+  const isInsideX = x >= bx && x <= bx + width;
+
+  // Check if y is within the vertical bounds of the box
+  const isInsideY = y >= by && y <= by + height;
+  // Return true if both x and y are inside the box, false otherwise
+  return isInsideX && isInsideY;
+}
 
 selection_description.innerText = keywords_only_description;
 selection_set.onchange = () => {
@@ -171,6 +197,7 @@ webcam_selection_btn.onclick = async () => {
         if (!streaming) {
           SetUpVideo();
           streaming = true;
+
           await PullTaggingClusters();
           await MainLoop();
         }
@@ -226,7 +253,6 @@ async function GetMediaStream(source) {
 //     }
 async function PullTaggingClusters() {
   const all_face_clusters = await DB_MODULE.Get_All_FaceClusters();
-  //console.log('all_face_clusters', all_face_clusters);
 
   for (const face_cluster of all_face_clusters) {
     for (const [fileName, fileTypeAndMemes] of Object.entries(face_cluster.images)) {
@@ -256,6 +282,8 @@ function SetUpVideo() {
 
   canvas_el.setAttribute('width', width.toString());
   canvas_el.setAttribute('height', height.toString());
+
+  ResizeCanvas();
 }
 
 function Take_Picture() {
@@ -263,8 +291,6 @@ function Take_Picture() {
     return;
   }
 
-  canvas_el.width = width;
-  canvas_el.height = height;
   ctx.drawImage(video_el, 0, 0, width, height);
   const data = canvas_el.toDataURL('image/png');
 
@@ -317,6 +343,21 @@ async function UpdateSearchResults() {
   Display_Images_Found();
   Display_Memes_Found();
   Create_Thumbnail_Events();
+}
+
+function ResizeCanvas() {
+  const canvas_parent = canvas_el.parentNode;
+  width = canvas_parent.clientWidth;
+  height = canvas_parent.clientHeight;
+
+  canvas_el.width = width;
+  canvas_el.height = height;
+  canvas_el.style.width = width + 'px';
+  canvas_el.style.height = height + 'px';
+  video_el.width = width;
+  video_el.height = height;
+  video_el.style.width = width + 'px';
+  video_el.style.height = height + 'px';
 }
 
 async function DrawDescriptors() {
@@ -384,7 +425,7 @@ async function DrawDescriptors() {
       ctx.beginPath();
       ctx.rect(rect_face_selected.x, rect_face_selected.y, rect_face_selected.width, rect_face_selected.height);
       ctx.setLineDash([]);
-      ctx.strokeStyle = 'red';
+      ctx.strokeStyle = homing_mode ? 'green' : 'red';
       ctx.lineWidth = 6;
       ctx.stroke();
     } else {
