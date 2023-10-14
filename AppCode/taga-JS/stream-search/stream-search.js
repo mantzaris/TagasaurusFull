@@ -26,6 +26,7 @@ let memes = [];
 let keyword_div;
 
 let outline_face_not_in_focus = false; //don't outline and highlight faces that are not being investigated
+let homing_face_selected = { x: 0, y: 0, width: 0, height: 0, descriptor: [] };
 let rect_face_selected = { x: 0, y: 0, width: 0, height: 0, descriptor: [] }; //holds the selected face which descriptors focus on in this cycle
 let detect_faces_time_stamp = Date.now();
 const detect_faces_interval = 300;
@@ -84,6 +85,10 @@ document.querySelectorAll('.stream-search-canvas').forEach((canvas) => {
 
     if (isPointInsideBox(px, py, x, y, width, height)) {
       homing_mode = !homing_mode;
+      if (homing_mode) {
+        homing_face_selected = JSON.parse(JSON.stringify(rect_face_selected));
+        homing_face_selected.descriptor = Float32Array.from(rect_face_selected.descriptor);
+      }
     }
   };
 });
@@ -315,9 +320,11 @@ async function UpdateSearchResults() {
   let best_score = -1;
   let best_cluster_id = null;
 
-  if (rect_face_selected.descriptor.length == 128) {
+  let selected = homing_mode ? homing_face_selected : rect_face_selected;
+
+  if (selected.descriptor.length == 128) {
     for (const [cluster_id, cluster] of clusters) {
-      const score = Get_Descriptors_DistanceScore([cluster.avgDescriptor], [rect_face_selected.descriptor]);
+      const score = Get_Descriptors_DistanceScore([cluster.avgDescriptor], [selected.descriptor]);
 
       if (score > best_score && score > 0) {
         best_cluster_id = cluster_id;
@@ -367,7 +374,7 @@ async function DrawDescriptors() {
     //find the selected box by finding the closest x,y face to the selected face and update it as well (assuming closest box origin point belongs to the shifted face position since last update)
     let selected_face_ind = -1; //index for which face is that focused on with keywords
     if (rect_face_array.length > 0) {
-      if (Date.now() - switched_face_time_stamp > switch_face_interval) {
+      if (Date.now() - switched_face_time_stamp > switch_face_interval && !homing_mode) {
         if (stream_paused) {
           switched_face_time_stamp = Date.now();
           return;
@@ -381,11 +388,11 @@ async function DrawDescriptors() {
       } else {
         let most_relevant_face_ind = -1;
         let most_relevant_face_score = -1;
+        let expected_face = homing_mode ? homing_face_selected : rect_face_selected;
 
-        if (rect_face_selected.descriptor.length == 128) {
+        if (expected_face.descriptor.length == 128) {
           for (let i = 0; i < rect_face_array.length; i++) {
             let possible_match = rect_face_array[i];
-            let expected_face = rect_face_selected;
 
             const score = Get_Descriptors_DistanceScore([possible_match.descriptor], [expected_face.descriptor]);
 
