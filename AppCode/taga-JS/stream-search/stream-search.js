@@ -16,7 +16,11 @@ let height = 0;
 let stream_ok = false;
 let selection_sources;
 let stream_paused = false;
+
 let homing_mode = false;
+let homing_found = false;
+let homing_need_update_search_results = true;
+let homing_face_selected = { x: 0, y: 0, width: 0, height: 0, descriptor: [] };
 
 let clusters = new Map();
 let keywords = [];
@@ -26,12 +30,11 @@ let memes = [];
 let keyword_div;
 
 let outline_face_not_in_focus = false; //don't outline and highlight faces that are not being investigated
-let homing_face_selected = { x: 0, y: 0, width: 0, height: 0, descriptor: [] };
 let rect_face_selected = { x: 0, y: 0, width: 0, height: 0, descriptor: [] }; //holds the selected face which descriptors focus on in this cycle
-let detect_faces_time_stamp = Date.now();
+let detect_faces_time_stamp = 0; // Date.now();
 const detect_faces_interval = 300;
 const switch_face_interval = 4000;
-let switched_face_time_stamp = Date.now();
+let switched_face_time_stamp = 0; //Date.now();
 
 let rect_face_array = []; //storing the each face detected for that run of the face detection api (rewrites itself each time to be fresh)
 const EMPTY_RECT_FACE = { x: 0, y: 0, width: 0, height: 0, descriptor: [] }; //the outputs held from the faceapi run
@@ -74,6 +77,7 @@ document.querySelectorAll('.pause-btn').forEach((btn) => {
   btn.onclick = () => {
     stream_paused = !stream_paused;
     btn.innerText = stream_paused ? 'Resume' : 'Freeze';
+    video_el_frozen = video_el.cloneNode(true);
   };
 });
 
@@ -81,13 +85,31 @@ document.querySelectorAll('.stream-search-canvas').forEach((canvas) => {
   canvas.onclick = (event) => {
     const px = Math.floor(event.offsetX);
     const py = Math.floor(event.offsetY);
-    const { x, y, width, height } = rect_face_selected;
 
-    if (isPointInsideBox(px, py, x, y, width, height)) {
-      homing_mode = !homing_mode;
-      if (homing_mode) {
-        homing_face_selected = JSON.parse(JSON.stringify(rect_face_selected));
-        homing_face_selected.descriptor = Float32Array.from(rect_face_selected.descriptor);
+    if (homing_mode) {
+      const homing_face_ind = Find_And_Set_Homing();
+      const inside_homing = isPointInsideBox(px, py, homing_face_selected.x, homing_face_selected.y, homing_face_selected.width, homing_face_selected.height);
+
+      if (homing_face_ind > -1 && inside_homing) {
+        //clicked on the homing face, now deactivate
+        homing_mode = false;
+        homing_found = false;
+        homing_face_selected = JSON.parse(JSON.stringify(EMPTY_RECT_FACE));
+        return;
+      }
+    }
+
+    // user clicked on a new face to focus on
+    for (let i = 0; i < rect_face_array.length; i++) {
+      const { x, y, width, height } = rect_face_array[i];
+
+      if (isPointInsideBox(px, py, x, y, width, height)) {
+        homing_mode = true;
+        homing_need_update_search_results = true;
+        homing_face_selected = JSON.parse(JSON.stringify(rect_face_array[i]));
+        homing_face_selected.descriptor = Float32Array.from(rect_face_array[i].descriptor);
+
+        return;
       }
     }
   };
@@ -320,7 +342,7 @@ async function UpdateSearchResults() {
   let best_score = -1;
   let best_cluster_id = null;
 
-  let selected = homing_mode ? homing_face_selected : rect_face_selected;
+  const selected = rect_face_selected; //homing_mode ? homing_face_selected : rect_face_selected;
 
   if (selected.descriptor.length == 128) {
     for (const [cluster_id, cluster] of clusters) {
@@ -365,6 +387,42 @@ function ResizeCanvas() {
   video_el.height = height;
   video_el.style.width = width + 'px';
   video_el.style.height = height + 'px';
+
+  if (stream_paused) {
+    //ctx.clearRect(0, 0, canvas_el.width, canvas_el.height);
+    ctx.drawImage(video_el, 0, 0, width, height);
+  }
+}
+
+function Find_And_Set_Homing() {
+  let most_relevant_face_ind = -1;
+  let most_relevant_face_score = -1;
+
+  if (homing_mode && rect_face_array.length > 0) {
+    for (let i = 0; i < rect_face_array.length; i++) {
+      const score = Get_Descriptors_DistanceScore([rect_face_array[i].descriptor], [homing_face_selected.descriptor]);
+
+      if (score > most_relevant_face_score && score > FACE_DISTANCE_IMAGE) {
+        most_relevant_face_score = score;
+        most_relevant_face_ind = i;
+      }
+    }
+
+    if (most_relevant_face_ind != -1) {
+      homing_found = true;
+      homing_face_selected.descriptor = rect_face_array[most_relevant_face_ind].descriptor;
+      homing_face_selected.x = rect_face_array[most_relevant_face_ind].x;
+      homing_face_selected.y = rect_face_array[most_relevant_face_ind].y;
+      homing_face_selected.width = rect_face_array[most_relevant_face_ind].width;
+      homing_face_selected.height = rect_face_array[most_relevant_face_ind].height;
+    } else {
+      homing_found = false;
+    }
+
+    return most_relevant_face_ind;
+  } else {
+    return -1;
+  }
 }
 
 async function DrawDescriptors() {
@@ -374,7 +432,20 @@ async function DrawDescriptors() {
     //find the selected box by finding the closest x,y face to the selected face and update it as well (assuming closest box origin point belongs to the shifted face position since last update)
     let selected_face_ind = -1; //index for which face is that focused on with keywords
     if (rect_face_array.length > 0) {
-      if (Date.now() - switched_face_time_stamp > switch_face_interval && !homing_mode) {
+      let homing_face_ind;
+
+      if (homing_mode) {
+        homing_face_ind = Find_And_Set_Homing();
+      }
+
+      if (homing_face_ind != -1 && homing_mode) {
+        selected_face_ind = homing_face_ind;
+        rect_face_selected.descriptor = rect_face_array[selected_face_ind].descriptor;
+        if (homing_need_update_search_results) {
+          await UpdateSearchResults();
+          homing_need_update_search_results = false;
+        }
+      } else if (Date.now() - switched_face_time_stamp > switch_face_interval || rect_face_selected.descriptor.length == 0) {
         if (stream_paused) {
           switched_face_time_stamp = Date.now();
           return;
@@ -385,16 +456,25 @@ async function DrawDescriptors() {
         switched_face_time_stamp = Date.now();
 
         await UpdateSearchResults();
+        homing_need_update_search_results = true;
       } else {
         let most_relevant_face_ind = -1;
         let most_relevant_face_score = -1;
-        let expected_face = homing_mode ? homing_face_selected : rect_face_selected;
 
-        if (expected_face.descriptor.length == 128) {
+        for (let i = 0; i < rect_face_array.length; i++) {
+          const score = Get_Descriptors_DistanceScore([rect_face_array[i].descriptor], [rect_face_selected.descriptor]);
+
+          if (score > most_relevant_face_score && score > FACE_DISTANCE_IMAGE) {
+            most_relevant_face_score = score;
+            most_relevant_face_ind = i;
+          }
+        }
+
+        if (rect_face_selected.descriptor.length == 128) {
           for (let i = 0; i < rect_face_array.length; i++) {
             let possible_match = rect_face_array[i];
 
-            const score = Get_Descriptors_DistanceScore([possible_match.descriptor], [expected_face.descriptor]);
+            const score = Get_Descriptors_DistanceScore([possible_match.descriptor], [rect_face_selected.descriptor]);
 
             if (score > most_relevant_face_score && score > FACE_DISTANCE_IMAGE) {
               most_relevant_face_score = score;
@@ -409,18 +489,11 @@ async function DrawDescriptors() {
             rect_face_selected.descriptor = rect_face_array[selected_face_ind].descriptor;
             switched_face_time_stamp = Date.now();
             await UpdateSearchResults();
+            homing_need_update_search_results = true;
+          } else {
+            rect_face_selected.descriptor = rect_face_array[selected_face_ind].descriptor;
           }
         } else return;
-        //draw the selected box for which keywords exist
-        // let dist_min = 10 ** 6;
-        // for (const [ind, face_rect] of rect_face_array.entries()) {
-        //   //get the index of the closest face rectangle to the selected face rectangle
-        //   let dist_tmp = Math.sqrt((face_rect.x - rect_face_selected.x) ** 2 + (face_rect.y - rect_face_selected.y) ** 2); //find the min distance face and update the index for it
-        //   if (dist_tmp < dist_min) {
-        //     dist_min = dist_tmp;
-        //     selected_face_ind = ind;
-        //   }
-        // }
       }
       //update the position of the box for the rect_face_selected which the DB was focused on
 
@@ -429,12 +502,14 @@ async function DrawDescriptors() {
       rect_face_selected.width = rect_face_array[selected_face_ind].width;
       rect_face_selected.height = rect_face_array[selected_face_ind].height;
 
-      ctx.beginPath();
-      ctx.rect(rect_face_selected.x, rect_face_selected.y, rect_face_selected.width, rect_face_selected.height);
-      ctx.setLineDash([]);
-      ctx.strokeStyle = homing_mode ? 'green' : 'red';
-      ctx.lineWidth = 6;
-      ctx.stroke();
+      if (!stream_paused) {
+        ctx.beginPath();
+        ctx.rect(rect_face_selected.x, rect_face_selected.y, rect_face_selected.width, rect_face_selected.height);
+        ctx.setLineDash([]);
+        ctx.strokeStyle = homing_found ? 'green' : 'red';
+        ctx.lineWidth = 6;
+        ctx.stroke();
+      }
     } else {
       rect_face_selected = JSON.parse(JSON.stringify(EMPTY_RECT_FACE));
       images = [];
