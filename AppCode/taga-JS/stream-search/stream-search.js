@@ -7,6 +7,7 @@ let kind = 'webcam';
 
 let media_source;
 let video_el = document.getElementById('inputVideo1');
+let photo_frozen;
 let canvas_el = document.getElementById('overlay1');
 let streaming = false;
 let ctx;
@@ -18,8 +19,6 @@ let selection_sources;
 let stream_paused = false;
 
 let homing_mode = false;
-let homing_found = false;
-let homing_need_update_search_results = true;
 let homing_face_selected = { x: 0, y: 0, width: 0, height: 0, descriptor: [] };
 
 let clusters = new Map();
@@ -77,7 +76,7 @@ document.querySelectorAll('.pause-btn').forEach((btn) => {
   btn.onclick = () => {
     stream_paused = !stream_paused;
     btn.innerText = stream_paused ? 'Resume' : 'Freeze';
-    video_el_frozen = video_el.cloneNode(true);
+    photo_frozen = photo.cloneNode(true);
   };
 });
 
@@ -86,32 +85,26 @@ document.querySelectorAll('.stream-search-canvas').forEach((canvas) => {
     const px = Math.floor(event.offsetX);
     const py = Math.floor(event.offsetY);
 
-    if (homing_mode) {
-      const homing_face_ind = Find_And_Set_Homing();
-      const inside_homing = isPointInsideBox(px, py, homing_face_selected.x, homing_face_selected.y, homing_face_selected.width, homing_face_selected.height);
+    let clicked_face = null;
 
-      if (homing_face_ind > -1 && inside_homing) {
-        //clicked on the homing face, now deactivate
-        homing_mode = false;
-        homing_found = false;
-        homing_face_selected = JSON.parse(JSON.stringify(EMPTY_RECT_FACE));
-        return;
+    for (const face of rect_face_array) {
+      if (isPointInsideBox(px, py, face.x, face.y, face.width, face.height)) {
+        clicked_face = face;
+        break;
       }
     }
 
-    // user clicked on a new face to focus on
-    for (let i = 0; i < rect_face_array.length; i++) {
-      const { x, y, width, height } = rect_face_array[i];
+    if (clicked_face == null) return;
 
-      if (isPointInsideBox(px, py, x, y, width, height)) {
-        homing_mode = true;
-        homing_need_update_search_results = true;
-        homing_face_selected = JSON.parse(JSON.stringify(rect_face_array[i]));
-        homing_face_selected.descriptor = Float32Array.from(rect_face_array[i].descriptor);
-
-        return;
-      }
+    if (JSON.stringify(clicked_face) === JSON.stringify(homing_face_selected)) {
+      homing_mode = false;
     }
+
+    homing_mode = true;
+    Object.assign(homing_face_selected, clicked_face);
+
+    rect_face_selected = homing_face_selected;
+    Render_Bounding_Boxes();
   };
 });
 
@@ -233,7 +226,6 @@ webcam_selection_btn.onclick = async () => {
     );
   } catch (e) {
     console.error(e);
-    //Stop_Stream_Search();
   }
 };
 
@@ -241,15 +233,9 @@ main_menu_btn.onclick = () => {
   location.href = 'welcome-screen.html';
 };
 
-//user returns to stream search menu from the running search stream and needs to change the view and stop the stream
 function Stop_Stream_Search() {
-  // stream?.getTracks().forEach(function (track) {
-  //   track.stop();
-  // });
-
   window.location.reload();
 }
-//END: INIT STUFF
 
 async function GetMediaStream(source) {
   const video_setup =
@@ -275,9 +261,6 @@ async function GetMediaStream(source) {
   });
 }
 
-//     if (fileType != 'image' && fileType != 'gif') {
-//       delete face_cluster.images[fileName];
-//     }
 async function PullTaggingClusters() {
   const all_face_clusters = await DB_MODULE.Get_All_FaceClusters();
 
@@ -285,7 +268,7 @@ async function PullTaggingClusters() {
     for (const [fileName, fileTypeAndMemes] of Object.entries(face_cluster.images)) {
       if (fileTypeAndMemes.fileType != 'image' && fileTypeAndMemes.fileType != 'gif') {
         delete face_cluster.images[fileName];
-        // TODO: should we skip the memes if this is not an image???
+
         continue;
       }
 
@@ -318,7 +301,6 @@ function Take_Picture() {
     return;
   }
 
-  ctx.drawImage(video_el, 0, 0, width, height);
   const data = canvas_el.toDataURL('image/png');
 
   if (!photo) {
@@ -329,13 +311,129 @@ function Take_Picture() {
 }
 
 async function MainLoop() {
-  await DrawDescriptors();
+  Take_Picture();
+  await Detect_Faces();
 
-  if (Date.now() - detect_faces_time_stamp > detect_faces_interval) await Detect_Faces();
-
-  if (stream_ok) {
-    requestAnimationFrame(MainLoop);
+  if (homing_mode) {
+    await Handle_Homing_Mode();
+  } else {
+    await Handle_Default_Search();
   }
+
+  await UpdateSearchResults();
+
+  Render_Bounding_Boxes();
+
+  requestAnimationFrame(MainLoop);
+}
+
+function Select_Random_Face() {
+  const new_face_index = Math.floor(Math.random() * rect_face_array.length);
+  return Object.assign({}, rect_face_array[new_face_index]);
+}
+
+async function Handle_Default_Search() {
+  if (rect_face_array.length == 0) return;
+
+  const elapsed_since_face_switched = Date.now() - switched_face_time_stamp;
+
+  if (elapsed_since_face_switched >= switch_face_interval) {
+    rect_face_selected = Select_Random_Face();
+    switched_face_time_stamp = Date.now();
+    return;
+  }
+
+  const similar_face = Find_Most_Similar_Descriptor(rect_face_selected.descriptor, FACE_DISTANCE_IMAGE);
+
+  if (similar_face) {
+    rect_face_selected = similar_face;
+    return;
+  }
+
+  rect_face_selected = Select_Random_Face();
+  switched_face_time_stamp = Date.now();
+}
+
+function Find_Most_Similar_Descriptor(descriptor, threshold) {
+  let best_score = -1;
+  let best_index = -1;
+
+  for (let i = 0; i < rect_face_array.length; i++) {
+    const score = Get_Descriptors_DistanceScore([rect_face_array[i].descriptor], [descriptor]);
+
+    if (score > threshold && score > best_score) {
+      best_score = score;
+      best_index = i;
+    }
+  }
+
+  if (best_score != -1) {
+    return Object.assign({}, rect_face_array[best_index]);
+  }
+
+  return null;
+}
+
+async function Handle_Homing_Mode() {
+  const best_scoring_face = Find_Most_Similar_Descriptor(homing_face_selected.descriptor, FACE_DISTANCE_IMAGE);
+
+  if (best_scoring_face) {
+    homing_face_selected = best_scoring_face;
+    return;
+  }
+
+  homing_mode = false;
+}
+
+function Render_Bounding_Boxes() {
+  if (!stream_paused) ctx.drawImage(video_el, 0, 0, width, height);
+  else {
+    ctx.drawImage(photo_frozen, 0, 0, width, height);
+    removeColorFromCanvas([255, 0, 0]);
+  }
+
+  ctx.beginPath();
+  ctx.strokeStyle = homing_mode ? 'green' : 'red';
+
+  if (homing_mode) {
+    ctx.rect(homing_face_selected.x, homing_face_selected.y, homing_face_selected.width, homing_face_selected.height);
+  } else {
+    ctx.rect(rect_face_selected.x, rect_face_selected.y, rect_face_selected.width, rect_face_selected.height);
+  }
+
+  ctx.setLineDash([]);
+  ctx.lineWidth = 6;
+  ctx.stroke();
+}
+
+function removeColorFromCanvas(color) {
+  // Get the width and height of the canvas
+  const canvasWidth = width;
+  const canvasHeight = height;
+
+  // Get the ImageData object, which contains pixel data
+  const imageData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
+
+  // Iterate through the pixel data
+  for (let y = 0; y < canvasHeight; y++) {
+    for (let x = 0; x < canvasWidth; x++) {
+      const pixelIndex = (y * canvasWidth + x) * 4;
+      const pixelColor = [
+        imageData.data[pixelIndex], // Red
+        imageData.data[pixelIndex + 1], // Green
+        imageData.data[pixelIndex + 2], // Blue
+      ];
+
+      // Check if the pixel color matches the red color
+      if (pixelColor[0] === color[0] && pixelColor[1] === color[1] && pixelColor[2] === color[2]) {
+        // Set the alpha (transparency) component of the pixel to 0
+        imageData.data[pixelIndex + 3] = 0;
+      }
+    }
+  }
+
+  // Put the modified image data back onto the canvas
+  ctx.putImageData(imageData, 0, 0);
 }
 
 async function UpdateSearchResults() {
@@ -389,165 +487,28 @@ function ResizeCanvas() {
   video_el.style.height = height + 'px';
 
   if (stream_paused) {
-    //ctx.clearRect(0, 0, canvas_el.width, canvas_el.height);
     ctx.drawImage(video_el, 0, 0, width, height);
   }
 }
 
-function Find_And_Set_Homing() {
-  let most_relevant_face_ind = -1;
-  let most_relevant_face_score = -1;
-
-  if (homing_mode && rect_face_array.length > 0) {
-    for (let i = 0; i < rect_face_array.length; i++) {
-      const score = Get_Descriptors_DistanceScore([rect_face_array[i].descriptor], [homing_face_selected.descriptor]);
-
-      if (score > most_relevant_face_score && score > FACE_DISTANCE_IMAGE) {
-        most_relevant_face_score = score;
-        most_relevant_face_ind = i;
-      }
-    }
-
-    if (most_relevant_face_ind != -1) {
-      homing_found = true;
-      homing_face_selected.descriptor = rect_face_array[most_relevant_face_ind].descriptor;
-      homing_face_selected.x = rect_face_array[most_relevant_face_ind].x;
-      homing_face_selected.y = rect_face_array[most_relevant_face_ind].y;
-      homing_face_selected.width = rect_face_array[most_relevant_face_ind].width;
-      homing_face_selected.height = rect_face_array[most_relevant_face_ind].height;
-    } else {
-      homing_found = false;
-    }
-
-    return most_relevant_face_ind;
-  } else {
-    return -1;
-  }
-}
-
-async function DrawDescriptors() {
-  if (canvas_el.width > 0 && canvas_el.height > 0) {
-    Take_Picture();
-
-    //find the selected box by finding the closest x,y face to the selected face and update it as well (assuming closest box origin point belongs to the shifted face position since last update)
-    let selected_face_ind = -1; //index for which face is that focused on with keywords
-    if (rect_face_array.length > 0) {
-      let homing_face_ind;
-
-      if (homing_mode) {
-        homing_face_ind = Find_And_Set_Homing();
-      }
-
-      if (homing_face_ind != -1 && homing_mode) {
-        selected_face_ind = homing_face_ind;
-        rect_face_selected.descriptor = rect_face_array[selected_face_ind].descriptor;
-        if (homing_need_update_search_results) {
-          await UpdateSearchResults();
-          homing_need_update_search_results = false;
-        }
-      } else if (Date.now() - switched_face_time_stamp > switch_face_interval || rect_face_selected.descriptor.length == 0) {
-        if (stream_paused) {
-          switched_face_time_stamp = Date.now();
-          return;
-        }
-
-        selected_face_ind = Math.floor(Math.random() * rect_face_array.length);
-        rect_face_selected.descriptor = rect_face_array[selected_face_ind].descriptor;
-        switched_face_time_stamp = Date.now();
-
-        await UpdateSearchResults();
-        homing_need_update_search_results = true;
-      } else {
-        let most_relevant_face_ind = -1;
-        let most_relevant_face_score = -1;
-
-        for (let i = 0; i < rect_face_array.length; i++) {
-          const score = Get_Descriptors_DistanceScore([rect_face_array[i].descriptor], [rect_face_selected.descriptor]);
-
-          if (score > most_relevant_face_score && score > FACE_DISTANCE_IMAGE) {
-            most_relevant_face_score = score;
-            most_relevant_face_ind = i;
-          }
-        }
-
-        if (rect_face_selected.descriptor.length == 128) {
-          for (let i = 0; i < rect_face_array.length; i++) {
-            let possible_match = rect_face_array[i];
-
-            const score = Get_Descriptors_DistanceScore([possible_match.descriptor], [rect_face_selected.descriptor]);
-
-            if (score > most_relevant_face_score && score > FACE_DISTANCE_IMAGE) {
-              most_relevant_face_score = score;
-              most_relevant_face_ind = i;
-            }
-          }
-
-          selected_face_ind = most_relevant_face_ind;
-
-          if (most_relevant_face_ind == -1) {
-            selected_face_ind = Math.floor(Math.random() * rect_face_array.length);
-            rect_face_selected.descriptor = rect_face_array[selected_face_ind].descriptor;
-            switched_face_time_stamp = Date.now();
-            await UpdateSearchResults();
-            homing_need_update_search_results = true;
-          } else {
-            rect_face_selected.descriptor = rect_face_array[selected_face_ind].descriptor;
-          }
-        } else return;
-      }
-      //update the position of the box for the rect_face_selected which the DB was focused on
-
-      rect_face_selected.x = rect_face_array[selected_face_ind].x;
-      rect_face_selected.y = rect_face_array[selected_face_ind].y;
-      rect_face_selected.width = rect_face_array[selected_face_ind].width;
-      rect_face_selected.height = rect_face_array[selected_face_ind].height;
-
-      if (!stream_paused) {
-        ctx.beginPath();
-        ctx.rect(rect_face_selected.x, rect_face_selected.y, rect_face_selected.width, rect_face_selected.height);
-        ctx.setLineDash([]);
-        ctx.strokeStyle = homing_found ? 'green' : 'red';
-        ctx.lineWidth = 6;
-        ctx.stroke();
-      }
-    } else {
-      rect_face_selected = JSON.parse(JSON.stringify(EMPTY_RECT_FACE));
-      images = [];
-      keywords = [];
-      memes = [];
-      return;
-    }
-    //draw boxes around the rest of the faces in dashes OPTIONAL can be turned off as well
-    if (outline_face_not_in_focus) {
-      for (const [ind, face_rect] of rect_face_array.entries()) {
-        //draw rest of the faces not in selected
-        if (selected_face_ind == ind) {
-          continue;
-        } //ignore the selected face so that it stays as solid stroke and the rest as dashed
-        ctx.beginPath();
-        ctx.rect(face_rect.x, face_rect.y, face_rect.width, face_rect.height);
-        ctx.strokeStyle = 'blue';
-        ctx.setLineDash([16, 14]); //dashes are 5px and spaces are 3px
-        ctx.lineWidth = 3;
-        ctx.stroke();
-      }
-    }
-  }
-}
-
 async function Detect_Faces() {
+  const elapsed_since_last_detection = Date.now() - detect_faces_time_stamp;
+  if (elapsed_since_last_detection < detect_faces_interval) return;
+
   let detections = await Get_Image_Face_Descriptors_And_Expresssions_From_HTML_Image(photo);
 
-  rect_face_array = []; //reset the array for the new faces
+  rect_face_array = [];
   for (const face of detections) {
-    let { x, y, width, height } = face.detection.box; //face.box if only face boxes are detected but with detection.box if landmarks and descriptors are taken
-    let rect_face_tmp = JSON.parse(JSON.stringify(EMPTY_RECT_FACE)); //clone object to make a new one
-    rect_face_tmp.x = x - width * 0.2; //shifting the box to be larger
-    rect_face_tmp.y = y - height * 0.2; //shifting the box to be larger
-    rect_face_tmp.width = width * 1.4; //scaling the box to be larger
-    rect_face_tmp.height = height * 1.4; //scaling the box to be larger
-    rect_face_tmp.descriptor = face.descriptor;
-    rect_face_array.push(rect_face_tmp); //add this face to the array of faces to draw boxes over
+    let { x, y, width, height } = face.detection.box;
+    let rect_face_tmp = {
+      x,
+      y,
+      width,
+      height,
+      descriptor: face.descriptor,
+    };
+
+    rect_face_array.push(rect_face_tmp);
   }
   detect_faces_time_stamp = Date.now();
 }
