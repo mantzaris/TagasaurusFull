@@ -77,6 +77,13 @@ document.querySelectorAll('.pause-btn').forEach((btn) => {
     stream_paused = !stream_paused;
     btn.innerText = stream_paused ? 'Resume' : 'Freeze';
     photo_frozen = photo.cloneNode(true);
+
+    ctx.clearRect(0, 0, canvas_el.width, canvas_el.height);
+    ctx.drawImage(video_el, 0, 0, width, height);
+
+    // Capture this frame as the photo_frozen
+    const data = canvas_el.toDataURL('image/png');
+    photo_frozen.src = data;
   };
 });
 
@@ -96,8 +103,16 @@ document.querySelectorAll('.stream-search-canvas').forEach((canvas) => {
 
     if (clicked_face == null) return;
 
-    if (JSON.stringify(clicked_face) === JSON.stringify(homing_face_selected)) {
-      homing_mode = false;
+    // if (JSON.stringify(clicked_face) === JSON.stringify(homing_face_selected)) {
+    //   homing_mode = false;
+    // }
+    if (homing_mode) {
+      const score = Get_Descriptors_DistanceScore([clicked_face.descriptor], [homing_face_selected.descriptor]);
+      if (score > FACE_DISTANCE_IMAGE) {
+        homing_mode = false;
+        Render_Bounding_Boxes();
+        return;
+      }
     }
 
     homing_mode = true;
@@ -386,11 +401,14 @@ async function Handle_Homing_Mode() {
 }
 
 function Render_Bounding_Boxes() {
-  if (!stream_paused) ctx.drawImage(video_el, 0, 0, width, height);
-  else {
+  if (stream_paused) {
+    // If the stream is paused, draw the photo_frozen and return
     ctx.drawImage(photo_frozen, 0, 0, width, height);
-    removeColorFromCanvas([255, 0, 0]);
+    return;
   }
+
+  // Draw the video frame
+  ctx.drawImage(video_el, 0, 0, width, height);
 
   ctx.beginPath();
   ctx.strokeStyle = homing_mode ? 'green' : 'red';
@@ -404,36 +422,6 @@ function Render_Bounding_Boxes() {
   ctx.setLineDash([]);
   ctx.lineWidth = 6;
   ctx.stroke();
-}
-
-function removeColorFromCanvas(color) {
-  // Get the width and height of the canvas
-  const canvasWidth = width;
-  const canvasHeight = height;
-
-  // Get the ImageData object, which contains pixel data
-  const imageData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
-
-  // Iterate through the pixel data
-  for (let y = 0; y < canvasHeight; y++) {
-    for (let x = 0; x < canvasWidth; x++) {
-      const pixelIndex = (y * canvasWidth + x) * 4;
-      const pixelColor = [
-        imageData.data[pixelIndex], // Red
-        imageData.data[pixelIndex + 1], // Green
-        imageData.data[pixelIndex + 2], // Blue
-      ];
-
-      // Check if the pixel color matches the red color
-      if (pixelColor[0] === color[0] && pixelColor[1] === color[1] && pixelColor[2] === color[2]) {
-        // Set the alpha (transparency) component of the pixel to 0
-        imageData.data[pixelIndex + 3] = 0;
-      }
-    }
-  }
-
-  // Put the modified image data back onto the canvas
-  ctx.putImageData(imageData, 0, 0);
 }
 
 async function UpdateSearchResults() {
