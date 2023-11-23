@@ -75,3 +75,24 @@ async function PDF_page_2_image(pdf, page_num) {
   return imageURL;
 }
 exports.PDF_page_2_image = PDF_page_2_image;
+
+function Read_File_Base64(filepath, prefix = 'data:image/png;base64') {
+  return new Promise((res, rej) => {
+    FS.readFile(filepath, { encoding: 'base64' }, (err, data) => {
+      if (err) rej(err);
+
+      res(`${prefix},${data}`);
+    });
+  });
+}
+exports.Read_File_Base64 = Read_File_Base64;
+
+function Full_Path_From_File_Name(filename) {
+  return `${TAGA_DATA_DIRECTORY}${PATH.sep}${filename}`;
+}
+exports.Full_Path_From_File_Name = Full_Path_From_File_Name;
+
+function Clamp(number, min, max) {
+  return Math.min(Math.max(number, min), max);
+}
+exports.Clamp = Clamp;

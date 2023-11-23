@@ -20,7 +20,7 @@
     "memes",
     "emoticons",
     "sentiment",
-    "hastags"  
+    "hastags"
   ],
   "main": "main.js",
   "postinstall": "electron-builder install-app-deps",
@@ -49,6 +49,7 @@
     "@vladmandic/face-api": "^1.7.7",
     "archiver": "^5.3.1",
     "better-sqlite3": "^8.5.0",
+    "d3": "^7.8.5",
     "decode-gif": "^1.0.1",
     "dotenv": "^16.0.3",
     "electron-pdf-window": "^1.0.12",
