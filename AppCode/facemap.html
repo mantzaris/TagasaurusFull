@@ -18,6 +18,8 @@
             /* border: 1px solid lightgray; */
         }
     </style>
+
+  <link rel="stylesheet" href="./taga-CSS/facemap-CSS/modal.css" />
     
   </head>
 
@@ -33,70 +35,29 @@
     <label for="size">size</label>
     <input type="number" min="5" max="20" step="1" value="10" id="size">
 
-    <button type="button" class="btn btn-primary">Primary</button>
-<button type="button" class="btn btn-secondary">Secondary</button>
-<button type="button" class="btn btn-success">Success</button>
-<button type="button" class="btn btn-danger">Danger</button>
-<button type="button" class="btn btn-warning">Warning</button>
-<button type="button" class="btn btn-info">Info</button>
-<button type="button" class="btn btn-light">Light</button>
-<button type="button" class="btn btn-dark">Dark</button>
 
-<button type="button" class="btn btn-link">Link</button>
 
-<button type="button" class="btn btn-primary btn-lg btn-block">Block level button</button>
-
-<button type="button" class="btn btn-secondary btn-lg btn-block">Block level button</button>
-
-<form>
-  <div class="form-row">
-    <div class="form-group col-md-6">
-      <label for="inputEmail4">Email</label>
-      <input type="email" class="form-control" id="inputEmail4" placeholder="Email">
+    <div id="cluster-modal" class="card hidden" style="width: 18rem;">
+      <img id="cluster-modal-img" class="card-img-top">
+      <div class="card-body">
+        <h5 class="card-title">Cluster <span id="cluster-modal-id"></span></h5>
+      </div>
+      <ul id="cluster-modal-list" class="list-group list-group-flush">
+        <li class="list-group-item cluster-list-item">
+          <img class="rounded  img-thumbnail cluster-thumbnail-sm" id="test">
+          <strong></strong>          
+        </li>
+        <li class="list-group-item">A second item</li>
+        <li class="list-group-item">A third item</li>
+      </ul>
+      
     </div>
-    <div class="form-group col-md-6">
-      <label for="inputPassword4">Password</label>
-      <input type="password" class="form-control" id="inputPassword4" placeholder="Password">
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="inputAddress">Address</label>
-    <input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St">
-  </div>
-  <div class="form-group">
-    <label for="inputAddress2">Address 2</label>
-    <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
-  </div>
-  <div class="form-row">
-    <div class="form-group col-md-6">
-      <label for="inputCity">City</label>
-      <input type="text" class="form-control" id="inputCity">
-    </div>
-    <div class="form-group col-md-4">
-      <label for="inputState">State</label>
-      <select id="inputState" class="form-control">
-        <option selected>Choose...</option>
-        <option>...</option>
-      </select>
-    </div>
-    <div class="form-group col-md-2">
-      <label for="inputZip">Zip</label>
-      <input type="text" class="form-control" id="inputZip">
-    </div>
-  </div>
-  <div class="form-group">
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="gridCheck">
-      <label class="form-check-label" for="gridCheck">
-        Check me out
-      </label>
-    </div>
-  </div>
-  <button type="submit" class="btn btn-primary">Sign in</button>
-</form>
-
+    
+    
   </body>
 
     <script type="module" src="./taga-JS/facemap/facemap.js"></script>
+
+
   
 </html>

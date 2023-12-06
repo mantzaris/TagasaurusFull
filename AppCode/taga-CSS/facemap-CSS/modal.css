@@ -1,0 +1,20 @@
+#cluster-modal {
+  width: 650px;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+}
+
+.hidden {
+  display: none;
+}
+
+.cluster-thumbnail-sm {
+  max-width: 5em;
+}
+
+.cluster-list-item {
+  display: grid;
+  grid-template-columns: 30% 70%;
+  align-items: center;
+}
