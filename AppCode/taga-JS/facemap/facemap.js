@@ -12,6 +12,8 @@ const settings = {
   image_size: 10,
 };
 
+let network;
+
 size_element.addEventListener('change', (ev) => {
   settings.image_size = Clamp(parseInt(size_element.value), size_element.min, size_element.max);
   size_element.value = settings.image_size;
@@ -30,6 +32,10 @@ function Get_Node_Info_From_ID(id) {
   for (const val of id_map.values()) {
     if (val.id == id) return val;
   }
+}
+
+function Select_Cluster_Thumbnail(cluster) {
+  return cluster.thumbnail ? cluster.thumbnail : Array.from(Object.keys(cluster.images))[0];
 }
 
 async function Generate_Face_Map(settings) {
@@ -67,7 +73,7 @@ async function Generate_Face_Map(settings) {
       label: cluster.rowid,
       shape: 'image',
       size: 20,
-      image: Full_Path_From_File_Name(image),
+      image: Full_Path_From_File_Name(Select_Cluster_Thumbnail(cluster)),
     };
 
     face_cluster_nodes.push(node);
@@ -122,7 +128,7 @@ async function Generate_Face_Map(settings) {
     nodes: {},
   };
 
-  let network = new vis.Network(container, data, options);
+  network = new vis.Network(container, data, options);
 
   network.on('selectNode', async (ev) => {
     const node_id = ev.nodes[0];
@@ -138,12 +144,13 @@ async function Generate_Face_Map(settings) {
       settings.show_selected_thumbnails = child_nodes;
       network.storePositions();
       //await Generate_Face_Map(Object.assign({}, settings));
-      ShowClusterInfoModal(selected, network);
+      ShowClusterInfoModal(selected);
     }
   });
 }
 
-function ShowClusterInfoModal({ cluster, id }, network) {
+function ShowClusterInfoModal(selected) {
+  const { cluster, id } = selected;
   const modal = document.getElementById('cluster-modal');
   document.getElementById('cluster-modal-id').innerText = cluster.rowid;
   modal.classList.remove('hidden');
@@ -153,26 +160,52 @@ function ShowClusterInfoModal({ cluster, id }, network) {
   modal.style.top = `${pos.y}px`;
 
   const images = Array.from(Object.keys(cluster.images));
-  const image = Full_Path_From_File_Name(images[Math.floor(Math.random() * images.length)]);
-  document.getElementById('cluster-modal-img').src = image;
+  const thumbnail = Full_Path_From_File_Name(Select_Cluster_Thumbnail(cluster));
+  document.getElementById('cluster-modal-img').src = thumbnail;
 
-  const ul = document.getElementById('cluster-modal-list');
-  ul.innerHTML = '';
+  const list = document.getElementById('cluster-modal-list');
+  console.log(list);
+  list.innerHTML = '';
 
-  for (const image of images) {
-    ul.appendChild(CreateClusterRelatedThumbnail(image));
-  }
+  images.forEach((image, index) => {
+    console.log(image, index);
+    const is_thumbnail = cluster.thumbnail === image || (!cluster.thumbnail && index == 0);
+    list.appendChild(CreateClusterRelatedThumbnail(selected, image, is_thumbnail));
+  });
 }
 
-function CreateClusterRelatedThumbnail(filename) {
-  const li = document.createElement('li');
-  li.classList.add(['list-group-item', 'cluster-list-item', 'list-group-item-action']);
-  li.innerHTML = `
-          <img class="rounded img-thumbnail cluster-thumbnail-sm" src="${Full_Path_From_File_Name(filename)}">
-          <strong>${filename}</strong>          
-                `;
+function CreateClusterRelatedThumbnail(selected, filename, is_thumbnail = false) {
+  const li = document.createElement('div');
+  const thumbnail_class = is_thumbnail ? ['favorite-thumbnail', 'filled-star'] : ['favorite-thumbnail'];
+  const thumbnail = is_thumbnail ? '★' : '☆';
+  li.classList.add(['row']);
 
-  li.onclick = () => GENERAL_HELPER_FNS.Goto_Tagging_Entry(filename);
+  const col3 = document.createElement('div');
+  col3.classList.add('col-3');
+  const col9 = document.createElement('div');
+  col9.classList.add(...['col-9', 'force-right']);
+
+  const img = document.createElement('img');
+  img.src = Full_Path_From_File_Name(filename);
+  img.className = 'rounded img-thumbnail cluster-thumbnail-sm';
+
+  const thumbnail_div = document.createElement('div');
+  thumbnail_div.innerHTML = thumbnail;
+  thumbnail_div.classList.add(...thumbnail_class);
+
+  li.appendChild(col3);
+  li.appendChild(col9);
+  col3.appendChild(img);
+  col9.appendChild(thumbnail_div);
+
+  img.onclick = () => GENERAL_HELPER_FNS.Goto_Tagging_Entry(filename);
+
+  thumbnail_div.onclick = async () => {
+    await DB_MODULE.Update_FaceCluster_Thumbnail(selected.cluster.rowid, filename);
+    selected.cluster.thumbnail = filename;
+    ShowClusterInfoModal(selected);
+  };
+
   return li;
 }
 

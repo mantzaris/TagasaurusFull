@@ -10,11 +10,32 @@
 }
 
 .cluster-thumbnail-sm {
-  max-width: 5em;
+  max-width: 8em;
+  max-height: 5em;
+  cursor: pointer;
+}
+
+.cluster-thumbnail-sm:hover {
+  outline: yellowgreen 1px solid;
 }
 
 .cluster-list-item {
   display: grid;
   grid-template-columns: 30% 70%;
   align-items: center;
+}
+
+.favorite-thumbnail {
+  font-size: 1.4em;
+  cursor: pointer;
+}
+.favorite-thumbnail:hover {
+  color: yellowgreen;
+}
+
+.force-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 2em;
 }
