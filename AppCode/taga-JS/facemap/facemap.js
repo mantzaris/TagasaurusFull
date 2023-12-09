@@ -2,9 +2,12 @@ const PATH = require('path');
 const { DB_MODULE, GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
 const { Full_Path_From_File_Name, Clamp } = require(PATH.join(__dirname, '..', 'AppCode', 'taga-JS', 'utilities', 'general-helper-fns.js'));
 
-const toggle_element = document.getElementById('check1');
-const size_element = document.getElementById('size');
+const image_thumbnail_toggle = document.getElementById('toggle-image-thumbnails');
+const size_element = document.getElementById('thumbnail-size');
 const container = document.getElementById('mynetwork');
+let cluster_modal_open = false;
+
+const id_map = new Map();
 
 const settings = {
   show_selected_thumbnails: [],
@@ -20,13 +23,27 @@ size_element.addEventListener('change', (ev) => {
   Generate_Face_Map(Object.assign(settings));
 });
 
-toggle_element.addEventListener('click', () => {
-  const checked = toggle_element.checked;
+image_thumbnail_toggle.addEventListener('click', () => {
+  const checked = image_thumbnail_toggle.checked;
   settings.show_image_thumbnail = checked;
   Generate_Face_Map(Object.assign(settings));
 });
 
-const id_map = new Map();
+window.addEventListener('click', (ev) => {
+  if (cluster_modal_open) {
+    const modal = document.getElementById('cluster-modal');
+
+    if (!Is_Point_Inside_Div(ev.clientX, ev.clientY, modal)) {
+      cluster_modal_open = false;
+      modal.classList.add('hidden');
+    }
+  }
+});
+
+function Is_Point_Inside_Div(x, y, div) {
+  const rect = div.getBoundingClientRect();
+  return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+}
 
 function Get_Node_Info_From_ID(id) {
   for (const val of id_map.values()) {
@@ -140,10 +157,6 @@ async function Generate_Face_Map(settings) {
     }
 
     if (selected.cluster) {
-      const child_nodes = Object.keys(selected.cluster.images);
-      settings.show_selected_thumbnails = child_nodes;
-      network.storePositions();
-      //await Generate_Face_Map(Object.assign({}, settings));
       ShowClusterInfoModal(selected);
     }
   });
@@ -172,6 +185,8 @@ function ShowClusterInfoModal(selected) {
     const is_thumbnail = cluster.thumbnail === image || (!cluster.thumbnail && index == 0);
     list.appendChild(CreateClusterRelatedThumbnail(selected, image, is_thumbnail));
   });
+
+  requestIdleCallback(() => (cluster_modal_open = true));
 }
 
 function CreateClusterRelatedThumbnail(selected, filename, is_thumbnail = false) {
@@ -200,10 +215,11 @@ function CreateClusterRelatedThumbnail(selected, filename, is_thumbnail = false)
 
   img.onclick = () => GENERAL_HELPER_FNS.Goto_Tagging_Entry(filename);
 
-  thumbnail_div.onclick = async () => {
+  thumbnail_div.onclick = async (ev) => {
     await DB_MODULE.Update_FaceCluster_Thumbnail(selected.cluster.rowid, filename);
     selected.cluster.thumbnail = filename;
     ShowClusterInfoModal(selected);
+    Generate_Face_Map(settings);
   };
 
   return li;

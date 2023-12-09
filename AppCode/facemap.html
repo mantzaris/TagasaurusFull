@@ -13,8 +13,9 @@
 
     <style type="text/css">
         #mynetwork {
-            width: 600px;
-            height: 400px;
+            width: 100vw;
+            height: 60vh;
+            background-color: #eee;
             /* border: 1px solid lightgray; */
         }
     </style>
@@ -23,17 +24,32 @@
     
   </head>
 
-  <body class="container">
+  <body >
     
     <div id="mynetwork"></div>
 
-    <br>
+    <section id="map-settings" class="container">
+      <h1 class="mt-3">Settings</h1>
 
-    <label for="check1">toggle image faces</label>
-    <input type="checkbox" id="check1">
-    
-    <label for="size">size</label>
-    <input type="number" min="5" max="20" step="1" value="10" id="size">
+      <hr>
+      <h3 class="mt-3">Thumbnails</h3>
+      <p>Adjust settings for image thumbnails in the network</p>
+      <div class="row">
+        <div class="col-3">
+          <label for="toggle-image-thumbnails">Toggle</label>
+          <br>  
+          <input class="form-check-input ml-3" type="checkbox" id="toggle-image-thumbnails">
+        </div>
+  
+        <div class="col-2">
+          <label for="thumbnail-size">Size</label>
+          <input class="form-range ml-3" type="range" id="thumbnail-size"  min="5" max="20" step="1" value="10">
+        </div>
+  
+      </div>
+      <hr>
+      
+    </section>
 
 
 

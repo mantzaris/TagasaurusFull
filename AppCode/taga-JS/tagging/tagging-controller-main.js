@@ -7,8 +7,7 @@ const { ipcRenderer } = require('electron');
 
 const { CreateTaggingEntryCluster, ComputeAvgFaceDescriptor } = require(PATH.join(__dirname, 'taga-JS', 'utilities', 'cluster.js'));
 const { GetFileTypeFromFileName, GetFileTypeFromMimeType } = require(PATH.join(__dirname, 'taga-JS', 'utilities', 'files.js'));
-const { domainToUnicode } = require('url');
-const { parse } = require('path/posix');
+
 //FSE is not being used but should be for the directory batch import
 //const FSE = require('fs-extra');
 
@@ -800,8 +799,9 @@ async function Handle_Delete_FileFrom_Cluster() {
 
   for (let i = 0; i < face_clusters.length; i++) {
     let cluster = face_clusters[i];
+    console.log(current_image_annotation);
 
-    delete cluster.relatedFaces[current_image_annotation.fileHash];
+    delete cluster.relatedFaces[current_image_annotation.fileName];
 
     let remaining_related_faces = Object.values(cluster.relatedFaces).flatMap((v) => v);
 
@@ -821,6 +821,11 @@ async function Handle_Delete_FileFrom_Cluster() {
     delete cluster.images[current_image_annotation.fileName];
 
     updated_clusters.push(cluster);
+
+    console.log(face_clusters[i].thumbnail);
+    if (face_clusters[i].thumbnail == current_image_annotation.fileName) {
+      await DB_MODULE.Update_FaceCluster_Thumbnail(face_clusters[i].rowid, null);
+    }
   }
 
   if (empty_clusters.length > 0) await DB_MODULE.Delete_FaceClusters_By_IDS(empty_clusters);
@@ -829,13 +834,14 @@ async function Handle_Delete_FileFrom_Cluster() {
     await DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, rowid);
   }
 
+  //deleting lingering meme references, images which use this image as a meme on their face cluster
   const { fileNames } = await DB_MODULE.Get_Tagging_MEME_Record_From_DB(current_image_annotation.fileName);
   const cluster_ids = await DB_MODULE.Get_Tagging_ClusterIDS_From_FileNames(fileNames);
   const clusters = await DB_MODULE.Get_FaceClusters_From_IDS(cluster_ids);
 
   for (let i = 0; i < clusters.length; i++) {
     for (const [filename, data] of Object.entries(clusters[i].images)) {
-      console.log(filename, data);
+      //console.log(filename, data);
       clusters[i].images[filename].memes = data.memes.filter((filename) => filename != current_image_annotation.fileName);
 
       const { rowid, avgDescriptor, relatedFaces, keywords, images } = clusters[i];
