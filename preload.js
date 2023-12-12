@@ -142,6 +142,11 @@ function Get_Descriptors_DistanceScore(descriptors_reference, descriptors_query)
 }
 window.Get_Descriptors_DistanceScore = Get_Descriptors_DistanceScore;
 
+function Get_Euclidean_Distance(descriptor1, descriptor2) {
+  return faceapi.euclideanDistance(descriptor1, descriptor2);
+}
+window.Get_Euclidean_Distance = Get_Euclidean_Distance;
+
 //When the file is a GIF
 //go through each frame sequentially and include descriptors of only novel faces
 //add a new descriptor if the distance to the rest is small

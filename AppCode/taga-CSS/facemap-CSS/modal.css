@@ -3,6 +3,9 @@
   position: fixed;
   top: 0px;
   left: 0px;
+  overflow-y: scroll;
+  max-height: 60vh;
+  overflow-x: hidden;
 }
 
 .hidden {

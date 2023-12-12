@@ -12,10 +12,11 @@ const id_map = new Map();
 const settings = {
   show_selected_thumbnails: [],
   show_image_thumbnail: false,
-  image_size: 10,
+  image_size: 5,
 };
 
 let network;
+let thumbnail_modal_ts = Date.now();
 
 size_element.addEventListener('change', (ev) => {
   settings.image_size = Clamp(parseInt(size_element.value), size_element.min, size_element.max);
@@ -30,7 +31,7 @@ image_thumbnail_toggle.addEventListener('click', () => {
 });
 
 window.addEventListener('click', (ev) => {
-  if (cluster_modal_open) {
+  if (cluster_modal_open && Date.now() - thumbnail_modal_ts > 50) {
     const modal = document.getElementById('cluster-modal');
 
     if (!Is_Point_Inside_Div(ev.clientX, ev.clientY, modal)) {
@@ -58,6 +59,8 @@ function Select_Cluster_Thumbnail(cluster) {
 async function Generate_Face_Map(settings) {
   const all_face_clusters = await DB_MODULE.Get_All_FaceClusters();
   const all_images = [...new Set(all_face_clusters.flatMap((c) => Object.keys(c.images)))];
+
+  let map = Sort_Cluster_Similarity(all_face_clusters);
 
   for (const image of all_images) {
     const id = id_map.has(image) ? id_map.get(image).id : crypto.randomUUID();
@@ -95,16 +98,20 @@ async function Generate_Face_Map(settings) {
 
     face_cluster_nodes.push(node);
 
-    const available_edges = face_cluster_ids.filter((fc_id) => fc_id != cluster.rowid);
-    const length = 250; // Math.ceil(Math.random() * 75) + 25;
+    const available_edges = map.get(cluster.rowid).related; // face_cluster_ids.filter((fc_id) => fc_id != cluster.rowid);
     const from = id_map.get(cluster.rowid).id;
 
     for (const to of available_edges) {
-      face_cluster_edges.push({ from, to: id_map.get(to).id, length });
+      const dist = 1 - to.score;
+      const length = 200 + (18 * dist) ** 5 + dist;
+      console.log({ length, dist: dist });
+      //const length = distance
+
+      face_cluster_edges.push({ from, to: id_map.get(to.rowid).id, length });
     }
 
     for (const to of images) {
-      face_cluster_edges.push({ from, to: id_map.get(to).id, length: 40 });
+      face_cluster_edges.push({ from, to: id_map.get(to).id, length: 20 });
     }
 
     for (const image of images) {
@@ -165,28 +172,22 @@ async function Generate_Face_Map(settings) {
 function ShowClusterInfoModal(selected) {
   const { cluster, id } = selected;
   const modal = document.getElementById('cluster-modal');
-  document.getElementById('cluster-modal-id').innerText = cluster.rowid;
   modal.classList.remove('hidden');
-
-  const pos = CanvasToWindowXY(network.getPosition(id), document.querySelector('canvas'));
-  modal.style.left = `${pos.x}px`;
-  modal.style.top = `${pos.y}px`;
 
   const images = Array.from(Object.keys(cluster.images));
   const thumbnail = Full_Path_From_File_Name(Select_Cluster_Thumbnail(cluster));
   document.getElementById('cluster-modal-img').src = thumbnail;
 
   const list = document.getElementById('cluster-modal-list');
-  console.log(list);
   list.innerHTML = '';
 
   images.forEach((image, index) => {
-    console.log(image, index);
     const is_thumbnail = cluster.thumbnail === image || (!cluster.thumbnail && index == 0);
     list.appendChild(CreateClusterRelatedThumbnail(selected, image, is_thumbnail));
   });
 
-  requestIdleCallback(() => (cluster_modal_open = true));
+  cluster_modal_open = true;
+  thumbnail_modal_ts = Date.now();
 }
 
 function CreateClusterRelatedThumbnail(selected, filename, is_thumbnail = false) {
@@ -242,3 +243,35 @@ function CanvasToWindowXY(pos, canvas) {
 }
 
 Generate_Face_Map(settings);
+
+function Sort_Cluster_Similarity(clusters) {
+  const map = new Map();
+
+  for (const cluster of clusters) {
+    let related = [];
+
+    for (const other of clusters.filter((c) => c.rowid != cluster.rowid)) {
+      const score = Get_Euclidean_Distance(other.avgDescriptor, cluster.avgDescriptor);
+      if (score >= 0.8) {
+        related.push({
+          score,
+          rowid: other.rowid,
+        });
+      }
+    }
+
+    related.sort((a, b) => b.score - a.score);
+    if (related.length > 5) {
+      related = related.slice(0, 5);
+    }
+
+    map.set(cluster.rowid, {
+      cluster,
+      related,
+    });
+  }
+
+  console.log(map);
+
+  return map;
+}
