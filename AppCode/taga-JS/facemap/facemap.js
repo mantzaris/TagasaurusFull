@@ -57,6 +57,7 @@ function Select_Cluster_Thumbnail(cluster) {
 }
 
 async function Generate_Face_Map(settings) {
+  console.time('Generate_Face_Map');
   const all_face_clusters = await DB_MODULE.Get_All_FaceClusters();
   const all_images = [...new Set(all_face_clusters.flatMap((c) => Object.keys(c.images)))];
 
@@ -103,8 +104,7 @@ async function Generate_Face_Map(settings) {
 
     for (const to of available_edges) {
       const dist = 1 - to.score;
-      const length = 200 + (18 * dist) ** 5 + dist;
-      console.log({ length, dist: dist });
+      const length = 300 + (40 * dist) ** 6 + dist;
       //const length = distance
 
       face_cluster_edges.push({ from, to: id_map.get(to.rowid).id, length });
@@ -145,6 +145,11 @@ async function Generate_Face_Map(settings) {
   let options = {
     edges: {
       selectionWidth: 1,
+      color: {
+        color: 'rgba(15,15,15,0.3)',
+        highlight: '#0d6efd',
+      },
+      chosen: {},
       smooth: {
         enabled: false,
       },
@@ -167,6 +172,8 @@ async function Generate_Face_Map(settings) {
       ShowClusterInfoModal(selected);
     }
   });
+
+  console.timeEnd('Generate_Face_Map');
 }
 
 function ShowClusterInfoModal(selected) {
@@ -252,7 +259,7 @@ function Sort_Cluster_Similarity(clusters) {
 
     for (const other of clusters.filter((c) => c.rowid != cluster.rowid)) {
       const score = Get_Euclidean_Distance(other.avgDescriptor, cluster.avgDescriptor);
-      if (score >= 0.8) {
+      if (score >= 0.95) {
         related.push({
           score,
           rowid: other.rowid,
@@ -260,6 +267,8 @@ function Sort_Cluster_Similarity(clusters) {
       }
     }
 
+    const num_clusters = related.length;
+    const num_elements = Object.keys(cluster.images).length;
     related.sort((a, b) => b.score - a.score);
     if (related.length > 5) {
       related = related.slice(0, 5);
@@ -268,6 +277,8 @@ function Sort_Cluster_Similarity(clusters) {
     map.set(cluster.rowid, {
       cluster,
       related,
+      num_clusters,
+      num_elements,
     });
   }
 
