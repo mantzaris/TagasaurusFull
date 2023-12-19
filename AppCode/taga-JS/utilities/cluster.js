@@ -77,7 +77,7 @@ async function CreateFaceCluster(avgDescriptor, fileName, tags, fileType, memes)
     memes,
   };
 
-  const rowid = await DB_MODULE.Insert_FaceCluster(avgDescriptor, relatedFaces, keywords, images); //returns rowid for the new record
+  const rowid = await DB_MODULE.Insert_FaceCluster(avgDescriptor, relatedFaces, keywords, images, null); //returns rowid for the new record
   return { rowid, relatedFaces, avgDescriptor };
 }
 

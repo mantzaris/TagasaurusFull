@@ -871,9 +871,10 @@ function Get_MEME_Collection_Obj_Fields_From_Record(record) {
 
 //FACECLUSTERS stuff const FACECLUSTERS_TABLE_NAME = 'FACECLUSTERS';
 const GET_ALL_FACECLUSTERS_STMT = DB.prepare(`SELECT ROWID, * FROM ${FACECLUSTERS_TABLE_NAME}`);
-const INSERT_FACECLUSTER_STMT = DB.prepare(`INSERT INTO ${FACECLUSTERS_TABLE_NAME} (avgDescriptor, relatedFaces, keywords, images ) VALUES ( ?, ?, ?, ?)`);
+const INSERT_FACECLUSTER_STMT = DB.prepare(`INSERT INTO ${FACECLUSTERS_TABLE_NAME} (avgDescriptor, relatedFaces, keywords, images, thumbnail ) VALUES ( ?, ?, ?, ?, ?)`);
 const DELETE_EMPTY_FACECLUSTER_STMT = DB.prepare(`DELETE FROM ${FACECLUSTERS_TABLE_NAME} WHERE relatedFaces=?`);
 const UPDATE_FACECLUSTER_STMT = DB.prepare(`UPDATE ${FACECLUSTERS_TABLE_NAME} SET avgDescriptor=?, relatedFaces=?, keywords=?, images=? WHERE ROWID=?`);
+const UPDATE_FACECLUSTER_THUMBNAIL_STMT = DB.prepare(`UPDATE ${FACECLUSTERS_TABLE_NAME} SET thumbnail=? WHERE ROWID=?`);
 
 const GET_LAST_ROWID_STMT = DB.prepare(`SELECT last_insert_rowid()`);
 
@@ -922,12 +923,13 @@ async function Get_Last_Rowid() {
 }
 exports.Get_Last_Rowid = Get_Last_Rowid;
 
-async function Insert_FaceCluster(avgDescriptor, relatedFaces, keywords, images) {
+async function Insert_FaceCluster(avgDescriptor, relatedFaces, keywords, images, thumbnail) {
   const res = await INSERT_FACECLUSTER_STMT.run(
     JSON.stringify(Array.from(avgDescriptor)),
     JSON.stringify(relatedFaces),
     JSON.stringify(keywords),
-    JSON.stringify(images)
+    JSON.stringify(images),
+    thumbnail
   );
 
   return res.lastInsertRowid;
@@ -943,6 +945,11 @@ async function Delete_All_Empty_FaceClusters() {
   await DELETE_EMPTY_FACECLUSTER_STMT.run(JSON.stringify([]));
 }
 exports.Delete_All_Empty_FaceClusters = Delete_All_Empty_FaceClusters;
+
+async function Update_FaceCluster_Thumbnail(rowid, thumbnail) {
+  await UPDATE_FACECLUSTER_THUMBNAIL_STMT.run(thumbnail, rowid);
+}
+exports.Update_FaceCluster_Thumbnail = Update_FaceCluster_Thumbnail;
 //COLLECTION SEARCH RELATED FNs END<<<
 
 //!!! make call to this when image is deleted from tagging to update collection meme table !!!
