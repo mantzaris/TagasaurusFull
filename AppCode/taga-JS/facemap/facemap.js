@@ -57,9 +57,23 @@ function Select_Cluster_Thumbnail(cluster) {
 }
 
 async function Generate_Face_Map(settings) {
-  console.time('Generate_Face_Map');
+  console.time(`Generate_Face_Map`);
   const all_face_clusters = await DB_MODULE.Get_All_FaceClusters();
-  const all_images = [...new Set(all_face_clusters.flatMap((c) => Object.keys(c.images)))];
+  const cluster_to_img_map = new Map();
+
+  console.time(`Filter_Cluster_Images[${all_face_clusters.length}]`);
+  const all_images = [
+    ...new Set(
+      all_face_clusters.flatMap((c) => {
+        const images = Object.entries(c.images)
+          .filter((i) => i[1].fileType == 'image')
+          .map((i) => i[0]);
+        cluster_to_img_map.set(c.rowid, images);
+        return images;
+      })
+    ),
+  ];
+  console.timeEnd(`Filter_Cluster_Images[${all_face_clusters.length}]`);
 
   let map = Sort_Cluster_Similarity(all_face_clusters);
 
@@ -86,8 +100,9 @@ async function Generate_Face_Map(settings) {
   let face_cluster_edges = [];
 
   for (const cluster of all_face_clusters) {
-    const images = Object.keys(cluster.images);
-    const image = images[Math.floor(Math.random() * images.length)];
+    //const images = Object.keys(cluster.images);
+    const images = cluster_to_img_map.get(cluster.rowid);
+    if (images.length == 0) break;
 
     const node = {
       id: id_map.get(cluster.rowid).id,
@@ -162,7 +177,6 @@ async function Generate_Face_Map(settings) {
   network.on('selectNode', async (ev) => {
     const node_id = ev.nodes[0];
     const selected = Get_Node_Info_From_ID(node_id);
-    console.log(selected);
     if (selected.image) {
       settings.show_selected_thumbnails = [];
       GENERAL_HELPER_FNS.Goto_Tagging_Entry(selected.image);
@@ -170,7 +184,16 @@ async function Generate_Face_Map(settings) {
 
     if (selected.cluster) {
       ShowClusterInfoModal(selected);
+
+      network.focus(node_id, {});
     }
+  });
+
+  network.on('stabilizationIterationsDone', function () {
+    network.moveTo({
+      scale: 0.5, // Adjust this value for zoom level (0.5 means 50% zoom)
+      position: { x: 0, y: 0 }, // You can adjust the initial position if needed
+    });
   });
 
   console.timeEnd('Generate_Face_Map');
@@ -281,8 +304,6 @@ function Sort_Cluster_Similarity(clusters) {
       num_elements,
     });
   }
-
-  console.log(map);
 
   return map;
 }
