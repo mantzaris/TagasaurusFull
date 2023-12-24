@@ -178,7 +178,9 @@ async function Display_Image() {
   let ft_res = current_image_annotation['fileType'];
   const show_face_boxes_btn = document.getElementById('show-faces-tagging-center');
 
-  if (current_image_annotation['faceDescriptors']?.length > 0 && ft_res == 'image') {
+  const has_descriptors = current_image_annotation['faceDescriptors']?.length > 0;
+
+  if (has_descriptors && (ft_res == 'image' || ft_res == 'video')) {
     show_face_boxes_btn.style.display = 'block';
   } else {
     show_face_boxes_btn.style.display = 'none';
@@ -1970,12 +1972,24 @@ document.body.addEventListener('mousedown', async (ev) => {
         }
         case 'show-faces-tagging-center': {
           const photo = document.getElementById('center-gallery-image-id');
+          let width,
+            height = 0;
+
+          if (current_image_annotation.fileType == 'video') {
+            photo.pause();
+            width = photo.videoWidth;
+            height = photo.videoHeight;
+          } else {
+            width = photo.naturalWidth;
+            height = photo.naturalHeight;
+          }
+
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
-          canvas.width = photo.naturalWidth; //original image dimensions
-          canvas.height = photo.naturalHeight;
-          ctx.drawImage(photo, 0, 0, photo.naturalWidth, photo.naturalHeight);
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(photo, 0, 0, width, height);
 
           // Get bounding boxes
           const detections = await Get_Image_Face_Descriptors_And_Expresssions_From_HTML_Image(canvas);
