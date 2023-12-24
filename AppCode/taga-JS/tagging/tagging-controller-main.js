@@ -2119,7 +2119,7 @@ async function Show_Similar_Faces(descriptor) {
   similar_faces = [...new Set(similar_faces)];
 
   const results_div = document.getElementById('modal-facesearch-images-results-grid-div-area-id');
-  results_div.innerHTML = '';
+  results_div.innerHTML = similar_faces.length == 0 ? '<h1>No Results</h1>' : '';
 
   for (const face of similar_faces) {
     const ft_res = await GetFileTypeFromFileName(face);
