@@ -1,0 +1,108 @@
+#modal-facesearch-top-grid-div-id {
+  width: 100%;
+  display: grid;
+  grid-template-rows: 3fr 24fr;
+  height: 100%;
+  /* box-sizing: border-box; */
+  padding: 0%;
+  grid-template-areas:
+    'modal-facesearch-main-button-container-div-id'
+    'modal-facesearch-images-results-display-id';
+}
+
+/* SEARCH BUTTON START */
+#modal-facesearch-main-button-container-div-id {
+  background-color: var(--primary-300);
+  grid-area: modal-facesearch-main-button-container-div-id;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+#modal-facesearch-main-button-id {
+  display: block;
+  width: 25%;
+  height: 90%;
+  /* background-color: #1884ff; */
+  /* border-radius: 15%; */
+  font-weight: bold;
+  font-size: 2.5vmin;
+}
+#modal-facesearch-similar-button-id {
+  display: block;
+  width: 25%;
+  height: 90%;
+  /* background-color: #1884ff; */
+  /* border-radius: 15%; */
+  font-weight: bold;
+  font-size: 2.5vmin;
+}
+#modal-facesearch-main-reset-button-id {
+  display: inline-block;
+  text-align: center; /*width: 30%;*/
+  height: 75%;
+  /* background-color: #ad2021; */
+  /* border-radius: 25%; */
+  font-weight: bold;
+  font-size: 2.5vmin;
+}
+/* SEARCH BUTTON END */
+
+/* TAG SEARCH START */
+
+#modal-facesearch-tag-textarea-entry-div-id {
+  flex-grow: 20;
+}
+#modal-facesearch-tag-textarea-entry-id {
+  height: 3vmin;
+  overflow: hidden;
+  font-size: 2.75vmin;
+  border-radius: 5px;
+  white-space: nowrap;
+  width: 99%;
+}
+/* TAG SEARCH END */
+
+/* IMAGE SEARCH RESULTS START */
+#modal-facesearch-images-results-display-id {
+  background-color: var(--primary-300);
+  grid-area: modal-facesearch-images-results-display-id;
+  border-top: 6px solid var(--primary);
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 11fr;
+  /* height: 100%; */
+  min-height: 1px;
+  /* max-width: 100%; */
+  /* overflow-y: scroll; */
+  box-sizing: border-box;
+  grid-template-areas:
+    'modal-facesearch-images-results-button-div-id'
+    'modal-facesearch-images-results-grid-div-area-id';
+}
+
+#modal-facesearch-images-results-grid-div-area-id {
+  background-color: var(--primary);
+  overflow-y: scroll;
+  border-top: 3px solid var(--primary);
+  /* max-height: 100%; */
+  /* overflow-y: scroll; */
+  grid-area: modal-facesearch-images-results-grid-div-area-id;
+}
+
+.modal-image-facesearch-result-single-image-div-class {
+  text-align: center;
+}
+.modal-image-facesearch-result-single-image-img-obj-class {
+  max-height: 25vh;
+  max-width: 50vw;
+  cursor: pointer;
+}
+#modal-facesearch-meme-tag-label-id {
+  white-space: nowrap;
+  font-size: 3vmin;
+  font-weight: bold;
+  padding-left: 0.5%;
+  vertical-align: middle;
+  float: left;
+}
+/* IMAGE SEARCH RESULTS END */

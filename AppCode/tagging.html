@@ -24,6 +24,9 @@
     <!-- style sheet for the add meme search modal pop up to search to add memes -->
     <link rel="stylesheet" href="./taga-CSS/tagging-CSS/tagging-add-memes-search-modal.css" />
 
+    <!-- style sheet for the facesearch modal pop up to search for faced images -->
+    <link rel="stylesheet" href="./taga-CSS/tagging-CSS/tagging-facesearch-modal.css" />
+
     <!-- style sheet for the processing message modal -->
     <link rel="stylesheet" href="./taga-CSS/processing-message-modal.css" />
 
@@ -457,13 +460,14 @@
 
     <!-- START DIV FOR THE RIGHT CLICK EVENTS -->
     <div id="right-click-modal-tagging-center" class="rc-modal">
-      <button id="save-file-tagging-center">save file</button>
+      <button id="save-file-tagging-center">Save File</button>
+      <button id="show-faces-tagging-center" style="display: none;">Search Face(s)</button>
     </div>
     <div id="right-click-modal-tagging-meme" class="rc-modal">
-      <button id="save-file-tagging-modal-meme">save file</button>
+      <button id="save-file-tagging-modal-meme">Save File</button>
     </div>
     <div id="right-click-tagging-meme" class="rc-modal">
-      <button id="save-file-tagging-meme">save file</button>
+      <button id="save-file-tagging-meme">Save File</button>
     </div>
 
     <!-- END DIV FOR THE RIGHT CLICK EVENTS -->
@@ -501,6 +505,50 @@
         </div>
       </div>
     </div>
+
+
+    <!-- Face Search Modal START -->
+    <div id="facesearch-modal-click-top-id" class="modal-top-class">
+      <!-- MEME MODAL CLOSE -->
+      <img
+        class="modal-close-button-class"
+        id="modal-facesearch-close-exit-view-button-id"
+        onmouseover="this.src='taga-ui-icons/CloseRed.png';"
+        onmouseout="this.src='taga-ui-icons/CloseBlack.png';"
+        src="taga-ui-icons/CloseBlack.png"
+        title="close"
+      />
+      <!-- Modal content container -->
+      <div class="modal-content-container">
+        <div id="modal-facesearch-top-grid-div-id">
+          <!-- search button -->
+          <div id="modal-facesearch-main-button-container-div-id">
+            <button type="button" class="fun-button-blue" id="modal-facesearch-main-button-id">SEARCH FACE</button>
+          </div>
+  
+          <!-- image tag entry -->
+
+  
+          <!-- IMAGE SEARCH RESULTS START -->
+          <div id="modal-facesearch-images-results-display-id">
+            <div id="modal-facesearch-images-results-button-div-id">
+              <label id="modal-facesearch-meme-tag-label-id">Select Image</label>
+              <!-- <button type="button" class="fun-button-blue" id="modal-search-images-results-select-images-order-button-id">Select Image</button> -->
+            </div>
+  
+            <!-- for the image annotation matches -->
+            <div id="modal-facesearch-images-results-grid-div-area-id">
+              <!-- <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-Taga.png" >
+                            <img class="modal-image-search-result-single-image-img-obj-class" id="modal-image-search-result-single-image-img-id-Taga.png" src="images/Taga.png" title="view" alt="memes" />
+                        </div> -->
+            </div>
+            
+          </div>
+          <!-- IMAGE SEARCH RESULTS END -->
+        </div>
+      </div>
+    </div>
+    <!-- Face Search Modal END -->
 
     <!-- MODALS FINISH -->
     <!-- ------------------------- -->

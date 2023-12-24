@@ -176,10 +176,13 @@ async function Display_Image() {
   const display_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation['fileName']}`;
   let center_gallery_element;
   let ft_res = current_image_annotation['fileType'];
+  const show_face_boxes_btn = document.getElementById('show-faces-tagging-center');
 
-  // if( ft_res.mime.includes('pdf') == false ) {
-  //     //IPC_RENDERER.send('closePDF')
-  // }
+  if (current_image_annotation['faceDescriptors']?.length > 0 && ft_res == 'image') {
+    show_face_boxes_btn.style.display = 'block';
+  } else {
+    show_face_boxes_btn.style.display = 'none';
+  }
 
   if (ft_res == 'image') {
     center_gallery_element = document.createElement('img');
@@ -1953,21 +1956,70 @@ document.body.addEventListener('mousedown', async (ev) => {
   if (ev.button == 0) {
     //left clicked
     if (save_modal_center_tagging.style.display == 'block') {
-      if (ev.target.id == 'save-file-tagging-center') {
-        // save button clicked from the tagging center modal,
+      switch (ev.target.id) {
+        case 'save-file-tagging-center': {
+          // save button clicked from the tagging center modal,
 
-        const results = await IPC_RENDERER.invoke('dialog:saveFile');
-        if (results.canceled == false) {
-          const output_name = results.filePath;
-          FS.copyFileSync(PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation.fileName), output_name, FS.constants.COPYFILE_EXCL);
-          alert('saved file to download');
+          const results = await IPC_RENDERER.invoke('dialog:saveFile');
+          if (results.canceled == false) {
+            const output_name = results.filePath;
+            FS.copyFileSync(PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation.fileName), output_name, FS.constants.COPYFILE_EXCL);
+            alert('saved file to download');
+          }
+          break;
         }
-        save_modal_center_tagging.style.display = 'none';
-      } else {
-        // clicked but not on the button so get rid of the button
+        case 'show-faces-tagging-center': {
+          const photo = document.getElementById('center-gallery-image-id');
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
-        save_modal_center_tagging.style.display = 'none';
+          canvas.width = photo.naturalWidth; //original image dimensions
+          canvas.height = photo.naturalHeight;
+          ctx.drawImage(photo, 0, 0, photo.naturalWidth, photo.naturalHeight);
+
+          // Get bounding boxes
+          const detections = await Get_Image_Face_Descriptors_And_Expresssions_From_HTML_Image(canvas);
+
+          const results_div = document.getElementById('modal-facesearch-images-results-grid-div-area-id');
+          results_div.innerHTML = '';
+
+          for (const { descriptor, detection } of detections) {
+            const { x, y, width, height } = detection.box;
+
+            const tmp_canvas = document.createElement('canvas');
+            const ctx2 = tmp_canvas.getContext('2d');
+
+            // Set temporary canvas size to the size of the detected face
+            tmp_canvas.width = width;
+            tmp_canvas.height = height;
+
+            // Draw the face region onto the temporary canvas
+            ctx2.drawImage(canvas, x, y, width, height, 0, 0, width, height);
+
+            // Create an image element and set its source to the data URL of the temporary canvas
+            const img_tmp = document.createElement('img');
+            img_tmp.src = tmp_canvas.toDataURL('image/jpeg');
+            img_tmp.classList.add('modal-image-search-result-single-image-img-obj-class');
+
+            const div = document.createElement('div');
+            div.classList.add('modal-image-facesearch-result-single-image-div-class');
+            div.appendChild(img_tmp);
+
+            results_div.appendChild(div);
+
+            div.onclick = async () => {
+              Show_Similar_Faces(descriptor);
+            };
+          }
+
+          let modal_search_click = document.getElementById('facesearch-modal-click-top-id');
+          modal_search_click.style.display = 'block';
+
+          break;
+        }
       }
+
+      save_modal_center_tagging.style.display = 'none';
     }
     if (save_modal_meme_tagging.style.display == 'block') {
       if (ev.target.id == 'save-file-tagging-modal-meme') {
@@ -2011,4 +2063,62 @@ document.body.addEventListener('mousedown', async (ev) => {
     }
   }
 });
+
+document.getElementById('modal-facesearch-close-exit-view-button-id').onclick = () => {
+  let modal_search_click = document.getElementById('facesearch-modal-click-top-id');
+  modal_search_click.style.display = 'none';
+};
+window.addEventListener('click', (event) => {
+  const div = document.getElementById('facesearch-modal-click-top-id');
+
+  if (event.target == div) {
+    div.style.display = 'none';
+  }
+});
+
+async function Show_Similar_Faces(descriptor) {
+  const all_face_clusters = await DB_MODULE.Get_All_FaceClusters();
+  let scores = new Map();
+  let similar_faces = [];
+
+  for (const cluster of all_face_clusters) {
+    const distance = Get_Euclidean_Distance(descriptor, cluster.avgDescriptor);
+
+    if (distance < 0.4) {
+      if (scores.has(distance)) {
+        const media = new Set([...scores.get(distance), ...Object.keys(cluster.relatedFaces)]);
+        scores.set(distance, media);
+      } else {
+        scores.set(distance, Object.keys(cluster.relatedFaces));
+      }
+    }
+  }
+
+  const sorted_distances = Array.from(scores.keys()).sort((a, b) => {
+    return parseFloat(a) - parseFloat(b);
+  });
+
+  for (const dist of sorted_distances) {
+    similar_faces.push(...scores.get(dist));
+  }
+
+  similar_faces = [...new Set(similar_faces)];
+
+  const results_div = document.getElementById('modal-facesearch-images-results-grid-div-area-id');
+  results_div.innerHTML = '';
+
+  for (const face of similar_faces) {
+    const img_tmp = document.createElement('img');
+    img_tmp.src = GENERAL_HELPER_FNS.Full_Path_From_File_Name(face);
+    console.log(img_tmp.src);
+    const div = document.createElement('div');
+    div.classList.add('modal-image-facesearch-result-single-image-div-class');
+    img_tmp.classList.add('modal-image-search-result-single-image-img-obj-class');
+
+    div.appendChild(img_tmp);
+    results_div.appendChild(div);
+  }
+
+  return similar_faces;
+}
 //END SAVING CONTENT (EXPORTING) RIGHT CLICK CONTENT <<<<<<<<<<<<<<
