@@ -2108,15 +2108,30 @@ async function Show_Similar_Faces(descriptor) {
   results_div.innerHTML = '';
 
   for (const face of similar_faces) {
-    const img_tmp = document.createElement('img');
-    img_tmp.src = GENERAL_HELPER_FNS.Full_Path_From_File_Name(face);
-    console.log(img_tmp.src);
+    const ft_res = await GetFileTypeFromFileName(face);
+    let media_element;
+
+    if (ft_res == 'image') {
+      media_element = document.createElement('img');
+      media_element.src = GENERAL_HELPER_FNS.Full_Path_From_File_Name(face);
+    } else if (ft_res == 'video') {
+      media_element = document.createElement('video');
+      media_element.src = GENERAL_HELPER_FNS.Full_Path_From_File_Name(face);
+      media_element.controls = true;
+      media_element.muted = true;
+      //media_element.play();
+    }
+
     const div = document.createElement('div');
     div.classList.add('modal-image-facesearch-result-single-image-div-class');
-    img_tmp.classList.add('modal-image-search-result-single-image-img-obj-class');
+    media_element.classList.add('modal-image-search-result-single-image-img-obj-class');
 
-    div.appendChild(img_tmp);
+    div.appendChild(media_element);
     results_div.appendChild(div);
+
+    div.onclick = () => {
+      GENERAL_HELPER_FNS.Goto_Tagging_Entry(face);
+    };
   }
 
   return similar_faces;
