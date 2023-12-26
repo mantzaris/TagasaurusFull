@@ -101,8 +101,7 @@ async function Super_Search() {
   super_search_obj.faceDescriptors = faceDescriptors_search;
 
   //perform the search
-  let tagging_db_iterator = await Tagging_Image_DB_Iterator();
-  search_results = await SEARCH_MODULE.Image_Search_DB(super_search_obj, tagging_db_iterator, Get_Tagging_Annotation_From_DB, MAX_COUNT_SEARCH_RESULTS);
+  search_results = await SEARCH_MODULE.Image_Search_DB(super_search_obj);
 
   let search_image_results_output = document.getElementById('top-results-div-id');
   search_image_results_output.innerHTML = '';
@@ -274,8 +273,7 @@ async function Get_Select_Recommended() {
   Set_Search_Obj_Tags();
 
   //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
-  let tagging_db_iterator = await Tagging_Image_DB_Iterator();
-  search_results_recommended = await SEARCH_MODULE.Image_Search_DB(super_search_obj, tagging_db_iterator, Get_Tagging_Annotation_From_DB, MAX_COUNT_SEARCH_RESULTS);
+  search_results_recommended = await SEARCH_MODULE.Image_Search_DB(super_search_obj);
 
   let search_image_results_output = document.getElementById('facial-row-four-div-id');
   search_image_results_output.innerHTML = '';

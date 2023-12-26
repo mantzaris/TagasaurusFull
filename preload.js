@@ -10,6 +10,7 @@ require('dotenv').config();
 
 // BUILD_INSTALLER = whether to build a installer. If false will build a free standing binary
 const APP_NAME = 'tagasaurus';
+window.MAX_COUNT_SEARCH_RESULTS = 250;
 
 //!!! XXX !!! manually set
 //const BUILD_INSTALLER = false; //process.env.npm_config_build_installer === 'true';
