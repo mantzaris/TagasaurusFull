@@ -1004,11 +1004,7 @@ async function Collection_Profile_Image_Search_Action() {
   //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
   //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
   //img_indices_sorted = await SEARCH_MODULE.Collection_Profile_Image_Search_Fn(collection_profile_search_obj,current_collection_obj.collectionGalleryFiles,Get_Tagging_Record_In_DB) //!!!indices !!!
-  let profile_img_sorted = await SEARCH_MODULE.Collection_Profile_Image_Search_Fn(
-    collection_profile_search_obj,
-    current_collection_obj.collectionGalleryFiles,
-    Get_Tagging_Annotation_From_DB
-  );
+  let profile_img_sorted = await SEARCH_MODULE.Collection_Profile_Image_Search_Fn(collection_profile_search_obj, current_collection_obj.collectionGalleryFiles);
 
   //present new sorted ordering now!
   let profile_search_display_div = document.getElementById('modal-search-profileimage-images-results-grid-div-area-id'); //("collections-profileimages-gallery-grid-images-div-id")
@@ -1304,13 +1300,8 @@ async function Collection_Add_Image_Search_Action() {
   processing_modal.style.display = 'flex';
 
   search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_gallery_search_obj);
-  let tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
-  search_image_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(
-    collection_gallery_search_obj,
-    tagging_meme_db_iterator,
-    Get_Tagging_Annotation_From_DB,
-    MAX_COUNT_SEARCH_RESULTS
-  );
+
+  search_image_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(collection_gallery_search_obj);
 
   processing_modal.style.display = 'none';
 
@@ -1669,13 +1660,8 @@ async function Collection_Add_Memes_Search_Action() {
   processing_modal.style.display = 'flex';
 
   meme_search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_meme_search_obj);
-  let tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
-  meme_search_image_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(
-    collection_meme_search_obj,
-    tagging_meme_db_iterator,
-    Get_Tagging_Annotation_From_DB,
-    MAX_COUNT_SEARCH_RESULTS
-  );
+
+  meme_search_image_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(collection_meme_search_obj);
 
   processing_modal.style.display = 'none';
 
@@ -1924,13 +1910,7 @@ async function Search_Collections_Search_Action() {
   let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
   processing_modal.style.display = 'flex';
 
-  let collection_db_iterator = await Collection_DB_Iterator();
-  search_collection_results = await SEARCH_MODULE.Collection_Search_DB(
-    collection_search_obj,
-    collection_db_iterator,
-    Get_Tagging_Annotation_From_DB,
-    MAX_COUNT_SEARCH_RESULTS
-  );
+  search_collection_results = await SEARCH_MODULE.Collection_Search_DB(collection_search_obj);
 
   processing_modal.style.display = 'none';
 

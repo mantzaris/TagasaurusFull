@@ -16,6 +16,8 @@ const COLLECTION_GALLERY_TABLE_NAME = 'COLLECTIONGALLERY';
 const FACECLUSTERS_TABLE_NAME = 'FACECLUSTERS';
 
 const SELECT_FROM_ID_PREPARED_STMT = new Map();
+const RECORD_PARSER_MAP = new Map();
+const GET_ROWID_STMT_MAP = new Map();
 
 const TAGA_FILES_DIRECTORY = PATH.join(USER_DATA_PATH, 'TagasaurusFiles'); //PATH.resolve()+PATH.sep+'..'+PATH.sep+'TagasaurusFiles')
 //set up the DB to use
@@ -28,6 +30,7 @@ const GET_RECORD_FROM_HASH_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TA
 const GET_HASH_TAGGING_STMT = DB.prepare(`SELECT fileHash FROM ${TAGGING_TABLE_NAME} WHERE fileHash=?`); //!!! use the index
 const GET_RECORD_FROM_ROWID_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE ROWID=?`);
 SELECT_FROM_ID_PREPARED_STMT.set(TAGGING_TABLE_NAME, GET_RECORD_FROM_ROWID_TAGGING_STMT);
+RECORD_PARSER_MAP.set(TAGGING_TABLE_NAME, Get_Obj_Fields_From_Record);
 
 const INSERT_TAGGING_STMT = DB.prepare(
   `INSERT INTO ${TAGGING_TABLE_NAME} (fileName, fileHash, fileType, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors, faceClusters) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
@@ -288,18 +291,20 @@ async function Tagging_Image_DB_Iterator() {
 exports.Tagging_Image_DB_Iterator = Tagging_Image_DB_Iterator;
 
 //Generator version of the iterator over the tagging entries
-async function* Tagging_Image_DB_Generator(table_name) {
+async function* DB_Iterator(table_name) {
   const stmt = SELECT_FROM_ID_PREPARED_STMT.get(table_name);
+  const parse = RECORD_PARSER_MAP.get(table_name);
+  const next_rowid_stmt = DB.prepare(`SELECT ROWID FROM ${table_name} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
 
   let iter_current_rowid = await GET_MIN_ROWID_STMT.get().rowid;
 
   while (iter_current_rowid) {
-    let current_record = Get_Obj_Fields_From_Record(await stmt.get(iter_current_rowid));
-    iter_current_rowid = (await GET_NEXT_ROWID_STMT.get(iter_current_rowid))?.rowid;
+    let current_record = parse(await stmt.get(iter_current_rowid));
+    iter_current_rowid = (await next_rowid_stmt.get(iter_current_rowid))?.rowid;
     yield current_record;
   }
 }
-exports.Tagging_Image_DB_Generator = Tagging_Image_DB_Generator;
+exports.DB_Iterator = DB_Iterator;
 //SEARCH FUNCTION ITERATOR VIA CLOSURE END<<<
 
 //TAGGING MEME START>>>
@@ -312,6 +317,7 @@ const UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT = DB.prepare(`UPDATE ${TAGGING_MEM
 const INSERT_MEME_TABLE_TAGGING_STMT = DB.prepare(`INSERT INTO ${TAGGING_MEME_TABLE_NAME} (memeFileName, fileType, fileNames) VALUES (?, ?, ?)`);
 const DELETE_MEME_TABLE_ENTRY_STMT = DB.prepare(`DELETE FROM ${TAGGING_MEME_TABLE_NAME} WHERE memeFileName=?`);
 SELECT_FROM_ID_PREPARED_STMT.set(TAGGING_MEME_TABLE_NAME, GET_RECORD_FROM_ROWID_TAGGING_MEME_STMT);
+RECORD_PARSER_MAP.set(TAGGING_MEME_TABLE_NAME, Get_Obj_Fields_From_MEME_Record);
 
 async function Insert_Meme_Tagging_Entry(record) {
   INSERT_MEME_TABLE_TAGGING_STMT.run(record.memeFileName, record.fileType, JSON.stringify(record.fileNames));
@@ -446,6 +452,7 @@ const GET_COLLECTION_FROM_NAME_STMT = DB.prepare(`SELECT * FROM ${COLLECTIONS_TA
 const GET_COLLECTION_ROWID_FROM_COLLECTION_NAME_STMT = DB.prepare(`SELECT ROWID FROM ${COLLECTIONS_TABLE_NAME} WHERE collectionName=?;`);
 const GET_RECORD_FROM_ROWID_COLLECTION_STMT = DB.prepare(`SELECT * FROM ${COLLECTIONS_TABLE_NAME} WHERE ROWID=?`);
 SELECT_FROM_ID_PREPARED_STMT.set(COLLECTIONS_TABLE_NAME, GET_RECORD_FROM_ROWID_COLLECTION_STMT);
+RECORD_PARSER_MAP.set(COLLECTIONS_TABLE_NAME, Get_Collection_Obj_Fields_From_Record);
 
 const INSERT_COLLECTION_STMT = DB.prepare(
   `INSERT INTO ${COLLECTIONS_TABLE_NAME} (collectionName, collectionImage, collectionGalleryFiles, collectionDescription, collectionDescriptionTags, collectionEmotions, collectionMemes) VALUES (?, ?, ?, ?, ?, ?, ?)`
@@ -593,6 +600,8 @@ const GET_MEME_COLLECTION_TABLE_STMT = DB.prepare(`SELECT * FROM ${COLLECTION_ME
 const DELETE_COLLECTION_MEME_TABLE_ENTRY_STMT = DB.prepare(`DELETE FROM ${COLLECTION_MEME_TABLE_NAME} WHERE collectionMemeFileName=?`);
 const UPDATE_FILENAME_MEME_TABLE_COLLECTION_STMT = DB.prepare(`UPDATE ${COLLECTION_MEME_TABLE_NAME} SET collectionNames=? WHERE collectionMemeFileName=?`);
 const INSERT_MEME_TABLE_COLLECTION_STMT = DB.prepare(`INSERT INTO ${COLLECTION_MEME_TABLE_NAME} (collectionMemeFileName, collectionNames) VALUES (?, ?)`);
+SELECT_FROM_ID_PREPARED_STMT.set(COLLECTION_MEME_TABLE_NAME, GET_MEME_COLLECTION_TABLE_STMT);
+RECORD_PARSER_MAP.set(COLLECTION_MEME_TABLE_NAME, Get_Obj_Fields_From_Collection_MEME_Record);
 
 async function Get_All_Collection_Memes() {
   return DB.prepare(`SELECT * FROM ${COLLECTION_MEME_TABLE_NAME}`).all();
@@ -687,6 +696,8 @@ const INSERT_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT = DB.prepare(
   `INSERT INTO ${COLLECTION_GALLERY_TABLE_NAME} (collectionGalleryFileName, collectionNames) VALUES (?, ?)`
 );
 const DELETE_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT = DB.prepare(`DELETE FROM ${COLLECTION_GALLERY_TABLE_NAME} WHERE collectionGalleryFileName=?`);
+SELECT_FROM_ID_PREPARED_STMT.set(COLLECTION_GALLERY_TABLE_NAME, GET_IMAGE_COLLECTION_MEMBERSHIP_TABLE_STMT);
+RECORD_PARSER_MAP.set(COLLECTION_GALLERY_TABLE_NAME, Get_Obj_Fields_From_Collection_IMAGE_Record);
 
 async function Get_All_Collection_Galleries() {
   return await DB.prepare(`SELECT * FROM ${COLLECTION_GALLERY_TABLE_NAME}`).all();

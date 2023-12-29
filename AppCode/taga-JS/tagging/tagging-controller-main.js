@@ -1462,8 +1462,7 @@ async function Modal_Search_Entry(search_similar = false, search_obj_similar_tmp
   processing_modal.style.display = 'flex';
 
   search_results = await SEARCH_MODULE.Image_Search_DB(search_obj_tmp);
-  let tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
-  search_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(search_obj_tmp, tagging_meme_db_iterator, Get_Tagging_Annotation_From_DB, MAX_COUNT_SEARCH_RESULTS);
+  search_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(search_obj_tmp);
 
   processing_modal.style.display = 'none';
 
@@ -1824,20 +1823,9 @@ async function Modal_Meme_Search_Btn() {
   let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
   processing_modal.style.display = 'flex';
 
-  let tagging_db_iterator = await Tagging_Image_DB_Iterator();
-  meme_search_results = await SEARCH_MODULE.Meme_Addition_Image_Search_DB(
-    meme_tagging_search_obj,
-    tagging_db_iterator,
-    Get_Tagging_Annotation_From_DB,
-    MAX_COUNT_SEARCH_RESULTS
-  );
-  let tagging_meme_db_iterator = await Tagging_MEME_Image_DB_Iterator();
-  meme_search_meme_results = await SEARCH_MODULE.Meme_Addition_Image_Meme_Search_DB(
-    meme_tagging_search_obj,
-    tagging_meme_db_iterator,
-    Get_Tagging_Annotation_From_DB,
-    MAX_COUNT_SEARCH_RESULTS
-  );
+  meme_search_results = await SEARCH_MODULE.Meme_Addition_Image_Search_DB(meme_tagging_search_obj);
+
+  meme_search_meme_results = await SEARCH_MODULE.Meme_Addition_Image_Meme_Search_DB(meme_tagging_search_obj);
 
   processing_modal.style.display = 'none';
   //get the record to know the memes that are present to not present any redundancy
