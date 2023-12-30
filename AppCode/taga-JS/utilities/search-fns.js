@@ -1,6 +1,5 @@
 //IMAGE SEARCH MODAL IN TAGGING START>>>
 //search function for the image additions
-//to iterate through the images: use via 'iter = await Tagging_Image_DB_Iterator()' and 'rr = await iter()' after all rows complete 'undefined' is returned
 //passing in the search criteria object, the iterator function handle, the get record annotation from DB and the max counts allowed.
 async function Image_Search_DB(search_obj) {
   const tags_lc = search_obj.searchTags.map((x) => x.toLowerCase());
@@ -341,6 +340,40 @@ async function Collection_Scoring(search_obj, collection, tags_lc, memetags_lc) 
 
   return tags_score + emotion_score + meme_score + image_score;
 }
+
+// Alex Face Search
+async function FaceSearch_Clusters(descriptor) {
+  let distances = [];
+  let similar_faces = [];
+
+  for await (const cluster of DB_MODULE.DB_Iterator('FACECLUSTERS')) {
+    const distance = Get_Euclidean_Distance(descriptor, cluster.avgDescriptor);
+
+    if (distances.length <= MAX_COUNT_SEARCH_RESULTS) {
+      distances.push(distance);
+      similar_faces.push(Object.keys(cluster.relatedFaces));
+    } else {
+      let max_distance = Math.max(...distances);
+      if (distance < max_distance) {
+        //place cluster in the set since it is smaller distance than the current maximum
+        let index_max = distances.indexOf(max_distance);
+        distances[index_max] = distance;
+        similar_faces[index_max] = Object.keys(cluster.relatedFaces);
+      }
+    }
+  }
+
+  //sort the scores and return the indices order from largest to smallest
+  let indices = new Array(distances.length);
+  for (let i = 0; i < distances.length; ++i) indices[i] = i;
+  indices.sort((a, b) => {
+    return distances[a] > distances[b] ? 1 : distances[a] < distances[b] ? -1 : 0;
+  });
+
+  const flat_ranked_filenames = indices.map((i) => similar_faces[i]).flat();
+  return Array.from(new Set(flat_ranked_filenames));
+}
+exports.FaceSearch_Clusters = FaceSearch_Clusters;
 
 function EmotionSimilarityScore(emotions, search_emotions) {
   let emotion_overlap_score = 0;

@@ -137,12 +137,7 @@ async function Delete_Tagging_Annotation_DB(filename) {
 async function Number_of_Tagging_Records() {
   return await DB_MODULE.Number_of_Tagging_Records();
 }
-async function Tagging_Image_DB_Iterator() {
-  return DB_MODULE.Tagging_Image_DB_Iterator();
-}
-async function Tagging_MEME_Image_DB_Iterator() {
-  return DB_MODULE.Tagging_MEME_Image_DB_Iterator();
-}
+
 async function Get_Tagging_MEME_Record_From_DB(image_name) {
   //
   return await DB_MODULE.Get_Tagging_MEME_Record_From_DB(image_name);
@@ -2078,32 +2073,7 @@ window.addEventListener('click', (event) => {
 });
 
 async function Show_Similar_Faces(descriptor) {
-  const all_face_clusters = await DB_MODULE.Get_All_FaceClusters();
-  let scores = new Map();
-  let similar_faces = [];
-
-  for (const cluster of all_face_clusters) {
-    const distance = Get_Euclidean_Distance(descriptor, cluster.avgDescriptor);
-
-    if (distance < 0.4) {
-      if (scores.has(distance)) {
-        const media = new Set([...scores.get(distance), ...Object.keys(cluster.relatedFaces)]);
-        scores.set(distance, media);
-      } else {
-        scores.set(distance, Object.keys(cluster.relatedFaces));
-      }
-    }
-  }
-
-  const sorted_distances = Array.from(scores.keys()).sort((a, b) => {
-    return parseFloat(a) - parseFloat(b);
-  });
-
-  for (const dist of sorted_distances) {
-    similar_faces.push(...scores.get(dist));
-  }
-
-  similar_faces = [...new Set(similar_faces)];
+  const similar_faces = await SEARCH_MODULE.FaceSearch_Clusters(descriptor);
 
   const results_div = document.getElementById('modal-facesearch-images-results-grid-div-area-id');
   results_div.innerHTML = similar_faces.length == 0 ? '<h1>No Results</h1>' : '';

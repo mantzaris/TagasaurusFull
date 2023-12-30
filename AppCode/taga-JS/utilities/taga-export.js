@@ -12,21 +12,6 @@ const { TAGA_DATA_DIRECTORY, TAGA_FILES_DIRECTORY } = require(PATH.join(__dirnam
 
 const EXPORT_NAME = 'DesktopTagasaurusExport.zip';
 
-async function Tagging_Image_DB_Iterator() {
-  return await DB_MODULE.Tagging_Image_DB_Iterator();
-}
-async function Tagging_MEME_Image_DB_Iterator() {
-  return await DB_MODULE.Tagging_MEME_Image_DB_Iterator();
-}
-async function Collection_DB_Iterator() {
-  return await DB_MODULE.Collection_DB_Iterator();
-}
-async function Collection_IMAGE_DB_Iterator() {
-  return await DB_MODULE.Collection_IMAGE_DB_Iterator();
-}
-async function Collection_MEME_DB_Iterator() {
-  return await DB_MODULE.Collection_MEME_DB_Iterator();
-}
 async function Get_All_Tagging_Records_From_DB() {
   return await DB_MODULE.Get_All_Tagging_Records_From_DB();
 }

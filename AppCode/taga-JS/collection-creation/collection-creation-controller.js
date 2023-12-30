@@ -54,12 +54,6 @@ async function Tagging_Random_DB_Images(num_of_records) {
 async function Meme_Tagging_Random_DB_Images(num_of_records) {
   return await DB_MODULE.Meme_Tagging_Random_DB_Images(num_of_records);
 }
-async function Tagging_Image_DB_Iterator() {
-  return DB_MODULE.Tagging_Image_DB_Iterator();
-}
-async function Tagging_MEME_Image_DB_Iterator() {
-  return DB_MODULE.Tagging_MEME_Image_DB_Iterator();
-}
 
 async function Update_Collection_MEME_Connections(collectionName, current_memes, new_collection_memes) {
   return await DB_MODULE.Update_Collection_MEME_Connections(collectionName, current_memes, new_collection_memes);

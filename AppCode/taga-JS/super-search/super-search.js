@@ -15,9 +15,6 @@ const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE,
 
 const { CLOSE_ICON_RED, CLOSE_ICON_BLACK, HASHTAG_ICON } = require(PATH.join(__dirname, '..', 'constants', 'constants-icons.js')); //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 
-async function Tagging_Image_DB_Iterator() {
-  return DB_MODULE.Tagging_Image_DB_Iterator();
-}
 async function Get_Tagging_Annotation_From_DB(image_name) {
   //
   return await DB_MODULE.Get_Tagging_Record_From_DB(image_name);
