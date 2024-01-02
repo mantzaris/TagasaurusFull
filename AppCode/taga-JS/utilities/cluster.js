@@ -82,17 +82,7 @@ async function CreateFaceCluster(avgDescriptor, fileName, tags, fileType, memes)
 }
 
 function ComputeAvgFaceDescriptor(descriptors) {
-  const avg = new Float32Array(descriptors[0].length);
-
-  for (let offset = 0; offset < avg.length; offset++) {
-    let sum = 0;
-    for (let vi = 0; vi < descriptors.length; vi++) {
-      sum += descriptors[vi][offset];
-    }
-    avg[offset] = sum / descriptors.length;
-  }
-
-  return avg;
+  return descriptors[Math.floor(Math.random() * descriptors.length)];
 }
 exports.ComputeAvgFaceDescriptor = ComputeAvgFaceDescriptor;
 
