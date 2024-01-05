@@ -158,6 +158,12 @@ async function Generate_Face_Map(settings) {
     edges: edges,
   };
   let options = {
+    physics: {
+      enabled: false,
+    },
+    layout: {
+      improvedLayout: false,
+    },
     edges: {
       selectionWidth: 1,
       color: {

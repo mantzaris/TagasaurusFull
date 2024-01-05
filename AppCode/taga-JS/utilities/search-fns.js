@@ -341,6 +341,24 @@ async function Collection_Scoring(search_obj, collection, tags_lc, memetags_lc) 
   return tags_score + emotion_score + meme_score + image_score;
 }
 
+function EmotionSimilarityScore(emotions, search_emotions) {
+  let emotion_overlap_score = 0;
+  const emotion_keys = Object.keys(emotions);
+  const search_emotions_keys = Object.keys(search_emotions);
+
+  search_emotions_keys.forEach((search_key_emotion_label) => {
+    emotion_keys.forEach((record_emotion_key_label) => {
+      if (search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()) {
+        let delta_tmp = (emotions[record_emotion_key_label] - search_emotions[search_key_emotion_label]) / 50;
+        let emotion_overlap_score_tmp = 1 - Math.abs(delta_tmp);
+        emotion_overlap_score += emotion_overlap_score_tmp; //scores range [-1,1]
+      }
+    });
+  });
+
+  return emotion_overlap_score;
+}
+
 // Alex Face Search
 async function FaceSearch_Clusters(descriptor) {
   let distances = [];
@@ -374,21 +392,3 @@ async function FaceSearch_Clusters(descriptor) {
   return Array.from(new Set(flat_ranked_filenames));
 }
 exports.FaceSearch_Clusters = FaceSearch_Clusters;
-
-function EmotionSimilarityScore(emotions, search_emotions) {
-  let emotion_overlap_score = 0;
-  const emotion_keys = Object.keys(emotions);
-  const search_emotions_keys = Object.keys(search_emotions);
-
-  search_emotions_keys.forEach((search_key_emotion_label) => {
-    emotion_keys.forEach((record_emotion_key_label) => {
-      if (search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()) {
-        let delta_tmp = (emotions[record_emotion_key_label] - search_emotions[search_key_emotion_label]) / 50;
-        let emotion_overlap_score_tmp = 1 - Math.abs(delta_tmp);
-        emotion_overlap_score += emotion_overlap_score_tmp; //scores range [-1,1]
-      }
-    });
-  });
-
-  return emotion_overlap_score;
-}

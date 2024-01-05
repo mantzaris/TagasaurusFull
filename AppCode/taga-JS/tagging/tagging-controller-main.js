@@ -968,6 +968,11 @@ async function Load_New_Image(filename) {
       //face cluster insertion code
       tagging_entry_tmp = await CreateTaggingEntryCluster(tagging_entry_tmp);
 
+      // TODO: Alex123
+      if (tagging_entry_tmp.faceDescriptors.length > 0) {
+        ipcRenderer.invoke('faiss-add', tagging_entry_tmp.faceDescriptors, tagging_entry_tmp.fileHash);
+      }
+
       await Insert_Record_Into_DB(tagging_entry_tmp);
       tagging_entry = tagging_entry_tmp;
     } //else { //hash is present so set to load it
