@@ -396,63 +396,55 @@ const FAISS_DB = new DATABASE(FAISS_DB_PATH, {
 });
 
 async function InitializeAndLoadFAISS() {
+  FAISS_Queue_DB_Init();
   //initialize FAISS index file with default set up
-  const exists = FS.existsSync(FAISS_FILE_PATH);
-
-  if (exists) {
+  const faiss_exists = FS.existsSync(FAISS_FILE_PATH);
+  if (faiss_exists) {
     FAISS_INDEX = IndexFlatIP.read(FAISS_FILE_PATH); // load already existing file
   } else {
     FAISS_INDEX = new IndexFlatIP(EMBEDDING_DIM).toIDMap2(); // set up index
-    FAISS_INDEX.write(FAISS_FILE_PATH); //write the initialized index
+    FAISS_INDEX.write(FAISS_FILE_PATH);
+    FAISS_INDEX = IndexFlatIP.read(FAISS_FILE_PATH);
   }
 
-  //initialize queue for FAISS indexing in sqliteDB
-  //check to see if the FAILSS table exists
-  const faissQueue_table_exists_stmt = FAISS_DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${FAISS_INDEX_TABLENAME}'; `);
-  const faissQUEUE_table_exists_res = faissQueue_table_exists_stmt.get();
-  //if table does not exit, so create it
-  if (faissQUEUE_table_exists_res['count(*)'] == 0) {
-    const STMT = FAISS_DB.prepare(`CREATE TABLE IF NOT EXISTS ${FAISS_INDEX_TABLENAME} (embedding TEXT, hash TEXT)`);
-    STMT.run();
-  } else {
-    //there is a DB
-    // TODO: put a loading spinner! ALEX123
-    await FAISS_CHECK_STALE_DB_ENTRIES();
-    await FAISS_WRITE_TO_INDEX_FILE();
-    FAISS_INDEX = IndexIVFFlat.read(FAISS_FILE_PATH);
+  console.log('9');
+  console.log(`FAISS_INDEX.dims = ${FAISS_INDEX.dims}`);
+  console.log(`FAISS_INDEX.ntotal = ${FAISS_INDEX.ntotal}`);
+  console.log(`FAISS_INDEX.metricType = ${FAISS_INDEX.metricType}`);
+  console.log(`FAISS_INDEX.metricArg = ${FAISS_INDEX.metricArg}`);
+  console.log(`FAISS_INDEX.isTrained = ${FAISS_INDEX.isTrained}`);
+  console.log(`FAISS_INDEX.indexType = ${FAISS_INDEX.indexType}`);
+  console.log('now all the queue DB');
+  console.log(FAISS_Queue_DB_Get_All_Entries());
+  const queue_rowcount = FAISS_Queue_DB_RowCount();
+  console.log(`queue_rowcount = ${queue_rowcount}`);
+  if (queue_rowcount > 0) {
+    console.log('queue row count > 0');
+    FAISS_Put_Queue_Into_Index();
+    FAISS_Write_To_Index_File();
   }
 }
 
 InitializeAndLoadFAISS();
 
-async function FAISS_ADD_TO_INDEX(embeddings, hashes, addToDB = true) {
-  console.log('foo');
-  console.log(embeddings, hashes);
+async function FAISS_Add_To_Index(embeddings, hashes, addToDB = true) {
   const hashes_bigInts = [hashes].map((h) => BigInt('0x' + h));
-  console.log('bar');
-  console.log(embeddings, hashes_bigInts);
-  console.log(embeddings.flat().length);
-  console.log('embeddings.length = ', embeddings.length);
-  console.log('embeddings[0].length = ', embeddings[0].length);
-  console.log('embeddings.flat().length = ', embeddings.flat().length);
-  console.log('embeddings[0].flat().length = ', embeddings[0].flat().length);
-  vtmp = Array.from({ length: embeddings[0].flat().length }, () => Math.random());
-  const h1 = [100n];
-  FAISS_INDEX.addWithIds(embeddings[0].flat(), h1);
-  console.log('baz');
+  try {
+    FAISS_INDEX.addWithIds(embeddings[0].flat(), hashes_bigInts);
+  } catch (err) {
+    console.error('error trying to add to faiss index , err=', err);
+  }
   //add to queue
   if (addToDB) {
-    console.log('qux');
     const STMT = FAISS_DB.prepare(`INSERT INTO ${FAISS_INDEX_TABLENAME} (embedding, hash) VALUES (?, ?)`);
-    console.log('quux');
-    STMT.run(JSON.stringify(embeddings), JSON.stringify(hashes));
-    console.log('corge');
+    STMT.run(JSON.stringify(embeddings), hashes);
   }
 }
 
-async function FAISS_SEARCH(embedding, k) {
+function FAISS_SEARCH(embedding, k) {
   //resturns hashes as well
-  const results = FAISS_INDEX.search(embedding, k);
+
+  const results = FAISS_INDEX.search(embedding.flat(), k);
   results['hashes'] = results.labels.map((l) => l.toString(16));
   return results;
 }
@@ -478,25 +470,42 @@ async function FAISS_REMOVE_ENTRIES(hashes) {
   }
 }
 
-async function FAISS_CHECK_STALE_DB_ENTRIES() {
-  const STMT = FAISS_DB.prepare(`DELETE FROM ${FAISS_INDEX_TABLENAME} WHERE hash=?`);
-  const all_faiss_queue = FAISS_DB.prepare(`SELECT * FROM ${FAISS_INDEX_TABLENAME}`).all();
+async function FAISS_Put_Queue_Into_Index() {
+  const all_queue_entries = FAISS_Queue_DB_Get_All_Entries();
+  // TODO: Alex123 make this adaptable to kick in with 10 after some entries
+  const search_num = Math.min(FAISS_INDEX.ntotal, 10);
 
-  for (const entry of all_faiss_queue) {
-    results = await FAISS_SEARCH(entry.embedding, 10);
-    if (results.hashes.includes(entry.hash)) {
-      STMT.run(entry.hash);
+  for (const { embedding, hash } of all_queue_entries) {
+    const parsedEmbedding = JSON.parse(embedding);
+
+    let results;
+
+    if (search_num) {
+      results = FAISS_SEARCH(parsedEmbedding, search_num);
+      console.log(`results.hashes = ${results.hashes}`);
+
+      if (results.hashes.includes(hash) == false) {
+        console.log('hash NOT found, adding');
+        FAISS_Add_To_Index(parsedEmbedding, hash, false);
+      }
     } else {
-      FAISS_ADD_TO_INDEX(embeddings, hashes, false);
+      console.log(`just directly add without search the entry`);
+      FAISS_Add_To_Index(parsedEmbedding, hash, false);
     }
+
+    console.log(`deleting queue row`);
+    FAISS_Queue_DB_Delete_Row_From_Hash(hash);
   }
 }
 
-async function FAISS_WRITE_TO_INDEX_FILE() {
+async function FAISS_Write_To_Index_File() {
   FAISS_INDEX.write(FAISS_FILE_PATH);
 }
 
-ipcMain.handle('faiss-add', (_, embeddings, hashes) => FAISS_ADD_TO_INDEX(embeddings, hashes));
+ipcMain.handle('faiss-add', (_, embeddings, hashes) => {
+  console.log('HANDLE ADD!');
+  FAISS_Add_To_Index(embeddings, hashes);
+});
 
 ipcMain.handle('faiss-search', (_, embedding, k) => {
   return FAISS_SEARCH(embedding, k);
@@ -505,3 +514,27 @@ ipcMain.handle('faiss-search', (_, embedding, k) => {
 ipcMain.handle('faiss-remove', (_, hashes) => {
   return FAISS_REMOVE_ENTRIES(hashes);
 });
+
+function FAISS_Queue_DB_Init() {
+  //initialize queue for FAISS indexing in sqliteDB
+  const faissQueue_table_exists_stmt = FAISS_DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${FAISS_INDEX_TABLENAME}'; `);
+  const faissQUEUE_table_exists_res = faissQueue_table_exists_stmt.get();
+
+  if (faissQUEUE_table_exists_res['count(*)'] == 0) {
+    const STMT = FAISS_DB.prepare(`CREATE TABLE IF NOT EXISTS ${FAISS_INDEX_TABLENAME} (embedding TEXT, hash TEXT)`);
+    STMT.run();
+  }
+}
+
+function FAISS_Queue_DB_RowCount() {
+  const GET_TAGGING_ROW_COUNT = FAISS_DB.prepare(`SELECT COUNT(*) AS rownum FROM ${FAISS_INDEX_TABLENAME}`);
+  return GET_TAGGING_ROW_COUNT.get().rownum;
+}
+
+function FAISS_Queue_DB_Get_All_Entries() {
+  return FAISS_DB.prepare(`SELECT * FROM ${FAISS_INDEX_TABLENAME}`).all();
+}
+
+function FAISS_Queue_DB_Delete_Row_From_Hash(hash) {
+  return FAISS_DB.prepare(`DELETE FROM ${FAISS_INDEX_TABLENAME} WHERE hash=?`).run(hash);
+}
