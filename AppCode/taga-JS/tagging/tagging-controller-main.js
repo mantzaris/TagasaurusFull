@@ -970,7 +970,11 @@ async function Load_New_Image(filename) {
 
       // TODO: Alex123
       if (tagging_entry_tmp.faceDescriptors.length > 0) {
-        ipcRenderer.invoke('faiss-add', tagging_entry_tmp.faceDescriptors, tagging_entry_tmp.fileHash);
+        const descriptors = Array.isArray(tagging_entry_tmp.faceDescriptors[0]) ? tagging_entry_tmp.faceDescriptors : [tagging_entry_tmp.faceDescriptors];
+        //repeat the hash for each face descriptor, needed and then the replication/repeat of the vector is added
+        const hashes = new Array(descriptors.length).fill(tagging_entry_tmp.fileHash);
+
+        ipcRenderer.invoke('faiss-add', descriptors, hashes);
       }
 
       await Insert_Record_Into_DB(tagging_entry_tmp);
