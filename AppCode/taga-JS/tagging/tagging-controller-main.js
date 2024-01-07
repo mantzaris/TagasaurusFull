@@ -968,7 +968,6 @@ async function Load_New_Image(filename) {
       //face cluster insertion code
       tagging_entry_tmp = await CreateTaggingEntryCluster(tagging_entry_tmp);
 
-      // TODO: Alex123
       if (tagging_entry_tmp.faceDescriptors.length > 0) {
         const descriptors = Array.isArray(tagging_entry_tmp.faceDescriptors[0]) ? tagging_entry_tmp.faceDescriptors : [tagging_entry_tmp.faceDescriptors];
         //repeat the hash for each face descriptor, needed and then the replication/repeat of the vector is added

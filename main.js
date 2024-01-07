@@ -43,11 +43,13 @@ console.log('icon path = ', tmp_icon_dir);
 let exists = FS.existsSync(tmp_icon_dir);
 console.log(`icon path exists = `, exists);
 
+let mainWindow;
+
 function createWindow() {
   // //tray stuff
   //const tray = new Tray(PATH.join(__dirname,"icon.png"))
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1200,
     height: 1000,
     icon: tmp_icon_dir,
@@ -378,8 +380,22 @@ ipcMain.handle('getCaptureID', async (_) => {
   });
 });
 
+function showSpinner() {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('show-spinner');
+  }
+}
+
+function hideSpinner() {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('hide-spinner');
+  }
+}
+
 ///////////////////////////////////////
+//
 // FAISS KNN: { IndexIVFFlat, Index, IndexFlatIP, MetricType }
+//
 //////////////////////////////////////
 let FAISS_INDEX;
 const EMBEDDING_DIM = 128;
@@ -390,11 +406,11 @@ const FAISS_FILE_PATH = PATH.join(TAGA_FILES_DIRECTORY, FAISS_INDEX_FILE_NAME);
 const FAISS_DB_PATH = PATH.join(TAGA_FILES_DIRECTORY, FAISS_DB_FILE_NAME);
 const FAISS_INDEX_TABLENAME = 'QUEUED_INDICES';
 
-const FAISS_DB = new DATABASE(FAISS_DB_PATH, {
-  verbose: console.log,
-});
+const FAISS_DB = new DATABASE(FAISS_DB_PATH, {});
 
 async function InitializeAndLoadFAISS() {
+  //showSpinner();
+
   FAISS_Queue_DB_Init();
   //initialize FAISS index file with default set up
   const faiss_exists = FS.existsSync(FAISS_FILE_PATH);
@@ -406,20 +422,13 @@ async function InitializeAndLoadFAISS() {
     FAISS_INDEX = IndexFlatIP.read(FAISS_FILE_PATH);
   }
 
-  console.log(`FAISS_INDEX.dims = ${FAISS_INDEX.dims}`);
-  console.log(`FAISS_INDEX.ntotal = ${FAISS_INDEX.ntotal}`);
-  console.log(`FAISS_INDEX.metricType = ${FAISS_INDEX.metricType}`);
-  console.log(`FAISS_INDEX.metricArg = ${FAISS_INDEX.metricArg}`);
-  console.log(`FAISS_INDEX.isTrained = ${FAISS_INDEX.isTrained}`);
-  console.log(`FAISS_INDEX.indexType = ${FAISS_INDEX.indexType}`);
-  console.log(FAISS_Queue_DB_Get_All_Entries());
-
   const queue_rowcount = FAISS_Queue_DB_RowCount();
-  console.log(`queue_rowcount = ${queue_rowcount}`);
   if (queue_rowcount > 0) {
     FAISS_Put_Queue_Into_Index();
     FAISS_Write_To_Index_File();
   }
+
+  //hideSpinner();
 }
 
 InitializeAndLoadFAISS();
@@ -573,7 +582,6 @@ function BigInt_Back_To_Hash(bigintOfHash) {
 }
 
 ipcMain.handle('faiss-add', (_, embeddings, hashes) => {
-  console.log('HANDLE ADD!');
   FAISS_Add_To_Index(embeddings, hashes);
 });
 

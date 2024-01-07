@@ -135,6 +135,14 @@ async function HandleImport() {
 
     tagging_entry = await CreateTaggingEntryCluster(tagging_entry);
 
+    if (tagging_entry.faceDescriptors.length > 0) {
+      const descriptors = Array.isArray(tagging_entry.faceDescriptors[0]) ? tagging_entry.faceDescriptors : [tagging_entry.faceDescriptors];
+      //repeat the hash for each face descriptor, needed and then the replication/repeat of the vector is added
+      const hashes = new Array(descriptors.length).fill(tagging_entry.fileHash);
+
+      IPC_Renderer3.invoke('faiss-add', descriptors, hashes);
+    }
+
     await DB_MODULE.Insert_Record_Into_DB(tagging_entry);
   }
 
