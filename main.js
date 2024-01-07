@@ -489,7 +489,6 @@ async function FAISS_Remove_Entries(file_hashes_input) {
 
   const removed = FAISS_INDEX.removeIds(hashes_bigInts);
   FAISS_Queue_DB_Delete_Row_From_Hash(file_hashes);
-
   return removed;
 }
 

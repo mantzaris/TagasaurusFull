@@ -782,12 +782,21 @@ async function Delete_Image() {
   let records_remaining = await Number_of_Tagging_Records();
   if (records_remaining == 1) {
     await Delete_Tagging_Annotation_DB(current_image_annotation.fileName);
+
+    if (current_image_annotation.faceDescriptors.length > 0) {
+      ipcRenderer.invoke('faiss-remove', current_image_annotation.fileHash);
+    }
+
     await Load_Default_Taga_Image();
     New_Image_Display(0);
   } else {
     let prev_tmp = current_image_annotation.fileName;
     New_Image_Display(1);
     await Delete_Tagging_Annotation_DB(prev_tmp);
+
+    if (current_image_annotation.faceDescriptors.length > 0) {
+      ipcRenderer.invoke('faiss-remove', current_image_annotation.fileHash);
+    }
   }
 }
 
