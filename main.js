@@ -316,6 +316,7 @@ ipcMain.handle('getDownloadsFolder', async () => app.getPath('downloads'));
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   Init(); //createWindow();
+  InitializeAndLoadFAISS();
 
   //tray stuff
   //const tray = new Tray(PATH.join(__dirname,"icon.png"))
@@ -406,9 +407,10 @@ const FAISS_FILE_PATH = PATH.join(TAGA_FILES_DIRECTORY, FAISS_INDEX_FILE_NAME);
 const FAISS_DB_PATH = PATH.join(TAGA_FILES_DIRECTORY, FAISS_DB_FILE_NAME);
 const FAISS_INDEX_TABLENAME = 'QUEUED_INDICES';
 
-const FAISS_DB = new DATABASE(FAISS_DB_PATH, {});
+let FAISS_DB; // = new DATABASE(FAISS_DB_PATH, {});
 
-async function InitializeAndLoadFAISS() {
+function InitializeAndLoadFAISS() {
+  FAISS_DB = new DATABASE(FAISS_DB_PATH, {});
   //showSpinner();
 
   FAISS_Queue_DB_Init();
@@ -430,8 +432,6 @@ async function InitializeAndLoadFAISS() {
 
   //hideSpinner();
 }
-
-InitializeAndLoadFAISS();
 
 async function FAISS_Add_To_Index(embeddings, hashes, addToDB = true) {
   let embeddings_checked;
@@ -466,7 +466,9 @@ function FAISS_Search(embeddings, k) {
 
   if (embeddings_checked == false) return false;
 
-  const results = FAISS_INDEX.search(embeddings_checked.flat(), k);
+  const adjustedK = Math.min(k, FAISS_INDEX.ntotal);
+
+  const results = FAISS_INDEX.search(embeddings_checked.flat(), adjustedK);
   results['hashes'] = results.labels.map((l) => BigInt_Back_To_Hash(l));
 
   return results;

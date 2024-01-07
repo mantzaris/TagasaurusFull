@@ -148,6 +148,20 @@ function Get_Euclidean_Distance(descriptor1, descriptor2) {
 }
 window.Get_Euclidean_Distance = Get_Euclidean_Distance;
 
+function Get_Descriptors_InnerProduct(vec1, vec2) {
+  if (vec1.length !== vec2.length) {
+    throw new Error('Vectors must be of the same length');
+  }
+
+  let product = 0;
+  for (let i = 0; i < vec1.length; i++) {
+    product += vec1[i] * vec2[i];
+  }
+
+  return product;
+}
+window.Get_Descriptors_InnerProduct = Get_Descriptors_InnerProduct;
+
 //When the file is a GIF
 //go through each frame sequentially and include descriptors of only novel faces
 //add a new descriptor if the distance to the rest is small

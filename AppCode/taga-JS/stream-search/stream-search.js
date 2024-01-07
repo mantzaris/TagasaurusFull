@@ -370,10 +370,13 @@ async function Handle_Default_Search() {
 }
 
 function Find_Most_Similar_Descriptor(descriptor, threshold) {
+  //!!
   let best_score = -1;
   let best_index = -1;
 
   for (let i = 0; i < rect_face_array.length; i++) {
+    //!!!
+    //const score = Get_Descriptors_InnerProduct(rect_face_array[i].descriptor,descriptor);
     const score = Get_Descriptors_DistanceScore([rect_face_array[i].descriptor], [descriptor]);
 
     if (score > threshold && score > best_score) {
@@ -425,6 +428,7 @@ function Render_Bounding_Boxes() {
 }
 
 async function UpdateSearchResults() {
+  //!!!
   let best_score = -1;
   let best_cluster_id = null;
 
@@ -432,6 +436,7 @@ async function UpdateSearchResults() {
 
   if (selected.descriptor.length == 128) {
     for (const [cluster_id, cluster] of clusters) {
+      //const score = Get_Descriptors_InnerProduct(rect_face_array[i].descriptor,descriptor);
       const score = Get_Descriptors_DistanceScore([cluster.avgDescriptor], [selected.descriptor]);
 
       if (score > best_score && score > 0) {
@@ -448,9 +453,14 @@ async function UpdateSearchResults() {
 
     const best_cluster = clusters.get(best_cluster_id);
 
-    keywords = Object.keys(best_cluster.keywords);
-    images = Object.keys(best_cluster.images);
-    memes = [...new Set(Object.values(best_cluster.images).flatMap((a) => a.memes))];
+    const { hashes } = ipcRenderer('faiss-search', selected.descriptor, 3);
+    images = [...new Set(hashes.map((h) => DB_MODULE.GET_RECORD_FROM_HASH_TAGGING_STMT(h).fileName))];
+    keywords = [...new Set(hashes.map((h) => DB_MODULE.GET_RECORD_FROM_HASH_TAGGING_STMT(h).taggingTags))];
+    memes = images;
+    console.log(images);
+    // keywords = Object.keys(best_cluster.keywords);
+    // images = Object.keys(best_cluster.images);
+    // memes = [...new Set(Object.values(best_cluster.images).flatMap((a) => a.memes))];
   }
 
   Remove_Thumbnail_Events();
