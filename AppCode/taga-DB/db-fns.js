@@ -78,8 +78,15 @@ async function Get_ROWID_From_Filename(filename) {
   let res = await GET_TAGGING_ROWID_FROM_FILENAME_STMT.get(filename);
   return res.rowid;
 }
-
 exports.Get_ROWID_From_Filename = Get_ROWID_From_Filename;
+
+// async function Get_ROWID_From_Filename_BigInt(filename) {
+//   const GET_TAGGING_ROWID_FROM_FILENAME_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE fileName=?;`);
+//   let res = await GET_TAGGING_ROWID_FROM_FILENAME_STMT.get(filename);
+//   return res.rowid;
+// }
+// exports.Get_ROWID_From_Filename_BigInt = Get_ROWID_From_Filename_BigInt;
+//const GET_TAGGING_ROWID_FROM_FILEHASH_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE fileHash=?;`);
 
 //the function expects a +1,-1,0 for movement about the current rowid
 async function Step_Get_Annotation(filename, step) {

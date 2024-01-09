@@ -411,6 +411,7 @@ let FAISS_DB; // = new DATABASE(FAISS_DB_PATH, {});
 
 function InitializeAndLoadFAISS() {
   FAISS_DB = new DATABASE(FAISS_DB_PATH, {});
+  FAISS_DB.defaultSafeIntegers(true); // BigInts by default
   //showSpinner();
 
   FAISS_Queue_DB_Init();
@@ -434,107 +435,62 @@ function InitializeAndLoadFAISS() {
   //hideSpinner();
 }
 
-async function FAISS_Add_To_Index(embeddings, hashes, addToDB = true) {
-  let embeddings_checked;
-  let hashes_bigInts;
-
+function FAISS_Add_To_Index(embeddings, rowid, addToDB = true) {
   try {
-    embeddings_checked = FAISS_Validate_Embedding(embeddings);
-    if (embeddings_checked === false) {
-      throw new Error('Invalid embedding format');
-    }
-
-    hashes_bigInts = FAISS_Validate_And_Convert_Hashes_To_BigInt(hashes);
-  } catch (err) {
-    console.error('Error in validating embeddings or hashes:', err);
-    return false;
-  }
-
-  try {
-    console.log('FAISS_Add_To_Index >>>');
-    console.log(`hashes given as input, hashes=${hashes} `);
-    console.log(`bigint inds used for faiss index, hashes_bigInts=${hashes_bigInts} `);
-    FAISS_INDEX.addWithIds(embeddings_checked.flat(), hashes_bigInts);
-    console.log('now checking return');
-    const results = FAISS_Search(embeddings_checked.flat(), 1);
-    console.log('Back in, FAISS_Add_To_Index >>>');
-    console.log('results.hashes = ', results.hashes);
+    const rowidsArray = Array.isArray(rowid) ? rowid : [rowid];
+    FAISS_INDEX.addWithIds(embeddings.flat(), rowidsArray);
   } catch (err) {
     console.error('error trying to add to faiss index , err=', err);
   }
 
   //add to DB as a queue incase of crash and to put and write them upon restart
   if (addToDB) {
-    FAISS_Queue_DB_Add_Row(embeddings_checked, hashes);
+    try {
+      FAISS_Queue_DB_Add_Row(embeddings, rowid);
+    } catch (err) {
+      console.error('error trying to add to queue DB for faiss , err=', err);
+    }
   }
 }
 
 function FAISS_Search(embeddings, k) {
-  const embeddings_checked = FAISS_Validate_Embedding(embeddings);
-  if (embeddings_checked == false) return false;
   const adjustedK = Math.min(k, FAISS_INDEX.ntotal);
-  const results = FAISS_INDEX.search(embeddings_checked.flat(), adjustedK);
+  const results = FAISS_INDEX.search(embeddings.flat(), adjustedK);
 
-  results['hashes'] = results.labels.map((l) => BigInt_Back_To_Hash(l));
-  console.log('FAISS_Search >>>');
-  console.log(`results.labels`, results.labels);
-  console.log(`results.hashes`, results.hashes);
   return results;
 }
 
-async function FAISS_Remove_Entries(file_hashes_input) {
-  let file_hashes = file_hashes_input;
-  if (!(file_hashes instanceof Array)) {
-    file_hashes = [file_hashes];
+function FAISS_Remove_Entries(rowids) {
+  if (!(rowids instanceof Array)) {
+    rowids = [rowids];
   }
 
-  let hashes_bigInts;
-
-  try {
-    hashes_bigInts = FAISS_Validate_And_Convert_Hashes_To_BigInt(file_hashes);
-  } catch (err) {
-    console.error('Error in validating embeddings or hashes:', err);
-    return false;
-  }
-
-  const removed = FAISS_INDEX.removeIds(hashes_bigInts);
-  FAISS_Queue_DB_Delete_Row_From_Hash(file_hashes);
+  const removed = FAISS_INDEX.removeIds(rowids);
+  FAISS_Queue_DB_Delete_Row_From_ROWIDs(rowids);
   return removed;
 }
 
-async function FAISS_Put_Queue_Into_Index() {
-  console.log('FAISS_Put_Queue_Into_Index ');
+function FAISS_Put_Queue_Into_Index() {
   const all_queue_entries = FAISS_Queue_DB_Get_All_Entries();
-  console.log('all_queue_entries', JSON.stringify(all_queue_entries));
-  //how many search results to use
-  const max_search = 1;
-  //const search_num = Math.min(FAISS_INDEX.ntotal, 10);
+  const max_search = 10;
 
-  for (const { embedding, hash } of all_queue_entries) {
-    console.log('embedding', embedding, 'hash', hash);
-    const embeddings_checked = FAISS_Validate_Embedding(embedding);
-
+  for (const { embedding, rowid } of all_queue_entries) {
     const search_num = Math.min(FAISS_INDEX.ntotal, max_search);
-
-    console.log('FAISS_Put_Queue_Into_Index >>>');
-    console.log(`hash`, hash);
 
     //only perform the search if the index is not empty
     if (FAISS_INDEX.ntotal > 0) {
-      const faiss_results = FAISS_Search(embeddings_checked, search_num);
-      console.log(`faiss_results.hashes`, faiss_results.hashes);
+      const faiss_results = FAISS_Search(embedding, search_num);
 
       //add to index if the hash is not found in the search results
-      if (!faiss_results.hashes.includes(hash)) {
-        FAISS_Add_To_Index(embeddings_checked, hash, false);
+      if (!faiss_results.labels.includes(rowid)) {
+        FAISS_Add_To_Index(embedding, rowid, false);
       }
     } else {
-      // If the index is empty, directly add to the index
-      FAISS_Add_To_Index(embeddings_checked, hash, false);
+      FAISS_Add_To_Index(embedding, rowid, false);
     }
 
-    // Delete the processed entry from the queue
-    FAISS_Queue_DB_Delete_Row_From_Hash(hash);
+    //delete the processed entry from the queue
+    FAISS_Queue_DB_Delete_Row_From_ROWIDs(rowid);
   }
 }
 
@@ -580,47 +536,37 @@ function FAISS_Validate_Embedding(embedding) {
   return result;
 }
 
-function FAISS_Validate_And_Convert_Hashes_To_BigInt(hashes) {
-  if (!Array.isArray(hashes)) {
-    hashes = [hashes];
+function EnsureBigIntArray(rowids) {
+  if (!Array.isArray(rowids)) {
+    rowids = [rowids];
   }
 
-  const hashes_bigInts = hashes.map((hash) => {
-    if (typeof hash !== 'string' || !hash.match(/^[a-f0-9]+$/i)) return false;
-    //convert to BigInt
-    try {
-      return BigInt('0x' + hash);
-    } catch (error) {
-      throw new Error(`Invalid hash format: ${hash}`);
-    }
-  });
+  if (!rowids.every((rowid) => typeof rowid == 'bigint')) {
+    rowids = rowids.map((rowid) => BigInt(rowid));
+  }
 
-  return hashes_bigInts;
+  return rowids;
 }
 
-function BigInt_Back_To_Hash(bigintOfHash) {
-  return bigintOfHash.toString(16);
-}
-
-ipcMain.handle('faiss-add', (_, embeddings, hashes) => {
-  FAISS_Add_To_Index(embeddings, '196f85');
+ipcMain.handle('faiss-add', (_, embeddings, rowid) => {
+  FAISS_Add_To_Index(embeddings, EnsureBigIntArray(rowid));
 });
 
 ipcMain.handle('faiss-search', (_, embedding, k) => {
-  return FAISS_Search(embedding, k);
+  return FAISS_Search(FAISS_Validate_Embedding(embedding), k);
 });
 
-ipcMain.handle('faiss-remove', (_, file_hashes) => {
-  return FAISS_Remove_Entries(file_hashes);
+ipcMain.handle('faiss-remove', (_, rowid) => {
+  return FAISS_Remove_Entries(EnsureBigIntArray(rowid));
 });
 
 function FAISS_Queue_DB_Init() {
   //initialize queue for FAISS indexing in sqliteDB
-  const faissQueue_table_exists_stmt = FAISS_DB.prepare(` SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${FAISS_INDEX_TABLENAME}'; `);
+  const faissQueue_table_exists_stmt = FAISS_DB.prepare(`SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${FAISS_INDEX_TABLENAME}';`);
   const faissQUEUE_table_exists_res = faissQueue_table_exists_stmt.get();
 
   if (faissQUEUE_table_exists_res['count(*)'] == 0) {
-    const STMT = FAISS_DB.prepare(`CREATE TABLE IF NOT EXISTS ${FAISS_INDEX_TABLENAME} (embedding TEXT, hash TEXT)`);
+    const STMT = FAISS_DB.prepare(`CREATE TABLE IF NOT EXISTS ${FAISS_INDEX_TABLENAME} (embedding TEXT, rowid INTEGER)`);
     STMT.run();
   }
 }
@@ -631,47 +577,50 @@ function FAISS_Queue_DB_RowCount() {
 }
 
 function FAISS_Queue_DB_Get_All_Entries() {
-  return FAISS_DB.prepare(`SELECT * FROM ${FAISS_INDEX_TABLENAME}`).all();
+  const results = FAISS_DB.prepare(`SELECT * FROM ${FAISS_INDEX_TABLENAME}`).all();
+
+  return results.map((entry) => ({
+    ...entry,
+    embedding: FAISS_Validate_Embedding(entry.embedding),
+  }));
 }
 
-function FAISS_Queue_DB_Delete_Row_From_Hash(hashes) {
-  if (!Array.isArray(hashes)) {
-    hashes = [hashes];
+function FAISS_Queue_DB_Delete_Row_From_ROWIDs(rowids) {
+  if (!Array.isArray(rowids)) {
+    rowids = [rowids];
   }
 
-  if (!hashes.every((hash) => typeof hash === 'string')) {
-    throw new Error('All hashes must be strings.');
+  if (!rowids.every((rowid) => typeof rowid === 'bigint')) {
+    throw new Error('All rowid must be BigInt numbers.');
   }
 
-  const Delete_STMT = FAISS_DB.prepare(`DELETE FROM ${FAISS_INDEX_TABLENAME} WHERE hash=?`);
+  const Delete_STMT = FAISS_DB.prepare(`DELETE FROM ${FAISS_INDEX_TABLENAME} WHERE rowid=?`);
 
-  for (const hash of hashes) {
-    Delete_STMT.run(hash);
+  for (const rowid of rowids) {
+    Delete_STMT.run(rowid);
   }
 }
 
-function FAISS_Queue_DB_Add_Row(embeddings, hashes) {
+function FAISS_Queue_DB_Add_Row(embeddings, rowids) {
   //makes sure embeddings is a nested array
   if (!Array.isArray(embeddings) || (embeddings.length > 0 && !Array.isArray(embeddings[0]))) {
     embeddings = [embeddings];
   }
 
   //make sure hashes is an array
-  if (!Array.isArray(hashes)) {
-    hashes = [hashes];
+  if (!Array.isArray(rowids)) {
+    rowids = [rowids];
   }
 
   // Check if lengths of embeddings and hashes match
-  if (embeddings.length !== hashes.length) {
-    throw new Error('The number of embeddings and hashes is not the same.');
+  if (embeddings.length !== rowids.length) {
+    throw new Error('The number of embeddings and rowids is not the same.');
   }
 
-  const INSERT_STMT = FAISS_DB.prepare(`INSERT INTO ${FAISS_INDEX_TABLENAME} (embedding, hash) VALUES (?, ?)`);
+  const INSERT_STMT = FAISS_DB.prepare(`INSERT INTO ${FAISS_INDEX_TABLENAME} (embedding, rowid) VALUES (?, ?)`);
 
   for (let i = 0; i < embeddings.length; i++) {
-    // Convert hash to string if it's a BigInt
-    const hashStr = typeof hashes[i] === 'bigint' ? BigInt_Back_To_Hash(hashes[i]) : hashes[i];
-    console.log('FAISS_Queue_DB_Add_Row ', 'hashStr=', hashStr);
-    INSERT_STMT.run(JSON.stringify(embeddings[i]), hashStr);
+    const rowid = typeof rowids[i] === 'bigint' ? rowids[i] : BigInt(rowids[i]);
+    INSERT_STMT.run(JSON.stringify(embeddings[i]), rowid);
   }
 }
