@@ -414,6 +414,7 @@ function InitializeAndLoadFAISS() {
   //showSpinner();
 
   FAISS_Queue_DB_Init();
+
   //initialize FAISS index file with default set up
   const faiss_exists = FS.existsSync(FAISS_FILE_PATH);
   if (faiss_exists) {
@@ -443,34 +444,41 @@ async function FAISS_Add_To_Index(embeddings, hashes, addToDB = true) {
       throw new Error('Invalid embedding format');
     }
 
-    hashes_bigInts = FAISS_Validate_And_Convert_Hashes_For_Index(hashes);
+    hashes_bigInts = FAISS_Validate_And_Convert_Hashes_To_BigInt(hashes);
   } catch (err) {
     console.error('Error in validating embeddings or hashes:', err);
     return false;
   }
 
   try {
+    console.log('FAISS_Add_To_Index >>>');
+    console.log(`hashes given as input, hashes=${hashes} `);
+    console.log(`bigint inds used for faiss index, hashes_bigInts=${hashes_bigInts} `);
     FAISS_INDEX.addWithIds(embeddings_checked.flat(), hashes_bigInts);
+    console.log('now checking return');
+    const results = FAISS_Search(embeddings_checked.flat(), 1);
+    console.log('Back in, FAISS_Add_To_Index >>>');
+    console.log('results.hashes = ', results.hashes);
   } catch (err) {
     console.error('error trying to add to faiss index , err=', err);
   }
 
-  //add to DB as a queue incase of crash
+  //add to DB as a queue incase of crash and to put and write them upon restart
   if (addToDB) {
-    FAISS_Queue_DB_Add_Row(embeddings_checked, hashes_bigInts);
+    FAISS_Queue_DB_Add_Row(embeddings_checked, hashes);
   }
 }
 
 function FAISS_Search(embeddings, k) {
   const embeddings_checked = FAISS_Validate_Embedding(embeddings);
-
   if (embeddings_checked == false) return false;
-
   const adjustedK = Math.min(k, FAISS_INDEX.ntotal);
-
   const results = FAISS_INDEX.search(embeddings_checked.flat(), adjustedK);
-  results['hashes'] = results.labels.map((l) => BigInt_Back_To_Hash(l));
 
+  results['hashes'] = results.labels.map((l) => BigInt_Back_To_Hash(l));
+  console.log('FAISS_Search >>>');
+  console.log(`results.labels`, results.labels);
+  console.log(`results.hashes`, results.hashes);
   return results;
 }
 
@@ -483,7 +491,7 @@ async function FAISS_Remove_Entries(file_hashes_input) {
   let hashes_bigInts;
 
   try {
-    hashes_bigInts = FAISS_Validate_And_Convert_Hashes_For_Index(file_hashes);
+    hashes_bigInts = FAISS_Validate_And_Convert_Hashes_To_BigInt(file_hashes);
   } catch (err) {
     console.error('Error in validating embeddings or hashes:', err);
     return false;
@@ -495,23 +503,29 @@ async function FAISS_Remove_Entries(file_hashes_input) {
 }
 
 async function FAISS_Put_Queue_Into_Index() {
+  console.log('FAISS_Put_Queue_Into_Index ');
   const all_queue_entries = FAISS_Queue_DB_Get_All_Entries();
-
+  console.log('all_queue_entries', JSON.stringify(all_queue_entries));
   //how many search results to use
-  const max_search = 12;
+  const max_search = 1;
   //const search_num = Math.min(FAISS_INDEX.ntotal, 10);
 
   for (const { embedding, hash } of all_queue_entries) {
+    console.log('embedding', embedding, 'hash', hash);
     const embeddings_checked = FAISS_Validate_Embedding(embedding);
 
     const search_num = Math.min(FAISS_INDEX.ntotal, max_search);
 
+    console.log('FAISS_Put_Queue_Into_Index >>>');
+    console.log(`hash`, hash);
+
     //only perform the search if the index is not empty
     if (FAISS_INDEX.ntotal > 0) {
-      const results = FAISS_Search(embeddings_checked, search_num);
+      const faiss_results = FAISS_Search(embeddings_checked, search_num);
+      console.log(`faiss_results.hashes`, faiss_results.hashes);
 
       //add to index if the hash is not found in the search results
-      if (!results.hashes.includes(hash)) {
+      if (!faiss_results.hashes.includes(hash)) {
         FAISS_Add_To_Index(embeddings_checked, hash, false);
       }
     } else {
@@ -528,7 +542,7 @@ async function FAISS_Write_To_Index_File() {
   await FAISS_INDEX.write(FAISS_FILE_PATH);
 }
 
-//always return a nested array
+//always return a nested array even if a Float32Array is passed
 function FAISS_Validate_Embedding(embedding) {
   let result = embedding;
 
@@ -536,20 +550,26 @@ function FAISS_Validate_Embedding(embedding) {
     try {
       result = JSON.parse(result);
     } catch (error) {
-      return false;
+      return false; //invalid JSON string
     }
   }
 
-  if (!Array.isArray(result)) {
+  //convert elements if result is an array (including array of Float32Array)
+  if (Array.isArray(result)) {
+    result = result.map((item) => (item instanceof Float32Array ? Array.from(item) : item));
+  } else if (result instanceof Float32Array) {
+    result = Array.from(result);
+  } else {
     return false;
   }
 
   if (result.every((inner) => Array.isArray(inner))) {
-    if (!result.every((innerArray) => Array.isArray(innerArray) && innerArray.length === EMBEDDING_DIM)) {
+    // Check if all inner arrays have the correct dimensionality
+    if (!result.every((innerArray) => innerArray.length === EMBEDDING_DIM)) {
       return false;
     }
   } else {
-    //if non-nested array, wrap it in an outer array
+    // If result is a flat array, check its length and wrap it in an outer array
     if (result.length === EMBEDDING_DIM) {
       result = [result];
     } else {
@@ -560,13 +580,13 @@ function FAISS_Validate_Embedding(embedding) {
   return result;
 }
 
-function FAISS_Validate_And_Convert_Hashes_For_Index(hashes) {
+function FAISS_Validate_And_Convert_Hashes_To_BigInt(hashes) {
   if (!Array.isArray(hashes)) {
     hashes = [hashes];
   }
 
   const hashes_bigInts = hashes.map((hash) => {
-    if (typeof hash !== 'string' || !hash.match(/^[a-f0-9]{64}$/i)) return false;
+    if (typeof hash !== 'string' || !hash.match(/^[a-f0-9]+$/i)) return false;
     //convert to BigInt
     try {
       return BigInt('0x' + hash);
@@ -583,7 +603,7 @@ function BigInt_Back_To_Hash(bigintOfHash) {
 }
 
 ipcMain.handle('faiss-add', (_, embeddings, hashes) => {
-  FAISS_Add_To_Index(embeddings, hashes);
+  FAISS_Add_To_Index(embeddings, '196f85');
 });
 
 ipcMain.handle('faiss-search', (_, embedding, k) => {
@@ -651,7 +671,7 @@ function FAISS_Queue_DB_Add_Row(embeddings, hashes) {
   for (let i = 0; i < embeddings.length; i++) {
     // Convert hash to string if it's a BigInt
     const hashStr = typeof hashes[i] === 'bigint' ? BigInt_Back_To_Hash(hashes[i]) : hashes[i];
-
+    console.log('FAISS_Queue_DB_Add_Row ', 'hashStr=', hashStr);
     INSERT_STMT.run(JSON.stringify(embeddings[i]), hashStr);
   }
 }

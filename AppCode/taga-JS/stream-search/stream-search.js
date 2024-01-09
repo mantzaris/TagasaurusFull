@@ -453,9 +453,12 @@ async function UpdateSearchResults() {
 
     const best_cluster = clusters.get(best_cluster_id);
 
-    const { hashes } = ipcRenderer('faiss-search', selected.descriptor, 3);
-    images = [...new Set(hashes.map((h) => DB_MODULE.GET_RECORD_FROM_HASH_TAGGING_STMT(h).fileName))];
-    keywords = [...new Set(hashes.map((h) => DB_MODULE.GET_RECORD_FROM_HASH_TAGGING_STMT(h).taggingTags))];
+    //TODO: Alex123 !!!
+    console.log('stream search!');
+    const { hashes } = await ipcRenderer.invoke('faiss-search', selected.descriptor, 3);
+    console.log('returned hashes', hashes);
+    images = [...new Set(hashes.map((h) => DB_MODULE.Get_Record_With_Tagging_Hash_From_DB(h).fileName))];
+    keywords = [...new Set(hashes.map((h) => DB_MODULE.Get_Record_With_Tagging_Hash_From_DB(h).taggingTags))];
     memes = images;
     console.log(images);
     // keywords = Object.keys(best_cluster.keywords);
