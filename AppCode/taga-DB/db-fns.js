@@ -2,7 +2,6 @@
 //should have created the tables and indexes as well
 
 const PATH = require('path');
-const FS = require('fs');
 const DATABASE = require('better-sqlite3');
 const { GetFileTypeFromFileName } = require(PATH.join(__dirname, '..', 'taga-JS', 'utilities', 'files.js'));
 
@@ -80,13 +79,23 @@ async function Get_ROWID_From_Filename(filename) {
 }
 exports.Get_ROWID_From_Filename = Get_ROWID_From_Filename;
 
-// async function Get_ROWID_From_Filename_BigInt(filename) {
-//   const GET_TAGGING_ROWID_FROM_FILENAME_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE fileName=?;`);
-//   let res = await GET_TAGGING_ROWID_FROM_FILENAME_STMT.get(filename);
-//   return res.rowid;
-// }
-// exports.Get_ROWID_From_Filename_BigInt = Get_ROWID_From_Filename_BigInt;
-//const GET_TAGGING_ROWID_FROM_FILEHASH_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE fileHash=?;`);
+function Get_Tagging_ROWID_From_FileHash_BigInt(fileHash) {
+  const GET_TAGGING_ROWID_FROM_FILEHASH_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE fileHash=?;`);
+  GET_TAGGING_ROWID_FROM_FILEHASH_STMT.safeIntegers(true); // Safe integers ON
+  return GET_TAGGING_ROWID_FROM_FILEHASH_STMT.get(fileHash).rowid;
+}
+exports.Get_Tagging_ROWID_From_FileHash_BigInt = Get_Tagging_ROWID_From_FileHash_BigInt;
+
+function Get_Tagging_Records_From_ROWIDs_BigInt(rowids) {
+  if (!Array.isArray(rowids)) {
+    rowids = [rowids];
+  }
+  const placeholders = rowids.map(() => '?').join(', ');
+  const stmt = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE ROWID IN (${placeholders})`);
+  stmt.safeIntegers(true); // Safe integers ON
+  return stmt.all(...rowids);
+}
+exports.Get_Tagging_Records_From_ROWIDs_BigInt = Get_Tagging_Records_From_ROWIDs_BigInt;
 
 //the function expects a +1,-1,0 for movement about the current rowid
 async function Step_Get_Annotation(filename, step) {

@@ -453,14 +453,34 @@ async function UpdateSearchResults() {
 
     const best_cluster = clusters.get(best_cluster_id);
 
-    //TODO: Alex123 !!!
-    console.log('stream search!');
-    const { hashes } = await ipcRenderer.invoke('faiss-search', selected.descriptor, 3);
-    console.log('returned hashes', hashes);
-    images = [...new Set(hashes.map((h) => DB_MODULE.Get_Record_With_Tagging_Hash_From_DB(h).fileName))];
-    keywords = [...new Set(hashes.map((h) => DB_MODULE.Get_Record_With_Tagging_Hash_From_DB(h).taggingTags))];
+    //TODO: now the rowids have to be sorted according to distances
+    const { distances, rowids } = await ipcRenderer.invoke('faiss-search', selected.descriptor, 3);
+    console.log('distances:', distances);
+    console.log('returned rowids, should be BigInts: ', rowids);
+    const tagging_entries = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowids);
+    console.log(`tagging_entries :`);
+    //console.log(JSON.stringify(tagging_entries));
+    images = Array.from(new Set(tagging_entries.map((entry) => entry.fileName)));
+    console.log(`images = ${images}`);
+
+    const keywords = Array.from(
+      new Set(
+        tagging_entries
+          .map((entry) => {
+            try {
+              return JSON.parse(entry.taggingTags);
+            } catch (error) {
+              console.error('Error parsing taggingTags:', entry.taggingTags, error);
+              return [];
+            }
+          })
+          .flat()
+      )
+    );
+
     memes = images;
     console.log(images);
+    console.log(keywords);
     // keywords = Object.keys(best_cluster.keywords);
     // images = Object.keys(best_cluster.images);
     // memes = [...new Set(Object.values(best_cluster.images).flatMap((a) => a.memes))];

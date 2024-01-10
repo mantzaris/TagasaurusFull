@@ -381,18 +381,6 @@ ipcMain.handle('getCaptureID', async (_) => {
   });
 });
 
-function showSpinner() {
-  if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.webContents.send('show-spinner');
-  }
-}
-
-function hideSpinner() {
-  if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.webContents.send('hide-spinner');
-  }
-}
-
 ///////////////////////////////////////
 //
 // FAISS KNN: { IndexIVFFlat, Index, IndexFlatIP, MetricType }
@@ -410,9 +398,9 @@ const FAISS_INDEX_TABLENAME = 'QUEUED_INDICES';
 let FAISS_DB; // = new DATABASE(FAISS_DB_PATH, {});
 
 function InitializeAndLoadFAISS() {
+  //showSpinner();
   FAISS_DB = new DATABASE(FAISS_DB_PATH, {});
   FAISS_DB.defaultSafeIntegers(true); // BigInts by default
-  //showSpinner();
 
   FAISS_Queue_DB_Init();
 
@@ -439,6 +427,7 @@ function FAISS_Add_To_Index(embeddings, rowid, addToDB = true) {
   try {
     const rowidsArray = Array.isArray(rowid) ? rowid : [rowid];
     FAISS_INDEX.addWithIds(embeddings.flat(), rowidsArray);
+    console.log('FAISS_INDEX.ntotal = ', FAISS_INDEX.ntotal);
   } catch (err) {
     console.error('error trying to add to faiss index , err=', err);
   }
@@ -457,7 +446,10 @@ function FAISS_Search(embeddings, k) {
   const adjustedK = Math.min(k, FAISS_INDEX.ntotal);
   const results = FAISS_INDEX.search(embeddings.flat(), adjustedK);
 
-  return results;
+  return {
+    rowids: results.labels,
+    distances: results.distances,
+  };
 }
 
 function FAISS_Remove_Entries(rowids) {
@@ -466,10 +458,12 @@ function FAISS_Remove_Entries(rowids) {
   }
 
   const removed = FAISS_INDEX.removeIds(rowids);
+  console.log('FAISS_INDEX.ntotal = ', FAISS_INDEX.ntotal);
   FAISS_Queue_DB_Delete_Row_From_ROWIDs(rowids);
   return removed;
 }
 
+//puts waiting entries from DB into FAISS and then Deletes those entries from the DB
 function FAISS_Put_Queue_Into_Index() {
   const all_queue_entries = FAISS_Queue_DB_Get_All_Entries();
   const max_search = 10;
@@ -548,8 +542,20 @@ function EnsureBigIntArray(rowids) {
   return rowids;
 }
 
+function AlignEmbeddingsAndRowIds(embeddings, rowid) {
+  //embeddings is a nested array and rowid is not an array of the same length
+  if (Array.isArray(embeddings) && (!Array.isArray(rowid) || rowid.length !== embeddings.length)) {
+    //duplicate the rowid for each embedding
+    return new Array(embeddings.length).fill(rowid).flat(); //make sure the result is a flat array
+  }
+  return Array.isArray(rowid) ? rowid.flat() : [rowid];
+}
+
 ipcMain.handle('faiss-add', (_, embeddings, rowid) => {
-  FAISS_Add_To_Index(embeddings, EnsureBigIntArray(rowid));
+  const validated_embeddings = FAISS_Validate_Embedding(embeddings);
+  const alignedRowIds = AlignEmbeddingsAndRowIds(validated_embeddings, EnsureBigIntArray(rowid));
+  console.log(alignedRowIds);
+  FAISS_Add_To_Index(validated_embeddings, alignedRowIds);
 });
 
 ipcMain.handle('faiss-search', (_, embedding, k) => {

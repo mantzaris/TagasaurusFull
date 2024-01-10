@@ -781,22 +781,24 @@ async function Delete_Image() {
 
   let records_remaining = await Number_of_Tagging_Records();
   if (records_remaining == 1) {
-    await Delete_Tagging_Annotation_DB(current_image_annotation.fileName);
-
     if (current_image_annotation.faceDescriptors.length > 0) {
-      ipcRenderer.invoke('faiss-remove', current_image_annotation.fileHash);
+      const rowid = DB_MODULE.Get_Tagging_ROWID_From_FileHash_BigInt(current_image_annotation.fileHash);
+      ipcRenderer.invoke('faiss-remove', rowid);
     }
+    await Delete_Tagging_Annotation_DB(current_image_annotation.fileName);
 
     await Load_Default_Taga_Image();
     New_Image_Display(0);
   } else {
     let prev_tmp = current_image_annotation.fileName;
     New_Image_Display(1);
-    await Delete_Tagging_Annotation_DB(prev_tmp);
 
     if (current_image_annotation.faceDescriptors.length > 0) {
-      ipcRenderer.invoke('faiss-remove', current_image_annotation.fileHash);
+      const rowid = DB_MODULE.Get_Tagging_ROWID_From_FileHash_BigInt(current_image_annotation.fileHash);
+      ipcRenderer.invoke('faiss-remove', rowid);
     }
+
+    await Delete_Tagging_Annotation_DB(prev_tmp);
   }
 }
 
@@ -808,7 +810,6 @@ async function Handle_Delete_FileFrom_Cluster() {
 
   for (let i = 0; i < face_clusters.length; i++) {
     let cluster = face_clusters[i];
-    console.log(current_image_annotation);
 
     delete cluster.relatedFaces[current_image_annotation.fileName];
 
@@ -977,16 +978,15 @@ async function Load_New_Image(filename) {
       //face cluster insertion code
       tagging_entry_tmp = await CreateTaggingEntryCluster(tagging_entry_tmp);
 
-      if (tagging_entry_tmp.faceDescriptors.length > 0) {
-        const descriptors = Array.isArray(tagging_entry_tmp.faceDescriptors[0]) ? tagging_entry_tmp.faceDescriptors : [tagging_entry_tmp.faceDescriptors];
-        //repeat the hash for each face descriptor, needed and then the replication/repeat of the vector is added
-        const hashes = new Array(descriptors.length).fill(tagging_entry_tmp.fileHash);
-
-        ipcRenderer.invoke('faiss-add', descriptors, hashes);
-      }
-
       await Insert_Record_Into_DB(tagging_entry_tmp);
       tagging_entry = tagging_entry_tmp;
+
+      //FAISS
+      if (tagging_entry_tmp.faceDescriptors.length > 0) {
+        const descriptors = Array.isArray(tagging_entry_tmp.faceDescriptors[0]) ? tagging_entry_tmp.faceDescriptors : [tagging_entry_tmp.faceDescriptors];
+        const rowid = DB_MODULE.Get_Tagging_ROWID_From_FileHash_BigInt(tagging_entry_tmp.fileHash);
+        ipcRenderer.invoke('faiss-add', descriptors, rowid);
+      }
     } //else { //hash is present so set to load it
     //tagging_entry = tagging_entry_tmp;
 
