@@ -91,9 +91,10 @@ function Get_Tagging_Records_From_ROWIDs_BigInt(rowids) {
     rowids = [rowids];
   }
   const placeholders = rowids.map(() => '?').join(', ');
-  const stmt = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE ROWID IN (${placeholders})`);
+  const stmt = DB.prepare(`SELECT *, ROWID FROM ${TAGGING_TABLE_NAME} WHERE ROWID IN (${placeholders})`);
   stmt.safeIntegers(true); // Safe integers ON
-  return stmt.all(...rowids);
+  const entries = stmt.all(...rowids);
+  return entries.map((entry) => Get_Obj_Fields_From_Record(entry));
 }
 exports.Get_Tagging_Records_From_ROWIDs_BigInt = Get_Tagging_Records_From_ROWIDs_BigInt;
 

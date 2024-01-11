@@ -428,62 +428,55 @@ function Render_Bounding_Boxes() {
 }
 
 async function UpdateSearchResults() {
-  //!!!
-  let best_score = -1;
-  let best_cluster_id = null;
+  keywords = [];
+  images = [];
+  memes = [];
 
   const selected = rect_face_selected; //homing_mode ? homing_face_selected : rect_face_selected;
-
+  console.log(`selected.descriptor.length = ${selected.descriptor.length}`);
   if (selected.descriptor.length == 128) {
-    for (const [cluster_id, cluster] of clusters) {
-      //const score = Get_Descriptors_InnerProduct(rect_face_array[i].descriptor,descriptor);
-      const score = Get_Descriptors_DistanceScore([cluster.avgDescriptor], [selected.descriptor]);
-
-      if (score > best_score && score > 0) {
-        best_cluster_id = cluster_id;
-        best_score = score;
+    const { distances, rowids } = await ipcRenderer.invoke('faiss-search', selected.descriptor, 3);
+    console.log('foo');
+    console.log(`distances = ${distances}, rowids = ${rowids}`);
+    // descending when using inner produce and ascending using euclidean
+    rowids_sorted = GENERAL_HELPER_FNS.Sort_Based_On_Scores_ASC(distances, rowids);
+    //remove duplicates
+    let uniqueRowidsSorted = [];
+    let seen = new Set();
+    for (const rowid of rowids_sorted) {
+      if (!seen.has(rowid)) {
+        uniqueRowidsSorted.push(rowid);
+        seen.add(rowid);
       }
     }
 
-    if (best_cluster_id == null) {
-      Display_Keywords();
-      keywords = images = memes = [];
-      return;
+    rowids_sorted = uniqueRowidsSorted;
+
+    console.log('rowids_sorted, should be BigInts: ', rowids_sorted);
+
+    const tagging_entries = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowids_sorted); //include entry ROWID
+    tagging_entries.map((entry) => console.log({ e: entry.rowid, f: entry.fileName }));
+
+    for (const rowid of rowids_sorted) {
+      console.log('looking for rowid=', rowid);
+      //index of the tagging entry with the specific rowid
+      const index = tagging_entries.findIndex((entry) => entry.rowid === rowid);
+      console.log('index =', index);
+      if (index !== -1) {
+        const entry = tagging_entries[index];
+        console.log(`current entry rowid = ${entry.rowid}`);
+        if (entry.taggingTags.length > 0) keywords.push(entry.taggingTags);
+        images.push(entry.fileName);
+        if (entry.taggingMemeChoices.length > 0) memes.push(entry.taggingMemeChoices);
+      }
     }
 
-    const best_cluster = clusters.get(best_cluster_id);
-
-    //TODO: now the rowids have to be sorted according to distances
-    const { distances, rowids } = await ipcRenderer.invoke('faiss-search', selected.descriptor, 3);
-    console.log('distances:', distances);
-    console.log('returned rowids, should be BigInts: ', rowids);
-    const tagging_entries = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowids);
-    console.log(`tagging_entries :`);
-    //console.log(JSON.stringify(tagging_entries));
-    images = Array.from(new Set(tagging_entries.map((entry) => entry.fileName)));
-    console.log(`images = ${images}`);
-
-    const keywords = Array.from(
-      new Set(
-        tagging_entries
-          .map((entry) => {
-            try {
-              return JSON.parse(entry.taggingTags);
-            } catch (error) {
-              console.error('Error parsing taggingTags:', entry.taggingTags, error);
-              return [];
-            }
-          })
-          .flat()
-      )
-    );
-
-    memes = images;
+    keywords = [...new Set(keywords)];
+    images = [...new Set(images)];
+    memes = [...new Set(memes)];
     console.log(images);
     console.log(keywords);
-    // keywords = Object.keys(best_cluster.keywords);
-    // images = Object.keys(best_cluster.images);
-    // memes = [...new Set(Object.values(best_cluster.images).flatMap((a) => a.memes))];
+    console.log(memes);
   }
 
   Remove_Thumbnail_Events();

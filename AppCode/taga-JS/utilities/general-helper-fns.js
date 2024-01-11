@@ -96,3 +96,25 @@ function Clamp(number, min, max) {
   return Math.min(Math.max(number, min), max);
 }
 exports.Clamp = Clamp;
+
+function Sort_Based_On_Scores_DES(scores, element_arr) {
+  let indices = new Array(scores.length);
+  for (let i = 0; i < scores.length; ++i) indices[i] = i;
+  indices.sort((a, b) => {
+    return scores[a] < scores[b] ? 1 : scores[a] > scores[b] ? -1 : 0;
+  });
+
+  return indices.map((i) => element_arr[i]);
+}
+exports.Sort_Based_On_Scores_DES = Sort_Based_On_Scores_DES;
+
+function Sort_Based_On_Scores_ASC(scores, element_arr) {
+  let indices = new Array(scores.length);
+  for (let i = 0; i < scores.length; ++i) indices[i] = i;
+  indices.sort((a, b) => {
+    return scores[a] > scores[b] ? 1 : scores[a] < scores[b] ? -1 : 0;
+  });
+
+  return indices.map((i) => element_arr[i]);
+}
+exports.Sort_Based_On_Scores_ASC = Sort_Based_On_Scores_ASC;

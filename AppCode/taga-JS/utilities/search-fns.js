@@ -381,7 +381,7 @@ async function FaceSearch_Clusters(descriptor) {
     }
   }
 
-  //sort the scores and return the indices order from largest to smallest
+  //sort the scores and return the indices order from smallest to largest
   let indices = new Array(distances.length);
   for (let i = 0; i < distances.length; ++i) indices[i] = i;
   indices.sort((a, b) => {

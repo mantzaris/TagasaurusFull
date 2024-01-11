@@ -4,7 +4,7 @@ const PATH = require('path');
 const FS = require('fs');
 const DATABASE = require('better-sqlite3');
 
-const { IndexIVFFlat, Index, IndexFlatIP, MetricType } = require('faiss-napi');
+const { IndexFlatL2, Index, IndexFlatIP, MetricType } = require('faiss-napi');
 const { result } = require('lodash');
 
 const { GetFileTypeFromFileName } = require(PATH.join(__dirname, 'AppCode', 'taga-JS', 'utilities', 'files.js'));
@@ -204,6 +204,11 @@ async function PopulateDefaultTaggingEntries() {
   tagging_entry.fileName = 'Taga.png';
   tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash(PATH.join(TAGA_DATA_DIRECTORY, 'Taga.png')); //`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
   tagging_entry.fileType = 'image';
+  tagging_entry.taggingRawDescription =
+    `Linus Torvalds: "Talk is cheap, show me the code" > why is it cheap?` +
+    `\nMartti Malmi: "Code speaks louder than Words" > again, why?` +
+    `\nMarshall McLuhan: "the Medium is the Message` +
+    `\n\n\nChaos. Good news.`;
 
   INSERT_TAGGING_STMT = DB.prepare(
     `INSERT INTO ${TAGGING_TABLE_NAME} (fileName, fileHash, fileType, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors, faceClusters) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
@@ -383,7 +388,7 @@ ipcMain.handle('getCaptureID', async (_) => {
 
 ///////////////////////////////////////
 //
-// FAISS KNN: { IndexIVFFlat, Index, IndexFlatIP, MetricType }
+// FAISS KNN: { IndexFlatL2, Index, IndexFlatIP, MetricType }
 //
 //////////////////////////////////////
 let FAISS_INDEX;
@@ -405,13 +410,14 @@ function InitializeAndLoadFAISS() {
   FAISS_Queue_DB_Init();
 
   //initialize FAISS index file with default set up
+  //IndexFlatIP for inner product or IndexFlatL2 for euclidean
   const faiss_exists = FS.existsSync(FAISS_FILE_PATH);
   if (faiss_exists) {
-    FAISS_INDEX = IndexFlatIP.read(FAISS_FILE_PATH); // load already existing file
+    FAISS_INDEX = IndexFlatL2.read(FAISS_FILE_PATH); // load already existing file
   } else {
-    FAISS_INDEX = new IndexFlatIP(EMBEDDING_DIM).toIDMap2(); // set up index
+    FAISS_INDEX = new IndexFlatL2(EMBEDDING_DIM).toIDMap2(); // set up index
     FAISS_INDEX.write(FAISS_FILE_PATH);
-    FAISS_INDEX = IndexFlatIP.read(FAISS_FILE_PATH);
+    FAISS_INDEX = IndexFlatL2.read(FAISS_FILE_PATH);
   }
 
   const queue_rowcount = FAISS_Queue_DB_RowCount();
@@ -427,7 +433,7 @@ function FAISS_Add_To_Index(embeddings, rowid, addToDB = true) {
   try {
     const rowidsArray = Array.isArray(rowid) ? rowid : [rowid];
     FAISS_INDEX.addWithIds(embeddings.flat(), rowidsArray);
-    console.log('FAISS_INDEX.ntotal = ', FAISS_INDEX.ntotal);
+    //console.log('FAISS_INDEX.ntotal = ', FAISS_INDEX.ntotal);
   } catch (err) {
     console.error('error trying to add to faiss index , err=', err);
   }
@@ -443,9 +449,15 @@ function FAISS_Add_To_Index(embeddings, rowid, addToDB = true) {
 }
 
 function FAISS_Search(embeddings, k) {
+  if (FAISS_INDEX.ntotal === 0) {
+    return {
+      rowids: [],
+      distances: [],
+    };
+  }
+
   const adjustedK = Math.min(k, FAISS_INDEX.ntotal);
   const results = FAISS_INDEX.search(embeddings.flat(), adjustedK);
-
   return {
     rowids: results.labels,
     distances: results.distances,
@@ -458,7 +470,7 @@ function FAISS_Remove_Entries(rowids) {
   }
 
   const removed = FAISS_INDEX.removeIds(rowids);
-  console.log('FAISS_INDEX.ntotal = ', FAISS_INDEX.ntotal);
+  //console.log('FAISS_INDEX.ntotal = ', FAISS_INDEX.ntotal);
   FAISS_Queue_DB_Delete_Row_From_ROWIDs(rowids);
   return removed;
 }
@@ -476,7 +488,7 @@ function FAISS_Put_Queue_Into_Index() {
       const faiss_results = FAISS_Search(embedding, search_num);
 
       //add to index if the hash is not found in the search results
-      if (!faiss_results.labels.includes(rowid)) {
+      if (!faiss_results?.labels?.includes(rowid)) {
         FAISS_Add_To_Index(embedding, rowid, false);
       }
     } else {
@@ -554,7 +566,7 @@ function AlignEmbeddingsAndRowIds(embeddings, rowid) {
 ipcMain.handle('faiss-add', (_, embeddings, rowid) => {
   const validated_embeddings = FAISS_Validate_Embedding(embeddings);
   const alignedRowIds = AlignEmbeddingsAndRowIds(validated_embeddings, EnsureBigIntArray(rowid));
-  console.log(alignedRowIds);
+  //console.log(alignedRowIds);
   FAISS_Add_To_Index(validated_embeddings, alignedRowIds);
 });
 
