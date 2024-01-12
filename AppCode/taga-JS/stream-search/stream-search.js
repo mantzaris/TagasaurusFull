@@ -427,17 +427,22 @@ function Render_Bounding_Boxes() {
   ctx.stroke();
 }
 
+function calculateL2Norm(vector) {
+  let sumOfSquares = vector.reduce((sum, value) => sum + value * value, 0);
+  return Math.sqrt(sumOfSquares);
+}
+
 async function UpdateSearchResults() {
   keywords = [];
   images = [];
   memes = [];
 
   const selected = rect_face_selected; //homing_mode ? homing_face_selected : rect_face_selected;
-  console.log(`selected.descriptor.length = ${selected.descriptor.length}`);
   if (selected.descriptor.length == 128) {
+    console.log(`L2 selected.descriptor = ${calculateL2Norm(selected.descriptor)}`);
+
     const { distances, rowids } = await ipcRenderer.invoke('faiss-search', selected.descriptor, 3);
-    console.log('foo');
-    console.log(`distances = ${distances}, rowids = ${rowids}`);
+    console.log('distances=', distances);
     // descending when using inner produce and ascending using euclidean
     rowids_sorted = GENERAL_HELPER_FNS.Sort_Based_On_Scores_ASC(distances, rowids);
     //remove duplicates
@@ -452,19 +457,14 @@ async function UpdateSearchResults() {
 
     rowids_sorted = uniqueRowidsSorted;
 
-    console.log('rowids_sorted, should be BigInts: ', rowids_sorted);
-
     const tagging_entries = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowids_sorted); //include entry ROWID
     tagging_entries.map((entry) => console.log({ e: entry.rowid, f: entry.fileName }));
 
     for (const rowid of rowids_sorted) {
-      console.log('looking for rowid=', rowid);
       //index of the tagging entry with the specific rowid
       const index = tagging_entries.findIndex((entry) => entry.rowid === rowid);
-      console.log('index =', index);
       if (index !== -1) {
         const entry = tagging_entries[index];
-        console.log(`current entry rowid = ${entry.rowid}`);
         if (entry.taggingTags.length > 0) keywords.push(entry.taggingTags);
         images.push(entry.fileName);
         if (entry.taggingMemeChoices.length > 0) memes.push(entry.taggingMemeChoices);
@@ -474,9 +474,6 @@ async function UpdateSearchResults() {
     keywords = [...new Set(keywords)];
     images = [...new Set(images)];
     memes = [...new Set(memes)];
-    console.log(images);
-    console.log(keywords);
-    console.log(memes);
   }
 
   Remove_Thumbnail_Events();
