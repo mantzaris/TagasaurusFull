@@ -433,6 +433,7 @@ function calculateL2Norm(vector) {
 }
 
 async function UpdateSearchResults() {
+  //do this less frequently
   keywords = [];
   images = [];
   memes = [];
@@ -441,10 +442,11 @@ async function UpdateSearchResults() {
   if (selected.descriptor.length == 128) {
     console.log(`L2 selected.descriptor = ${calculateL2Norm(selected.descriptor)}`);
 
-    const { distances, rowids } = await ipcRenderer.invoke('faiss-search', selected.descriptor, 3);
+    //TODO: L2 distances threshold at around 0.17 and IP at 0.92
+    const { distances, rowids } = await ipcRenderer.invoke('faiss-search', selected.descriptor, 6);
     console.log('distances=', distances);
     // descending when using inner produce and ascending using euclidean
-    rowids_sorted = GENERAL_HELPER_FNS.Sort_Based_On_Scores_ASC(distances, rowids);
+    rowids_sorted = GENERAL_HELPER_FNS.Sort_Based_On_Scores_DES(distances, rowids);
     //remove duplicates
     let uniqueRowidsSorted = [];
     let seen = new Set();
@@ -458,7 +460,6 @@ async function UpdateSearchResults() {
     rowids_sorted = uniqueRowidsSorted;
 
     const tagging_entries = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowids_sorted); //include entry ROWID
-    tagging_entries.map((entry) => console.log({ e: entry.rowid, f: entry.fileName }));
 
     for (const rowid of rowids_sorted) {
       //index of the tagging entry with the specific rowid

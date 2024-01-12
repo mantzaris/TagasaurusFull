@@ -413,11 +413,11 @@ function InitializeAndLoadFAISS() {
   //IndexFlatIP for inner product or IndexFlatL2 for euclidean
   const faiss_exists = FS.existsSync(FAISS_FILE_PATH);
   if (faiss_exists) {
-    FAISS_INDEX = IndexFlatL2.read(FAISS_FILE_PATH); // load already existing file
+    FAISS_INDEX = IndexFlatIP.read(FAISS_FILE_PATH); // load already existing file
   } else {
-    FAISS_INDEX = new IndexFlatL2(EMBEDDING_DIM).toIDMap2(); // set up index
+    FAISS_INDEX = new IndexFlatIP(EMBEDDING_DIM).toIDMap2(); // set up index
     FAISS_INDEX.write(FAISS_FILE_PATH);
-    FAISS_INDEX = IndexFlatL2.read(FAISS_FILE_PATH);
+    FAISS_INDEX = IndexFlatIP.read(FAISS_FILE_PATH);
   }
 
   const queue_rowcount = FAISS_Queue_DB_RowCount();
