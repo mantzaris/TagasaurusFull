@@ -370,10 +370,13 @@ async function Handle_Default_Search() {
 }
 
 function Find_Most_Similar_Descriptor(descriptor, threshold) {
+  //!!
   let best_score = -1;
   let best_index = -1;
 
   for (let i = 0; i < rect_face_array.length; i++) {
+    //!!!
+    //const score = Get_Descriptors_InnerProduct(rect_face_array[i].descriptor,descriptor);
     const score = Get_Descriptors_DistanceScore([rect_face_array[i].descriptor], [descriptor]);
 
     if (score > threshold && score > best_score) {
@@ -424,33 +427,54 @@ function Render_Bounding_Boxes() {
   ctx.stroke();
 }
 
+function calculateL2Norm(vector) {
+  let sumOfSquares = vector.reduce((sum, value) => sum + value * value, 0);
+  return Math.sqrt(sumOfSquares);
+}
+
 async function UpdateSearchResults() {
-  let best_score = -1;
-  let best_cluster_id = null;
+  //do this less frequently
+  keywords = [];
+  images = [];
+  memes = [];
 
   const selected = rect_face_selected; //homing_mode ? homing_face_selected : rect_face_selected;
-
   if (selected.descriptor.length == 128) {
-    for (const [cluster_id, cluster] of clusters) {
-      const score = Get_Descriptors_DistanceScore([cluster.avgDescriptor], [selected.descriptor]);
+    console.log(`L2 selected.descriptor = ${calculateL2Norm(selected.descriptor)}`);
 
-      if (score > best_score && score > 0) {
-        best_cluster_id = cluster_id;
-        best_score = score;
+    //TODO: L2 distances threshold at around 0.17 and IP at 0.92
+    const { distances, rowids } = await ipcRenderer.invoke('faiss-search', selected.descriptor, 6);
+    console.log('distances=', distances);
+    // descending when using inner produce and ascending using euclidean
+    rowids_sorted = GENERAL_HELPER_FNS.Sort_Based_On_Scores_DES(distances, rowids);
+    //remove duplicates
+    let uniqueRowidsSorted = [];
+    let seen = new Set();
+    for (const rowid of rowids_sorted) {
+      if (!seen.has(rowid)) {
+        uniqueRowidsSorted.push(rowid);
+        seen.add(rowid);
       }
     }
 
-    if (best_cluster_id == null) {
-      Display_Keywords();
-      keywords = images = memes = [];
-      return;
+    rowids_sorted = uniqueRowidsSorted;
+
+    const tagging_entries = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowids_sorted); //include entry ROWID
+
+    for (const rowid of rowids_sorted) {
+      //index of the tagging entry with the specific rowid
+      const index = tagging_entries.findIndex((entry) => entry.rowid === rowid);
+      if (index !== -1) {
+        const entry = tagging_entries[index];
+        if (entry.taggingTags.length > 0) keywords.push(entry.taggingTags);
+        images.push(entry.fileName);
+        if (entry.taggingMemeChoices.length > 0) memes.push(entry.taggingMemeChoices);
+      }
     }
 
-    const best_cluster = clusters.get(best_cluster_id);
-
-    keywords = Object.keys(best_cluster.keywords);
-    images = Object.keys(best_cluster.images);
-    memes = [...new Set(Object.values(best_cluster.images).flatMap((a) => a.memes))];
+    keywords = [...new Set(keywords)];
+    images = [...new Set(images)];
+    memes = [...new Set(memes)];
   }
 
   Remove_Thumbnail_Events();

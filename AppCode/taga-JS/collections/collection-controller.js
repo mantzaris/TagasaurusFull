@@ -487,7 +487,7 @@ async function Check_Gallery_And_Profile_Image_Integrity() {
   //1-profile image is missing, and image set is empty (or none present to show)
   if (profile_pic_present_bool == false && image_set_present.length == 0) {
     let app_path = await IPC_RENDERER2.invoke('getAppPath');
-    let default_path = PATH.join(app_path, 'Taga.png'); //PATH.resolve()+PATH.sep+'Taga.png';
+    let default_path = PATH.join(app_path, 'Taga.png'); //Description DEFAULT
     //default_path = PATH.join(__dirname,'..','..','Taga.png')//PATH.resolve()+PATH.sep+'Taga.png';
     let default_hash = MY_FILE_HELPER.Return_File_Hash(default_path);
     let hash_tmp = Get_Tagging_Hash_From_DB(default_hash);

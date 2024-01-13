@@ -1,4 +1,5 @@
 const PATH = require('path');
+const { ipcRenderer } = require('electron');
 
 const { DB_MODULE, MAX_SAMPLE_COUNT_RECORDS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js')); //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
@@ -99,3 +100,14 @@ async function Init_Analytics() {
 }
 
 Init_Analytics();
+
+ipcRenderer.on('show-spinner', () => {
+  console.log('showing spinner renderer');
+  let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
+  processing_modal.style.display = 'flex';
+});
+
+ipcRenderer.on('hide-spinner', () => {
+  let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
+  processing_modal.style.display = 'none';
+});

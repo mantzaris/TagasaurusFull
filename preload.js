@@ -81,30 +81,50 @@ async function Load_Face_Api_Model() {
 }
 Load_Face_Api_Model();
 
+window.faceapi = faceapi;
+
+function Normalize_Vector(vector) {
+  // Convert Float32Array to a regular array if necessary
+  let arrayVector = vector instanceof Float32Array ? Array.from(vector) : vector;
+
+  let norm = Math.sqrt(arrayVector.reduce((sum, value) => sum + value * value, 0));
+  return arrayVector.map((component) => component / norm);
+}
+
+function Normalize_Face_Descriptors(res) {
+  return res.map((face) => ({
+    ...face,
+    descriptor: Normalize_Vector(face.descriptor),
+  }));
+}
+
 async function Get_Image_Face_Descriptors_And_Expresssions_From_File(imagePath) {
   let img = document.createElement('img'); // Use DOM HTMLImageElement
   img.src = imagePath;
-  return await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceExpressions().withFaceDescriptors();
+  const res = await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceExpressions().withFaceDescriptors();
+  return Normalize_Face_Descriptors(res);
 }
 window.Get_Image_Face_Descriptors_And_Expresssions_From_File = Get_Image_Face_Descriptors_And_Expresssions_From_File;
 
 async function Get_Image_Face_Expresssions_From_File(imagePath) {
   let img = document.createElement('img'); // Use DOM HTMLImageElement
   img.src = imagePath;
-  return await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceExpressions();
+  const res = await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceExpressions();
+  return Normalize_Face_Descriptors(res);
 }
 window.Get_Image_Face_Expresssions_From_File = Get_Image_Face_Expresssions_From_File;
 
 async function Get_Image_Face_Descriptors_From_File(imagePath) {
   let img = document.createElement('img'); // Use DOM HTMLImageElement
   img.src = imagePath;
-  return await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceDescriptors();
+  const res = await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceDescriptors();
+  return Normalize_Face_Descriptors(res);
 }
 window.Get_Image_Face_Descriptors_From_File = Get_Image_Face_Descriptors_From_File;
-window.faceapi = faceapi;
 
 async function Get_Image_Face_Descriptors_And_Expresssions_From_HTML_Image(img) {
-  return await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceExpressions().withFaceDescriptors();
+  const res = await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceExpressions().withFaceDescriptors();
+  return Normalize_Face_Descriptors(res);
 }
 window.Get_Image_Face_Descriptors_And_Expresssions_From_HTML_Image = Get_Image_Face_Descriptors_And_Expresssions_From_HTML_Image;
 
@@ -148,6 +168,20 @@ function Get_Euclidean_Distance(descriptor1, descriptor2) {
 }
 window.Get_Euclidean_Distance = Get_Euclidean_Distance;
 
+function Get_Descriptors_InnerProduct(vec1, vec2) {
+  if (vec1.length !== vec2.length) {
+    throw new Error('Vectors must be of the same length');
+  }
+
+  let product = 0;
+  for (let i = 0; i < vec1.length; i++) {
+    product += vec1[i] * vec2[i];
+  }
+
+  return product;
+}
+window.Get_Descriptors_InnerProduct = Get_Descriptors_InnerProduct;
+
 //When the file is a GIF
 //go through each frame sequentially and include descriptors of only novel faces
 //add a new descriptor if the distance to the rest is small
@@ -171,10 +205,13 @@ async function Get_Image_Face_Expresssions_From_GIF(imagePath, get_emotions = fa
       let img = Imagedata_To_Image(image_tmp);
       if (get_emotions == false) {
         res = await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceDescriptors();
+        res = Normalize_Face_Descriptors(res);
       } else if (get_only_emotions == false) {
         res = await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceExpressions().withFaceDescriptors();
+        res = Normalize_Face_Descriptors(res);
       } else {
         res = await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceExpressions();
+        res = Normalize_Face_Descriptors(res);
       }
       if (get_only_emotions == false) {
         let descriptors_array_tmp = Get_Face_Descriptors_Arrays(res);
@@ -244,14 +281,19 @@ function Imagedata_To_Image(imagedata) {
   return image;
 }
 
-//returns the obj with the extended emotions auto filled
-//faceapi.euclideanDistance( Object.values({'1':1,'2':2,'3':2}), Object.values({'1':-1,'2':0.2,'3':15}) ) -> 13.275541
+//faceapi uses a Float32Array by default
 function Get_Face_Descriptors_Arrays(super_res) {
   let faces_descriptors_array_tmp = [];
   if (super_res.length > 0) {
     for (let face_ii = 0; face_ii < super_res.length; face_ii++) {
-      //each descriptor is an 'object' not an array so that each dimension of the descriptor feature vector has a key pointing to the value but we just use the values that are needed to compute the 'distace' between descriptors later faceapi.euclideanDistance( aa[0] , aa[1] ), faceapi.euclideanDistance( JSON.parse(res5[2].faceDescriptors)[0] , JSON.parse(res5[2].faceDescriptors)[2] ) (get face descriptors string, parse and then select to compare via euclidean distances)
-      faces_descriptors_array_tmp[face_ii] = Object.values(super_res[face_ii].descriptor);
+      // Check if the descriptor is a Float32Array or a regular array
+      if (super_res[face_ii].descriptor instanceof Float32Array) {
+        // Convert Float32Array to a regular array
+        faces_descriptors_array_tmp[face_ii] = Array.from(super_res[face_ii].descriptor);
+      } else {
+        // If it's already a regular array, use it as is
+        faces_descriptors_array_tmp[face_ii] = super_res[face_ii].descriptor;
+      }
     }
   }
   return faces_descriptors_array_tmp;
@@ -342,10 +384,13 @@ async function extractFramesFromVideo(videoUrl, get_emotions = false, get_only_e
 
         if (get_emotions == false) {
           res = faceapi.detectAllFaces(photo).withFaceLandmarks().withFaceDescriptors();
+          res = Normalize_Face_Descriptors(res);
         } else if (get_only_emotions == true) {
           res = faceapi.detectAllFaces(photo).withFaceLandmarks().withFaceExpressions();
+          res = Normalize_Face_Descriptors(res);
         } else {
           res = faceapi.detectAllFaces(photo).withFaceLandmarks().withFaceExpressions().withFaceDescriptors();
+          res = Normalize_Face_Descriptors(res);
         }
 
         frames.push(res);
@@ -360,30 +405,3 @@ async function extractFramesFromVideo(videoUrl, get_emotions = false, get_only_e
     video.src = videoObjectUrl;
   });
 }
-
-//
-//---------<<<<<<<<<<<<<<<<<<<<<<
-//img.src = URL.createObjectURL(new Blob(tmp1,{type: 'image/png' }))  //imagePath
-// setTimeout(async ()=> {
-//
-//   let {frames,width,height} = DECODE_GIF(FS.readFileSync('/home/resort/Downloads/AHandJD.gif'));
-//   let tmp1 = frames[0].data // uint8clampedarray
-//   let image_tmp = await new ImageData(tmp1,width,height)
-//   let img = Imagedata_To_Image(image_tmp)
-//   // var img = document.createElement('img'); // Use DOM HTMLImageElement
-//   // img.src = '/home/resort/Downloads/AHandJD.gif'
-//   const res = await faceapi.detectAllFaces(img).
-//                                         withFaceLandmarks().
-//                                         withFaceExpressions()
-// },4000)
-//
-// window.addEventListener('DOMContentLoaded', () => {
-//   const replaceText = (selector, text) => {
-//     const element = document.getElementById(selector)
-//     if (element) element.innerText = text
-//   }
-
-//   for (const type of ['chrome', 'node', 'electron']) {
-//     replaceText(`${type}-version`, process.versions[type])
-//   }
-// })

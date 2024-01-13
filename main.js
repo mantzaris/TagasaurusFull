@@ -1,10 +1,11 @@
-// Modules to control application life and create native browser window
-//'ipcMain' and 'dialog' are introduced to open the dialog window in slides.js
-//
+//const FSE = require('fs-extra');
 const { app, ipcMain, dialog, BrowserWindow, desktopCapturer } = require('electron');
 const PATH = require('path');
 const FS = require('fs');
-const FSE = require('fs-extra');
+const DATABASE = require('better-sqlite3');
+
+const { IndexFlatL2, Index, IndexFlatIP, MetricType } = require('faiss-napi');
+const { result } = require('lodash');
 
 const { GetFileTypeFromFileName } = require(PATH.join(__dirname, 'AppCode', 'taga-JS', 'utilities', 'files.js'));
 
@@ -31,7 +32,6 @@ const TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY, 'files'); //where th
 
 const MY_FILE_HELPER = require(PATH.join(__dirname, 'AppCode', 'taga-JS', 'utilities', 'copy-new-file-helper.js')); //PATH.resolve()+PATH.sep+'AppCode'+PATH.sep+'taga-JS'+PATH.sep+'utilities'+PATH.sep+'copy-new-file-helper.js') //require('./myJS/copy-new-file-helper.js')
 
-const DATABASE = require('better-sqlite3');
 //const { build } = require('electron-builder');
 let DB;
 DB_FILE_NAME = 'TagasaurusDB.db';
@@ -43,11 +43,13 @@ console.log('icon path = ', tmp_icon_dir);
 let exists = FS.existsSync(tmp_icon_dir);
 console.log(`icon path exists = `, exists);
 
+let mainWindow;
+
 function createWindow() {
   // //tray stuff
   //const tray = new Tray(PATH.join(__dirname,"icon.png"))
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1200,
     height: 1000,
     icon: tmp_icon_dir,
@@ -202,6 +204,11 @@ async function PopulateDefaultTaggingEntries() {
   tagging_entry.fileName = 'Taga.png';
   tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash(PATH.join(TAGA_DATA_DIRECTORY, 'Taga.png')); //`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
   tagging_entry.fileType = 'image';
+  tagging_entry.taggingRawDescription =
+    `Linus Torvalds: "Talk is cheap, show me the code" > why is it cheap?` +
+    `\nMartti Malmi: "Code speaks louder than Words" > again, why?` +
+    `\nMarshall McLuhan: "the Medium is the Message` +
+    `\n\n\nChaos. Good news.`;
 
   INSERT_TAGGING_STMT = DB.prepare(
     `INSERT INTO ${TAGGING_TABLE_NAME} (fileName, fileHash, fileType, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors, faceClusters) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
@@ -314,6 +321,7 @@ ipcMain.handle('getDownloadsFolder', async () => app.getPath('downloads'));
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   Init(); //createWindow();
+  InitializeAndLoadFAISS();
 
   //tray stuff
   //const tray = new Tray(PATH.join(__dirname,"icon.png"))
@@ -378,103 +386,259 @@ ipcMain.handle('getCaptureID', async (_) => {
   });
 });
 
-// only the linux installation will include the LinuxRunOnExternalMedia directory and if a zip and not installer then we want the zip to be able to run on USB and need to copy the remount script forward for the user to use
-// if (!BUILD_INSTALLER) {
-//   const unpacked_linux_run_dir_path = PATH.join(
-//     __dirname,
-//     '..',
-//     'app.asar.unpacked',
-//     'LinuxRunOnExternalMedia'
-//   );
-//   const linux_run_dir_exists = FS.existsSync(unpacked_linux_run_dir_path);
-//   if (linux_run_dir_exists) {
-//     const target_dir = PATH.join(
-//       __dirname,
-//       '..',
-//       '..',
-//       'LinuxRunOnExternalMedia'
-//     );
-//     FSE.copySync(unpacked_linux_run_dir_path, target_dir);
-//   }
-// }
-
-// function formatBytes(bytes, decimals = 2) {
-//   if (!+bytes) return '0 Bytes'
-
-//   const k = 1024
-//   const dm = decimals < 0 ? 0 : decimals
-//   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-
-//   const i = Math.floor(Math.log(bytes) / Math.log(k))
-
-//   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
-// }
-
-//for the ability to load the entity creation for the selection of a profile image set
-// ipcMain.handle('dialog:openEntityImageSet', async (_, args) => {
-//   const result = dialog.showOpenDialog({ properties: ['openFile', 'multiSelections' ], defaultPath: TAGA_DATA_DIRECTORY }) //!!! remove old reference
-//   return result
-// })
-////for the GIF image extraction
-// const gifFrames = require('gif-frames')
-
-// ipcMain.handle('extractGIFframes', async (_,gif_path) => {
-//   let frameData = await gifFrames({ url: '/home/resort/Downloads/AHandJD.gif', frames: 'all' })
+///////////////////////////////////////
 //
-//   if( FS.existsSync(PATH.join(__dirname, 'tempFiles')) == false ) {
-//     FS.mkdirSync( PATH.join(__dirname, 'tempFiles') )
-//   }
-//   let gif_file_names = []
-//   frameData.forEach( async (image,index) => {
+// FAISS KNN: { IndexFlatL2, Index, IndexFlatIP, MetricType }
+//
+//////////////////////////////////////
+let FAISS_INDEX;
+const EMBEDDING_DIM = 128;
 
-//     gif_file_names.push( writeFrameDataToFile(image,index) )
-//   })
-//   let gifFilenames = await Promise.all(gif_file_names)
-//   return gifFilenames
-// })
-// async function writeFrameDataToFile(image,index) {
-//   return new Promise((resolve, reject) => {
-//     let filename_tmp = PATH.join(__dirname, 'tempFiles',`tmp${index}.jpg`)
-//     const stream = FS.createWriteStream( filename_tmp )
-//     image.getImage().pipe( stream );
-//     stream.on('finish', () =>{
-//       resolve(filename_tmp)
-//     })
-//   })
-// }
-// "win": {
-//   "target": [
-//     "nsis",
-//     "portable",
-//     "zip"
-//   ],
-//   "icon": "build/TagaIcon1024x1024.ico"
-// }
+const FAISS_INDEX_FILE_NAME = 'fais.index';
+const FAISS_DB_FILE_NAME = 'FAISS_DB.db';
+const FAISS_FILE_PATH = PATH.join(TAGA_FILES_DIRECTORY, FAISS_INDEX_FILE_NAME);
+const FAISS_DB_PATH = PATH.join(TAGA_FILES_DIRECTORY, FAISS_DB_FILE_NAME);
+const FAISS_INDEX_TABLENAME = 'QUEUED_INDICES';
 
-// ,
-//     "nsis": {
-//       "oneClick": true,
-//       "perMachine": false,
-//       "createDesktopShortcut": false,
-//       "artifactName": "tagasaurus.app"
-//     }
+let FAISS_DB; // = new DATABASE(FAISS_DB_PATH, {});
 
-// const PDFWindow = require('electron-pdf-window')
-// let pdf_window = null
-// ipcMain.on('displayPDF', (_,pdfPath) => {
-//   if(pdf_window == null) {
-//     pdf_window = new PDFWindow({
-//       width: 800,
-//       height: 600
-//     })
-//     pdf_window.on('close', () => pdf_window = null )
-//   }
-//   pdf_window.loadURL(pdfPath)
-//   pdf_window.show()
-// })
-// ipcMain.on('closePDF', (_) => {
-//   if( pdf_window ) {
-//     pdf_window.hide()
-//     //pdf_window = null
-//   }
-// })
+function InitializeAndLoadFAISS() {
+  //showSpinner();
+  FAISS_DB = new DATABASE(FAISS_DB_PATH, {});
+  FAISS_DB.defaultSafeIntegers(true); // BigInts by default
+
+  FAISS_Queue_DB_Init();
+
+  //initialize FAISS index file with default set up
+  //IndexFlatIP for inner product or IndexFlatL2 for euclidean
+  const faiss_exists = FS.existsSync(FAISS_FILE_PATH);
+  if (faiss_exists) {
+    FAISS_INDEX = IndexFlatIP.read(FAISS_FILE_PATH); // load already existing file
+  } else {
+    FAISS_INDEX = new IndexFlatIP(EMBEDDING_DIM).toIDMap2(); // set up index
+    FAISS_INDEX.write(FAISS_FILE_PATH);
+    FAISS_INDEX = IndexFlatIP.read(FAISS_FILE_PATH);
+  }
+
+  const queue_rowcount = FAISS_Queue_DB_RowCount();
+  if (queue_rowcount > 0) {
+    FAISS_Put_Queue_Into_Index();
+    FAISS_Write_To_Index_File();
+  }
+
+  //hideSpinner();
+}
+
+function FAISS_Add_To_Index(embeddings, rowid, addToDB = true) {
+  try {
+    const rowidsArray = Array.isArray(rowid) ? rowid : [rowid];
+    FAISS_INDEX.addWithIds(embeddings.flat(), rowidsArray);
+    //console.log('FAISS_INDEX.ntotal = ', FAISS_INDEX.ntotal);
+  } catch (err) {
+    console.error('error trying to add to faiss index , err=', err);
+  }
+
+  //add to DB as a queue incase of crash and to put and write them upon restart
+  if (addToDB) {
+    try {
+      FAISS_Queue_DB_Add_Row(embeddings, rowid);
+    } catch (err) {
+      console.error('error trying to add to queue DB for faiss , err=', err);
+    }
+  }
+}
+
+function FAISS_Search(embeddings, k) {
+  if (FAISS_INDEX.ntotal === 0) {
+    return {
+      rowids: [],
+      distances: [],
+    };
+  }
+
+  const adjustedK = Math.min(k, FAISS_INDEX.ntotal);
+  const results = FAISS_INDEX.search(embeddings.flat(), adjustedK);
+  return {
+    rowids: results.labels,
+    distances: results.distances,
+  };
+}
+
+function FAISS_Remove_Entries(rowids) {
+  if (!(rowids instanceof Array)) {
+    rowids = [rowids];
+  }
+
+  const removed = FAISS_INDEX.removeIds(rowids);
+  //console.log('FAISS_INDEX.ntotal = ', FAISS_INDEX.ntotal);
+  FAISS_Queue_DB_Delete_Row_From_ROWIDs(rowids);
+  return removed;
+}
+
+//puts waiting entries from DB into FAISS and then Deletes those entries from the DB
+function FAISS_Put_Queue_Into_Index() {
+  const all_queue_entries = FAISS_Queue_DB_Get_All_Entries();
+  const max_search = 10;
+
+  for (const { embedding, rowid } of all_queue_entries) {
+    const search_num = Math.min(FAISS_INDEX.ntotal, max_search);
+
+    //only perform the search if the index is not empty
+    if (FAISS_INDEX.ntotal > 0) {
+      const faiss_results = FAISS_Search(embedding, search_num);
+
+      //add to index if the hash is not found in the search results
+      if (!faiss_results?.labels?.includes(rowid)) {
+        FAISS_Add_To_Index(embedding, rowid, false);
+      }
+    } else {
+      FAISS_Add_To_Index(embedding, rowid, false);
+    }
+
+    //delete the processed entry from the queue
+    FAISS_Queue_DB_Delete_Row_From_ROWIDs(rowid);
+  }
+}
+
+async function FAISS_Write_To_Index_File() {
+  await FAISS_INDEX.write(FAISS_FILE_PATH);
+}
+
+//always return a nested array even if a Float32Array is passed
+function FAISS_Validate_Embedding(embedding) {
+  let result = embedding;
+
+  if (typeof result === 'string') {
+    try {
+      result = JSON.parse(result);
+    } catch (error) {
+      return false; //invalid JSON string
+    }
+  }
+
+  //convert elements if result is an array (including array of Float32Array)
+  if (Array.isArray(result)) {
+    result = result.map((item) => (item instanceof Float32Array ? Array.from(item) : item));
+  } else if (result instanceof Float32Array) {
+    result = Array.from(result);
+  } else {
+    return false;
+  }
+
+  if (result.every((inner) => Array.isArray(inner))) {
+    // Check if all inner arrays have the correct dimensionality
+    if (!result.every((innerArray) => innerArray.length === EMBEDDING_DIM)) {
+      return false;
+    }
+  } else {
+    // If result is a flat array, check its length and wrap it in an outer array
+    if (result.length === EMBEDDING_DIM) {
+      result = [result];
+    } else {
+      return false;
+    }
+  }
+
+  return result;
+}
+
+function EnsureBigIntArray(rowids) {
+  if (!Array.isArray(rowids)) {
+    rowids = [rowids];
+  }
+
+  if (!rowids.every((rowid) => typeof rowid == 'bigint')) {
+    rowids = rowids.map((rowid) => BigInt(rowid));
+  }
+
+  return rowids;
+}
+
+function AlignEmbeddingsAndRowIds(embeddings, rowid) {
+  //embeddings is a nested array and rowid is not an array of the same length
+  if (Array.isArray(embeddings) && (!Array.isArray(rowid) || rowid.length !== embeddings.length)) {
+    //duplicate the rowid for each embedding
+    return new Array(embeddings.length).fill(rowid).flat(); //make sure the result is a flat array
+  }
+  return Array.isArray(rowid) ? rowid.flat() : [rowid];
+}
+
+ipcMain.handle('faiss-add', (_, embeddings, rowid) => {
+  const validated_embeddings = FAISS_Validate_Embedding(embeddings);
+  const alignedRowIds = AlignEmbeddingsAndRowIds(validated_embeddings, EnsureBigIntArray(rowid));
+  //console.log(alignedRowIds);
+  FAISS_Add_To_Index(validated_embeddings, alignedRowIds);
+});
+
+ipcMain.handle('faiss-search', (_, embedding, k) => {
+  return FAISS_Search(FAISS_Validate_Embedding(embedding), k);
+});
+
+ipcMain.handle('faiss-remove', (_, rowid) => {
+  return FAISS_Remove_Entries(EnsureBigIntArray(rowid));
+});
+
+function FAISS_Queue_DB_Init() {
+  //initialize queue for FAISS indexing in sqliteDB
+  const faissQueue_table_exists_stmt = FAISS_DB.prepare(`SELECT count(*) FROM sqlite_master WHERE type='table' AND name='${FAISS_INDEX_TABLENAME}';`);
+  const faissQUEUE_table_exists_res = faissQueue_table_exists_stmt.get();
+
+  if (faissQUEUE_table_exists_res['count(*)'] == 0) {
+    const STMT = FAISS_DB.prepare(`CREATE TABLE IF NOT EXISTS ${FAISS_INDEX_TABLENAME} (embedding TEXT, rowid INTEGER)`);
+    STMT.run();
+  }
+}
+
+function FAISS_Queue_DB_RowCount() {
+  const GET_TAGGING_ROW_COUNT = FAISS_DB.prepare(`SELECT COUNT(*) AS rownum FROM ${FAISS_INDEX_TABLENAME}`);
+  return GET_TAGGING_ROW_COUNT.get().rownum;
+}
+
+function FAISS_Queue_DB_Get_All_Entries() {
+  const results = FAISS_DB.prepare(`SELECT * FROM ${FAISS_INDEX_TABLENAME}`).all();
+
+  return results.map((entry) => ({
+    ...entry,
+    embedding: FAISS_Validate_Embedding(entry.embedding),
+  }));
+}
+
+function FAISS_Queue_DB_Delete_Row_From_ROWIDs(rowids) {
+  if (!Array.isArray(rowids)) {
+    rowids = [rowids];
+  }
+
+  if (!rowids.every((rowid) => typeof rowid === 'bigint')) {
+    throw new Error('All rowid must be BigInt numbers.');
+  }
+
+  const Delete_STMT = FAISS_DB.prepare(`DELETE FROM ${FAISS_INDEX_TABLENAME} WHERE rowid=?`);
+
+  for (const rowid of rowids) {
+    Delete_STMT.run(rowid);
+  }
+}
+
+function FAISS_Queue_DB_Add_Row(embeddings, rowids) {
+  //makes sure embeddings is a nested array
+  if (!Array.isArray(embeddings) || (embeddings.length > 0 && !Array.isArray(embeddings[0]))) {
+    embeddings = [embeddings];
+  }
+
+  //make sure hashes is an array
+  if (!Array.isArray(rowids)) {
+    rowids = [rowids];
+  }
+
+  // Check if lengths of embeddings and hashes match
+  if (embeddings.length !== rowids.length) {
+    throw new Error('The number of embeddings and rowids is not the same.');
+  }
+
+  const INSERT_STMT = FAISS_DB.prepare(`INSERT INTO ${FAISS_INDEX_TABLENAME} (embedding, rowid) VALUES (?, ?)`);
+
+  for (let i = 0; i < embeddings.length; i++) {
+    const rowid = typeof rowids[i] === 'bigint' ? rowids[i] : BigInt(rowids[i]);
+    INSERT_STMT.run(JSON.stringify(embeddings[i]), rowid);
+  }
+}
