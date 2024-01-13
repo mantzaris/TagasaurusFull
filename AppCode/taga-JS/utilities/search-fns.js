@@ -1,5 +1,7 @@
-//IMAGE SEARCH MODAL IN TAGGING START>>>
-//search function for the image additions
+const PATH = require('path');
+
+const { Sort_Based_On_Scores_DES, Sort_Based_On_Scores_ASC } = require(PATH.join(__dirname, 'general-helper-fns.js'));
+
 //passing in the search criteria object, the iterator function handle, the get record annotation from DB and the max counts allowed.
 async function Image_Search_DB(search_obj) {
   const tags_lc = search_obj.searchTags.map((x) => x.toLowerCase());
@@ -360,35 +362,31 @@ function EmotionSimilarityScore(emotions, search_emotions) {
 }
 
 // Alex Face Search
-async function FaceSearch_Clusters(descriptor) {
-  let distances = [];
-  let similar_faces = [];
+async function FaceSearch(descriptor) {
+  let scores = [];
+  let filenames = [];
 
-  for await (const cluster of DB_MODULE.DB_Iterator('FACECLUSTERS')) {
-    const distance = Get_Euclidean_Distance(descriptor, cluster.avgDescriptor);
+  for await (const entry of DB_MODULE.DB_Iterator('TAGGING')) {
+    if (!('faceDescriptors' in entry && entry.faceDescriptors.length != 0)) {
+      continue;
+    }
 
-    if (distances.length <= MAX_COUNT_SEARCH_RESULTS) {
-      distances.push(distance);
-      similar_faces.push(Object.keys(cluster.relatedFaces));
+    const score = Get_Descriptors_DistanceScore([descriptor], entry.faceDescriptors);
+    if (scores.length <= MAX_COUNT_SEARCH_RESULTS) {
+      scores.push(score);
+      filenames.push(entry.fileName);
     } else {
-      let max_distance = Math.max(...distances);
-      if (distance < max_distance) {
-        //place cluster in the set since it is smaller distance than the current maximum
-        let index_max = distances.indexOf(max_distance);
-        distances[index_max] = distance;
-        similar_faces[index_max] = Object.keys(cluster.relatedFaces);
+      let min_score = Math.min(...scores);
+      if (score > min_score) {
+        let index_min = scores.indexOf(min_score);
+        scores[index_min] = score;
+        filenames[index_min] = entry.fileName;
       }
     }
   }
 
-  //sort the scores and return the indices order from smallest to largest
-  let indices = new Array(distances.length);
-  for (let i = 0; i < distances.length; ++i) indices[i] = i;
-  indices.sort((a, b) => {
-    return distances[a] > distances[b] ? 1 : distances[a] < distances[b] ? -1 : 0;
-  });
+  files_sorted = Sort_Based_On_Scores_DES(scores, filenames);
 
-  const flat_ranked_filenames = indices.map((i) => similar_faces[i]).flat();
-  return Array.from(new Set(flat_ranked_filenames));
+  return files_sorted;
 }
-exports.FaceSearch_Clusters = FaceSearch_Clusters;
+exports.FaceSearch = FaceSearch;

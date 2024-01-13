@@ -2090,7 +2090,7 @@ window.addEventListener('click', (event) => {
 });
 
 async function Show_Similar_Faces(descriptor) {
-  const similar_faces = await SEARCH_MODULE.FaceSearch_Clusters(descriptor);
+  const similar_faces = await SEARCH_MODULE.FaceSearch(descriptor);
 
   const results_div = document.getElementById('modal-facesearch-images-results-grid-div-area-id');
   results_div.innerHTML = similar_faces.length == 0 ? '<h1>No Results</h1>' : '';
