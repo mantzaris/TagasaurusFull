@@ -3,7 +3,7 @@
 const PATH = require('path');
 const FS = require('fs');
 require('dotenv').config();
-//console.log(process.env)
+require(PATH.join(__dirname, 'AppCode', 'taga-JS', 'settings', 'settings-fns.js'));
 
 //clear the console on a new start of the app
 //console.clear()

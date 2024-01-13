@@ -2,14 +2,6 @@
 <!--  The gray for the general background 808a80  rgb(128, 138, 128)	-->
 <!--	The button background color	--> */
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Verdana, sans-serif;
-  box-sizing: border-box;
-}
-
 #collections-screen-id {
   display: grid;
   grid-template-columns: 14fr 24fr;

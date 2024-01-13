@@ -1,11 +1,3 @@
-html,
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Verdana, sans-serif;
-  box-sizing: border-box;
-}
-
 .top-buttons {
   font-weight: bold;
   border-radius: 25%;

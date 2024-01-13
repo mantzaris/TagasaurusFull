@@ -19,4 +19,16 @@
   --warning-600: #aa0000; /* var(--warning-600) */
 
   --toast: rgb(220, 220, 119);
+
+  --sans-serif-family: Verdana, sans-serif;
+  --monospace-family: Monaco, Lucida, Monospace;
+  --serif-family: Garamond, Georgia, Serif;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--sans-serif-family);
+  box-sizing: border-box;
 }

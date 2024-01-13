@@ -2,13 +2,6 @@
 <!--  The gray for the general background 808a80  rgb(128, 138, 128)	-->
 <!--	The button background color	--> */
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Verdana, sans-serif;
-}
-
 #tagging-screen-id {
   display: grid;
   grid-template-columns: 5fr 10fr 5fr;

@@ -1,12 +1,3 @@
-html,
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Verdana, sans-serif;
-
-  background-color: var(--bg);
-}
-
 #export-screen-id {
   padding-top: 10%;
 
