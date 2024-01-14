@@ -16,4 +16,5 @@ function Load_Settings() {
   Load_Font_Family();
 }
 
-window.onload = Load_Settings;
+//window.onload = Load_Settings;
+window.addEventListener('load', Load_Settings);
