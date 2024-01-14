@@ -29,13 +29,7 @@ async function Image_Search_DB(search_obj) {
   }
 
   //sort the scores and return the indices order from largest to smallest
-  const img_indices_sorted = new Array(scores.length);
-  for (let i = 0; i < scores.length; ++i) img_indices_sorted[i] = i;
-  img_indices_sorted.sort((a, b) => {
-    return scores[a] < scores[b] ? 1 : scores[a] > scores[b] ? -1 : 0;
-  });
-
-  return img_indices_sorted.map((i) => filenames[i]);
+  return Sort_Based_On_Scores_DES(scores, filenames);
 }
 exports.Image_Search_DB = Image_Search_DB;
 //called in each loop for each image
@@ -94,13 +88,7 @@ async function Image_Meme_Search_DB(search_obj) {
   }
 
   //sort the meme image scores and return the indices order from largest to smallest
-  let meme_indices = new Array(scores.length);
-  for (let i = 0; i < scores.length; ++i) meme_indices[i] = i;
-  meme_indices.sort((a, b) => {
-    return scores[a] < scores[b] ? 1 : scores[a] > scores[b] ? -1 : 0;
-  });
-
-  return meme_indices.map((i) => filenames[i]);
+  return Sort_Based_On_Scores_DES(scores, filenames);
 }
 exports.Image_Meme_Search_DB = Image_Meme_Search_DB;
 async function Meme_Image_Scoring(search_obj, entry, tags_lc, memetags_lc) {
@@ -154,13 +142,7 @@ async function Meme_Addition_Image_Search_DB(search_obj) {
   }
 
   //sort the scores and return the indices order from largest to smallest
-  let indices = new Array(scores.length);
-  for (let i = 0; i < scores.length; ++i) indices[i] = i;
-  indices.sort((a, b) => {
-    return scores[a] < scores[b] ? 1 : scores[a] > scores[b] ? -1 : 0;
-  });
-  //ranked filenames now
-  return indices.map((i) => filenames[i]);
+  return Sort_Based_On_Scores_DES(scores, filenames);
 }
 exports.Meme_Addition_Image_Search_DB = Meme_Addition_Image_Search_DB;
 //called in each loop for each image
@@ -211,13 +193,7 @@ async function Meme_Addition_Image_Meme_Search_DB(search_obj) {
   }
 
   //sort the meme image scores and return the indices order from largest to smallest
-  let indices = new Array(scores.length);
-  for (let i = 0; i < scores.length; ++i) indices[i] = i;
-  indices.sort((a, b) => {
-    return scores[a] < scores[b] ? 1 : scores[a] > scores[b] ? -1 : 0;
-  });
-
-  return indices.map((i) => filenames[i]);
+  return Sort_Based_On_Scores_DES(scores, filenames);
 }
 exports.Meme_Addition_Image_Meme_Search_DB = Meme_Addition_Image_Meme_Search_DB;
 
@@ -266,13 +242,7 @@ async function Collection_Profile_Image_Search_Fn(search_obj, candidates) {
     scores[img_ind] = tags_score + emotion_score + meme_tag_score;
   }
   //sort the scores and return the indices order from largest to smallest
-  let indices = new Array(scores.length);
-  for (let i = 0; i < scores.length; ++i) indices[i] = i;
-  indices.sort((a, b) => {
-    return scores[a] < scores[b] ? 1 : scores[a] > scores[b] ? -1 : 0;
-  });
-
-  return indices.map((i) => candidates[i]);
+  return Sort_Based_On_Scores_DES(scores, candidates);
 }
 exports.Collection_Profile_Image_Search_Fn = Collection_Profile_Image_Search_Fn;
 
@@ -303,13 +273,7 @@ async function Collection_Search_DB(search_obj) {
   }
 
   //sort the scores and return the indices order from largest to smallest
-  let indices = new Array(scores.length);
-  for (let i = 0; i < scores.length; ++i) indices[i] = i;
-  indices.sort((a, b) => {
-    return scores[a] < scores[b] ? 1 : scores[a] > scores[b] ? -1 : 0;
-  });
-  //ranked filenames now
-  return indices.map((i) => filenames[i]);
+  return Sort_Based_On_Scores_DES(scores, filenames);
 }
 exports.Collection_Search_DB = Collection_Search_DB;
 
@@ -361,7 +325,7 @@ function EmotionSimilarityScore(emotions, search_emotions) {
   return emotion_overlap_score;
 }
 
-// Alex Face Search
+//search the faces on a single image
 async function FaceSearch(descriptor) {
   let scores = [];
   let filenames = [];
@@ -371,6 +335,7 @@ async function FaceSearch(descriptor) {
       continue;
     }
 
+    //bigger scores are better
     const score = Get_Descriptors_DistanceScore([descriptor], entry.faceDescriptors);
     if (scores.length <= MAX_COUNT_SEARCH_RESULTS) {
       scores.push(score);
@@ -385,8 +350,6 @@ async function FaceSearch(descriptor) {
     }
   }
 
-  files_sorted = Sort_Based_On_Scores_DES(scores, filenames);
-
-  return files_sorted;
+  return Sort_Based_On_Scores_DES(scores, filenames);
 }
 exports.FaceSearch = FaceSearch;

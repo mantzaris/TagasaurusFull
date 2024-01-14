@@ -205,9 +205,10 @@ async function PopulateDefaultTaggingEntries() {
   tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash(PATH.join(TAGA_DATA_DIRECTORY, 'Taga.png')); //`${TAGA_DATA_DIRECTORY}${PATH.sep}${'Taga.png'}`);
   tagging_entry.fileType = 'image';
   tagging_entry.taggingRawDescription =
-    `Linus Torvalds: "Talk is cheap, show me the code" > why is it cheap?` +
-    `\nMartti Malmi: "Code speaks louder than Words" > again, why?` +
-    `\nMarshall McLuhan: "the Medium is the Message` +
+    `This is Taga` +
+    `\n\n Taga heard this:``Linus Torvalds, "Talk is cheap, show me the code" > why is it cheap?` +
+    `\nMartti Malmi, "Code speaks louder than Words" > again, why?` +
+    `\nMarshall McLuhan, "the Medium is the Message` +
     `\n\n\nChaos. Good news.`;
 
   INSERT_TAGGING_STMT = DB.prepare(
