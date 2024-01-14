@@ -12,20 +12,8 @@ async function Image_Search_DB(search_obj) {
   const filenames = [];
 
   for await (const entry of DB_MODULE.DB_Iterator('TAGGING')) {
-    const image_score = await Image_Scoring(search_obj, entry, tags_lc, memetags_lc);
-
-    if (scores.length <= MAX_COUNT_SEARCH_RESULTS) {
-      scores.push(image_score);
-      filenames.push(entry.fileName);
-    } else {
-      const min_score = Math.min(...scores);
-      if (image_score > min_score) {
-        //place image in the set since it is bigger than the current minimum
-        const min_index = scores.indexOf(min_score);
-        scores[min_index] = image_score;
-        filenames[min_index] = entry.fileName;
-      }
-    }
+    const score = await Image_Scoring(search_obj, entry, tags_lc, memetags_lc);
+    Update_Mutate_Scores_Filenames_MAX(scores, filenames, score, entry.fileName);
   }
 
   //sort the scores and return the indices order from largest to smallest
@@ -39,9 +27,9 @@ async function Image_Scoring(search_obj, entry, tags_lc, memetags_lc) {
   const memes = entry.taggingMemeChoices;
 
   //get the score of the overlap of the object with the search terms
-  let tags_overlap_score = tags.filter((tag) => tags_lc.includes(tag.toLowerCase())).length;
+  const tags_overlap_score = tags.filter((tag) => tags_lc.includes(tag.toLowerCase())).length;
   //get the score for the emotions overlap scores range [-1,1] for each emotion that is accumulated
-  let emotion_overlap_score = EmotionSimilarityScore(emotions, search_obj.emotions);
+  const emotion_overlap_score = EmotionSimilarityScore(emotions, search_obj.emotions);
 
   //get the score for the memes
   let meme_tag_overlap_score = 0;
@@ -64,42 +52,31 @@ async function Image_Scoring(search_obj, entry, tags_lc, memetags_lc) {
 }
 
 async function Image_Meme_Search_DB(search_obj) {
-  let tags_lc = search_obj['searchTags'].map((x) => x.toLowerCase());
-  let memetags_lc = search_obj['searchMemeTags'].map((x) => x.toLowerCase());
+  const tags_lc = search_obj['searchTags'].map((x) => x.toLowerCase());
+  const memetags_lc = search_obj['searchMemeTags'].map((x) => x.toLowerCase());
 
   //now for the memes to be ranked
   let scores = [];
   let filenames = [];
   for await (const entry of DB_MODULE.DB_Iterator('TAGGINGMEMES')) {
-    let score = await Meme_Image_Scoring(search_obj, entry, tags_lc, memetags_lc);
-    //get the overlap score for this image tmp
-    if (scores.length <= MAX_COUNT_SEARCH_RESULTS) {
-      scores.push(score);
-      filenames.push(entry.memeFileName);
-    } else {
-      let min_score = Math.min(...scores);
-      if (score > min_score) {
-        //place image in the set since it is bigger than the current minimum
-        let index_min = scores.indexOf(min_score);
-        scores[index_min] = score;
-        filenames[index_min] = entry.memeFileName;
-      }
-    }
+    const score = await Meme_Image_Scoring(search_obj, entry, tags_lc, memetags_lc);
+    Update_Mutate_Scores_Filenames_MAX(scores, filenames, score, entry.memeFileName);
   }
 
   //sort the meme image scores and return the indices order from largest to smallest
   return Sort_Based_On_Scores_DES(scores, filenames);
 }
 exports.Image_Meme_Search_DB = Image_Meme_Search_DB;
+
 async function Meme_Image_Scoring(search_obj, entry, tags_lc, memetags_lc) {
-  let record = await DB_MODULE.Get_Tagging_Record_From_DB(entry.memeFileName);
-  let meme_score = record.taggingTags.filter((tag) => memetags_lc.includes(tag.toLowerCase())).length;
+  const record = await DB_MODULE.Get_Tagging_Record_From_DB(entry.memeFileName);
+  const meme_score = record.taggingTags.filter((tag) => memetags_lc.includes(tag.toLowerCase())).length;
   let emotion_score = 0;
   let image_score = 0;
 
   for (let ii = 0; ii < entry.fileNames.length; ii++) {
-    let image = entry.fileNames[ii];
-    let other_record = await DB_MODULE.Get_Tagging_Record_From_DB(image);
+    const image = entry.fileNames[ii];
+    const other_record = await DB_MODULE.Get_Tagging_Record_From_DB(image);
 
     image_score += other_record.taggingTags.filter((tag) => tags_lc.includes(tag.toLowerCase())).length;
     emotion_score += EmotionSimilarityScore(other_record.taggingEmotions, search_obj.emotions);
@@ -117,28 +94,16 @@ async function Meme_Image_Scoring(search_obj, entry, tags_lc, memetags_lc) {
 //MEME ADDITION IN TAGGING MODAL START>>>
 //for the MEME modal meme addition functionality
 async function Meme_Addition_Image_Search_DB(search_obj) {
-  let tags_lc = search_obj.searchTags.map((x) => x.toLowerCase());
-  let memetags_lc = search_obj.searchMemeTags.map((x) => x.toLowerCase());
+  const tags_lc = search_obj.searchTags.map((x) => x.toLowerCase());
+  const memetags_lc = search_obj.searchMemeTags.map((x) => x.toLowerCase());
 
   //empty array to store the scores of the images against the search
   let scores = [];
   let filenames = [];
 
   for await (const entry of DB_MODULE.DB_Iterator('TAGGING')) {
-    let score = await Meme_Addition_Image_Scoring(search_obj, entry, tags_lc, memetags_lc);
-    //get the overlap score for this image tmp
-    if (scores.length <= MAX_COUNT_SEARCH_RESULTS) {
-      scores.push(score);
-      filenames.push(entry.fileName);
-    } else {
-      let min_score = Math.min(...scores);
-      if (score > min_score) {
-        //place image in the set since it is bigger than the current minimum
-        let index_min = scores.indexOf(min_score);
-        scores[index_min] = score;
-        filenames[index_min] = entry.fileName;
-      }
-    }
+    const score = await Meme_Addition_Image_Scoring(search_obj, entry, tags_lc, memetags_lc);
+    Update_Mutate_Scores_Filenames_MAX(scores, filenames, score, entry.fileName);
   }
 
   //sort the scores and return the indices order from largest to smallest
@@ -168,28 +133,16 @@ async function Meme_Addition_Image_Scoring(search_obj, entry, tags_lc, memetags_
 }
 
 async function Meme_Addition_Image_Meme_Search_DB(search_obj) {
-  let tags_lc = search_obj.searchTags.map((x) => x.toLowerCase());
-  let memetags_lc = search_obj.searchMemeTags.map((x) => x.toLowerCase());
+  const tags_lc = search_obj.searchTags.map((x) => x.toLowerCase());
+  const memetags_lc = search_obj.searchMemeTags.map((x) => x.toLowerCase());
 
   //now for the memes to be ranked
   let scores = [];
   let filenames = [];
 
   for await (const entry of DB_MODULE.DB_Iterator('TAGGINGMEMES')) {
-    let score = await Meme_Addition_Meme_Image_Scoring(search_obj, entry, tags_lc, memetags_lc);
-    //get the overlap score for this image tmp
-    if (scores.length <= MAX_COUNT_SEARCH_RESULTS) {
-      scores.push(score);
-      filenames.push(entry.memeFileName);
-    } else {
-      let min_score = Math.min(...scores);
-      if (score > min_score) {
-        //place image in the set since it is bigger than the current minimum
-        let index_min = scores.indexOf(min_score);
-        scores[index_min] = score;
-        filenames[index_min] = entry.memeFileName;
-      }
-    }
+    const score = await Meme_Addition_Meme_Image_Scoring(search_obj, entry, tags_lc, memetags_lc);
+    Update_Mutate_Scores_Filenames_MAX(scores, filenames, score, entry.memeFileName);
   }
 
   //sort the meme image scores and return the indices order from largest to smallest
@@ -247,29 +200,16 @@ async function Collection_Profile_Image_Search_Fn(search_obj, candidates) {
 exports.Collection_Profile_Image_Search_Fn = Collection_Profile_Image_Search_Fn;
 
 //COLLECTION SEARCH MODAL IN TAGGING START>>>
-//passing in the search criteria object, the iterator function handle, the get record annotation from DB and the max counts allowed.
 async function Collection_Search_DB(search_obj) {
-  let tags_lc = search_obj.searchTags.map((x) => x.toLowerCase());
-  let memetags_lc = search_obj.searchMemeTags.map((x) => x.toLowerCase());
+  const tags_lc = search_obj.searchTags.map((x) => x.toLowerCase());
+  const memetags_lc = search_obj.searchMemeTags.map((x) => x.toLowerCase());
 
   let scores = [];
   let filenames = [];
 
   for await (const collection of DB_MODULE.DB_Iterator('COLLECTIONS')) {
-    let score = await Collection_Scoring(search_obj, collection, tags_lc, memetags_lc);
-
-    if (scores.length <= MAX_COUNT_SEARCH_RESULTS) {
-      scores.push(score);
-      filenames.push(collection.collectionName);
-    } else {
-      let min_score = Math.min(...scores);
-      if (score > min_score) {
-        //place image in the set since it is bigger than the current minimum
-        let index_min = scores.indexOf(min_score);
-        scores[index_min] = score;
-        filenames[index_min] = collection.collectionName;
-      }
-    }
+    const score = await Collection_Scoring(search_obj, collection, tags_lc, memetags_lc);
+    Update_Mutate_Scores_Filenames_MAX(scores, filenames, score, collection.collectionName);
   }
 
   //sort the scores and return the indices order from largest to smallest
@@ -307,6 +247,28 @@ async function Collection_Scoring(search_obj, collection, tags_lc, memetags_lc) 
   return tags_score + emotion_score + meme_score + image_score;
 }
 
+//search the faces on a single image
+async function FaceSearch(descriptor) {
+  let scores = [];
+  let filenames = [];
+
+  for await (const entry of DB_MODULE.DB_Iterator('TAGGING')) {
+    if (!('faceDescriptors' in entry && entry.faceDescriptors.length != 0)) {
+      continue;
+    }
+
+    //bigger scores are better
+    const score = Get_Descriptors_DistanceScore([descriptor], entry.faceDescriptors);
+    Update_Mutate_Scores_Filenames_MAX(scores, filenames, score, entry.fileName);
+  }
+
+  return Sort_Based_On_Scores_DES(scores, filenames);
+}
+exports.FaceSearch = FaceSearch;
+
+///////////////////////////////////
+// Utility functions here
+///////////////////////////////////
 function EmotionSimilarityScore(emotions, search_emotions) {
   let emotion_overlap_score = 0;
   const emotion_keys = Object.keys(emotions);
@@ -325,31 +287,16 @@ function EmotionSimilarityScore(emotions, search_emotions) {
   return emotion_overlap_score;
 }
 
-//search the faces on a single image
-async function FaceSearch(descriptor) {
-  let scores = [];
-  let filenames = [];
-
-  for await (const entry of DB_MODULE.DB_Iterator('TAGGING')) {
-    if (!('faceDescriptors' in entry && entry.faceDescriptors.length != 0)) {
-      continue;
-    }
-
-    //bigger scores are better
-    const score = Get_Descriptors_DistanceScore([descriptor], entry.faceDescriptors);
-    if (scores.length <= MAX_COUNT_SEARCH_RESULTS) {
-      scores.push(score);
-      filenames.push(entry.fileName);
-    } else {
-      let min_score = Math.min(...scores);
-      if (score > min_score) {
-        let index_min = scores.indexOf(min_score);
-        scores[index_min] = score;
-        filenames[index_min] = entry.fileName;
-      }
+async function Update_Mutate_Scores_Filenames_MAX(scores, filenames, score, filename) {
+  if (scores.length <= MAX_COUNT_SEARCH_RESULTS) {
+    scores.push(score);
+    filenames.push(filename);
+  } else {
+    const min_score = Math.min(...scores);
+    if (score > min_score) {
+      const index_min = scores.indexOf(min_score);
+      scores[index_min] = score;
+      filenames[index_min] = filename;
     }
   }
-
-  return Sort_Based_On_Scores_DES(scores, filenames);
 }
-exports.FaceSearch = FaceSearch;
