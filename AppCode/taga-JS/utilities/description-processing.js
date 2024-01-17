@@ -6,7 +6,6 @@ const natural = require('natural');
 const tokenizer = new natural.WordTokenizer();
 
 const combined_Stopwords = Get_StopWords();
-console.log(combined_Stopwords);
 
 exports.process_description = function (text) {
   const tokens = tokenizer.tokenize(text);
@@ -14,7 +13,7 @@ exports.process_description = function (text) {
 };
 
 function Get_StopWords() {
-  const selectedLanguages = JSON.parse(localStorage.getItem('selected-languages')) || ['eng', 'ell'];
+  const selectedLanguages = JSON.parse(localStorage.getItem('selected-stopword-languages')) || ['eng', 'ell'];
 
   let all_words = selectedLanguages.reduce((acc, lang) => {
     const langStopwords = stopword[lang] || [];
@@ -27,7 +26,7 @@ function Get_StopWords() {
 }
 
 function Read_Stopwords_From_File() {
-  const extra_words_path = PATH.join(__dirname, '..', '..', '..', 'Assets', 'stopwords', 'eng.txt');
+  const extra_words_path = PATH.join(__dirname, '..', '..', '..', 'Assets', 'languages', 'stopwords', 'eng.txt');
 
   try {
     const data = FS.readFileSync(extra_words_path, 'utf8');

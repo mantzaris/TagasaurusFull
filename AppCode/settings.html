@@ -37,213 +37,88 @@
         </div>
     </div>
 
+    <!-- <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label">Select Languages for Stopwords</label>
+                <select id="language-select" class="form-select" multiple aria-label="Select Languages">
+                    <option value="eng" selected disabled>English</option>
+                    <option value="ell" selected disabled>Greek</option>
+                    <option value="ara">Arabic</option>
+                    <option value="eus">Basque</option>
+                    <option value="ben">Bengali</option>
+                    <option value="bul">Bulgarian</option>
+                    <option value="cat">Catalan</option>
+                    <option value="zho">Chinese</option>
+                    <option value="hrv">Croatian</option>
+                    <option value="ces">Czech</option>
+                    <option value="dan">Danish</option>
+                    <option value="nld">Dutch</option>
+                    <option value="est">Estonian</option>
+                    <option value="fin">Finnish</option>
+                    <option value="fra">French</option>
+                    <option value="deu">German</option>
+                    <option value="heb">Hebrew</option>
+                    <option value="hin">Hindi</option>
+                    <option value="hun">Hungarian</option>
+                    <option value="ind">Indonesian</option>
+                    <option value="ita">Italian</option>
+                    <option value="jpn">Japanese</option>
+                    <option value="kor">Korean</option>
+                    <option value="kur">Kurdish</option>
+                    <option value="lav">Latvian</option>
+                    <option value="lit">Lithuanian</option>
+                    <option value="msa">Malay</option>
+                    <option value="mya">Myanmar (Burmese)</option>
+                    <option value="nob">Norwegian</option>
+                    <option value="fas">Persian</option>
+                    <option value="pol">Polish</option>
+                    <option value="por">Portuguese</option>
+                    <option value="porBr">Portuguese-Brazilian</option>
+                    <option value="panGu">Punjabi (Panjabi)</option>
+                    <option value="ron">Romanian (Moldavian, Moldovan)</option>
+                    <option value="rus">Russian</option>
+                    <option value="slk">Slovak</option>
+                    <option value="slv">Slovenian</option>
+                    <option value="som">Somali</option>
+                    <option value="spa">Spanish</option>
+                    <option value="swa">Swahili</option>
+                    <option value="swe">Swedish</option>
+                    <option value="tgl">Tagalog (Filipino)</option>
+                    <option value="tha">Thai</option>
+                    <option value="tur">Turkish</option>
+                    <option value="ukr">Ukrainian</option>
+                    <option value="urd">Urdu</option>
+                    <option value="vie">Vietnamese</option>
+                    <option value="zul">Zulu</option>
+                </select>
+
+            </div>
+        </div>
+    </div> -->
+
     <hr>
 
     <div class="row">
         <div class="col-md-6">
             <div class="mb-3">
                 <label class="form-label">Select Languages for Stopwords</label>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="eng" id="lang-eng" checked disabled>
-                    <label class="form-check-label" for="lang-eng">English</label>
+                
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="stopword-dropdown-button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Select Stopword Languages
+                    </button>
+
+                    <ul class="dropdown-menu stopword-dropdown-menu" aria-labelledby="stopword-dropdown-button">
+                        <!-- filled from code -->
+                    </ul>
+                    
                 </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="ell" id="lang-ell" checked disabled>
-                    <label class="form-check-label" for="lang-ell">Greek</label>
-                </div>
-                <!-- Add more languages as needed -->
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="ara" id="lang-ara" unchecked>
-                    <label class="form-check-label" for="lang-ara">Arabic</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="eus" id="lang-eus" unchecked>
-                    <label class="form-check-label" for="lang-eus">Basque</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="ben" id="lang-ben" unchecked>
-                    <label class="form-check-label" for="lang-ben">Bengali</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="bul" id="lang-bul" unchecked>
-                    <label class="form-check-label" for="lang-bul">Bulgarian</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="cat" id="lang-cat" unchecked>
-                    <label class="form-check-label" for="lang-cat">Catalan</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="zho" id="lang-zho" unchecked>
-                    <label class="form-check-label" for="lang-zho">Chinese</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="hrv" id="lang-hrv" unchecked>
-                    <label class="form-check-label" for="lang-hrv">Croatian</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="ces" id="lang-ces" unchecked>
-                    <label class="form-check-label" for="lang-ces">Czech</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="dan" id="lang-dan" unchecked>
-                    <label class="form-check-label" for="lang-dan">Danish</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="nld" id="lang-nld" unchecked>
-                    <label class="form-check-label" for="lang-nld">Dutch</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="est" id="lang-est" unchecked>
-                    <label class="form-check-label" for="lang-est">Estonian</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="fin" id="lang-fin" unchecked>
-                    <label class="form-check-label" for="lang-fin">Finnish</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="fra" id="lang-fra" unchecked>
-                    <label class="form-check-label" for="lang-fra">French</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="deu" id="lang-deu" unchecked>
-                    <label class="form-check-label" for="lang-deu">German</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="heb" id="lang-heb" unchecked>
-                    <label class="form-check-label" for="lang-heb">Hebrew</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="hin" id="lang-hin" unchecked>
-                    <label class="form-check-label" for="lang-hin">Hindi</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="hun" id="lang-hun" unchecked>
-                    <label class="form-check-label" for="lang-hun">Hungarian</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="ind" id="lang-ind" unchecked>
-                    <label class="form-check-label" for="lang-ind">Indonesian</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="ita" id="lang-ita" unchecked>
-                    <label class="form-check-label" for="lang-ita">Italian</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="jpn" id="lang-jpn" unchecked>
-                    <label class="form-check-label" for="lang-jpn">Japanese</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="kor" id="lang-kor" unchecked>
-                    <label class="form-check-label" for="lang-kor">Korean</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="kur" id="lang-kur" unchecked>
-                    <label class="form-check-label" for="lang-kur">Kurdish</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="lav" id="lang-lav" unchecked>
-                    <label class="form-check-label" for="lang-lav">Latvian</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="lit" id="lang-lit" unchecked>
-                    <label class="form-check-label" for="lang-lit">Lithuanian</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="msa" id="lang-msa" unchecked>
-                    <label class="form-check-label" for="lang-msa">Malay</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="mya" id="lang-mya" unchecked>
-                    <label class="form-check-label" for="lang-mya">Myanmar (Burmese)</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="nob" id="lang-nob" unchecked>
-                    <label class="form-check-label" for="lang-nob">Norwegian</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="fas" id="lang-fas" unchecked>
-                    <label class="form-check-label" for="lang-fas">Persian</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="pol" id="lang-pol" unchecked>
-                    <label class="form-check-label" for="lang-pol">Polish</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="por" id="lang-por" unchecked>
-                    <label class="form-check-label" for="lang-por">Portuguese</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="porBr" id="lang-porBr" unchecked>
-                    <label class="form-check-label" for="lang-porBr">Portuguese-Brazilian</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="panGu" id="lang-panGu" unchecked>
-                    <label class="form-check-label" for="lang-panGu">Punjabi (Panjabi)</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="ron" id="lang-ron" unchecked>
-                    <label class="form-check-label" for="lang-ron">Romanian (Moldavian, Moldovan)</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="rus" id="lang-rus" unchecked>
-                    <label class="form-check-label" for="lang-rus">Russian</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="slk" id="lang-slk" unchecked>
-                    <label class="form-check-label" for="lang-slk">Slovak</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="slv" id="lang-slv" unchecked>
-                    <label class="form-check-label" for="lang-slv">Slovenian</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="som" id="lang-som" unchecked>
-                    <label class="form-check-label" for="lang-som">Somali</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="spa" id="lang-spa" unchecked>
-                    <label class="form-check-label" for="lang-spa">Spanish</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="swa" id="lang-swa" unchecked>
-                    <label class="form-check-label" for="lang-swa">Swahili</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="swe" id="lang-swe" unchecked>
-                    <label class="form-check-label" for="lang-swe">Swedish</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="tgl" id="lang-tgl" unchecked>
-                    <label class="form-check-label" for="lang-tgl">Tagalog (Filipino)</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="tha" id="lang-tha" unchecked>
-                    <label class="form-check-label" for="lang-tha">Thai</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="tur" id="lang-tur" unchecked>
-                    <label class="form-check-label" for="lang-tur">Turkish</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="ukr" id="lang-ukr" unchecked>
-                    <label class="form-check-label" for="lang-ukr">Ukrainian</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="urd" id="lang-urd" unchecked>
-                    <label class="form-check-label" for="lang-urd">Urdu</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="vie" id="lang-vie" unchecked>
-                    <label class="form-check-label" for="lang-vie">Vietnamese</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input lang-checkbox" type="checkbox" value="zul" id="lang-zul" unchecked>
-                    <label class="form-check-label" for="lang-zul">Zulu</label>
-                </div>
+                
             </div>
         </div>
     </div>
-
+    
     <hr>
 
     <div class="row mt-4"> <!-- Adjust the number in mt-* to increase or decrease the space -->
