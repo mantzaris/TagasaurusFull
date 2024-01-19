@@ -12,8 +12,8 @@ const { TAGA_DATA_DIRECTORY, TAGA_FILES_DIRECTORY } = require(PATH.join(__dirnam
 
 const EXPORT_NAME = 'DesktopTagasaurusExport.zip';
 
-async function Get_All_Tagging_Records_From_DB() {
-  return await DB_MODULE.Get_All_Tagging_Records_From_DB();
+function Get_All_Tagging_Records_From_DB() {
+  return DB_MODULE.Get_All_Tagging_Records_From_DB();
 }
 
 let export_button = document.getElementById('export-button-id');
@@ -84,7 +84,7 @@ export_button.onclick = async () => {
 };
 
 async function GenerateTaggingExportJSON() {
-  const all_tagging = await Get_All_Tagging_Records_From_DB();
+  const all_tagging = Get_All_Tagging_Records_From_DB();
 
   const tagging = new Array(all_tagging.length);
 
@@ -113,7 +113,7 @@ async function GenerateTaggingExportJSON() {
     entry.file_size = FS.statSync(PATH.join(TAGA_DATA_DIRECTORY, fileName)).size;
 
     const meme_filenames = JSON.parse(taggingMemeChoices);
-    entry.meme_choices = await DB_MODULE.Get_Hashes_From_FileNames(meme_filenames);
+    entry.meme_choices = DB_MODULE.Get_Hashes_From_FileNames(meme_filenames);
 
     entry.face_descriptors = JSON.parse(faceDescriptors);
 
@@ -136,7 +136,7 @@ async function GenerateTaggingMemesExportJSON() {
       file_type: fileType,
     };
 
-    entry._id = (await DB_MODULE.Get_Tagging_Record_From_DB(memeFileName)).fileHash;
+    entry._id = DB_MODULE.Get_Tagging_Record_From_DB(memeFileName).fileHash;
     entry.connected_to = await DB_MODULE.Get_Hashes_From_FileNames(JSON.parse(fileNames));
 
     memes[i++] = entry;
@@ -169,10 +169,10 @@ async function GenerateCollectionExportJSON() {
       emotions: {},
     };
 
-    entry.thumbnail = (await DB_MODULE.Get_Tagging_Record_From_DB(collectionImage)).fileHash;
-    entry.gallery = await DB_MODULE.Get_Hashes_From_FileNames(JSON.parse(collectionGalleryFiles));
+    entry.thumbnail = DB_MODULE.Get_Tagging_Record_From_DB(collectionImage).fileHash;
+    entry.gallery = DB_MODULE.Get_Hashes_From_FileNames(JSON.parse(collectionGalleryFiles));
     entry.tags = JSON.parse(collectionDescriptionTags);
-    entry.memes = await DB_MODULE.Get_Hashes_From_FileNames(JSON.parse(collectionMemes));
+    entry.memes = DB_MODULE.Get_Hashes_From_FileNames(JSON.parse(collectionMemes));
 
     for (const [k, v] of Object.entries(JSON.parse(collectionEmotions))) {
       entry.emotions[k] = parseFloat(v);
@@ -196,7 +196,7 @@ async function GenerateCollectionMemesExportJSON() {
       collection_names: [],
     };
 
-    entry._id = (await DB_MODULE.Get_Tagging_Record_From_DB(collectionMemeFileName)).fileHash;
+    entry._id = DB_MODULE.Get_Tagging_Record_From_DB(collectionMemeFileName).fileHash;
     entry.collection_names = JSON.parse(collectionNames);
 
     collection_memes[i++] = entry;
@@ -217,7 +217,7 @@ async function GenerateCollectionGalleryExportJSON() {
       collection_names: [],
     };
 
-    entry._id = (await DB_MODULE.Get_Tagging_Record_From_DB(collectionGalleryFileName)).fileHash;
+    entry._id = DB_MODULE.Get_Tagging_Record_From_DB(collectionGalleryFileName).fileHash;
     entry.collection_names = JSON.parse(collectionNames);
 
     collection_galleries[i++] = entry;

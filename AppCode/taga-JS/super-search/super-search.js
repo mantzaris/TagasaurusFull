@@ -15,9 +15,9 @@ const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE,
 
 const { CLOSE_ICON_RED, CLOSE_ICON_BLACK, HASHTAG_ICON } = require(PATH.join(__dirname, '..', 'constants', 'constants-icons.js')); //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 
-async function Get_Tagging_Annotation_From_DB(image_name) {
+function Get_Tagging_Annotation_From_DB(image_name) {
   //
-  return await DB_MODULE.Get_Tagging_Record_From_DB(image_name);
+  return DB_MODULE.Get_Tagging_Record_From_DB(image_name);
 }
 
 let reg_exp_delims = /[#:,;| ]+/;
@@ -57,7 +57,7 @@ async function Super_Search() {
     let faceDescriptors_tmp = [];
 
     if (selected_images_type[img_ind] == 'stored') {
-      let annotation_tmp = await Get_Tagging_Annotation_From_DB(selected_images[img_ind]);
+      let annotation_tmp = Get_Tagging_Annotation_From_DB(selected_images[img_ind]);
 
       for (let ind = 0; ind < annotation_tmp.faceDescriptors.length; ind++) {
         faceDescriptors_search.push(annotation_tmp.faceDescriptors[ind]);
@@ -277,7 +277,7 @@ async function Get_Select_Recommended() {
   let search_display_inner_tmp = '';
   let search_results_faces = [];
   for (let file_key of search_results_recommended) {
-    let annotation_tmp = await Get_Tagging_Annotation_From_DB(file_key);
+    let annotation_tmp = Get_Tagging_Annotation_From_DB(file_key);
     if (annotation_tmp.faceDescriptors.length > 0) {
       search_results_faces.push(file_key);
     }
@@ -317,7 +317,7 @@ async function Handle_Get_Recommended_Image_Checked(filename) {
   let search_display_inner_tmp = '';
   let search_results_faces = [];
   for (let file_key of search_results_recommended) {
-    let annotation_tmp = await Get_Tagging_Annotation_From_DB(file_key);
+    let annotation_tmp = Get_Tagging_Annotation_From_DB(file_key);
     if (annotation_tmp.faceDescriptors.length > 0) {
       search_results_faces.push(file_key);
     }

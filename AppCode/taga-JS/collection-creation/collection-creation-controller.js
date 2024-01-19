@@ -36,7 +36,7 @@ let meme_search_image_meme_results = '';
 
 async function Get_Tagging_Annotation_From_DB(image_name) {
   //
-  return await DB_MODULE.Get_Tagging_Record_From_DB(image_name);
+  return DB_MODULE.Get_Tagging_Record_From_DB(image_name);
 }
 
 async function Insert_Collection_Record_Into_DB(collect_obj) {
@@ -48,8 +48,8 @@ async function Get_Collection_Record_From_DB(collectionname) {
   return await DB_MODULE.Get_Collection_Record_From_DB(collectionname);
 }
 
-async function Tagging_Random_DB_Images(num_of_records) {
-  return await DB_MODULE.Tagging_Random_DB_Images(num_of_records);
+function Tagging_Random_DB_Images(num_of_records) {
+  return DB_MODULE.Tagging_Random_DB_Images(num_of_records);
 }
 async function Meme_Tagging_Random_DB_Images(num_of_records) {
   return await DB_MODULE.Meme_Tagging_Random_DB_Images(num_of_records);
@@ -624,7 +624,7 @@ async function Change_Profile_Image() {
   };
   //present default ordering first
   if (profile_search_image_results == '') {
-    profile_search_image_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+    profile_search_image_results = Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
   }
 
   let profile_search_display_div = document.getElementById('modal-search-profileimage-images-results-grid-div-area-id');
@@ -722,12 +722,6 @@ async function Collection_Profile_Image_Search_Action() {
   search_unique_meme_search_terms = search_unique_meme_search_terms.filter((tag) => tag !== '');
   collection_profile_search_obj['searchMemeTags'] = search_unique_meme_search_terms;
   //emotion key value already is in: collection_profile_search_obj
-
-  //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
-  //for the meme addition search and returns an object (JSON) for the image inds and the meme inds //!!! indexeddb !!! old style
-  //if(profile_search_image_results == '') {
-  //    profile_search_image_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS)
-  //}
 
   let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
   processing_modal.style.display = 'flex';
@@ -1276,7 +1270,7 @@ async function Add_Meme_Images() {
   };
   //display default ordering first
   if (meme_search_image_results == '' && meme_search_image_meme_results == '') {
-    meme_search_image_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+    meme_search_image_results = Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
     meme_search_image_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
   }
 

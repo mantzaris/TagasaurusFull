@@ -35,7 +35,7 @@ async function Image_Scoring(search_obj, entry, tags_lc, memetags_lc) {
   let meme_tag_overlap_score = 0;
   if (memetags_lc.length > 0) {
     for (let rtm = 0; rtm < memes.length; rtm++) {
-      const tagging_record = await DB_MODULE.Get_Tagging_Record_From_DB(memes[rtm]);
+      const tagging_record = DB_MODULE.Get_Tagging_Record_From_DB(memes[rtm]);
       const meme_tmp_tags = tagging_record.taggingTags;
       meme_tag_overlap_score += meme_tmp_tags.filter((tag) => memetags_lc.includes(tag.toLowerCase())).length;
     }
@@ -69,14 +69,14 @@ async function Image_Meme_Search_DB(search_obj) {
 exports.Image_Meme_Search_DB = Image_Meme_Search_DB;
 
 async function Meme_Image_Scoring(search_obj, entry, tags_lc, memetags_lc) {
-  const record = await DB_MODULE.Get_Tagging_Record_From_DB(entry.memeFileName);
+  const record = DB_MODULE.Get_Tagging_Record_From_DB(entry.memeFileName);
   const meme_score = record.taggingTags.filter((tag) => memetags_lc.includes(tag.toLowerCase())).length;
   let emotion_score = 0;
   let image_score = 0;
 
   for (let ii = 0; ii < entry.fileNames.length; ii++) {
     const image = entry.fileNames[ii];
-    const other_record = await DB_MODULE.Get_Tagging_Record_From_DB(image);
+    const other_record = DB_MODULE.Get_Tagging_Record_From_DB(image);
 
     image_score += other_record.taggingTags.filter((tag) => tags_lc.includes(tag.toLowerCase())).length;
     emotion_score += EmotionSimilarityScore(other_record.taggingEmotions, search_obj.emotions);
@@ -123,7 +123,7 @@ async function Meme_Addition_Image_Scoring(search_obj, entry, tags_lc, memetags_
   let meme_emotion_score = 0;
 
   for (let rtm = 0; rtm < memes.length; rtm++) {
-    let meme = await DB_MODULE.Get_Tagging_Record_From_DB(memes[rtm]);
+    let meme = DB_MODULE.Get_Tagging_Record_From_DB(memes[rtm]);
 
     tag_score += meme.taggingTags.filter((tag) => memetags_lc.includes(tag.toLowerCase())).length;
     meme_emotion_score += EmotionSimilarityScore(meme.taggingEmotions, search_obj.meme_emotions);
@@ -151,7 +151,7 @@ async function Meme_Addition_Image_Meme_Search_DB(search_obj) {
 exports.Meme_Addition_Image_Meme_Search_DB = Meme_Addition_Image_Meme_Search_DB;
 
 async function Meme_Addition_Meme_Image_Scoring(search_obj, entry, tags_lc, memetags_lc) {
-  const record = await DB_MODULE.Get_Tagging_Record_From_DB(entry.memeFileName);
+  const record = DB_MODULE.Get_Tagging_Record_From_DB(entry.memeFileName);
   const tag_score = record.taggingTags.filter((tag) => memetags_lc.includes(tag.toLowerCase())).length;
 
   const emotion_score = EmotionSimilarityScore(record.taggingEmotions, search_obj.emotions);
@@ -160,7 +160,7 @@ async function Meme_Addition_Meme_Image_Scoring(search_obj, entry, tags_lc, meme
   let tag_overlap_score = 0;
 
   for (let ii = 0; ii < entry.fileNames.length; ii++) {
-    const tagging_record = await DB_MODULE.Get_Tagging_Record_From_DB(entry.fileNames[ii]);
+    const tagging_record = DB_MODULE.Get_Tagging_Record_From_DB(entry.fileNames[ii]);
     tag_overlap_score += tagging_record.taggingTags.filter((tag) => tags_lc.includes(tag.toLowerCase())).length;
     emotion_overlap_score += EmotionSimilarityScore(tagging_record.taggingEmotions, search_obj.emotions);
   }
@@ -175,7 +175,7 @@ async function Collection_Profile_Image_Search_Fn(search_obj, candidates) {
 
   let scores = Array(candidates.length).fill(0);
   for (let img_ind = 0; img_ind < candidates.length; img_ind++) {
-    const image = await DB_MODULE.Get_Tagging_Record_From_DB(candidates[img_ind]);
+    const image = DB_MODULE.Get_Tagging_Record_From_DB(candidates[img_ind]);
     const tags = image.taggingTags;
     const emotions = image.taggingEmotions;
     const memes = image.taggingMemeChoices;
@@ -187,7 +187,7 @@ async function Collection_Profile_Image_Search_Fn(search_obj, candidates) {
     let meme_tag_score = 0;
     if (memetags_lc.length > 0) {
       for (let rtm = 0; rtm < memes.length; rtm++) {
-        const meme = await DB_MODULE.Get_Tagging_Record_From_DB(memes[rtm]);
+        const meme = DB_MODULE.Get_Tagging_Record_From_DB(memes[rtm]);
         meme_tag_score += meme.taggingTags.filter((tag) => memetags_lc.includes(tag.toLowerCase())).length;
       }
     }
@@ -230,7 +230,7 @@ async function Collection_Scoring(search_obj, collection, tags_lc, memetags_lc) 
   let meme_score = 0;
   if (memetags_lc.length > 0) {
     for (let rtm = 0; rtm < memes.length; rtm++) {
-      const meme = await DB_MODULE.Get_Tagging_Record_From_DB(memes[rtm]); ///
+      const meme = DB_MODULE.Get_Tagging_Record_From_DB(memes[rtm]); ///
       meme_score += meme.taggingTags.filter((tag) => memetags_lc.includes(tag.toLowerCase())).length;
     }
   }
@@ -239,7 +239,7 @@ async function Collection_Scoring(search_obj, collection, tags_lc, memetags_lc) 
   let image_score = 0;
   if (tags_lc.length > 0) {
     for (let rtm = 0; rtm < files.length; rtm++) {
-      const record = await DB_MODULE.Get_Tagging_Record_From_DB(files[rtm]); ///
+      const record = DB_MODULE.Get_Tagging_Record_From_DB(files[rtm]); ///
       image_score += record.taggingTags.filter((tag) => tags_lc.includes(tag.toLowerCase())).length;
     }
   }

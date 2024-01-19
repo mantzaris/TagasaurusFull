@@ -87,12 +87,12 @@ document.getElementById(`auto-fill-emotions-button-id`).onclick = async function
         true
       );
       current_image_annotation['taggingEmotions'] = faceEmotions;
-      await Update_Tagging_Annotation_DB(current_image_annotation);
+      Update_Tagging_Annotation_DB(current_image_annotation);
       Emotion_Display_Fill();
     } else {
       super_res = await Get_Image_Face_Expresssions_From_File(PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation['fileName']));
       current_image_annotation['taggingEmotions'] = await Auto_Fill_Emotions(super_res, current_image_annotation);
-      await Update_Tagging_Annotation_DB(current_image_annotation);
+      Update_Tagging_Annotation_DB(current_image_annotation);
       Emotion_Display_Fill();
     }
   } else if (ft_res == 'video') {
@@ -112,30 +112,30 @@ document.getElementById(`auto-fill-emotions-check-box-id`).addEventListener('cha
 });
 
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS START>>>
-async function Step_Get_Annotation(filename, step) {
-  return await DB_MODULE.Step_Get_Annotation(filename, step);
+function Step_Get_Annotation(filename, step) {
+  return DB_MODULE.Step_Get_Annotation(filename, step);
 }
-async function Get_Tagging_Annotation_From_DB(image_name) {
+function Get_Tagging_Annotation_From_DB(image_name) {
   //
-  return await DB_MODULE.Get_Tagging_Record_From_DB(image_name);
+  return DB_MODULE.Get_Tagging_Record_From_DB(image_name);
 }
-async function Get_Tagging_Hash_From_DB(hash) {
+function Check_Tagging_Hash_From_DB(hash) {
   //
-  return await DB_MODULE.Get_Tagging_Hash_From_DB(hash);
+  return DB_MODULE.Check_Tagging_Hash_From_DB(hash);
 }
-async function Insert_Record_Into_DB(tagging_obj) {
-  await DB_MODULE.Insert_Record_Into_DB(tagging_obj);
+function Insert_Record_Into_DB(tagging_obj) {
+  DB_MODULE.Insert_Record_Into_DB(tagging_obj);
 }
-async function Update_Tagging_Annotation_DB(tagging_obj) {
+function Update_Tagging_Annotation_DB(tagging_obj) {
   //update via file name
-  await DB_MODULE.Update_Tagging_Annotation_DB(tagging_obj);
+  DB_MODULE.Update_Tagging_Annotation_DB(tagging_obj);
 }
-async function Delete_Tagging_Annotation_DB(filename) {
+function Delete_Tagging_Annotation_DB(filename) {
   //delete via file name
-  return await DB_MODULE.Delete_Tagging_Annotation_DB(filename);
+  return DB_MODULE.Delete_Tagging_Annotation_DB(filename);
 }
-async function Number_of_Tagging_Records() {
-  return await DB_MODULE.Number_of_Tagging_Records();
+function Number_of_Tagging_Records() {
+  return DB_MODULE.Number_of_Tagging_Records();
 }
 
 async function Get_Tagging_MEME_Record_From_DB(image_name) {
@@ -152,8 +152,8 @@ async function Handle_Delete_Collection_MEME_references(fileName) {
   //delete the references of this image as a meme in the collections
   return await DB_MODULE.Handle_Delete_Collection_MEME_references(fileName);
 }
-async function Tagging_Random_DB_Images(num_of_records) {
-  return await DB_MODULE.Tagging_Random_DB_Images(num_of_records);
+function Tagging_Random_DB_Images(num_of_records) {
+  return DB_MODULE.Tagging_Random_DB_Images(num_of_records);
 }
 async function Meme_Tagging_Random_DB_Images(num_of_records) {
   return await DB_MODULE.Meme_Tagging_Random_DB_Images(num_of_records);
@@ -304,7 +304,7 @@ async function Emotion_Display_Fill() {
 //delete an emotion from the emotion set
 async function Delete_Emotion(emotion_key) {
   delete current_image_annotation['taggingEmotions'][emotion_key];
-  await Update_Tagging_Annotation_DB(current_image_annotation);
+  Update_Tagging_Annotation_DB(current_image_annotation);
   //refresh emotion container fill
   Emotion_Display_Fill();
 }
@@ -317,7 +317,7 @@ async function Add_New_Emotion() {
     let boolean_included = keys_tmp.includes(new_emotion_text);
     if (boolean_included == false) {
       current_image_annotation['taggingEmotions'][new_emotion_text] = new_emotion_value;
-      await Update_Tagging_Annotation_DB(current_image_annotation);
+      Update_Tagging_Annotation_DB(current_image_annotation);
     }
     document.getElementById('emotions-new-emotion-textarea-id').value = '';
     document.getElementById('new-emotion-range-id').value = `0`;
@@ -335,7 +335,7 @@ async function Meme_View_Fill() {
 
   for (file of meme_choices) {
     if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true) {
-      const ft_res = (await Get_Tagging_Annotation_From_DB(file)).fileType;
+      const ft_res = Get_Tagging_Annotation_From_DB(file).fileType;
       //let type = ( ft_res.mime.includes("image") ) ? 'img' : 'video'
 
       let content_html;
@@ -474,7 +474,7 @@ async function Meme_Image_Clicked(meme_file_name) {
   }
   meme_click_modal_body_html_tmp += content_html; //`<img id="modal-meme-clicked-displayimg-id" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_file_name}" title="meme" alt="meme" />`;
   meme_click_modal_div.insertAdjacentHTML('beforeend', meme_click_modal_body_html_tmp);
-  let meme_image_annotations = await Get_Tagging_Annotation_From_DB(meme_file_name);
+  let meme_image_annotations = Get_Tagging_Annotation_From_DB(meme_file_name);
   //add emotion tuples to view
   let modal_emotions_html_tmp = `Emotions: `;
   let emotion_keys = Object.keys(meme_image_annotations['taggingEmotions']);
@@ -564,11 +564,11 @@ async function Load_State_Of_Image_IDB() {
 //called from the gallery widget, where 'n' is the number of images forward or backwards to move
 async function New_Image_Display(n) {
   if (current_image_annotation == undefined || n == 0) {
-    current_image_annotation = await Step_Get_Annotation('', 0);
+    current_image_annotation = Step_Get_Annotation('', 0);
   } else if (n == 1) {
-    current_image_annotation = await Step_Get_Annotation(current_image_annotation.fileName, 1);
+    current_image_annotation = Step_Get_Annotation(current_image_annotation.fileName, 1);
   } else if (n == -1) {
-    current_image_annotation = await Step_Get_Annotation(current_image_annotation.fileName, -1);
+    current_image_annotation = Step_Get_Annotation(current_image_annotation.fileName, -1);
   }
   Load_State_Of_Image_IDB();
 }
@@ -644,15 +644,9 @@ async function First_Display_Init() {
     },
     false
   );
-  document.getElementById(`search-images-button-id`).addEventListener(
-    'click',
-    function () {
-      Search_Images();
-    },
-    false
-  );
+  document.getElementById(`search-images-button-id`).addEventListener('click', Search_Images, false);
 
-  let records_remaining = await Number_of_Tagging_Records();
+  let records_remaining = Number_of_Tagging_Records();
   if (records_remaining == 0) {
     Load_Default_Taga_Image();
   } else if (window.location.href.indexOf('fileName') > -1) {
@@ -660,12 +654,11 @@ async function First_Display_Init() {
 
     tagging_name_param = fromBinary(atob(tagging_name_param));
 
-    current_image_annotation = await Get_Tagging_Annotation_From_DB(tagging_name_param);
+    current_image_annotation = Get_Tagging_Annotation_From_DB(tagging_name_param);
     Load_State_Of_Image_IDB();
 
     //window.location.href = tagging.html
   } else {
-    //current_image_annotation = await Get_Tagging_Annotation_From_DB(tagging_name_param);
     await New_Image_Display(0);
     //await Load_State_Of_Image_IDB() //display the image in view currently and the annotations it has
   }
@@ -742,7 +735,7 @@ async function Save_Image_Annotation_Changes() {
   for (var key of Object.keys(current_image_annotation['taggingEmotions'])) {
     current_image_annotation['taggingEmotions'][key] = document.getElementById('emotion-range-id-' + key).value;
   }
-  await Update_Tagging_Annotation_DB(current_image_annotation);
+  Update_Tagging_Annotation_DB(current_image_annotation);
   await Update_Tagging_MEME_Connections(fileName, visible_memes, newMemes);
 
   Load_State_Of_Image_IDB(); //TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_annotations)
@@ -762,7 +755,7 @@ async function Load_Default_Taga_Image() {
   tagging_entry.faceClusters = [];
   //for taga no emotion inference is needed but done for consistency
 
-  await Insert_Record_Into_DB(tagging_entry); //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
+  Insert_Record_Into_DB(tagging_entry); //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
 }
 //delete image from user choice
 async function Delete_Image() {
@@ -779,13 +772,13 @@ async function Delete_Image() {
   await Handle_Delete_Collection_IMAGE_references(current_image_annotation.fileName);
   await Handle_Delete_Collection_MEME_references(current_image_annotation.fileName);
 
-  let records_remaining = await Number_of_Tagging_Records();
+  let records_remaining = Number_of_Tagging_Records();
   if (records_remaining == 1) {
     if (current_image_annotation.faceDescriptors.length > 0) {
       const rowid = DB_MODULE.Get_Tagging_ROWID_From_FileHash_BigInt(current_image_annotation.fileHash);
       ipcRenderer.invoke('faiss-remove', rowid);
     }
-    await Delete_Tagging_Annotation_DB(current_image_annotation.fileName);
+    Delete_Tagging_Annotation_DB(current_image_annotation.fileName);
 
     await Load_Default_Taga_Image();
     New_Image_Display(0);
@@ -798,7 +791,7 @@ async function Delete_Image() {
       ipcRenderer.invoke('faiss-remove', rowid);
     }
 
-    await Delete_Tagging_Annotation_DB(prev_tmp);
+    Delete_Tagging_Annotation_DB(prev_tmp);
   }
 }
 
@@ -832,7 +825,7 @@ async function Handle_Delete_FileFrom_Cluster() {
 
     updated_clusters.push(cluster);
 
-    console.log(face_clusters[i].thumbnail);
+    //console.log(face_clusters[i].thumbnail);
     if (face_clusters[i].thumbnail == current_image_annotation.fileName) {
       await DB_MODULE.Update_FaceCluster_Thumbnail(face_clusters[i].rowid, null);
     }
@@ -846,7 +839,7 @@ async function Handle_Delete_FileFrom_Cluster() {
 
   //deleting lingering meme references, images which use this image as a meme on their face cluster
   const { fileNames } = await DB_MODULE.Get_Tagging_MEME_Record_From_DB(current_image_annotation.fileName);
-  const cluster_ids = await DB_MODULE.Get_Tagging_ClusterIDS_From_FileNames(fileNames);
+  const cluster_ids = DB_MODULE.Get_Tagging_ClusterIDS_From_FileNames(fileNames);
   const clusters = await DB_MODULE.Get_FaceClusters_From_IDS(cluster_ids);
 
   for (let i = 0; i < clusters.length; i++) {
@@ -873,10 +866,10 @@ async function Load_New_Image(filename) {
       return;
     }
     last_user_image_directory_chosen = PATH.dirname(result.filePaths[0]);
-    filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result, TAGA_DATA_DIRECTORY, Get_Tagging_Hash_From_DB);
+    filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result, TAGA_DATA_DIRECTORY, Check_Tagging_Hash_From_DB);
   } else {
     const result = { filePaths: [filename] };
-    filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result, TAGA_DATA_DIRECTORY, Get_Tagging_Hash_From_DB);
+    filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result, TAGA_DATA_DIRECTORY, Check_Tagging_Hash_From_DB);
   }
   if (filenames.length == 0) {
     alert('no new media selected');
@@ -894,7 +887,7 @@ async function Load_New_Image(filename) {
     tagging_entry_tmp.fileName = filename;
     tagging_entry_tmp.fileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${filename}`);
 
-    let hash_present = await Get_Tagging_Hash_From_DB(tagging_entry_tmp.fileHash);
+    let hash_present = Check_Tagging_Hash_From_DB(tagging_entry_tmp.fileHash);
 
     if (hash_present == undefined) {
       //emotion inference upon the default selected
@@ -978,7 +971,7 @@ async function Load_New_Image(filename) {
       //face cluster insertion code
       tagging_entry_tmp = await CreateTaggingEntryCluster(tagging_entry_tmp);
 
-      await Insert_Record_Into_DB(tagging_entry_tmp);
+      Insert_Record_Into_DB(tagging_entry_tmp);
       tagging_entry = tagging_entry_tmp;
 
       //FAISS
@@ -1357,7 +1350,7 @@ async function Search_Images() {
   let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
   processing_modal.style.display = 'flex';
 
-  search_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+  search_results = Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
   search_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
 
   processing_modal.style.display = 'none';
@@ -1418,27 +1411,12 @@ async function Search_Images() {
         const children_tmp = [...search_res_children, ...search_meme_res_children];
         GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp);
 
-        current_image_annotation = await Get_Tagging_Annotation_From_DB(file);
+        current_image_annotation = Get_Tagging_Annotation_From_DB(file);
         Load_State_Of_Image_IDB();
         document.getElementById('search-modal-click-top-id').style.display = 'none';
       };
     }
   });
-
-  //DEFUNCT BUTTONS USAGE>>>
-  //user presses this to 'choose' the results of the search from the images
-  // document.getElementById("modal-search-images-results-select-images-order-button-id").onclick = async function() {
-  //     current_image_annotation = await Get_Tagging_Annotation_From_DB(search_results[2]);
-  //     Load_State_Of_Image_IDB();
-  //     document.getElementById("search-modal-click-top-id").style.display = "none";
-  // }
-  // //user presses this to 'choose' the results of the search from the meme images
-  // document.getElementById("modal-search-images-results-select-meme-images-order-button-id").onclick = async function() {
-  //     current_image_annotation = await Get_Tagging_Annotation_From_DB(search_results[1]);
-  //     Load_State_Of_Image_IDB()
-  //     document.getElementById("search-modal-click-top-id").style.display = "none";
-  // }
-  ////DEFUNCT BUTTONS USAGE<<<
 
   //user presses the main search button for the add memes search modal
   document.getElementById('modal-search-main-button-id').onclick = function () {
@@ -1516,7 +1494,7 @@ async function Modal_Search_Entry(search_similar = false, search_obj_similar_tmp
   search_results.forEach((file) => {
     if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true) {
       document.getElementById(`modal-image-search-result-single-image-img-id-${file}`).onclick = async function () {
-        current_image_annotation = await Get_Tagging_Annotation_From_DB(file);
+        current_image_annotation = Get_Tagging_Annotation_From_DB(file);
         Load_State_Of_Image_IDB();
         document.getElementById('search-modal-click-top-id').style.display = 'none';
       };
@@ -1525,7 +1503,7 @@ async function Modal_Search_Entry(search_similar = false, search_obj_similar_tmp
   search_meme_results.forEach((file) => {
     if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true) {
       document.getElementById(`modal-image-search-result-single-meme-image-img-id-${file}`).onclick = async function () {
-        current_image_annotation = await Get_Tagging_Annotation_From_DB(file);
+        current_image_annotation = Get_Tagging_Annotation_From_DB(file);
         Load_State_Of_Image_IDB();
         document.getElementById('search-modal-click-top-id').style.display = 'none';
       };
@@ -1717,7 +1695,7 @@ async function Add_New_Meme() {
     await Update_Tagging_MEME_Connections(fileName, JSON.parse(JSON.stringify(origMemes)), JSON.parse(JSON.stringify(meme_switch_booleans)));
     meme_switch_booleans.push(...current_image_annotation.taggingMemeChoices);
     current_image_annotation.taggingMemeChoices = [...new Set(meme_switch_booleans)]; //add a 'unique' set of memes as the 'new Set' has unique contents
-    await Update_Tagging_Annotation_DB(current_image_annotation);
+    Update_Tagging_Annotation_DB(current_image_annotation);
 
     await Update_Cluster_For_Updated_TaggingEntry(
       { newTags: taggingTags, origTags: taggingTags, fileName, newMemes: current_image_annotation.taggingMemeChoices },
@@ -1744,7 +1722,7 @@ async function Add_New_Meme() {
   let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
   processing_modal.style.display = 'flex';
 
-  meme_search_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+  meme_search_results = Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
   meme_search_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
 
   processing_modal.style.display = 'none';

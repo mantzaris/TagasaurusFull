@@ -1,6 +1,6 @@
 // All of the Node.js APIs are available in the preload process.
 // It has the same sandbox as a Chrome extension.
-const PATH = require('path');
+window.PATH = require('path');
 const FS = require('fs');
 require('dotenv').config();
 require(PATH.join(__dirname, 'AppCode', 'taga-JS', 'settings', 'settings-fns.js'));
@@ -40,6 +40,19 @@ window.TAGA_FILES_DIRECTORY = PATH.join(USER_DATA_PATH, 'TagasaurusFiles'); //PA
 window.TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY, 'files'); //PATH.resolve(TAGA_FILES_DIRECTORY,'data');
 
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+const DATABASE = require('better-sqlite3');
+
+window.DB_FILE_NAME = 'TagasaurusDB.db';
+window.TAGGING_TABLE_NAME = 'TAGGING';
+window.TAGGING_MEME_TABLE_NAME = 'TAGGINGMEMES';
+window.COLLECTIONS_TABLE_NAME = 'COLLECTIONS';
+window.COLLECTION_MEME_TABLE_NAME = 'COLLECTIONMEMES';
+window.COLLECTION_GALLERY_TABLE_NAME = 'COLLECTIONGALLERY';
+window.FACECLUSTERS_TABLE_NAME = 'FACECLUSTERS';
+
+window.DB = new DATABASE(PATH.join(TAGA_FILES_DIRECTORY, DB_FILE_NAME), {});
+window.RECORD_PARSER_MAP = new Map();
 
 //DB INIT, sets the database and adds the obj ref to the window to not need to be loaded again
 window.DB_MODULE = require(PATH.join(__dirname, 'AppCode', 'taga-DB', 'db-fns.js'));

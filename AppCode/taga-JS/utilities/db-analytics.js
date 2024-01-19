@@ -9,12 +9,12 @@ let sample_num;
 async function Number_of_Tagging_Records() {
   return await DB_MODULE.Number_of_Tagging_Records();
 }
-async function Tagging_Random_DB_Images(num_of_records) {
-  return await DB_MODULE.Tagging_Random_DB_Images(num_of_records);
+function Tagging_Random_DB_Images(num_of_records) {
+  return DB_MODULE.Tagging_Random_DB_Images(num_of_records);
 }
-async function Get_Tagging_Annotation_From_DB(image_name) {
+function Get_Tagging_Annotation_From_DB(image_name) {
   //
-  return await DB_MODULE.Get_Tagging_Record_From_DB(image_name);
+  return DB_MODULE.Get_Tagging_Record_From_DB(image_name);
 }
 // algorithm DFLOW by EPA ( https://stats.stackexchange.com/a/430254/1098 )
 //$\mu_H = \left(\frac{\sum^{n_T - n_0}_{i=1} 1/x_i} {n_T - n_0}\right)^{-1} \times \frac{n_T - n_0} {n_T} ,$
@@ -38,7 +38,7 @@ function Harmonic_Mean(arr) {
 }
 
 async function Display_Skill_Levels() {
-  let random_filenames = await Tagging_Random_DB_Images(sample_num);
+  let random_filenames = Tagging_Random_DB_Images(sample_num);
   let total_tagged_images = 0;
   let meme_connected_images = 0;
   let emotion_stamped_images = 0;

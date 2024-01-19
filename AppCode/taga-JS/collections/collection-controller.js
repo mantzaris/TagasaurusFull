@@ -72,17 +72,17 @@ async function Delete_Collection_Record_In_DB(collectioname) {
   return await DB_MODULE.Delete_Collection_Record_In_DB(collectioname);
 }
 
-async function Get_Tagging_Annotation_From_DB(image_name) {
+function Get_Tagging_Annotation_From_DB(image_name) {
   //
-  return await DB_MODULE.Get_Tagging_Record_From_DB(image_name);
+  return DB_MODULE.Get_Tagging_Record_From_DB(image_name);
 }
 
-async function Get_Tagging_Hash_From_DB(hash) {
-  return await DB_MODULE.Get_Tagging_Hash_From_DB(hash);
+function Check_Tagging_Hash_From_DB(hash) {
+  return DB_MODULE.Check_Tagging_Hash_From_DB(hash);
 }
 
-async function Tagging_Random_DB_Images(num_of_records) {
-  return await DB_MODULE.Tagging_Random_DB_Images(num_of_records);
+function Tagging_Random_DB_Images(num_of_records) {
+  return DB_MODULE.Tagging_Random_DB_Images(num_of_records);
 }
 async function Meme_Tagging_Random_DB_Images(num_of_records) {
   return await DB_MODULE.Meme_Tagging_Random_DB_Images(num_of_records);
@@ -96,12 +96,8 @@ async function Update_Collection_IMAGE_Connections(collectionName, current_colle
   return await DB_MODULE.Update_Collection_IMAGE_Connections(collectionName, current_collection_images, new_collection_images);
 }
 
-async function Insert_Record_Into_DB(tagging_obj) {
-  await DB_MODULE.Insert_Record_Into_DB(tagging_obj);
-}
-async function Get_Tagging_Annotation_From_DB(image_name) {
-  //
-  return await DB_MODULE.Get_Tagging_Record_From_DB(image_name);
+function Insert_Record_Into_DB(tagging_obj) {
+  DB_MODULE.Insert_Record_Into_DB(tagging_obj);
 }
 
 async function Random_DB_Collections(num_of_records) {
@@ -490,10 +486,10 @@ async function Check_Gallery_And_Profile_Image_Integrity() {
     let default_path = PATH.join(app_path, 'Taga.png'); //Description DEFAULT
     //default_path = PATH.join(__dirname,'..','..','Taga.png')//PATH.resolve()+PATH.sep+'Taga.png';
     let default_hash = MY_FILE_HELPER.Return_File_Hash(default_path);
-    let hash_tmp = Get_Tagging_Hash_From_DB(default_hash);
+    let hash_tmp = Check_Tagging_Hash_From_DB(default_hash);
     let filename_tmp = 'Taga.png';
     if (hash_tmp == undefined) {
-      let filename_tmp = await MY_FILE_HELPER.Copy_Non_Taga_Files(default_path, TAGA_DATA_DIRECTORY, Get_Tagging_Hash_From_DB);
+      let filename_tmp = await MY_FILE_HELPER.Copy_Non_Taga_Files(default_path, TAGA_DATA_DIRECTORY, Check_Tagging_Hash_From_DB);
       let tagging_entry = {
         fileName: '',
         fileHash: '',
@@ -567,7 +563,7 @@ async function Show_Collection() {
 }
 async function Update_Profile_Image() {
   let file_path = PATH.join(TAGA_DATA_DIRECTORY, current_collection_obj.collectionImage);
-  let ft_res = (await Get_Tagging_Annotation_From_DB(current_collection_obj.collectionImage)).fileType;
+  let ft_res = Get_Tagging_Annotation_From_DB(current_collection_obj.collectionImage).fileType;
 
   //let node_type = ( ft_res.mime.includes("image") ) ? 'IMG' : 'VIDEO'
   let content_html;
@@ -627,7 +623,7 @@ async function Handle_Empty_DB() {
     tagging_entry = JSON.parse(JSON.stringify(emtpy_annotation_tmp)); //clone the default obj
     tagging_entry.fileName = 'Taga.png';
     tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash(`${PATH.join(TAGA_DATA_DIRECTORY, 'Taga.png')}`);
-    await Insert_Record_Into_DB(tagging_entry); //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
+    Insert_Record_Into_DB(tagging_entry); //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
   }
 
   let new_default_obj = { ...COLLECTION_DEFAULT_EMPTY_OBJECT };
@@ -819,7 +815,7 @@ async function Image_Clicked_Modal(filename, node_type) {
     }
   };
 
-  let img_record_obj = await Get_Tagging_Annotation_From_DB(filename);
+  let img_record_obj = Get_Tagging_Annotation_From_DB(filename);
   let tag_array = img_record_obj['taggingTags'];
   let modal_html_tmp = `Tags: `;
   if (tag_array.length != 0 && !(tag_array.length == 1 && tag_array[0] == '')) {
@@ -1122,7 +1118,7 @@ async function Add_Gallery_Images() {
     let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
     processing_modal.style.display = 'flex';
 
-    search_image_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+    search_image_results = Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
     search_image_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
 
     processing_modal.style.display = 'none';
@@ -1485,7 +1481,7 @@ async function Add_Meme_Images() {
     let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
     processing_modal.style.display = 'flex';
 
-    meme_search_image_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+    meme_search_image_results = Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
     meme_search_image_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
 
     processing_modal.style.display = 'none';
