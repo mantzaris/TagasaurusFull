@@ -2012,7 +2012,7 @@ document.body.addEventListener('mousedown', async (ev) => {
             // Create an image element and set its source to the data URL of the temporary canvas
             const img_tmp = document.createElement('img');
             img_tmp.src = tmp_canvas.toDataURL('image/jpeg');
-            img_tmp.classList.add('modal-image-search-result-single-image-img-obj-class');
+            img_tmp.classList.add('facesearch-initial-thumbnail');
 
             const div = document.createElement('div');
             div.classList.add('modal-image-facesearch-result-single-image-div-class');

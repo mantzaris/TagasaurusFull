@@ -262,6 +262,13 @@
   cursor: pointer;
 }
 
+.facesearch-initial-thumbnail {
+  min-height: 25vh;
+  max-height: 25vh;
+  max-width: 100%;
+  cursor: pointer;
+}
+
 #modal-search-meme-images-results-grid-div-area-id {
   background-color: var(--primary);
   border-top: 3px solid var(--primary);
