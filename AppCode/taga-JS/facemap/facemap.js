@@ -58,7 +58,7 @@ function Select_Cluster_Thumbnail(cluster) {
 
 async function Generate_Face_Map(settings) {
   console.time(`Generate_Face_Map`);
-  const all_face_clusters = await DB_MODULE.Get_All_FaceClusters();
+  const all_face_clusters = DB_MODULE.Get_All_FaceClusters();
   const cluster_to_img_map = new Map();
 
   console.time(`Filter_Cluster_Images[${all_face_clusters.length}]`);
@@ -253,7 +253,7 @@ function CreateClusterRelatedThumbnail(selected, filename, is_thumbnail = false)
   img.onclick = () => GENERAL_HELPER_FNS.Goto_Tagging_Entry(filename);
 
   thumbnail_div.onclick = async (ev) => {
-    await DB_MODULE.Update_FaceCluster_Thumbnail(selected.cluster.rowid, filename);
+    DB_MODULE.Update_FaceCluster_Thumbnail(selected.cluster.rowid, filename);
     selected.cluster.thumbnail = filename;
     ShowClusterInfoModal(selected);
     Generate_Face_Map(settings);

@@ -32,7 +32,7 @@ export_button.onclick = async () => {
     const memes = await GenerateTaggingMemesExportJSON();
     const collections = await GenerateCollectionExportJSON();
     const collection_memes = await GenerateCollectionMemesExportJSON();
-    const collection_galleries = await GenerateCollectionGalleryExportJSON();
+    const collection_galleries = GenerateCollectionGalleryExportJSON();
 
     const archive = archiver('zip', {
       zlib: {
@@ -124,7 +124,7 @@ async function GenerateTaggingExportJSON() {
 }
 
 async function GenerateTaggingMemesExportJSON() {
-  const all_tagging_memes = await DB_MODULE.Get_All_TaggingMeme_Records_From_DB();
+  const all_tagging_memes = DB_MODULE.Get_All_TaggingMeme_Records_From_DB();
 
   const memes = new Array(all_tagging_memes.length);
 
@@ -205,8 +205,8 @@ async function GenerateCollectionMemesExportJSON() {
   return JSON.stringify(collection_memes, null, 2);
 }
 
-async function GenerateCollectionGalleryExportJSON() {
-  const db_entries = await DB_MODULE.Get_All_Collection_Galleries();
+function GenerateCollectionGalleryExportJSON() {
+  const db_entries = DB_MODULE.Get_All_Collection_Galleries();
   const collection_galleries = new Array(db_entries.length);
 
   //(collectionGalleryFileName TEXT, collectionNames TEXT)

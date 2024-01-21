@@ -154,11 +154,11 @@ async function HandleImport() {
 
     if (existing_record) {
       existing_record.fileNames = MergeArrays(incoming_meme.connected_to, existing_record.fileNames);
-      await DB_MODULE.Update_Tagging_Meme_Entry(existing_record);
+      DB_MODULE.Update_Tagging_Meme_Entry(existing_record);
       continue;
     }
 
-    await DB_MODULE.Insert_Meme_Tagging_Entry(TranslateMemeTaggingSnakeCase(incoming_meme));
+    DB_MODULE.Insert_Meme_Tagging_Entry(TranslateMemeTaggingSnakeCase(incoming_meme));
   }
 
   let collection_import;
@@ -183,7 +183,7 @@ async function HandleImport() {
   if (handle_collections) {
     for (const incoming of collection_import) {
       const { name, thumbnail, gallery, description, tags, memes, emotions } = incoming;
-      const existing_collection = await DB_MODULE.Get_Collection_Record_From_DB(name);
+      const existing_collection = DB_MODULE.Get_Collection_Record_From_DB(name);
       const thumbnail_filename = file_hash_to_name_map.get(thumbnail);
       const gallery_filenames = gallery.map((i) => file_hash_to_name_map.get(i));
       const memes_filenames = memes.map((i) => file_hash_to_name_map.get(i));
@@ -195,7 +195,7 @@ async function HandleImport() {
         existing_collection.collectionDescription = DescriptionMerge(existing_collection.collectionDescription, description);
         existing_collection.collectionDescriptionTags = MergeArrays(existing_collection.collectionDescriptionTags, tags);
 
-        await DB_MODULE.Update_Collection_Record_In_DB(existing_collection);
+        DB_MODULE.Update_Collection_Record_In_DB(existing_collection);
         continue;
       }
 
@@ -209,7 +209,7 @@ async function HandleImport() {
         collectionMemes: memes_filenames,
       };
 
-      await DB_MODULE.Insert_Collection_Record_Into_DB(entry);
+      DB_MODULE.Insert_Collection_Record_Into_DB(entry);
     }
 
     for (const incoming of collection_memes_import) {
@@ -234,11 +234,11 @@ async function HandleImport() {
     for (const incoming of collection_gallery_import) {
       const { _id, collection_names } = incoming;
       const file_name = file_hash_to_name_map.get(_id);
-      const entry_orig = await DB_MODULE.Get_Collection_IMAGE_Record_From_DB(file_name);
+      const entry_orig = DB_MODULE.Get_Collection_IMAGE_Record_From_DB(file_name);
 
       if (entry_orig) {
         entry_orig.collectionNames = MergeArrays(entry_orig.collectionNames, collection_names);
-        await DB_MODULE.Update_Collection_GALLERY(entry_orig);
+        DB_MODULE.Update_Collection_GALLERY(entry_orig);
         continue;
       }
 
@@ -247,7 +247,7 @@ async function HandleImport() {
         collectionNames: collection_names,
       };
 
-      await DB_MODULE.Insert_Collection_IMAGE_Record_From_DB(entry);
+      DB_MODULE.Insert_Collection_IMAGE_Record_From_DB(entry);
     }
   }
 

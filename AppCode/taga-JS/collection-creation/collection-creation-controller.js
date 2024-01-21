@@ -39,28 +39,28 @@ async function Get_Tagging_Annotation_From_DB(image_name) {
   return DB_MODULE.Get_Tagging_Record_From_DB(image_name);
 }
 
-async function Insert_Collection_Record_Into_DB(collect_obj) {
+function Insert_Collection_Record_Into_DB(collect_obj) {
   //delete via file name
-  return await DB_MODULE.Insert_Collection_Record_Into_DB(collect_obj);
+  return DB_MODULE.Insert_Collection_Record_Into_DB(collect_obj);
 }
-async function Get_Collection_Record_From_DB(collectionname) {
+function Get_Collection_Record_From_DB(collectionname) {
   //delete via file name
-  return await DB_MODULE.Get_Collection_Record_From_DB(collectionname);
+  return DB_MODULE.Get_Collection_Record_From_DB(collectionname);
 }
 
 function Tagging_Random_DB_Images(num_of_records) {
   return DB_MODULE.Tagging_Random_DB_Images(num_of_records);
 }
-async function Meme_Tagging_Random_DB_Images(num_of_records) {
-  return await DB_MODULE.Meme_Tagging_Random_DB_Images(num_of_records);
+function Meme_Tagging_Random_DB_Images(num_of_records) {
+  return DB_MODULE.Meme_Tagging_Random_DB_Images(num_of_records);
 }
 
 async function Update_Collection_MEME_Connections(collectionName, current_memes, new_collection_memes) {
   return await DB_MODULE.Update_Collection_MEME_Connections(collectionName, current_memes, new_collection_memes);
 }
 
-async function Update_Collection_IMAGE_Connections(collectionName, current_collection_images, new_collection_images) {
-  return await DB_MODULE.Update_Collection_IMAGE_Connections(collectionName, current_collection_images, new_collection_images);
+function Update_Collection_IMAGE_Connections(collectionName, current_collection_images, new_collection_images) {
+  return DB_MODULE.Update_Collection_IMAGE_Connections(collectionName, current_collection_images, new_collection_images);
 }
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END<<<
 
@@ -142,11 +142,11 @@ async function Creation_Next_Btn() {
   }
   //the next button was pressed while at the final step so we now are completed and return after storing in DB new collection
   if (creation_step_num == 5) {
-    await Insert_Collection_Record_Into_DB(COLLECTION_DEFAULT_EMPTY_OBJECT);
+    Insert_Collection_Record_Into_DB(COLLECTION_DEFAULT_EMPTY_OBJECT);
     await Update_Collection_MEME_Connections(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName, [], COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes);
     COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles.push(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage);
     COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles = [...COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles];
-    await Update_Collection_IMAGE_Connections(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName, [], COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles);
+    Update_Collection_IMAGE_Connections(COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName, [], COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles);
     //
     //window redirect and pass collection name as a parameter
     window.location = 'collections.html' + '?' + `collectionName=${COLLECTION_DEFAULT_EMPTY_OBJECT.collectionName}`;
@@ -541,7 +541,7 @@ async function Check_Collection_Name() {
     return false;
   }
 
-  let collection_obj = await Get_Collection_Record_From_DB(collection_name_text_area);
+  let collection_obj = Get_Collection_Record_From_DB(collection_name_text_area);
   if (collection_obj != undefined) {
     return false; //exit without proceeding until unique name supplied
   }
@@ -874,7 +874,7 @@ async function Add_Images_To_New_Collection() {
   //display default ordering first
   if (search_image_results == '' && search_image_meme_results == '') {
     search_image_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
-    search_image_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+    search_image_meme_results = Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
   }
 
   let search_display_div = document.getElementById('modal-search-images-results-grid-div-area-id');
@@ -1271,7 +1271,7 @@ async function Add_Meme_Images() {
   //display default ordering first
   if (meme_search_image_results == '' && meme_search_image_meme_results == '') {
     meme_search_image_results = Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
-    meme_search_image_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+    meme_search_image_meme_results = Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
   }
 
   let search_display_div = document.getElementById('modal-search-add-memes-images-results-grid-div-area-id');

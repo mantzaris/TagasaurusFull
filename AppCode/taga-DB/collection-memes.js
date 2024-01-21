@@ -1,4 +1,6 @@
 //function for handling the update of the memes for the collections ++memes & --memes
+const { Get_Collection_Record_From_DB, Update_Collection_Record_In_DB, Delete_Collection_Record_In_DB } = require('./collections.js');
+
 const GET_MEME_COLLECTION_TABLE_STMT = DB.prepare(`SELECT * FROM ${COLLECTION_MEME_TABLE_NAME} WHERE collectionMemeFileName=?`);
 const DELETE_COLLECTION_MEME_TABLE_ENTRY_STMT = DB.prepare(`DELETE FROM ${COLLECTION_MEME_TABLE_NAME} WHERE collectionMemeFileName=?`);
 const UPDATE_FILENAME_MEME_TABLE_COLLECTION_STMT = DB.prepare(`UPDATE ${COLLECTION_MEME_TABLE_NAME} SET collectionNames=? WHERE collectionMemeFileName=?`);
@@ -71,6 +73,8 @@ function Get_Obj_Fields_From_Collection_MEME_Record(record) {
   record.collectionNames = JSON.parse(record.collectionNames);
   return record;
 }
+
+exports.Get_Obj_Fields_From_Collection_MEME_Record = Get_Obj_Fields_From_Collection_MEME_Record;
 //fn for the update of the collection image table connections
 
 //when an image is deleted its ability to serve as a meme is removed and it must be removed from collection meme sets
@@ -83,14 +87,14 @@ async function Handle_Delete_Collection_MEME_references(fileName) {
   }
   meme_row_obj = Get_Obj_Fields_From_Collection_MEME_Record(meme_row_obj);
   for (let collectionName of meme_row_obj['collectionNames']) {
-    let record_tmp = await Get_Collection_Record_From_DB(collectionName);
+    let record_tmp = Get_Collection_Record_From_DB(collectionName);
     if (record_tmp == undefined) {
       continue;
     }
     let new_meme_choices_tmp = record_tmp.collectionMemes.filter((item) => item !== fileName);
     if (new_meme_choices_tmp.length != record_tmp.collectionMemes.length) {
       record_tmp.collectionMemes = new_meme_choices_tmp;
-      await Update_Collection_Record_In_DB(record_tmp);
+      Update_Collection_Record_In_DB(record_tmp);
     }
   }
   //remove this image as a meme in the meme table

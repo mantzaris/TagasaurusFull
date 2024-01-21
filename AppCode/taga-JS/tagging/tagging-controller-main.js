@@ -145,8 +145,8 @@ async function Get_Tagging_MEME_Record_From_DB(image_name) {
 async function Update_Tagging_MEME_Connections(fileName, current_image_memes, new_image_memes) {
   return await DB_MODULE.Update_Tagging_MEME_Connections(fileName, current_image_memes, new_image_memes);
 }
-async function Handle_Delete_Image_MEME_references(fileName) {
-  return await DB_MODULE.Handle_Delete_Image_MEME_references(fileName);
+function Handle_Delete_Image_MEME_References(fileName) {
+  return DB_MODULE.Handle_Delete_Image_MEME_References(fileName);
 }
 async function Handle_Delete_Collection_MEME_references(fileName) {
   //delete the references of this image as a meme in the collections
@@ -155,12 +155,12 @@ async function Handle_Delete_Collection_MEME_references(fileName) {
 function Tagging_Random_DB_Images(num_of_records) {
   return DB_MODULE.Tagging_Random_DB_Images(num_of_records);
 }
-async function Meme_Tagging_Random_DB_Images(num_of_records) {
-  return await DB_MODULE.Meme_Tagging_Random_DB_Images(num_of_records);
+function Meme_Tagging_Random_DB_Images(num_of_records) {
+  return DB_MODULE.Meme_Tagging_Random_DB_Images(num_of_records);
 }
 
-async function Handle_Delete_Collection_IMAGE_references(fileName) {
-  return await DB_MODULE.Handle_Delete_Collection_IMAGE_references(fileName);
+function Handle_Delete_Collection_IMAGE_references(fileName) {
+  return DB_MODULE.Handle_Delete_Collection_IMAGE_references(fileName);
 }
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END>>>
 
@@ -683,8 +683,7 @@ function fromBinary(binary) {
 async function Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags, fileName, newMemes }, clustersIDS) {
   const keyword_additions = newTags.filter((item) => !origTags.includes(item));
   const keyword_subtractions = origTags.filter((item) => !newTags.includes(item));
-
-  const clusters = await DB_MODULE.Get_FaceClusters_From_IDS(clustersIDS);
+  const clusters = DB_MODULE.Get_FaceClusters_From_IDS(clustersIDS);
 
   for (let i = 0; i < clusters.length; i++) {
     for (const k of keyword_additions) {
@@ -700,7 +699,7 @@ async function Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags, file
 
     const { rowid, avgDescriptor, relatedFaces, keywords, images } = clusters[i];
 
-    await DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, rowid);
+    DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, rowid);
   }
 }
 
@@ -767,9 +766,9 @@ async function Delete_Image() {
   }
 
   await Update_Tagging_MEME_Connections(current_image_annotation.fileName, current_image_annotation.taggingMemeChoices, []);
-  await Handle_Delete_Image_MEME_references(current_image_annotation.fileName);
+  Handle_Delete_Image_MEME_References(current_image_annotation.fileName);
 
-  await Handle_Delete_Collection_IMAGE_references(current_image_annotation.fileName);
+  Handle_Delete_Collection_IMAGE_references(current_image_annotation.fileName);
   await Handle_Delete_Collection_MEME_references(current_image_annotation.fileName);
 
   let records_remaining = Number_of_Tagging_Records();
@@ -796,7 +795,7 @@ async function Delete_Image() {
 }
 
 async function Handle_Delete_FileFrom_Cluster() {
-  const face_clusters = await DB_MODULE.Get_FaceClusters_From_IDS(current_image_annotation.faceClusters);
+  const face_clusters = DB_MODULE.Get_FaceClusters_From_IDS(current_image_annotation.faceClusters);
 
   const empty_clusters = [];
   const updated_clusters = [];
@@ -827,20 +826,21 @@ async function Handle_Delete_FileFrom_Cluster() {
 
     //console.log(face_clusters[i].thumbnail);
     if (face_clusters[i].thumbnail == current_image_annotation.fileName) {
-      await DB_MODULE.Update_FaceCluster_Thumbnail(face_clusters[i].rowid, null);
+      DB_MODULE.Update_FaceCluster_Thumbnail(face_clusters[i].rowid, null);
     }
   }
 
-  if (empty_clusters.length > 0) await DB_MODULE.Delete_FaceClusters_By_IDS(empty_clusters);
+  if (empty_clusters.length > 0) DB_MODULE.Delete_FaceClusters_By_IDS(empty_clusters);
 
   for (const { rowid, avgDescriptor, relatedFaces, keywords, images } of updated_clusters) {
-    await DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, rowid);
+    DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, rowid);
   }
 
   //deleting lingering meme references, images which use this image as a meme on their face cluster
   const { fileNames } = await DB_MODULE.Get_Tagging_MEME_Record_From_DB(current_image_annotation.fileName);
   const cluster_ids = DB_MODULE.Get_Tagging_ClusterIDS_From_FileNames(fileNames);
-  const clusters = await DB_MODULE.Get_FaceClusters_From_IDS(cluster_ids);
+
+  const clusters = DB_MODULE.Get_FaceClusters_From_IDS(cluster_ids);
 
   for (let i = 0; i < clusters.length; i++) {
     for (const [filename, data] of Object.entries(clusters[i].images)) {
@@ -848,7 +848,7 @@ async function Handle_Delete_FileFrom_Cluster() {
       clusters[i].images[filename].memes = data.memes.filter((filename) => filename != current_image_annotation.fileName);
 
       const { rowid, avgDescriptor, relatedFaces, keywords, images } = clusters[i];
-      await DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, rowid);
+      DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, rowid);
     }
   }
 }
@@ -1351,7 +1351,7 @@ async function Search_Images() {
   processing_modal.style.display = 'flex';
 
   search_results = Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
-  search_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+  search_meme_results = Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
 
   processing_modal.style.display = 'none';
 
@@ -1723,7 +1723,7 @@ async function Add_New_Meme() {
   processing_modal.style.display = 'flex';
 
   meme_search_results = Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
-  meme_search_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+  meme_search_meme_results = Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
 
   processing_modal.style.display = 'none';
 

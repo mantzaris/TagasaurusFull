@@ -42,34 +42,34 @@ let reg_exp_delims = /[#:,;| ]+/;
 
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS START>>>
 
-async function Number_of_Collection_Records() {
+function Number_of_Collection_Records() {
   //delete via file name
-  return await DB_MODULE.Number_of_Collection_Records();
+  return DB_MODULE.Number_of_Collection_Records();
 }
-async function Get_ROWID_From_CollectionName(CollectionName) {
-  return await DB_MODULE.Get_ROWID_From_CollectionName(CollectionName);
+function Get_ROWID_From_CollectionName(CollectionName) {
+  return DB_MODULE.Get_ROWID_From_CollectionName(CollectionName);
 }
 function Set_ROWID_From_ROWID(rowid) {
   DB_MODULE.Set_ROWID_From_ROWID(rowid);
 }
-async function Step_Get_Collection_Annotation(collectionName, step) {
-  return await DB_MODULE.Step_Get_Collection_Annotation(collectionName, step);
+function Step_Get_Collection_Annotation(collectionName, step) {
+  return DB_MODULE.Step_Get_Collection_Annotation(collectionName, step);
 }
-async function Get_Collection_Record_From_DB(collectionname) {
+function Get_Collection_Record_From_DB(collectionname) {
   //delete via file name
-  return await DB_MODULE.Get_Collection_Record_From_DB(collectionname);
+  return DB_MODULE.Get_Collection_Record_From_DB(collectionname);
 }
-async function Insert_Collection_Record_Into_DB(collect_obj) {
+function Insert_Collection_Record_Into_DB(collect_obj) {
   //delete via file name
-  return await DB_MODULE.Insert_Collection_Record_Into_DB(collect_obj);
+  return DB_MODULE.Insert_Collection_Record_Into_DB(collect_obj);
 }
-async function Update_Collection_Record_In_DB(collect_obj) {
+function Update_Collection_Record_In_DB(collect_obj) {
   //delete via file name
-  return await DB_MODULE.Update_Collection_Record_In_DB(collect_obj);
+  return DB_MODULE.Update_Collection_Record_In_DB(collect_obj);
 }
-async function Delete_Collection_Record_In_DB(collectioname) {
+function Delete_Collection_Record_In_DB(collectioname) {
   //delete via file name
-  return await DB_MODULE.Delete_Collection_Record_In_DB(collectioname);
+  return DB_MODULE.Delete_Collection_Record_In_DB(collectioname);
 }
 
 function Get_Tagging_Annotation_From_DB(image_name) {
@@ -84,24 +84,24 @@ function Check_Tagging_Hash_From_DB(hash) {
 function Tagging_Random_DB_Images(num_of_records) {
   return DB_MODULE.Tagging_Random_DB_Images(num_of_records);
 }
-async function Meme_Tagging_Random_DB_Images(num_of_records) {
-  return await DB_MODULE.Meme_Tagging_Random_DB_Images(num_of_records);
+function Meme_Tagging_Random_DB_Images(num_of_records) {
+  return DB_MODULE.Meme_Tagging_Random_DB_Images(num_of_records);
 }
 
 async function Update_Collection_MEME_Connections(collectionName, current_memes, new_collection_memes) {
   return await DB_MODULE.Update_Collection_MEME_Connections(collectionName, current_memes, new_collection_memes);
 }
 
-async function Update_Collection_IMAGE_Connections(collectionName, current_collection_images, new_collection_images) {
-  return await DB_MODULE.Update_Collection_IMAGE_Connections(collectionName, current_collection_images, new_collection_images);
+function Update_Collection_IMAGE_Connections(collectionName, current_collection_images, new_collection_images) {
+  return DB_MODULE.Update_Collection_IMAGE_Connections(collectionName, current_collection_images, new_collection_images);
 }
 
 function Insert_Record_Into_DB(tagging_obj) {
   DB_MODULE.Insert_Record_Into_DB(tagging_obj);
 }
 
-async function Random_DB_Collections(num_of_records) {
-  return await DB_MODULE.Random_DB_Collections(num_of_records);
+function Random_DB_Collections(num_of_records) {
+  return DB_MODULE.Random_DB_Collections(num_of_records);
 }
 
 //NEW SQLITE MODEL DB ACCESS FUNCTIONS END<<<
@@ -125,18 +125,18 @@ function addMouseOverIconSwitch_Collection(emotion_div, child_num = 1) {
 //this function deletes the entity object currently in focus from var 'current_key_index', and calls for the refresh of the next entity to be in view
 async function Delete_Collection() {
   await Update_Collection_MEME_Connections(current_collection_obj.collectionName, current_collection_obj.collectionMemes, []);
-  await Update_Collection_IMAGE_Connections(current_collection_obj.collectionName, current_collection_obj.collectionGalleryFiles, []);
+  Update_Collection_IMAGE_Connections(current_collection_obj.collectionName, current_collection_obj.collectionGalleryFiles, []);
 
-  let collections_remaining = await Number_of_Collection_Records();
+  let collections_remaining = Number_of_Collection_Records();
 
   if (collections_remaining == 1) {
-    await Delete_Collection_Record_In_DB(current_collection_obj.collectionName);
+    Delete_Collection_Record_In_DB(current_collection_obj.collectionName);
     await Handle_Empty_DB();
     New_Collection_Display(0);
   } else {
     let prev_tmp = current_collection_obj.collectionName;
     New_Collection_Display(1);
-    await Delete_Collection_Record_In_DB(prev_tmp);
+    Delete_Collection_Record_In_DB(prev_tmp);
   }
 }
 
@@ -174,7 +174,7 @@ async function Save_Collection_Description() {
   //now process  description text in order to have the tags
   current_collection_obj.collectionDescriptionTags = DESCRIPTION_PROCESS_MODULE.process_description(current_collection_obj.collectionDescription);
 
-  await Update_Collection_Record_In_DB(current_collection_obj);
+  Update_Collection_Record_In_DB(current_collection_obj);
   Collection_Description_Page();
 }
 
@@ -230,7 +230,7 @@ async function Delete_Emotion(emotion_key) {
   element_emotion_entry_div.remove();
   delete current_collection_obj['collectionEmotions'][emotion_key];
 
-  await Update_Collection_Record_In_DB(current_collection_obj);
+  Update_Collection_Record_In_DB(current_collection_obj);
   Collection_Emotion_Page();
 }
 //will take the current emotion values, and store it into an object to replace the current entity object's emotions
@@ -239,7 +239,7 @@ async function Save_Collection_Emotions() {
   for (let key of Object.keys(current_collection_obj['collectionEmotions'])) {
     current_collection_obj['collectionEmotions'][key] = document.getElementById('emotion-range-id-' + key).value;
   }
-  await Update_Collection_Record_In_DB(current_collection_obj);
+  Update_Collection_Record_In_DB(current_collection_obj);
   Collection_Emotion_Page();
 }
 //add a new emotion to the emotion set
@@ -252,7 +252,7 @@ async function Add_New_Emotion() {
       let new_emotion_value = document.getElementById('collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id').value;
       current_collection_obj['collectionEmotions'][new_emotion_text] = new_emotion_value;
 
-      await Update_Collection_Record_In_DB(current_collection_obj);
+      Update_Collection_Record_In_DB(current_collection_obj);
       //do not save upon addition of a new emotion, the save button is necessary
       document.getElementById('collection-image-annotation-emotions-new-entry-emotion-textarea-id').value = '';
       document.getElementById('collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id').value = '0';
@@ -365,7 +365,7 @@ async function Save_Meme_Changes() {
   }
   current_collection_obj.collectionMemes = meme_switch_booleans;
 
-  await Update_Collection_Record_In_DB(current_collection_obj);
+  Update_Collection_Record_In_DB(current_collection_obj);
   await Update_Collection_MEME_Connections(current_collection_obj.collectionName, current_memes, meme_switch_booleans);
   Collection_Memes_Page();
 }
@@ -457,9 +457,9 @@ async function Save_Gallery_Changes() {
   if (length_new < length_original) {
     current_collection_obj.collectionGalleryFiles = gallery_switch_booleans;
 
-    await Update_Collection_Record_In_DB(current_collection_obj);
+    Update_Collection_Record_In_DB(current_collection_obj);
     await Check_Gallery_And_Profile_Image_Integrity();
-    await Update_Collection_IMAGE_Connections(current_collection_obj.collectionName, current_images, current_collection_obj.collectionGalleryFiles);
+    Update_Collection_IMAGE_Connections(current_collection_obj.collectionName, current_images, current_collection_obj.collectionGalleryFiles);
     Display_Gallery_Images();
   }
 }
@@ -522,8 +522,8 @@ async function Check_Gallery_And_Profile_Image_Integrity() {
   }
 
   if (changes_made == true) {
-    await Update_Collection_Record_In_DB(current_collection_obj);
-    await Update_Collection_IMAGE_Connections(current_collection_obj.collectionName, image_set, current_collection_obj.collectionGalleryFiles);
+    Update_Collection_Record_In_DB(current_collection_obj);
+    Update_Collection_IMAGE_Connections(current_collection_obj.collectionName, image_set, current_collection_obj.collectionGalleryFiles);
   }
   return changes_made;
 }
@@ -534,7 +534,7 @@ async function Show_Collection() {
   //check for issues
   let reload_bool = Check_Gallery_And_Profile_Image_Integrity();
   if (reload_bool == true) {
-    current_collection_obj = await Get_Collection_Record_From_DB(current_collection_obj.collectionName);
+    current_collection_obj = Get_Collection_Record_From_DB(current_collection_obj.collectionName);
   }
   //document.getElementById("collection-profile-image-img-id").src =
   await Update_Profile_Image();
@@ -593,11 +593,11 @@ async function Update_Profile_Image() {
 //called from the gallery widget, where 'n' is the number of images forward or backwards to move
 async function New_Collection_Display(n) {
   if (current_collection_obj == undefined || n == 0) {
-    current_collection_obj = await Step_Get_Collection_Annotation('', 0);
+    current_collection_obj = Step_Get_Collection_Annotation('', 0);
   } else if (n == 1) {
-    current_collection_obj = await Step_Get_Collection_Annotation(current_collection_obj.collectionName, 1);
+    current_collection_obj = Step_Get_Collection_Annotation(current_collection_obj.collectionName, 1);
   } else if (n == -1) {
-    current_collection_obj = await Step_Get_Collection_Annotation(current_collection_obj.collectionName, -1);
+    current_collection_obj = Step_Get_Collection_Annotation(current_collection_obj.collectionName, -1);
   }
   Show_Collection();
 }
@@ -632,9 +632,9 @@ async function Handle_Empty_DB() {
   new_default_obj.collectionImage = 'Taga.png';
   new_default_obj.collectionGalleryFiles = ['Taga.png'];
 
-  await Insert_Collection_Record_Into_DB(new_default_obj);
+  Insert_Collection_Record_Into_DB(new_default_obj);
   current_collection_obj = new_default_obj;
-  await Update_Collection_IMAGE_Connections(current_collection_obj.collectionName, [], current_collection_obj.collectionGalleryFiles);
+  Update_Collection_IMAGE_Connections(current_collection_obj.collectionName, [], current_collection_obj.collectionGalleryFiles);
 }
 //The missing image filtering is not done in the initial stage here like in the Tagging where all missing
 //images are removed and the annotation objects removed
@@ -698,7 +698,7 @@ async function Initialize_Collection_Page() {
     Search_Collections();
   });
 
-  let record_num_tmp = await Number_of_Collection_Records();
+  let record_num_tmp = Number_of_Collection_Records();
   if (record_num_tmp == 0) {
     await Handle_Empty_DB();
   }
@@ -706,8 +706,8 @@ async function Initialize_Collection_Page() {
   if (window.location.href.indexOf('collectionName') > -1) {
     collection_name_param = window.location.search.split('=')[1];
 
-    current_collection_obj = await Get_Collection_Record_From_DB(collection_name_param);
-    let row_id_tmp = await Get_ROWID_From_CollectionName(current_collection_obj.collectionName);
+    current_collection_obj = Get_Collection_Record_From_DB(collection_name_param);
+    let row_id_tmp = Get_ROWID_From_CollectionName(current_collection_obj.collectionName);
     Set_ROWID_From_ROWID(row_id_tmp);
     await New_Collection_Display(0);
   } else {
@@ -946,7 +946,7 @@ async function Change_Profile_Image() {
     if (FS.existsSync(image_path_tmp) == true) {
       document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).onclick = async function () {
         current_collection_obj.collectionImage = image_filename;
-        await Update_Collection_Record_In_DB(current_collection_obj);
+        Update_Collection_Record_In_DB(current_collection_obj);
         await Update_Profile_Image(); //document.getElementById("collection-profile-image-img-id").src = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         GENERAL_HELPER_FNS.Pause_Media_From_Modals();
         modal_profile_img_change.style.display = 'none';
@@ -1034,7 +1034,7 @@ async function Collection_Profile_Image_Search_Action() {
       document.getElementById(`modal-image-search-profileimageresult-single-image-img-id-${image_filename}`).onclick = async function () {
         current_collection_obj.collectionImage = image_filename;
 
-        await Update_Collection_Record_In_DB(current_collection_obj);
+        Update_Collection_Record_In_DB(current_collection_obj);
         await Update_Profile_Image(); //document.getElementById("collection-profile-image-img-id").src = PATH.join(TAGA_DATA_DIRECTORY, image_filename)
         GENERAL_HELPER_FNS.Pause_Media_From_Modals();
         document.getElementById('search-profileimage-modal-click-top-id').style.display = 'none';
@@ -1119,7 +1119,7 @@ async function Add_Gallery_Images() {
     processing_modal.style.display = 'flex';
 
     search_image_results = Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
-    search_image_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+    search_image_meme_results = Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
 
     processing_modal.style.display = 'none';
   }
@@ -1221,8 +1221,8 @@ async function Add_Gallery_Images() {
       }
     });
     if (update == true) {
-      await Update_Collection_Record_In_DB(current_collection_obj);
-      await Update_Collection_IMAGE_Connections(current_collection_obj.collectionName, imageSet_original, current_collection_obj.collectionGalleryFiles);
+      Update_Collection_Record_In_DB(current_collection_obj);
+      Update_Collection_IMAGE_Connections(current_collection_obj.collectionName, imageSet_original, current_collection_obj.collectionGalleryFiles);
       //await Show_Collection()   //!!!xxx
       Display_Gallery_Images();
     }
@@ -1482,7 +1482,7 @@ async function Add_Meme_Images() {
     processing_modal.style.display = 'flex';
 
     meme_search_image_results = Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
-    meme_search_image_meme_results = await Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+    meme_search_image_meme_results = Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
 
     processing_modal.style.display = 'none';
   }
@@ -1581,7 +1581,7 @@ async function Add_Meme_Images() {
       }
     });
     if (update == true) {
-      await Update_Collection_Record_In_DB(current_collection_obj);
+      Update_Collection_Record_In_DB(current_collection_obj);
       await Update_Collection_MEME_Connections(current_collection_obj.collectionName, original_memes_tmp, current_collection_obj.collectionMemes);
       //await Show_Collection()
       Collection_Memes_Page();
@@ -1800,13 +1800,13 @@ async function Search_Collections() {
   };
 
   //PRESENT RAND COLLECTIONS TO THE USER
-  let rand_collections_init = await Random_DB_Collections(MAX_COUNT_SEARCH_RESULTS);
+  let rand_collections_init = Random_DB_Collections(MAX_COUNT_SEARCH_RESULTS);
   //present random ordering first
   let search_display_div = document.getElementById('collections-modal-search-images-results-grid-div-area-id');
   search_display_div.innerHTML = '';
   let search_display_inner_tmp = '';
   for (collectionName_tmp of rand_collections_init) {
-    let collection_tmp = await Get_Collection_Record_From_DB(collectionName_tmp);
+    let collection_tmp = Get_Collection_Record_From_DB(collectionName_tmp);
     let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, collection_tmp.collectionImage); // collectionGalleryFiles
     if (FS.existsSync(image_path_tmp) == true) {
       search_display_inner_tmp += `
@@ -1849,7 +1849,7 @@ async function Search_Collections() {
   rand_collections_init.forEach((collectionName_tmp) => {
     document.getElementById(`collection-selection-option-id-${collectionName_tmp}`).onclick = async function (event) {
       event.preventDefault();
-      let collection_tmp = await Get_Collection_Record_From_DB(collectionName_tmp);
+      let collection_tmp = Get_Collection_Record_From_DB(collectionName_tmp);
       current_collection_obj = collection_tmp;
       Show_Collection();
       GENERAL_HELPER_FNS.Pause_Media_From_Modals();
@@ -1905,7 +1905,7 @@ async function Search_Collections_Search_Action() {
   search_display_div.innerHTML = '';
   let search_display_inner_tmp = '';
   for (let collectionName_tmp of search_collection_results) {
-    let collection_tmp = await Get_Collection_Record_From_DB(collectionName_tmp);
+    let collection_tmp = Get_Collection_Record_From_DB(collectionName_tmp);
     let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, collection_tmp.collectionImage); // collectionGalleryFiles
     if (FS.existsSync(image_path_tmp) == true) {
       search_display_inner_tmp += `
@@ -1949,7 +1949,7 @@ async function Search_Collections_Search_Action() {
   search_collection_results.forEach((collectionName_tmp) => {
     document.getElementById(`collection-selection-option-id-${collectionName_tmp}`).onclick = async function (event) {
       event.preventDefault();
-      let collection_tmp = await Get_Collection_Record_From_DB(collectionName_tmp);
+      let collection_tmp = Get_Collection_Record_From_DB(collectionName_tmp);
       current_collection_obj = collection_tmp;
       Show_Collection();
       modal_gallery_img_add.style.display = 'none';
@@ -2104,47 +2104,3 @@ document.body.addEventListener('mousedown', async (ev) => {
     }
   }
 });
-
-//takes 5042 ms on 10M random numbers
-
-//takes 4656 ms on 10M random numbers
-// var test = [3, 4, 1, 2];
-// var len = test.length;
-// var indices = new Array(len);
-// for (var i = 0; i < len; ++i) indices[i] = i;
-// indices.sort(function (a, b) { return test[a] < test[b] ? -1 : test[a] > test[b] ? 1 : 0; });
-
-// **MODEL ACCESS FUNCTIONS START**
-//pass the entity name which is the key to remove the collection from the DB
-// async function Create_Collection_DB_Instance() {
-//     await COLLECTION_DB_MODULE.Create_Db()
-// }
-// async function Insert_Collection_Record_Into_DB(obj) {
-//     COLLECTION_DB_MODULE.Insert_Record(obj)
-// }
-// async function Get_Collection_Record_In_DB(entity_key) {
-//     return await COLLECTION_DB_MODULE.Get_Record(entity_key)
-// }
-// async function Update_Collection_In_DB(current_collection_obj) {
-//     await COLLECTION_DB_MODULE.Update_Record(current_collection_obj)
-// }
-// async function Refresh_Collection_Keys_From_DB() {
-//     await COLLECTION_DB_MODULE.Get_All_Keys_From_DB() //refresh the current key list
-//     all_collection_keys = COLLECTION_DB_MODULE.Read_All_Keys_From_DB() //retrieve that key list and set to the local global variable
-// }
-// async function Create_Tagging_DB_Instance() {
-//     await TAGGING_DB_MODULE.Create_Db()
-// }
-// async function Get_Tagging_Record_In_DB(filename) {
-//     return await TAGGING_DB_MODULE.Get_Record(filename)
-// }
-// async function Set_All_Image_Keys_In_Tagging_DB() {
-//     await TAGGING_DB_MODULE.Get_All_Keys_From_DB()
-//     all_image_keys = TAGGING_DB_MODULE.Read_All_Keys_From_DB()
-// }
-// **MODEL ACCESS FUNCTIONS END**
-
-//await Create_Tagging_DB_Instance() //!!!indexeddb !!!
-//await Create_Collection_DB_Instance() //sets a global variable in the module to hold the DB for access //!!!indexeddb !!!
-//await Refresh_Collection_Keys_From_DB() //!!!indexeddb !!!
-//await Set_All_Image_Keys_In_Tagging_DB() //!!!indexeddb !!!

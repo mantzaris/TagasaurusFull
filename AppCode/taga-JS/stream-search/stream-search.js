@@ -277,7 +277,7 @@ async function GetMediaStream(source) {
 }
 
 async function PullTaggingClusters() {
-  const all_face_clusters = await DB_MODULE.Get_All_FaceClusters();
+  const all_face_clusters = DB_MODULE.Get_All_FaceClusters();
 
   for (const face_cluster of all_face_clusters) {
     for (const [fileName, fileTypeAndMemes] of Object.entries(face_cluster.images)) {

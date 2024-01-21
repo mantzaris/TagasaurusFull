@@ -4,8 +4,7 @@ const { DB_MODULE } = require(PATH.join(__dirname, '..', '..', '..', 'constants'
 const MIN_CLUSTER_DIST_SCORE = 0.64;
 async function CreateTaggingEntryCluster(tagging_entry) {
   if (tagging_entry.faceDescriptors.length > 0) {
-    // TODO: replace with an iterator on clusters to not hold all in memory at same time
-    const clusters = await DB_MODULE.Get_All_FaceClusters();
+    const clusters = DB_MODULE.Get_All_FaceClusters();
 
     const parent_cluster_row_ids = [];
 
@@ -43,7 +42,7 @@ async function CreateTaggingEntryCluster(tagging_entry) {
         //const keywords_inside_cluster = Object.values()
         related_clusters[i].avgDescriptor = ComputeAvgFaceDescriptor(descriptors_inside_cluster);
 
-        await DB_MODULE.Update_FaceCluster_ROWID(
+        DB_MODULE.Update_FaceCluster_ROWID(
           related_clusters[i].avgDescriptor,
           related_clusters[i].relatedFaces,
           related_clusters[i].keywords,
@@ -77,7 +76,7 @@ async function CreateFaceCluster(avgDescriptor, fileName, tags, fileType, memes)
     memes,
   };
 
-  const rowid = await DB_MODULE.Insert_FaceCluster(avgDescriptor, relatedFaces, keywords, images, null); //returns rowid for the new record
+  const rowid = DB_MODULE.Insert_FaceCluster(avgDescriptor, relatedFaces, keywords, images, null); //returns rowid for the new record
   return { rowid, relatedFaces, avgDescriptor };
 }
 
