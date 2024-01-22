@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="./taga-CSS/face-explore-CSS/face-explore.css">
+    <link rel="stylesheet" href="./taga-CSS/variables.css">
+
+    <script src="../Assets/bootstrap/popper.min.js" defer></script>
+    <script src="../Assets/bootstrap/bootstrap.min.js" defer></script> 
+    <link href="../Assets/bootstrap/bootstrap.min.css" rel="stylesheet" > 
+
+    <script type="text/javascript" src="../Assets/d3/d3.v7.min.js" defer></script>
+
+    <title>FACE EXPLORE</title>
+</head>
+<body>
+
+    <div class="container-fluid" id="top-facemap">
+        <div class="row" id="facemap">
+            <div class="col-md-8 col-sm-8" id="d3-view">
+                
+                <!-- D3.js tree will be rendered here -->
+            </div>
+            <div class="col-md-4 col-sm-4" id="facemap-controls">
+                <div id="button-container">
+                    
+                    <button type="button" class="btn btn-primary my-1 mx-1">Home</button>
+                    <button type="button" class="btn btn-primary my-1 mx-1">Go To Selected</button>
+                    <button type="button" class="btn btn-primary my-1 mx-1">Restart</button>
+
+                    <div class="slider-container">
+                        <label for="thumbnail-size-slider">Image Size:</label>
+                        <input type="range" id="thumbnail-size-slider" name="thumbnailSize" min="1" max="10">
+                    </div>
+
+                </div>
+                <div id="image-container">
+                    
+                    <!-- Closest faces images will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- <div class="chart"></div> -->
+</body>
+    <script src="./taga-JS/face-explore/face-explore.js"></script>
+</html>
