@@ -6,16 +6,15 @@ const treeData = {
 };
 
 // Dimensions for the SVG container
-const width = 800;
-const height = 600;
 
-// Function to position nodes horizontally
-function positionNodes(nodes) {
-  const nodeWidth = 100;
-  const spacing = 20;
+const nodeWidth = 100;
+const spacing = 20;
+
+function positionNodes(nodes, svgHeight) {
+  const startY = svgHeight * 0.2; // Start at 20% of the SVG height
   nodes.forEach((node, index) => {
-    node.x = 0;
-    node.y = index * (nodeWidth + spacing);
+    node.x = startY; // Set the initial Y position
+    node.y = index * (nodeWidth + spacing); // Increment X position for each node
   });
 }
 
@@ -57,7 +56,7 @@ function Init_FaceExplore_D3() {
   });
 
   const root = d3.hierarchy(treeData);
-  positionNodes(root.descendants());
+  positionNodes(root.descendants(), svgHeight); // Pass the SVG height
 
   const node = svgGroup
     .selectAll('.node')
