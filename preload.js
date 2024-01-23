@@ -122,8 +122,7 @@ window.Get_Image_Face_Descriptors_And_Expresssions_From_File = Get_Image_Face_De
 async function Get_Image_Face_Expresssions_From_File(imagePath) {
   let img = document.createElement('img'); // Use DOM HTMLImageElement
   img.src = imagePath;
-  const res = await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceExpressions();
-  return Normalize_Face_Descriptors(res);
+  return (res = await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceExpressions());
 }
 window.Get_Image_Face_Expresssions_From_File = Get_Image_Face_Expresssions_From_File;
 

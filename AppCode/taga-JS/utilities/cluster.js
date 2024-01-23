@@ -23,12 +23,17 @@ async function CreateTaggingEntryCluster(tagging_entry) {
       }
 
       for (let i = 0; i < related_clusters.length; i++) {
-        related_clusters[i].relatedFaces[tagging_entry.fileName] = [descriptor];
-        const descriptors_inside_cluster = Object.values(related_clusters[i].relatedFaces).flatMap((a) => a);
-        related_clusters[i].images[tagging_entry.fileName] = {
-          fileType: tagging_entry.fileType,
-          memes: tagging_entry.taggingMemeChoices,
-        };
+        let descriptors_inside_cluster;
+        try {
+          related_clusters[i].relatedFaces[tagging_entry.fileName] = [descriptor];
+          descriptors_inside_cluster = Object.values(related_clusters[i].relatedFaces).flatMap((a) => a);
+          related_clusters[i].images[tagging_entry.fileName] = {
+            fileType: tagging_entry.fileType,
+            memes: tagging_entry.taggingMemeChoices,
+          };
+        } catch (error) {
+          console.log(error);
+        }
 
         for (const k of tagging_entry.taggingTags) {
           if (k in related_clusters[i].keywords) {

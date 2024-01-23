@@ -1,26 +1,22 @@
 const FS = require('fs');
 const PATH = require('path');
 const fileType = require('file-type');
-//the object for the window functionality
 const IPC_RENDERER = require('electron').ipcRenderer;
 const { ipcRenderer } = require('electron');
 
 const { CreateTaggingEntryCluster, ComputeAvgFaceDescriptor } = require(PATH.join(__dirname, 'taga-JS', 'utilities', 'cluster.js'));
 const { GetFileTypeFromFileName, GetFileTypeFromMimeType } = require(PATH.join(__dirname, 'taga-JS', 'utilities', 'files.js'));
 
-//FSE is not being used but should be for the directory batch import
-//const FSE = require('fs-extra');
-
 const { TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MY_FILE_HELPER, GENERAL_HELPER_FNS } = require(PATH.join(
   __dirname,
   '..',
   'constants',
   'constants-code.js'
-)); // require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+));
 
-const { CLOSE_ICON_RED, CLOSE_ICON_BLACK, HASHTAG_ICON } = require(PATH.join(__dirname, '..', 'constants', 'constants-icons.js')); //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
+const { CLOSE_ICON_RED, CLOSE_ICON_BLACK, HASHTAG_ICON } = require(PATH.join(__dirname, '..', 'constants', 'constants-icons.js'));
 
-let TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
+const TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
   fileName: '',
   fileHash: '',
   fileType: '',
@@ -32,7 +28,6 @@ let TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
   faceClusters: [],
 };
 
-//holds current annotation obj
 let current_image_annotation;
 
 //holds the last directory the user imported images from
@@ -49,20 +44,20 @@ let default_auto_fill_emotions = false;
 let reg_exp_delims = /[#:,;| ]+/;
 
 //returns the obj with the extended emotions auto filled (the object is not a full annotation obj, but just the extended obj for emotions)
-async function Auto_Fill_Emotions(super_res, file_annotation_obj) {
-  let emotion_max_faces_tmp = {};
-  if (super_res.length > 0) {
-    for (let face_ii = 0; face_ii < super_res.length; face_ii++) {
-      for (let [key, value] of Object.entries(super_res[face_ii].expressions)) {
-        if (Object.keys(file_annotation_obj['taggingEmotions']).includes(key) == false) {
+function Auto_Fill_Emotions(face_results, tagging_entry) {
+  let emotion_scores = {};
+
+  if (face_results.length > 0) {
+    for (let face_ii = 0; face_ii < face_results.length; face_ii++) {
+      for (let [key, value] of Object.entries(face_results[face_ii].expressions)) {
+        if (Object.keys(tagging_entry.taggingEmotions).includes(key) == false) {
           //don't alter emotions that are already there as added by the user
-          if (emotion_max_faces_tmp[key] == undefined) {
-            //add emotion and value
-            emotion_max_faces_tmp[key] = Math.round(value * 100);
+          if (!emotion_scores[key]) {
+            emotion_scores[key] = Math.round(value * 100);
           } else {
             //check which emotion value should be used (take the largest value)
-            if (emotion_max_faces_tmp[key] < Math.round(value * 100)) {
-              emotion_max_faces_tmp[key] = Math.round(value * 100);
+            if (emotion_scores[key] < Math.round(value * 100)) {
+              emotion_scores[key] = Math.round(value * 100);
             }
           }
         }
@@ -70,172 +65,116 @@ async function Auto_Fill_Emotions(super_res, file_annotation_obj) {
     }
   }
   return {
-    ...file_annotation_obj['taggingEmotions'],
-    ...emotion_max_faces_tmp,
+    ...tagging_entry.taggingEmotions,
+    ...emotion_scores,
   };
 }
 
 //actions for the AUTO-FILL emotions button being pressed, populate
-document.getElementById(`auto-fill-emotions-button-id`).onclick = async function () {
-  const ft_res = current_image_annotation['fileType'];
+document.getElementById(`auto-fill-emotions-button-id`).onclick = async () => {
+  const filetype = current_image_annotation['fileType'];
+  const filepath = PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation['fileName']);
 
-  if (ft_res == 'image') {
-    if (ft_res == 'gif') {
-      let { faceDescriptors, faceEmotions } = await Get_Image_Face_Expresssions_From_GIF(
-        PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation['fileName']),
-        true,
-        true
-      );
+  if (filetype == 'image') {
+    if (filetype == 'gif') {
+      const { faceEmotions } = await Get_Image_Face_Expresssions_From_GIF(filepath, true, true);
       current_image_annotation['taggingEmotions'] = faceEmotions;
-      Update_Tagging_Annotation_DB(current_image_annotation);
-      Emotion_Display_Fill();
     } else {
-      super_res = await Get_Image_Face_Expresssions_From_File(PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation['fileName']));
-      current_image_annotation['taggingEmotions'] = await Auto_Fill_Emotions(super_res, current_image_annotation);
-      Update_Tagging_Annotation_DB(current_image_annotation);
-      Emotion_Display_Fill();
+      super_res = await Get_Image_Face_Expresssions_From_File(filepath);
+      current_image_annotation['taggingEmotions'] = Auto_Fill_Emotions(super_res, current_image_annotation);
     }
-  } else if (ft_res == 'video') {
-    let { emotions_total } = await Get_Image_FaceApi_From_VIDEO(PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation['fileName']), true, true);
+
+    DB_MODULE.Update_Tagging_Annotation_DB(current_image_annotation);
+    Emotion_Display_Fill();
+  } else if (filetype == 'video') {
+    const { emotions_total } = await Get_Image_FaceApi_From_VIDEO(filepath, true, true);
     current_image_annotation['taggingEmotions'] = emotions_total;
     Emotion_Display_Fill();
   }
 };
 
 //default_auto_fill_emotions = document.getElementById(`auto-fill-emotions-check-box-id`).checked
-document.getElementById(`auto-fill-emotions-check-box-id`).addEventListener('change', function () {
-  if (this.checked) {
-    default_auto_fill_emotions = true;
-  } else {
-    default_auto_fill_emotions = false;
-  }
+document.getElementById(`auto-fill-emotions-check-box-id`).addEventListener('change', (ev) => {
+  default_auto_fill_emotions = ev.target.checked;
 });
 
-//NEW SQLITE MODEL DB ACCESS FUNCTIONS START>>>
-function Step_Get_Annotation(filename, step) {
-  return DB_MODULE.Step_Get_Annotation(filename, step);
-}
-function Get_Tagging_Annotation_From_DB(image_name) {
-  //
-  return DB_MODULE.Get_Tagging_Record_From_DB(image_name);
-}
-function Check_Tagging_Hash_From_DB(hash) {
-  //
-  return DB_MODULE.Check_Tagging_Hash_From_DB(hash);
-}
-function Insert_Record_Into_DB(tagging_obj) {
-  DB_MODULE.Insert_Record_Into_DB(tagging_obj);
-}
-function Update_Tagging_Annotation_DB(tagging_obj) {
-  //update via file name
-  DB_MODULE.Update_Tagging_Annotation_DB(tagging_obj);
-}
-function Delete_Tagging_Annotation_DB(filename) {
-  //delete via file name
-  return DB_MODULE.Delete_Tagging_Annotation_DB(filename);
-}
-function Number_of_Tagging_Records() {
-  return DB_MODULE.Number_of_Tagging_Records();
+async function Display_PDF(display_path) {
+  const parent = document.getElementById('center-gallery-area-div-id');
+  let center_gallery_element;
+  let page_num = 1;
+
+  const processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
+  processing_modal.style.display = 'flex';
+
+  const pdf = await pdfjsLib.getDocument(display_path).promise;
+  const total_pages = pdf.numPages;
+  const imageURL = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf, page_num);
+
+  center_gallery_element = document.createElement('img');
+  center_gallery_element.src = imageURL;
+  parent.appendChild(center_gallery_element);
+
+  const btn_div = document.createElement('div');
+  btn_div.id = 'pdf-btns-div-id';
+
+  let btn_next = document.createElement('button');
+  btn_next.innerText = 'NEXT PAGE';
+  btn_next.onclick = async () => {
+    if (page_num < total_pages) {
+      page_num += 1;
+      pdf_page_num.value = page_num;
+      center_gallery_element.src = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf, page_num);
+    }
+  };
+
+  let btn_prev = document.createElement('button');
+  btn_prev.innerText = 'PREV PAGE';
+  btn_prev.onclick = async () => {
+    if (page_num > 1) {
+      page_num -= 1;
+      pdf_page_num.value = page_num;
+      center_gallery_element.src = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf, page_num);
+    }
+  };
+
+  let pdf_page_num = document.createElement('input');
+  pdf_page_num.type = 'number';
+  pdf_page_num.min = 1;
+  pdf_page_num.max = total_pages;
+  pdf_page_num.onkeyup = async () => {
+    page_num = parseInt(pdf_page_num.value) || page_num;
+    page_num = Math.max(1, Math.min(page_num, total_pages));
+    pdf_page_num.value = page_num;
+    center_gallery_element.src = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf, page_num);
+  };
+
+  btn_div.appendChild(btn_next);
+  btn_div.appendChild(btn_prev);
+  btn_div.appendChild(pdf_page_num);
+
+  parent.appendChild(btn_div);
+
+  processing_modal.style.display = 'none';
 }
 
-async function Get_Tagging_MEME_Record_From_DB(image_name) {
-  //
-  return await DB_MODULE.Get_Tagging_MEME_Record_From_DB(image_name);
-}
-async function Update_Tagging_MEME_Connections(fileName, current_image_memes, new_image_memes) {
-  return await DB_MODULE.Update_Tagging_MEME_Connections(fileName, current_image_memes, new_image_memes);
-}
-function Handle_Delete_Image_MEME_References(fileName) {
-  return DB_MODULE.Handle_Delete_Image_MEME_References(fileName);
-}
-async function Handle_Delete_Collection_MEME_references(fileName) {
-  //delete the references of this image as a meme in the collections
-  return await DB_MODULE.Handle_Delete_Collection_MEME_references(fileName);
-}
-function Tagging_Random_DB_Images(num_of_records) {
-  return DB_MODULE.Tagging_Random_DB_Images(num_of_records);
-}
-function Meme_Tagging_Random_DB_Images(num_of_records) {
-  return DB_MODULE.Meme_Tagging_Random_DB_Images(num_of_records);
-}
-
-function Handle_Delete_Collection_IMAGE_references(fileName) {
-  return DB_MODULE.Handle_Delete_Collection_IMAGE_references(fileName);
-}
-//NEW SQLITE MODEL DB ACCESS FUNCTIONS END>>>
-
-//DISPLAY THE MAIN IMAGE START>>>
 async function Display_Image() {
+  const filetype = current_image_annotation.fileType;
+  const has_descriptors = current_image_annotation.faceDescriptors?.length > 0;
+  const display_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation.fileName}`;
+  const show_face_boxes_btn = document.getElementById('show-faces-tagging-center');
   const parent = document.getElementById('center-gallery-area-div-id');
   parent.innerText = '';
-  const display_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation['fileName']}`;
+
   let center_gallery_element;
-  let ft_res = current_image_annotation['fileType'];
-  const show_face_boxes_btn = document.getElementById('show-faces-tagging-center');
+  const has_faces = has_descriptors && (filetype == 'image' || filetype == 'video');
+  show_face_boxes_btn.style.display = has_faces ? 'block' : 'none';
 
-  const has_descriptors = current_image_annotation['faceDescriptors']?.length > 0;
-
-  if (has_descriptors && (ft_res == 'image' || ft_res == 'video')) {
-    show_face_boxes_btn.style.display = 'block';
-  } else {
-    show_face_boxes_btn.style.display = 'none';
-  }
-
-  if (ft_res == 'image') {
+  if (filetype == 'image') {
     center_gallery_element = document.createElement('img');
     center_gallery_element.src = display_path;
     parent.appendChild(center_gallery_element);
-  } else if (ft_res == 'pdf') {
-    let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
-    processing_modal.style.display = 'flex';
-
-    const pdf = await pdfjsLib.getDocument(display_path).promise;
-    const total_pages = pdf.numPages;
-    let page_num = 1;
-    const imageURL = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf, page_num);
-    center_gallery_element = document.createElement('img');
-    center_gallery_element.src = imageURL;
-    parent.appendChild(center_gallery_element);
-
-    const btn_div = document.createElement('div');
-    btn_div.id = 'pdf-btns-div-id';
-    let btn_next = document.createElement('button');
-    btn_next.innerText = 'NEXT PAGE';
-    btn_next.onclick = async () => {
-      if (page_num < total_pages) {
-        page_num += 1;
-        pdf_page_num.value = page_num;
-        center_gallery_element.src = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf, page_num);
-      }
-    };
-    let btn_prev = document.createElement('button');
-    btn_prev.innerText = 'PREV PAGE';
-    btn_prev.onclick = async () => {
-      if (page_num > 1) {
-        page_num -= 1;
-        pdf_page_num.value = page_num;
-        center_gallery_element.src = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf, page_num);
-      }
-    };
-
-    let pdf_page_num = document.createElement('input');
-    pdf_page_num.type = 'number';
-    pdf_page_num.min = 1;
-    pdf_page_num.max = total_pages;
-    pdf_page_num.onkeyup = async () => {
-      page_num = parseInt(pdf_page_num.value) || page_num;
-      page_num = Math.max(1, Math.min(page_num, total_pages));
-      pdf_page_num.value = page_num;
-      center_gallery_element.src = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf, page_num);
-    };
-
-    btn_div.appendChild(btn_next);
-    btn_div.appendChild(btn_prev);
-    btn_div.appendChild(pdf_page_num);
-
-    parent.appendChild(btn_div);
-
-    processing_modal.style.display = 'none';
+  } else if (filetype == 'pdf') {
+    await Display_PDF(display_path);
   } else {
     center_gallery_element = document.createElement('video');
     center_gallery_element.autoplay = true;
@@ -246,39 +185,36 @@ async function Display_Image() {
   }
 
   center_gallery_element.id = 'center-gallery-image-id';
-
-  //parent.appendChild(center_gallery_element)
 }
-//DISPLAY THE MAIN IMAGE END<<<
 
-//DESCRIPTION AND HASHTAGS POPULATE START>>>
 function Description_Hashtags_Display_Fill() {
-  document.getElementById('description-textarea-id').value = current_image_annotation['taggingRawDescription'];
-  let tag_array = current_image_annotation['taggingTags'];
-  //Create the tag unordered list
+  document.getElementById('description-textarea-id').value = current_image_annotation.taggingRawDescription;
+  let tag_array = current_image_annotation.taggingTags;
   let list = document.createElement('ul');
   list.setAttribute('id', 'hashtag-list-id');
-  for (let i = 0; i < tag_array.length; i++) {
-    let item = document.createElement('li');
-    let image_el = document.createElement('img');
+
+  for (const tag of tag_array) {
+    const item = document.createElement('li');
+    const image_el = document.createElement('img');
     image_el.setAttribute('id', 'hashtags-icon-id');
     image_el.setAttribute('src', `${HASHTAG_ICON}`);
     item.appendChild(image_el);
-    item.appendChild(document.createTextNode(tag_array[i]));
+    item.appendChild(document.createTextNode(tag));
     list.appendChild(item);
   }
+
   document.getElementById('hashtags-innerbox-displayhashtags-id').appendChild(list);
 }
-//DESCRIPTION AND HASHTAGS POPULATE END<<<
 
 //EMOTION STUFF START>>>
 //populate the emotion value view with emotional values
 async function Emotion_Display_Fill() {
-  let emotion_div = document.getElementById('emotion-collectionlist-div-id');
-  let emotion_keys = Object.keys(current_image_annotation['taggingEmotions']);
-  let emotion_html_tmp = '';
-  for (var key of emotion_keys) {
-    emotion_html_tmp += `<div class="emotion-list-class" id="emotion-entry-div-id-${key}">
+  const emotion_div = document.getElementById('emotion-collectionlist-div-id');
+  const keys = Object.keys(current_image_annotation.taggingEmotions);
+  let html = '';
+
+  for (const key of keys) {
+    html += `<div class="emotion-list-class" id="emotion-entry-div-id-${key}">
                                 <img class="emotion-delete-icon-class" id="emotion-delete-button-id-${key}" 
                                     src="${CLOSE_ICON_BLACK}" alt="emotions" title="remove"  />
                                 <span class="emotion-label-view-class" id="emotion-id-label-view-name-${key}">${key}</span>
@@ -286,152 +222,149 @@ async function Emotion_Display_Fill() {
                             </div>
                             `;
   }
-  emotion_div.innerHTML = emotion_html_tmp;
 
-  // Add button hover event listeners to each inage tag.!!!
+  emotion_div.innerHTML = html;
   addMouseOverIconSwitch(emotion_div);
 
-  emotion_keys.forEach(function (key_tmp) {
-    document.getElementById(`emotion-delete-button-id-${key_tmp}`).onclick = function () {
-      Delete_Emotion(`${key_tmp}`);
+  for (const key of keys) {
+    document.getElementById(`emotion-delete-button-id-${key}`).onclick = () => {
+      Delete_Emotion(`${key}`);
     };
-  });
-  for (var key of emotion_keys) {
-    //display emotion range values
+
     document.getElementById('emotion-range-id-' + key).value = current_image_annotation['taggingEmotions'][key];
   }
 }
-//delete an emotion from the emotion set
-async function Delete_Emotion(emotion_key) {
-  delete current_image_annotation['taggingEmotions'][emotion_key];
-  Update_Tagging_Annotation_DB(current_image_annotation);
-  //refresh emotion container fill
+
+async function Delete_Emotion(emotion) {
+  delete current_image_annotation['taggingEmotions'][emotion];
+  DB_MODULE.Update_Tagging_Annotation_DB(current_image_annotation);
+
   Emotion_Display_Fill();
 }
-//add a new emotion to the emotion set
+
 async function Add_New_Emotion() {
-  let new_emotion_text = document.getElementById('emotions-new-emotion-textarea-id').value;
-  let new_emotion_value = document.getElementById('new-emotion-range-id').value;
-  if (new_emotion_text) {
-    let keys_tmp = Object.keys(current_image_annotation['taggingEmotions']);
-    let boolean_included = keys_tmp.includes(new_emotion_text);
-    if (boolean_included == false) {
-      current_image_annotation['taggingEmotions'][new_emotion_text] = new_emotion_value;
-      Update_Tagging_Annotation_DB(current_image_annotation);
+  const emotion = document.getElementById('emotions-new-emotion-textarea-id').value;
+  const emotion_value = document.getElementById('new-emotion-range-id').value;
+
+  if (emotion) {
+    const keys = Object.keys(current_image_annotation.taggingEmotions);
+
+    if (!keys.includes(emotion)) {
+      current_image_annotation.taggingEmotions[emotion] = emotion_value;
+      DB_MODULE.Update_Tagging_Annotation_DB(current_image_annotation);
     }
+
     document.getElementById('emotions-new-emotion-textarea-id').value = '';
     document.getElementById('new-emotion-range-id').value = `0`;
-    //refresh emotion container fill
+
     Emotion_Display_Fill();
   }
 }
-//EMOTION STUFF END<<<
 
-//MEME STUFF START>>>
-//populate the meme switch view with images
 async function Meme_View_Fill() {
-  let meme_box = document.getElementById('memes-innerbox-displaymemes-id');
-  let meme_choices = current_image_annotation['taggingMemeChoices'];
+  const meme_box = document.getElementById('memes-innerbox-displaymemes-id');
+  const meme_choices = current_image_annotation['taggingMemeChoices'];
 
-  for (file of meme_choices) {
-    if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true) {
-      const ft_res = Get_Tagging_Annotation_From_DB(file).fileType;
-      //let type = ( ft_res.mime.includes("image") ) ? 'img' : 'video'
+  for (const meme of meme_choices) {
+    const filepath = `${TAGA_DATA_DIRECTORY}${PATH.sep}${meme}`;
 
-      let content_html;
-      if (ft_res == 'image') {
-        content_html = `<img class="memes-img-class" id="memes-image-img-id-${file}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file}" title="view" alt="meme" />`;
-      } else if (ft_res == 'video' || ft_res == 'audio') {
-        content_html = `<video class="memes-img-class" id="memes-image-img-id-${file}" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${file}" controls muted />`;
-      } else if (ft_res == 'pdf') {
-        content_html = `<div id="memes-image-img-id-${file}" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="memes-img-class" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${file}</div>   </div>`;
+    if (FS.existsSync(filepath)) {
+      const filetype = DB_MODULE.Get_Tagging_Record_From_DB(meme).fileType;
+
+      let html;
+      const attributes = `class="memes-img-class" id="memes-image-img-id-${meme}"`;
+      if (filetype == 'image') {
+        html = `<img ${attributes} src="${filepath}" title="view" alt="meme" />`;
+      } else if (filetype == 'video' || filetype == 'audio') {
+        html = `<video  ${attributes} src="${filepath}" controls muted />`;
+      } else if (filetype == 'pdf') {
+        html = `<div ${attributes} style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="memes-img-class" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${meme}</div>   </div>`;
       }
 
       meme_box.insertAdjacentHTML(
         'beforeend',
         `
-                                                <label class="memeswitch" title="deselect / keep" >   <input id="meme-toggle-id-${file}" type="checkbox"> <span class="slider"></span>   </label>
-                                                <div class="memes-img-div-class" id="memes-image-div-id-${file}">
-                                                    ${content_html}
+                                                <label class="memeswitch" title="deselect / keep" >   <input id="meme-toggle-id-${meme}" type="checkbox"> <span class="slider"></span>   </label>
+                                                <div class="memes-img-div-class" id="memes-image-div-id-${meme}">
+                                                    ${html}
                                                 </div>
                                                 `
       );
     }
   }
-  //set default meme choice toggle button direction
-  for (ii = 0; ii < meme_choices.length; ii++) {
-    if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_choices[ii]}`) == true) {
-      document.getElementById(`meme-toggle-id-${meme_choices[ii]}`).checked = true;
-    }
-  }
-  //add an event listener for when a meme image is clicked to open the modal, and send the file name of the meme
-  meme_choices.forEach((file) => {
-    if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true) {
-      document.getElementById(`memes-image-img-id-${file}`).onclick = function (e) {
+
+  for (const meme of meme_choices) {
+    const filepath = `${TAGA_DATA_DIRECTORY}${PATH.sep}${meme}`;
+
+    if (FS.existsSync(filepath)) {
+      document.getElementById(`meme-toggle-id-${meme}`).checked = true;
+      document.getElementById(`memes-image-img-id-${meme}`).onclick = (e) => {
         e.preventDefault();
-        Meme_Image_Clicked(file);
+        Meme_Image_Clicked(meme);
       };
     }
-  });
+  }
 }
+
 //open the modal to view the meme
-//id of meme clicked is: "memes-image-img-id-${file}"
-async function Meme_Image_Clicked(meme_file_name) {
-  let modal_meme_click_top_id_element = document.getElementById('modal-meme-clicked-top-id');
-  modal_meme_click_top_id_element.style.display = 'block';
-  // Get the button that opens the modal
-  let meme_modal_close_btn = document.getElementById('modal-meme-clicked-close-button-id');
-  // When the user clicks on the button, close the modal
-  meme_modal_close_btn.onclick = function () {
-    let name_type = document.getElementById('modal-meme-clicked-displayimg-id').nodeName;
-    if (name_type == 'VIDEO') {
+async function Meme_Image_Clicked(filename) {
+  const modal_outside = document.getElementById('modal-meme-clicked-top-id');
+  modal_outside.style.display = 'block';
+
+  const modal_close_btn = document.getElementById('modal-meme-clicked-close-button-id');
+
+  modal_close_btn.onclick = () => {
+    const type = document.getElementById('modal-meme-clicked-displayimg-id').nodeName;
+    if (type == 'VIDEO') {
       document.getElementById('modal-meme-clicked-displayimg-id').pause();
     }
-    modal_meme_click_top_id_element.style.display = 'none';
+    modal_outside.style.display = 'none';
   };
-  // When the user clicks anywhere outside of the modal, close it
-  window.onclick = function (event) {
-    if (event.target == modal_meme_click_top_id_element) {
-      let name_type = document.getElementById('modal-meme-clicked-displayimg-id').nodeName;
-      if (name_type == 'VIDEO') {
+
+  window.onclick = (ev) => {
+    if (ev.target == modal_outside) {
+      const type = document.getElementById('modal-meme-clicked-displayimg-id').nodeName;
+      if (type == 'VIDEO') {
         document.getElementById('modal-meme-clicked-displayimg-id').pause();
       }
-      modal_meme_click_top_id_element.style.display = 'none';
+      modal_outside.style.display = 'none';
     }
   };
+
   document.getElementById('modal-meme-clicked-image-gridbox-id').innerHTML = '';
-  let meme_click_modal_div = document.getElementById('modal-meme-clicked-image-gridbox-id');
-  let meme_click_modal_body_html_tmp = '';
 
   //pause element of meme if video
   let pdf, total_pages, page_num, pdf_page_num;
-  let clicked_meme_element = document.getElementById(`memes-image-img-id-${meme_file_name}`);
+  let clicked_meme_element = document.getElementById(`memes-image-img-id-${filename}`);
   let node_type = clicked_meme_element.nodeName;
   let content_html;
+
+  const filepath = `${TAGA_DATA_DIRECTORY}${PATH.sep}${filename}`;
+
   if (node_type == 'IMG') {
-    content_html = `<img class="memes-img-class" id="modal-meme-clicked-displayimg-id" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_file_name}" title="view" alt="meme" />`;
+    content_html = `<img class="memes-img-class" id="modal-meme-clicked-displayimg-id" src="${filepath}" title="view" alt="meme" />`;
   } else if (node_type == 'VIDEO') {
-    content_html = `<video class="memes-img-class" id="modal-meme-clicked-displayimg-id" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_file_name}" controls muted />`;
+    content_html = `<video class="memes-img-class" id="modal-meme-clicked-displayimg-id" src="${filepath}" controls muted />`;
     clicked_meme_element.pause();
   } else if (node_type == 'DIV') {
-    //content_html = `<div id="modal-meme-clicked-displayimg-id" style="display:flex;align-items:center" >  <img style="max-width:30%;max-height:50%; class="memes-img-class" src="../build/icons/PDFicon.png" alt="pdf" /> <div style="font-size:1.5em; word-wrap: break-word;word-break: break-all; overflow-wrap: break-word;">${meme_file_name}</div>   </div>`
     const parent = document.createElement('div');
-    //parent = "modal-meme-clicked-displayimg-id"
-    let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
+
+    const processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
     processing_modal.style.display = 'flex';
 
-    pdf = await pdfjsLib.getDocument(`${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_file_name}`).promise;
+    pdf = await pdfjsLib.getDocument(filepath).promise;
     total_pages = pdf.numPages;
     page_num = 1;
     const imageURL = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf, page_num);
     center_gallery_element = document.createElement('img');
-    center_gallery_element.id = 'modal-meme-clicked-displayimg-id'; //"center-gallery-element-modal-pdf-id"
+    center_gallery_element.id = 'modal-meme-clicked-displayimg-id';
     center_gallery_element.src = imageURL;
     parent.appendChild(center_gallery_element);
 
     const btn_div = document.createElement('div');
     btn_div.id = 'pdf-btns-div-id';
-    let btn_next = document.createElement('button');
+
+    const btn_next = document.createElement('button');
     btn_next.id = 'pdf-button-next-id';
     btn_next.innerText = 'NEXT PAGE';
     btn_next.onclick = async () => {
@@ -441,7 +374,8 @@ async function Meme_Image_Clicked(meme_file_name) {
         center_gallery_element.src = await GENERAL_HELPER_FNS.PDF_page_2_image(pdf, page_num);
       }
     };
-    let btn_prev = document.createElement('button');
+
+    const btn_prev = document.createElement('button');
     btn_prev.id = 'pdf-button-prev-id';
     btn_prev.innerText = 'PREV PAGE';
     btn_prev.onclick = async () => {
@@ -472,35 +406,43 @@ async function Meme_Image_Clicked(meme_file_name) {
 
     processing_modal.style.display = 'none';
   }
-  meme_click_modal_body_html_tmp += content_html; //`<img id="modal-meme-clicked-displayimg-id" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme_file_name}" title="meme" alt="meme" />`;
-  meme_click_modal_div.insertAdjacentHTML('beforeend', meme_click_modal_body_html_tmp);
-  let meme_image_annotations = Get_Tagging_Annotation_From_DB(meme_file_name);
-  //add emotion tuples to view
-  let modal_emotions_html_tmp = `Emotions: `;
-  let emotion_keys = Object.keys(meme_image_annotations['taggingEmotions']);
-  if (emotion_keys.length > 0) {
-    emotion_keys.forEach(function (key_tmp, index) {
-      let emotion_value = meme_image_annotations['taggingEmotions'][key_tmp];
-      if (index < emotion_keys.length - 1) {
-        modal_emotions_html_tmp += `(${key_tmp}:${emotion_value}), `;
+
+  const modal_div = document.getElementById('modal-meme-clicked-image-gridbox-id');
+  let modal_html = '';
+
+  modal_html += content_html;
+  modal_div.insertAdjacentHTML('beforeend', modal_html);
+  const meme_record = DB_MODULE.Get_Tagging_Record_From_DB(filename);
+  let emotions_html = `Emotions: `;
+
+  const emotions = Object.keys(meme_record.taggingEmotions);
+
+  if (emotions.length > 0) {
+    emotions.forEach((key_tmp, index) => {
+      let emotion_value = meme_record.taggingEmotions[key_tmp];
+      if (index < emotions.length - 1) {
+        emotions_html += `(${key_tmp}:${emotion_value}), `;
       } else {
-        modal_emotions_html_tmp += `(${key_tmp}:${emotion_value})`;
+        emotions_html += `(${key_tmp}:${emotion_value})`;
       }
     });
   } else {
-    modal_emotions_html_tmp += `no emotions added`;
+    emotions_html += `no emotions added`;
   }
-  document.getElementById('modal-meme-clicked-emotion-list-div-container-id').innerHTML = modal_emotions_html_tmp;
-  let tag_array = meme_image_annotations['taggingTags'];
-  let modal_tags_html_tmp = `Tags: `;
-  if (tag_array.length > 0) {
-    tag_array.forEach(function (tag) {
-      modal_tags_html_tmp += `#${tag} `;
+
+  document.getElementById('modal-meme-clicked-emotion-list-div-container-id').innerHTML = emotions_html;
+  const tags = meme_record.taggingTags;
+  let tags_html = `Tags: `;
+
+  if (tags.length > 0) {
+    tags.forEach((tag) => {
+      tags_html += `#${tag} `;
     });
   } else {
-    modal_tags_html_tmp += `no tags added`;
+    tags_html += `no tags added`;
   }
-  document.getElementById('modal-meme-clicked-tag-list-div-container-id').innerHTML = modal_tags_html_tmp;
+
+  document.getElementById('modal-meme-clicked-tag-list-div-container-id').innerHTML = tags_html;
 
   //event listeners for the pdf view
   if (node_type == 'DIV') {
@@ -524,8 +466,8 @@ async function Meme_Image_Clicked(meme_file_name) {
     };
   }
 }
-//MEME STUFF END<<<
 
+//TODO: refactor from here!
 //RESET TYPE FUNCTIONS START>>>
 //makes the tagging view 'blank' for the annotations to be placed
 function Make_Blank_Tagging_View() {
@@ -564,11 +506,11 @@ async function Load_State_Of_Image_IDB() {
 //called from the gallery widget, where 'n' is the number of images forward or backwards to move
 async function New_Image_Display(n) {
   if (current_image_annotation == undefined || n == 0) {
-    current_image_annotation = Step_Get_Annotation('', 0);
+    current_image_annotation = DB_MODULE.Step_Get_Annotation('', 0);
   } else if (n == 1) {
-    current_image_annotation = Step_Get_Annotation(current_image_annotation.fileName, 1);
+    current_image_annotation = DB_MODULE.Step_Get_Annotation(current_image_annotation.fileName, 1);
   } else if (n == -1) {
-    current_image_annotation = Step_Get_Annotation(current_image_annotation.fileName, -1);
+    current_image_annotation = DB_MODULE.Step_Get_Annotation(current_image_annotation.fileName, -1);
   }
   Load_State_Of_Image_IDB();
 }
@@ -646,7 +588,7 @@ async function First_Display_Init() {
   );
   document.getElementById(`search-images-button-id`).addEventListener('click', Search_Images, false);
 
-  let records_remaining = Number_of_Tagging_Records();
+  let records_remaining = DB_MODULE.Number_of_Tagging_Records();
   if (records_remaining == 0) {
     Load_Default_Taga_Image();
   } else if (window.location.href.indexOf('fileName') > -1) {
@@ -654,7 +596,7 @@ async function First_Display_Init() {
 
     tagging_name_param = fromBinary(atob(tagging_name_param));
 
-    current_image_annotation = Get_Tagging_Annotation_From_DB(tagging_name_param);
+    current_image_annotation = DB_MODULE.Get_Tagging_Record_From_DB(tagging_name_param);
     Load_State_Of_Image_IDB();
 
     //window.location.href = tagging.html
@@ -734,8 +676,8 @@ async function Save_Image_Annotation_Changes() {
   for (var key of Object.keys(current_image_annotation['taggingEmotions'])) {
     current_image_annotation['taggingEmotions'][key] = document.getElementById('emotion-range-id-' + key).value;
   }
-  Update_Tagging_Annotation_DB(current_image_annotation);
-  await Update_Tagging_MEME_Connections(fileName, visible_memes, newMemes);
+  DB_MODULE.Update_Tagging_Annotation_DB(current_image_annotation);
+  await DB_MODULE.Update_Tagging_MEME_Connections(fileName, visible_memes, newMemes);
 
   Load_State_Of_Image_IDB(); //TAGGING_VIEW_ANNOTATE_MODULE.Display_Image_State_Results(image_annotations)
 }
@@ -754,7 +696,7 @@ async function Load_Default_Taga_Image() {
   tagging_entry.faceClusters = [];
   //for taga no emotion inference is needed but done for consistency
 
-  Insert_Record_Into_DB(tagging_entry); //filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result,TAGA_DATA_DIRECTORY);
+  DB_MODULE.Insert_Record_Into_DB(tagging_entry);
 }
 //delete image from user choice
 async function Delete_Image() {
@@ -765,19 +707,19 @@ async function Delete_Image() {
     FS.unlinkSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${current_image_annotation.fileName}`);
   }
 
-  await Update_Tagging_MEME_Connections(current_image_annotation.fileName, current_image_annotation.taggingMemeChoices, []);
-  Handle_Delete_Image_MEME_References(current_image_annotation.fileName);
+  await DB_MODULE.Update_Tagging_MEME_Connections(current_image_annotation.fileName, current_image_annotation.taggingMemeChoices, []);
+  DB_MODULE.Handle_Delete_Image_MEME_References(current_image_annotation.fileName);
 
-  Handle_Delete_Collection_IMAGE_references(current_image_annotation.fileName);
-  await Handle_Delete_Collection_MEME_references(current_image_annotation.fileName);
+  DB_MODULE.Handle_Delete_Collection_IMAGE_references(current_image_annotation.fileName);
+  await DB_MODULE.Handle_Delete_Collection_MEME_references(current_image_annotation.fileName);
 
-  let records_remaining = Number_of_Tagging_Records();
+  let records_remaining = DB_MODULE.Number_of_Tagging_Records();
   if (records_remaining == 1) {
     if (current_image_annotation.faceDescriptors.length > 0) {
       const rowid = DB_MODULE.Get_Tagging_ROWID_From_FileHash_BigInt(current_image_annotation.fileHash);
       ipcRenderer.invoke('faiss-remove', rowid);
     }
-    Delete_Tagging_Annotation_DB(current_image_annotation.fileName);
+    DB_MODULE.Delete_Tagging_Annotation_DB(current_image_annotation.fileName);
 
     await Load_Default_Taga_Image();
     New_Image_Display(0);
@@ -790,7 +732,7 @@ async function Delete_Image() {
       ipcRenderer.invoke('faiss-remove', rowid);
     }
 
-    Delete_Tagging_Annotation_DB(prev_tmp);
+    DB_MODULE.Delete_Tagging_Annotation_DB(prev_tmp);
   }
 }
 
@@ -866,10 +808,10 @@ async function Load_New_Image(filename) {
       return;
     }
     last_user_image_directory_chosen = PATH.dirname(result.filePaths[0]);
-    filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result, TAGA_DATA_DIRECTORY, Check_Tagging_Hash_From_DB);
+    filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result, TAGA_DATA_DIRECTORY);
   } else {
     const result = { filePaths: [filename] };
-    filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result, TAGA_DATA_DIRECTORY, Check_Tagging_Hash_From_DB);
+    filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result, TAGA_DATA_DIRECTORY);
   }
   if (filenames.length == 0) {
     alert('no new media selected');
@@ -887,7 +829,7 @@ async function Load_New_Image(filename) {
     tagging_entry_tmp.fileName = filename;
     tagging_entry_tmp.fileHash = MY_FILE_HELPER.Return_File_Hash(`${TAGA_DATA_DIRECTORY}${PATH.sep}${filename}`);
 
-    let hash_present = Check_Tagging_Hash_From_DB(tagging_entry_tmp.fileHash);
+    let hash_present = DB_MODULE.Check_Tagging_Hash_From_DB(tagging_entry_tmp.fileHash);
 
     if (hash_present == undefined) {
       //emotion inference upon the default selected
@@ -912,7 +854,7 @@ async function Load_New_Image(filename) {
         } else {
           if (default_auto_fill_emotions == true) {
             let super_res = await Get_Image_Face_Descriptors_And_Expresssions_From_File(PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp['fileName']));
-            tagging_entry_tmp['taggingEmotions'] = await Auto_Fill_Emotions(super_res, tagging_entry_tmp);
+            tagging_entry_tmp['taggingEmotions'] = Auto_Fill_Emotions(super_res, tagging_entry_tmp);
             tagging_entry_tmp['faceDescriptors'] = await Get_Face_Descriptors_Arrays(super_res);
           } else {
             let super_res = await Get_Image_Face_Descriptors_From_File(PATH.join(TAGA_DATA_DIRECTORY, tagging_entry_tmp['fileName']));
@@ -971,7 +913,7 @@ async function Load_New_Image(filename) {
       //face cluster insertion code
       tagging_entry_tmp = await CreateTaggingEntryCluster(tagging_entry_tmp);
 
-      Insert_Record_Into_DB(tagging_entry_tmp);
+      DB_MODULE.Insert_Record_Into_DB(tagging_entry_tmp);
       tagging_entry = tagging_entry_tmp;
 
       //FAISS
@@ -1350,8 +1292,8 @@ async function Search_Images() {
   let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
   processing_modal.style.display = 'flex';
 
-  search_results = Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
-  search_meme_results = Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+  search_results = DB_MODULE.Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+  search_meme_results = DB_MODULE.Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
 
   processing_modal.style.display = 'none';
 
@@ -1397,7 +1339,7 @@ async function Search_Images() {
         const children_tmp = [...search_res_children, ...search_meme_res_children];
         GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp);
 
-        current_image_annotation = await Get_Tagging_Annotation_From_DB(file);
+        current_image_annotation = DB_MODULE.Get_Tagging_Record_From_DB(file);
         Load_State_Of_Image_IDB();
         document.getElementById('search-modal-click-top-id').style.display = 'none';
       };
@@ -1411,7 +1353,7 @@ async function Search_Images() {
         const children_tmp = [...search_res_children, ...search_meme_res_children];
         GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp);
 
-        current_image_annotation = Get_Tagging_Annotation_From_DB(file);
+        current_image_annotation = DB_MODULE.Get_Tagging_Record_From_DB(file);
         Load_State_Of_Image_IDB();
         document.getElementById('search-modal-click-top-id').style.display = 'none';
       };
@@ -1494,7 +1436,7 @@ async function Modal_Search_Entry(search_similar = false, search_obj_similar_tmp
   search_results.forEach((file) => {
     if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true) {
       document.getElementById(`modal-image-search-result-single-image-img-id-${file}`).onclick = async function () {
-        current_image_annotation = Get_Tagging_Annotation_From_DB(file);
+        current_image_annotation = DB_MODULE.Get_Tagging_Record_From_DB(file);
         Load_State_Of_Image_IDB();
         document.getElementById('search-modal-click-top-id').style.display = 'none';
       };
@@ -1503,7 +1445,7 @@ async function Modal_Search_Entry(search_similar = false, search_obj_similar_tmp
   search_meme_results.forEach((file) => {
     if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true) {
       document.getElementById(`modal-image-search-result-single-meme-image-img-id-${file}`).onclick = async function () {
-        current_image_annotation = Get_Tagging_Annotation_From_DB(file);
+        current_image_annotation = DB_MODULE.Get_Tagging_Record_From_DB(file);
         Load_State_Of_Image_IDB();
         document.getElementById('search-modal-click-top-id').style.display = 'none';
       };
@@ -1692,10 +1634,10 @@ async function Add_New_Meme() {
         }
       }
     }
-    await Update_Tagging_MEME_Connections(fileName, JSON.parse(JSON.stringify(origMemes)), JSON.parse(JSON.stringify(meme_switch_booleans)));
+    await DB_MODULE.Update_Tagging_MEME_Connections(fileName, JSON.parse(JSON.stringify(origMemes)), JSON.parse(JSON.stringify(meme_switch_booleans)));
     meme_switch_booleans.push(...current_image_annotation.taggingMemeChoices);
     current_image_annotation.taggingMemeChoices = [...new Set(meme_switch_booleans)]; //add a 'unique' set of memes as the 'new Set' has unique contents
-    Update_Tagging_Annotation_DB(current_image_annotation);
+    DB_MODULE.Update_Tagging_Annotation_DB(current_image_annotation);
 
     await Update_Cluster_For_Updated_TaggingEntry(
       { newTags: taggingTags, origTags: taggingTags, fileName, newMemes: current_image_annotation.taggingMemeChoices },
@@ -1722,8 +1664,8 @@ async function Add_New_Meme() {
   let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
   processing_modal.style.display = 'flex';
 
-  meme_search_results = Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
-  meme_search_meme_results = Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+  meme_search_results = DB_MODULE.Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+  meme_search_meme_results = DB_MODULE.Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
 
   processing_modal.style.display = 'none';
 

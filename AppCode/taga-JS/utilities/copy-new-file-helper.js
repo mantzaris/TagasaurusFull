@@ -18,7 +18,7 @@ function Make_Salt() {
 }
 exports.Make_Salt = Make_Salt;
 
-async function Copy_Non_Taga_Files(result, dir_pics, Check_Tagging_Hash_From_DB) {
+async function Copy_Non_Taga_Files(result, dir_pics) {
   let new_filename_array = [];
 
   let current_file_hashes_tmp = new Set();
@@ -35,7 +35,7 @@ async function Copy_Non_Taga_Files(result, dir_pics, Check_Tagging_Hash_From_DB)
 
     //await file_paths.forEach( async file_path => {
     let file_hash_tmp = Return_File_Hash(file_path);
-    let hash_tmp = Check_Tagging_Hash_From_DB(file_hash_tmp);
+    let hash_tmp = DB_MODULE.Check_Tagging_Hash_From_DB(file_hash_tmp);
     if (hash_tmp == undefined && current_file_hashes_tmp.has(file_hash_tmp) == false) {
       current_file_hashes_tmp.add(file_hash_tmp);
       let filename = PATH.parse(file_path).base;
