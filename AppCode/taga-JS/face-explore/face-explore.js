@@ -1,80 +1,103 @@
-const default_image = PATH.join(__dirname, '..', 'fd2.jpg');
-// Sample tree data with multiple roots
-const treeData = {
-  name: 'invisibleRoot',
-  children: Array.from({ length: 10 }, (_, i) => ({ name: `root${i + 1}`, children: [] })),
+const default_image = PATH.join(__dirname, '..', 'test4.png');
+const nodes = new vis.DataSet([]);
+const edges = new vis.DataSet([]);
+
+const yTopRow = 0; // Y-coordinate for the top row
+const yBottomRow = 150; // Y-coordinate for the bottom row
+const xSpacing = 100; // Spacing between nodes
+
+// Add only parent nodes initially
+for (let i = 0; i < 10; i++) {
+  nodes.add({ id: i, shape: 'image', image: default_image, x: i * xSpacing, y: yTopRow });
+}
+
+const container = document.getElementById('d3-view');
+const containerWidth = container.offsetWidth;
+const containerHeight = container.offsetHeight;
+const springLength = containerWidth * 0.05; // 5% of the container's width
+
+const data = { nodes, edges };
+const options = {
+  // Basic options; layout is not hierarchical
+  nodes: {
+    shape: 'image',
+    size: 30,
+  },
+  edges: {
+    arrows: 'to',
+  },
+  interaction: {
+    dragNodes: true,
+    zoomView: true,
+  },
+  physics: {
+    enabled: true,
+    barnesHut: {
+      gravitationalConstant: -2000,
+      centralGravity: 0.2,
+      springLength: springLength,
+      springConstant: 0.04,
+      damping: 0.25,
+      avoidOverlap: 0.6,
+    },
+    solver: 'barnesHut',
+  },
 };
+const network = new vis.Network(container, data, options);
 
-function positionNodes(nodes, svgWidth, svgHeight, maxImageWidth, maxImageHeight) {
-  const startY = svgHeight * 0.2; // Start at 20% of the SVG height
-  const spacing = maxImageWidth * 0.5; // Half the width of an image as spacing
+// Event listener for node clicks
+network.on('click', function (params) {
+  if (params.nodes.length > 0) {
+    const nodeId = params.nodes[0];
+    loadChildren(nodeId);
+  }
+});
 
-  nodes.forEach((node, index) => {
-    node.x = startY;
-    node.y = index * (maxImageWidth + spacing);
+function loadChildren(parentNodeId) {
+  const parentNodePosition = network.getPositions([parentNodeId])[parentNodeId];
+  const parentNode = data.nodes.get(parentNodeId);
+  const parentDepth = parentNode.depth !== undefined ? parentNode.depth : 0;
+  const childNodes = fetchChildNodesFromDatabase(parentNodeId, parentNodePosition, parentDepth + 1);
+
+  // Add child nodes and edges to the network
+  childNodes.forEach((childNode) => {
+    if (!data.nodes.get(childNode.id)) {
+      data.nodes.add(childNode);
+      data.edges.add({ from: parentNodeId, to: childNode.id });
+    }
   });
 }
 
-function zoomed(event) {
-  svgGroup.attr('transform', event.transform);
-}
+function fetchChildNodesFromDatabase(parentNodeId, parentNodePosition, depth) {
+  const childNodes = [];
+  const numberOfChildren = 3; // Assuming each parent has 3 children
+  const xOffset = 80; // Horizontal spacing between child nodes
 
-let zoom;
-
-// Drag behavior
-function dragged(event, d) {
-  d3.select(this).attr('transform', `translate(${event.x},${event.y})`);
-}
-
-let drag;
-
-// Initialize the chart
-function Init_FaceExplore_D3() {
-  const container = document.querySelector('#d3-view');
-  const svgWidth = container.clientWidth;
-  const svgHeight = container.clientHeight;
-
-  const maxImageWidth = svgWidth * 0.06; // 6% of the SVG's width
-  const maxImageHeight = svgHeight * 0.08; // 8% of the SVG's height
-
-  const svg = d3.select('#d3-view').append('svg').attr('viewBox', `0 0 ${svgWidth} ${svgHeight}`).attr('width', '100%').attr('height', '100%');
-
-  const svgGroup = svg.append('g');
-
-  // Zoom behavior
-  const zoom = d3
-    .zoom()
-    .scaleExtent([0.5, 10])
-    .on('zoom', (event) => {
-      svgGroup.attr('transform', event.transform);
+  console.log(parentNodeId, parentNodePosition);
+  for (let i = 0; i < numberOfChildren; i++) {
+    const childId = `${parentNodeId}-child-${i}`;
+    childNodes.push({
+      id: childId,
+      shape: 'image',
+      image: default_image,
+      label: `Depth: ${depth}`,
+      x: parentNodePosition.x + (i - Math.floor(numberOfChildren / 2)) * xOffset,
+      y: 100 + parentNodePosition.y * 1.2, // 20% downwards
     });
-
-  svg.call(zoom);
-
-  // Drag behavior
-  const drag = d3.drag().on('drag', (event, d) => {
-    d3.select(this).attr('transform', `translate(${event.x},${event.y})`);
-  });
-
-  const root = d3.hierarchy(treeData);
-  positionNodes(root.descendants(), svgWidth, svgHeight, maxImageWidth, maxImageHeight);
-
-  const node = svgGroup
-    .selectAll('.node')
-    .data(root.descendants().slice(1))
-    .enter()
-    .append('g')
-    .attr('class', 'node')
-    .attr('transform', (d) => `translate(${d.y},${d.x})`)
-    .call(drag);
-
-  node
-    .append('image')
-    .attr('xlink:href', default_image)
-    .attr('width', maxImageWidth)
-    .attr('height', maxImageHeight)
-    .attr('x', -maxImageWidth / 2)
-    .attr('y', -maxImageHeight / 2);
+  }
+  return childNodes;
 }
 
-document.addEventListener('DOMContentLoaded', Init_FaceExplore_D3);
+window.addEventListener('resize', function () {
+  const newWidth = container.offsetWidth;
+  const newSpringLength = newWidth * 0.05; // 5% of the new width
+
+  // Update the network's options
+  network.setOptions({
+    physics: {
+      barnesHut: {
+        springLength: newSpringLength,
+      },
+    },
+  });
+});
