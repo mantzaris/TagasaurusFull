@@ -1,86 +1,122 @@
-const default_image = PATH.join(__dirname, '..', 'test4.png');
-const nodes = new vis.DataSet([]);
-const edges = new vis.DataSet([]);
+const { GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
 
-const yTopRow = 0; // Y-coordinate for the top row
-const yBottomRow = 150; // Y-coordinate for the bottom row
-const xSpacing = 100; // Spacing between nodes
+const default_image = PATH.join(__dirname, '..', 'fr2.jpg');
+const default_filename = 'fr2.jpg';
 
-// Add only parent nodes initially
-for (let i = 0; i < 10; i++) {
-  nodes.add({ id: i, shape: 'image', image: default_image, x: i * xSpacing, y: yTopRow });
-}
+const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 const container = document.getElementById('d3-view');
 const containerWidth = container.offsetWidth;
 const containerHeight = container.offsetHeight;
-const springLength = containerWidth * 0.05; // 5% of the container's width
 
-const data = { nodes, edges };
-const options = {
-  // Basic options; layout is not hierarchical
-  nodes: {
-    shape: 'image',
-    size: 30,
-  },
-  edges: {
-    arrows: 'to',
-  },
-  interaction: {
-    dragNodes: true,
-    zoomView: true,
-  },
-  physics: {
-    enabled: true,
-    barnesHut: {
-      gravitationalConstant: -2000,
-      centralGravity: 0.2,
-      springLength: springLength,
-      springConstant: 0.04,
-      damping: 0.25,
-      avoidOverlap: 0.6,
+const spawn_num = 10;
+const init_radius = Math.min(containerHeight, containerWidth) * 0.3;
+let springLength = containerWidth * 0.05;
+
+const nodes = new vis.DataSet([]);
+const edges = new vis.DataSet([]);
+let network_data;
+let network_options;
+
+let id2filename_map = new Map();
+
+function Initialize_FirstView() {
+  for (let i = 0; i < spawn_num; i++) {
+    const angle = (2 * Math.PI * i) / spawn_num; // Angle for each node
+    const x = init_radius * Math.cos(angle);
+    const y = init_radius * Math.sin(angle);
+
+    // DOES NOT WORK widthConstraint: { minimum: 5, maximum: 5 },
+    // DOES NOT WORK heightConstraint: { minimum: 5, maximum: 5 },
+    const childId = Rand_Node_ID();
+    id2filename_map.set(childId, default_filename);
+    nodes.add({
+      id: childId,
+      shape: 'image',
+      image: GENERAL_HELPER_FNS.Full_Path_From_File_Name(default_filename),
+      x: x,
+      y: y,
+    });
+  }
+
+  network_options = {
+    nodes: {
+      shape: 'image',
+      size: 30,
     },
-    solver: 'barnesHut',
-  },
-};
-const network = new vis.Network(container, data, options);
+    edges: {
+      arrows: 'to',
+    },
+    interaction: {
+      dragNodes: true,
+      zoomView: true,
+    },
+    physics: {
+      enabled: true,
+      barnesHut: {
+        gravitationalConstant: -2000,
+        centralGravity: 0.2,
+        springLength: springLength,
+        springConstant: 0.04,
+        damping: 0.25,
+        avoidOverlap: 0.6,
+      },
+      solver: 'barnesHut',
+    },
+  };
 
+  network_data = { nodes, edges };
+}
+
+Initialize_FirstView();
+
+const network = new vis.Network(container, network_data, network_options);
+
+////////////////////////////////////////////////////////////
+// now the dynamic functions
+////////////////////////////////////////////////////////////
 // Event listener for node clicks
 network.on('click', function (params) {
   if (params.nodes.length > 0) {
     const nodeId = params.nodes[0];
-    loadChildren(nodeId);
+
+    const connectedEdges = network_data.edges.get({
+      filter: (edge) => {
+        return edge.from === nodeId;
+      },
+    });
+
+    if (connectedEdges.length === 0) {
+      Spawn_Children(nodeId);
+    }
   }
 });
 
-function loadChildren(parentNodeId) {
+function Spawn_Children(parentNodeId) {
   const parentNodePosition = network.getPositions([parentNodeId])[parentNodeId];
-  const parentNode = data.nodes.get(parentNodeId);
-  const parentDepth = parentNode.depth !== undefined ? parentNode.depth : 0;
-  const childNodes = fetchChildNodesFromDatabase(parentNodeId, parentNodePosition, parentDepth + 1);
-
+  const childNodes = fetchChildNodesFromDatabase(parentNodePosition);
   // Add child nodes and edges to the network
   childNodes.forEach((childNode) => {
-    if (!data.nodes.get(childNode.id)) {
-      data.nodes.add(childNode);
-      data.edges.add({ from: parentNodeId, to: childNode.id });
+    if (!network_data.nodes.get(childNode.id)) {
+      network_data.nodes.add(childNode);
+      network_data.edges.add({ from: parentNodeId, to: childNode.id });
     }
   });
 }
 
-function fetchChildNodesFromDatabase(parentNodeId, parentNodePosition, depth) {
+function fetchChildNodesFromDatabase(parentNodePosition) {
   const childNodes = [];
   const numberOfChildren = 3; // Assuming each parent has 3 children
   const xOffset = 80; // Horizontal spacing between child nodes
 
-  console.log(parentNodeId, parentNodePosition);
   for (let i = 0; i < numberOfChildren; i++) {
-    const childId = `${parentNodeId}-child-${i}`;
+    const childId = Rand_Node_ID();
+    id2filename_map.set(childId, default_filename);
     childNodes.push({
       id: childId,
       shape: 'image',
-      image: default_image,
-      label: `Depth: ${depth}`,
+      image: GENERAL_HELPER_FNS.Full_Path_From_File_Name(default_filename),
+      label: ``,
       x: parentNodePosition.x + (i - Math.floor(numberOfChildren / 2)) * xOffset,
       y: 100 + parentNodePosition.y * 1.2, // 20% downwards
     });
@@ -92,7 +128,6 @@ window.addEventListener('resize', function () {
   const newWidth = container.offsetWidth;
   const newSpringLength = newWidth * 0.05; // 5% of the new width
 
-  // Update the network's options
   network.setOptions({
     physics: {
       barnesHut: {
@@ -101,3 +136,12 @@ window.addEventListener('resize', function () {
     },
   });
 });
+
+function Rand_Node_ID(length = 7) {
+  let result = '';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
