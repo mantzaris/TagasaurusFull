@@ -13,29 +13,26 @@
 
     <script type="text/javascript" src="../Assets/visjs/vis-network.min.js" defer></script>
 
-    <script type="text/javascript" src="../Assets/d3/d3.v7.min.js" defer></script>
-
     <title>FACE EXPLORE</title>
 </head>
 <body>
 
     <div class="container-fluid" id="top-facemap">
         <div class="row" id="facemap">
-            <div class="col-md-8 col-sm-8" id="d3-view">
+            <div class="col-md-8 col-sm-8" id="network-view">
                 
                 <!-- D3.js tree will be rendered here -->
             </div>
             <div class="col-md-4 col-sm-4" id="facemap-controls">
                 <div id="button-container">
-                    
-                    <button type="button" class="btn btn-primary my-1 mx-1">Home</button>
-                    <button type="button" class="btn btn-primary my-1 mx-1">Go To Selected</button>
-                    <button type="button" class="btn btn-primary my-1 mx-1">Restart</button>
+                    <a href="welcome-screen.html" class="btn btn-primary my-1 mx-1">Home</a>
+                    <button id="restart-btn" type="button" class="btn btn-primary my-1 mx-1">Restart</button>
 
-                    <div class="slider-container">
+                    <!-- <button type="button" class="btn btn-primary my-1 mx-1">Go To Selected</button> -->
+                    <!-- <div class="slider-container">
                         <label for="thumbnail-size-slider">Image Size:</label>
                         <input type="range" id="thumbnail-size-slider" name="thumbnailSize" min="1" max="10">
-                    </div>
+                    </div> -->
 
                 </div>
                 <div id="image-container">

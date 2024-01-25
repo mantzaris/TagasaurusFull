@@ -4,19 +4,15 @@ html {
   background-color: var(--bg);
 }
 
-#d3-view {
-  /* width: 100%; */
-}
-
 #top-facemap,
 #facemap,
-#d3-view,
+#network-view,
 #facemap-controls {
   height: 100%;
   background-color: var(--bg);
 }
 
-#d3-view {
+#network-view {
   height: 100%;
   overflow: hidden; /*auto;*/
   border-right: 2px solid var(--primary);
@@ -38,6 +34,7 @@ html {
 #image-container {
   flex-grow: 1;
   overflow-y: auto;
+  background-color: blue;
 }
 
 .slider-container {

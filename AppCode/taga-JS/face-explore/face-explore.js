@@ -3,16 +3,16 @@ const { GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', '
 const default_filename = 'fr2.jpg';
 const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-const container = document.getElementById('d3-view');
+const container = document.getElementById('network-view');
 const nodes = new vis.DataSet([]);
 const edges = new vis.DataSet([]);
 
-let containerWidth = container.offsetWidth;
-let containerHeight = container.offsetHeight;
-let springLength = containerWidth * 0.05;
 let network_data;
 let network_options;
 let id2filename_map = new Map();
+let containerWidth = container.offsetWidth;
+let containerHeight = container.offsetHeight;
+let springLength = containerWidth * 0.05;
 
 const init_radius = Math.min(containerHeight, containerWidth) * 0.3;
 const spawn_num = 8;
@@ -74,18 +74,23 @@ const network = new vis.Network(container, network_data, network_options);
 ////////////////////////////////////////////////////////////
 // Event listener for node clicks
 network.on('click', function (params) {
-  if (params.nodes.length > 0) {
-    const nodeId = params.nodes[0];
+  const nodeId = params.nodes[0];
 
+  if (nodeId) {
+    //if one or more nodes selected
     const connectedEdges = network_data.edges.get({
       filter: (edge) => {
         return edge.from === nodeId;
       },
     });
 
+    //it is a leaf node without connections outwards
     if (connectedEdges.length === 0) {
       Spawn_Children(nodeId);
     }
+
+    //display the clicked node image/video etc separately
+    Present_Node_Locality(id2filename_map.get(nodeId));
   }
 });
 
@@ -141,4 +146,52 @@ function Rand_Node_ID(length = 7) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
+}
+
+////////////////////////////////////////////
+//UI interactivity
+////////////////////////////////////////////
+document.getElementById('restart-btn').onclick = () => {
+  nodes.clear();
+  edges.clear();
+  id2filename_map.clear();
+
+  Initialize_FirstView();
+};
+
+async function Present_Node_Locality(filename) {
+  console.log(filename);
+  let search_results = [filename];
+  let search_results_output = document.getElementById('image-container');
+  search_results_output.innerHTML = '';
+  let search_display_inner_tmp = '';
+
+  // for (let file_key of search_results) {
+  //   search_display_inner_tmp += `
+  //                               <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${file_key}" >
+  //                                   ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
+  //                                     file_key,
+  //                                     'modal-image-search-result-single-image-img-obj-class',
+  //                                     `modal-image-search-result-single-image-img-id-${file_key}`
+  //                                   )}
+  //                               </div>
+  //                               `;
+  // }
+
+  // search_results_output.innerHTML += search_display_inner_tmp;
+
+  // search_results.forEach((file) => {
+  //   if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true) {
+  //     document.getElementById(`modal-image-search-result-single-image-img-id-${file}`).onclick = async function () {
+  //       const search_res_children = document.getElementById('modal-search-images-results-grid-div-area-id').children;
+  //       const search_meme_res_children = document.getElementById('modal-search-meme-images-results-grid-div-area-id').children;
+  //       const children_tmp = [...search_res_children, ...search_meme_res_children];
+  //       GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp);
+
+  //       current_image_annotation = DB_MODULE.Get_Tagging_Record_From_DB(file);
+  //       Load_State_Of_Image_IDB();
+  //       document.getElementById('search-modal-click-top-id').style.display = 'none';
+  //     };
+  //   }
+  // });
 }
