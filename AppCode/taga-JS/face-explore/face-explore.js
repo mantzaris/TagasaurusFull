@@ -1,24 +1,21 @@
 const { GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
 
-const default_image = PATH.join(__dirname, '..', 'fr2.jpg');
 const default_filename = 'fr2.jpg';
-
 const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 const container = document.getElementById('d3-view');
-const containerWidth = container.offsetWidth;
-const containerHeight = container.offsetHeight;
-
-const spawn_num = 10;
-const init_radius = Math.min(containerHeight, containerWidth) * 0.3;
-let springLength = containerWidth * 0.05;
-
 const nodes = new vis.DataSet([]);
 const edges = new vis.DataSet([]);
+
+let containerWidth = container.offsetWidth;
+let containerHeight = container.offsetHeight;
+let springLength = containerWidth * 0.05;
 let network_data;
 let network_options;
-
 let id2filename_map = new Map();
+
+const init_radius = Math.min(containerHeight, containerWidth) * 0.3;
+const spawn_num = 8;
 
 function Initialize_FirstView() {
   for (let i = 0; i < spawn_num; i++) {
@@ -57,8 +54,8 @@ function Initialize_FirstView() {
         gravitationalConstant: -2000,
         centralGravity: 0.2,
         springLength: springLength,
-        springConstant: 0.04,
-        damping: 0.25,
+        springConstant: 0.06,
+        damping: 0.3,
         avoidOverlap: 0.6,
       },
       solver: 'barnesHut',
@@ -94,39 +91,39 @@ network.on('click', function (params) {
 
 function Spawn_Children(parentNodeId) {
   const parentNodePosition = network.getPositions([parentNodeId])[parentNodeId];
-  const childNodes = fetchChildNodesFromDatabase(parentNodePosition);
-  // Add child nodes and edges to the network
-  childNodes.forEach((childNode) => {
-    if (!network_data.nodes.get(childNode.id)) {
-      network_data.nodes.add(childNode);
-      network_data.edges.add({ from: parentNodeId, to: childNode.id });
-    }
-  });
-}
+  const child_IDs = fetchChildNodesFromDatabase(parentNodeId);
 
-function fetchChildNodesFromDatabase(parentNodePosition) {
-  const childNodes = [];
-  const numberOfChildren = 3; // Assuming each parent has 3 children
-  const xOffset = 80; // Horizontal spacing between child nodes
-
-  for (let i = 0; i < numberOfChildren; i++) {
-    const childId = Rand_Node_ID();
+  for (let i = 0; i < spawn_num; i++) {
+    const childId = child_IDs[i];
     id2filename_map.set(childId, default_filename);
-    childNodes.push({
+
+    const childNode = {
       id: childId,
       shape: 'image',
       image: GENERAL_HELPER_FNS.Full_Path_From_File_Name(default_filename),
       label: ``,
-      x: parentNodePosition.x + (i - Math.floor(numberOfChildren / 2)) * xOffset,
-      y: 100 + parentNodePosition.y * 1.2, // 20% downwards
-    });
+      x: parentNodePosition.x + (Math.random() - 0.5),
+      y: parentNodePosition.y + (Math.random() - 0.5),
+    };
+
+    // Add child node and edge to the network if it doesn't already exist
+    if (!network_data.nodes.get(childNode.id)) {
+      network_data.nodes.add(childNode);
+      network_data.edges.add({ from: parentNodeId, to: childNode.id });
+    }
   }
-  return childNodes;
+}
+
+function fetchChildNodesFromDatabase(parentNodeId) {
+  return Array.from({ length: spawn_num }, Rand_Node_ID);
 }
 
 window.addEventListener('resize', function () {
   const newWidth = container.offsetWidth;
   const newSpringLength = newWidth * 0.05; // 5% of the new width
+
+  containerWidth = container.offsetWidth;
+  containerHeight = container.offsetHeight;
 
   network.setOptions({
     physics: {
