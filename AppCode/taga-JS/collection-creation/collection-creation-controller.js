@@ -723,12 +723,11 @@ async function Collection_Profile_Image_Search_Action() {
   collection_profile_search_obj['searchMemeTags'] = search_unique_meme_search_terms;
   //emotion key value already is in: collection_profile_search_obj
 
-  let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
-  processing_modal.style.display = 'flex';
+  Show_Loading_Spinner();
 
   profile_search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_profile_search_obj);
 
-  processing_modal.style.display = 'none';
+  Hide_Loading_Spinner();
 
   //present new sorted ordering now!
   let profile_search_display_div = document.getElementById('modal-search-profileimage-images-results-grid-div-area-id');
@@ -1073,14 +1072,13 @@ async function Collection_Add_Image_Search_Action() {
   //img_indices_sorted = image_search_result_obj.imgInds //!!! indexeddb !!!
   //meme_img_indices_sorted = image_search_result_obj.memeInds //!!! indexeddb !!!
 
-  let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
-  processing_modal.style.display = 'flex';
+  Show_Loading_Spinner();
 
   search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_gallery_search_obj);
 
   search_image_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(collection_gallery_search_obj);
 
-  processing_modal.style.display = 'none';
+  Hide_Loading_Spinner();
 
   //display the search order with the image order first and then the memes that are relevant
   let search_display_div = document.getElementById('modal-search-images-results-grid-div-area-id');
@@ -1478,14 +1476,13 @@ async function Collection_Add_Memes_Search_Action() {
   // img_indices_sorted = meme_search_result_obj.imgInds //!!!indexeddb !!!
   // meme_img_indices_sorted = meme_search_result_obj.memeInds //!!!indexeddb !!!
 
-  let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
-  processing_modal.style.display = 'flex';
+  Show_Loading_Spinner();
 
   meme_search_image_results = await SEARCH_MODULE.Image_Search_DB(collection_meme_search_obj);
 
   meme_search_image_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(collection_meme_search_obj);
 
-  processing_modal.style.display = 'none';
+  Hide_Loading_Spinner();
 
   //display the search order with the image order first and then the memes that are relevant
   let search_display_div = document.getElementById('modal-search-add-memes-images-results-grid-div-area-id');

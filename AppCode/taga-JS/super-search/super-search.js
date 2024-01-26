@@ -48,8 +48,7 @@ document.getElementById('get-recommended-button-id').onclick = function () {
 async function Super_Search() {
   Set_Search_Obj_Tags();
 
-  let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
-  processing_modal.style.display = 'flex';
+  Show_Loading_Spinner();
 
   let faceDescriptors_search = [];
   for (let img_ind = 0; img_ind < selected_images.length; img_ind++) {
@@ -120,7 +119,7 @@ async function Super_Search() {
     };
   });
 
-  processing_modal.style.display = 'none';
+  Hide_Loading_Spinner();
 }
 
 //return to main screen
@@ -404,8 +403,7 @@ document.getElementById('use-new-image-button-id').onclick = async function () {
   last_user_image_directory_chosen = PATH.dirname(result.filePaths[0]);
 
   //show loading modal and disallow user input !!!
-  let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
-  processing_modal.style.display = 'flex';
+  Show_Loading_Spinner();
 
   for (let element of result.filePaths) {
     //result.filePaths.forEach( (element, index) => {
@@ -425,7 +423,7 @@ document.getElementById('use-new-image-button-id').onclick = async function () {
   }
   selected_images = [...new Set(selected_images)];
   Update_Selected_Images();
-  processing_modal.style.display = 'none';
+  Hide_Loading_Spinner();
 };
 
 async function Handle_Unsupported_Video_Format(path_tmp, ext_tmp = '.mp4') {

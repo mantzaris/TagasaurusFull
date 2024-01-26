@@ -100,14 +100,3 @@ async function Init_Analytics() {
 }
 
 Init_Analytics();
-
-ipcRenderer.on('show-spinner', () => {
-  console.log('showing spinner renderer');
-  let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
-  processing_modal.style.display = 'flex';
-});
-
-ipcRenderer.on('hide-spinner', () => {
-  let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
-  processing_modal.style.display = 'none';
-});

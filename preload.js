@@ -417,3 +417,21 @@ async function extractFramesFromVideo(videoUrl, get_emotions = false, get_only_e
     video.src = videoObjectUrl;
   });
 }
+
+function Show_Loading_Spinner() {
+  const processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
+
+  if (!processing_modal) return;
+
+  processing_modal.style.display = 'flex';
+}
+window.Show_Loading_Spinner = Show_Loading_Spinner;
+
+function Hide_Loading_Spinner() {
+  const processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
+
+  if (!processing_modal) return;
+
+  processing_modal.style.display = 'none';
+}
+window.Hide_Loading_Spinner = Hide_Loading_Spinner;

@@ -23,8 +23,7 @@ export_button.onclick = async () => {
 
   //get ready to export data
   if (path_chosen.canceled == false) {
-    let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
-    processing_modal.style.display = 'flex';
+    Show_Loading_Spinner();
 
     const destination = PATH.join(path_chosen.filePaths[0], EXPORT_NAME);
 
@@ -67,14 +66,14 @@ export_button.onclick = async () => {
       console.log(`bytes written: ${archive.pointer()} bytes`);
     });
     output.on('finish', () => {
-      processing_modal.style.display = 'none';
+      Hide_Loading_Spinner();
       shell.showItemInFolder(destination);
       alert('export success');
     });
 
     output.on('error', (err) => {
       console.error(err);
-      processing_modal.style.display = 'none';
+      Hide_Loading_Spinner();
       alert(`error: ${err}`);
     });
 

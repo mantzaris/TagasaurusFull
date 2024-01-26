@@ -21,7 +21,6 @@ import_button.onclick = Import_User_Annotation_Data;
 let tagging_import;
 let meme_import;
 let temp_dir;
-let processing_modal = document.querySelector('.processing-notice-modal-top-div-class');
 
 //functionality for the export of all the information, init() function
 //called at the start from the user
@@ -31,14 +30,14 @@ async function Import_User_Annotation_Data() {
   //create a db from the import path
   if (path_chosen.canceled) return;
 
-  processing_modal.style.display = 'flex';
+  Show_Loading_Spinner();
 
   DB_import_path = path_chosen.filePaths[0];
   const ft_res = await ft.fromFile(DB_import_path);
 
   if (!ft_res.mime.includes('zip')) {
     alert('expected imported file format was not a zip');
-    return (processing_modal.style.display = 'none');
+    return Hide_Loading_Spinner();
   }
 
   temp_dir = PATH.join(USER_DATA_PATH, 'TagasaurusFiles', 'temp');
@@ -59,7 +58,7 @@ async function Import_User_Annotation_Data() {
   } catch (e) {
     console.log(e);
     alert('something went wrong, cannot extract specified file');
-    return (processing_modal.style.display = 'none');
+    return Hide_Loading_Spinner();
   }
 
   const ev = new EventEmitter();
@@ -75,7 +74,7 @@ async function Import_User_Annotation_Data() {
   } catch (e) {
     console.log(e);
     alert('could not read tagging.json and/or memes.json in import');
-    return (processing_modal.style.display = 'none');
+    return Hide_Loading_Spinner();
   } finally {
     ev.emit('ready');
   }
@@ -257,7 +256,7 @@ async function HandleImport() {
     force: true,
   });
 
-  processing_modal.style.display = 'none';
+  Hide_Loading_Spinner();
   alert('successfully imported');
 }
 
