@@ -1,4 +1,5 @@
 const { GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
+const { ipcRenderer } = require('electron');
 
 const default_filename = 'fr2.jpg';
 const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -160,23 +161,32 @@ document.getElementById('restart-btn').onclick = () => {
 };
 
 async function Present_Node_Locality(filename) {
-  console.log(filename);
-  let search_results = [filename];
-  let search_results_output = document.getElementById('image-container');
-  search_results_output.innerHTML = '';
-  let search_display_inner_tmp = '';
+  const record = DB_MODULE.Get_Tagging_Record_From_DB(filename);
 
-  // for (let file_key of search_results) {
-  //   search_display_inner_tmp += `
-  //                               <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${file_key}" >
-  //                                   ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
-  //                                     file_key,
-  //                                     'modal-image-search-result-single-image-img-obj-class',
-  //                                     `modal-image-search-result-single-image-img-id-${file_key}`
-  //                                   )}
-  //                               </div>
-  //                               `;
-  // }
+  let search_results = [filename, filename];
+  const { distances, rowids } = await ipcRenderer.invoke('faiss-search', selected.descriptor, 6);
+  console.log('distances=', distances, `rowids = ${rowids}`);
+
+  let search_results_output = document.getElementById('media-container');
+  search_results_output.innerHTML = '';
+
+  for (const fn_result of search_results) {
+    const file_type = DB_MODULE.Get_Tagging_Record_From_DB(fn_result).fileType;
+
+    if (file_type == 'image') {
+      const image = document.createElement('img');
+      image.src = GENERAL_HELPER_FNS.Full_Path_From_File_Name(fn_result);
+      image.classList.add('media-style');
+      image.id = `candidate-${fn_result}`;
+      image.alt = 'image';
+      document.getElementById('media-container').appendChild(image);
+      document.getElementById(`candidate-${fn_result}`).onclick = () => {
+        GENERAL_HELPER_FNS.Goto_Tagging_Entry(fn_result);
+      };
+    } else if (file_type == 'video') {
+      return `<video class="${class_name} ${VIDEO_IDENTIFIER}" id="${id_tmp}" src="${file_path}" controls muted alt="${type}" />`;
+    }
+  }
 
   // search_results_output.innerHTML += search_display_inner_tmp;
 
@@ -187,7 +197,7 @@ async function Present_Node_Locality(filename) {
   //       const search_meme_res_children = document.getElementById('modal-search-meme-images-results-grid-div-area-id').children;
   //       const children_tmp = [...search_res_children, ...search_meme_res_children];
   //       GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp);
-
+  //function Pause_Media_From_Modals() {
   //       current_image_annotation = DB_MODULE.Get_Tagging_Record_From_DB(file);
   //       Load_State_Of_Image_IDB();
   //       document.getElementById('search-modal-click-top-id').style.display = 'none';

@@ -31,10 +31,21 @@ html {
   padding: 3px;
 }
 
-#image-container {
+#media-container {
   flex-grow: 1;
   overflow-y: auto;
+  padding-bottom: 3px;
   background-color: blue;
+}
+
+.media-style {
+  max-height: 20vh;
+  max-width: 100%;
+  cursor: pointer;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 3px;
 }
 
 .slider-container {
