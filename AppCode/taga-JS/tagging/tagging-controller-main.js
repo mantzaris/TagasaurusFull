@@ -1233,7 +1233,14 @@ async function Search_Images() {
 
   Hide_Loading_Spinner();
 
-  //display default ordering first
+  await Populate_Search_Results();
+
+  //user presses the main search button for the add memes search modal
+  document.getElementById('modal-search-main-button-id').onclick = () => Modal_Search_Entry();
+  document.getElementById('modal-search-similar-button-id').onclick = () => Modal_Search_Similar();
+}
+
+async function Populate_Search_Results() {
   const output_div = document.getElementById('modal-search-images-results-grid-div-area-id');
   output_div.innerHTML = '';
   let search_html = '';
@@ -1302,30 +1309,25 @@ async function Search_Images() {
       };
     }
   });
-
-  //user presses the main search button for the add memes search modal
-  document.getElementById('modal-search-main-button-id').onclick = Modal_Search_Entry;
-  document.getElementById('modal-search-similar-button-id').onclick = Modal_Search_Similar;
 }
-
-function Populate_Search_Results() {}
 
 //when the tagging search modal 'search' button is pressed
 async function Modal_Search_Entry(search_similar = false, search_obj_similar_tmp = {}) {
   search_obj_tmp = tagging_search_obj;
-  if (search_similar == false) {
+
+  if (!search_similar) {
     //annotation tags
-    let search_tags_input = document.getElementById('modal-search-tag-textarea-entry-id').value;
-    let split_search_string = search_tags_input.split(reg_exp_delims);
-    let search_unique_search_terms = [...new Set(split_search_string)];
-    search_unique_search_terms = search_unique_search_terms.filter((tag) => tag !== '');
-    search_obj_tmp['searchTags'] = search_unique_search_terms;
-    //meme tags now
-    let search_meme_tags_input = document.getElementById('modal-search-meme-tag-textarea-entry-id').value;
-    let split_meme_search_string = search_meme_tags_input.split(reg_exp_delims);
-    let search_unique_meme_search_terms = [...new Set(split_meme_search_string)];
-    search_unique_meme_search_terms = search_unique_meme_search_terms.filter((tag) => tag !== '');
-    search_obj_tmp['searchMemeTags'] = search_unique_meme_search_terms;
+    const search_tags_input = document.getElementById('modal-search-tag-textarea-entry-id').value;
+    const split_search_string = search_tags_input.split(reg_exp_delims);
+    const search_unique_search_terms = [...new Set(split_search_string)].filter((tag) => tag !== '');
+
+    search_obj_tmp.searchTags = search_unique_search_terms;
+
+    const search_meme_tags_input = document.getElementById('modal-search-meme-tag-textarea-entry-id').value;
+    const split_meme_search_string = search_meme_tags_input.split(reg_exp_delims);
+    const search_unique_meme_search_terms = [...new Set(split_meme_search_string)].filter((tag) => tag !== '');
+
+    search_obj_tmp.searchMemeTags = search_unique_meme_search_terms;
   } else {
     search_obj_tmp = search_obj_similar_tmp;
   }
@@ -1339,59 +1341,7 @@ async function Modal_Search_Entry(search_similar = false, search_obj_similar_tmp
 
   Hide_Loading_Spinner();
 
-  //>>SHOW SEARCH RESULTS<<
-  //search images results annotations
-  let search_image_results_output = document.getElementById('modal-search-images-results-grid-div-area-id');
-  search_image_results_output.innerHTML = '';
-  let search_display_inner_tmp = '';
-  for (let file_key of search_results) {
-    search_display_inner_tmp += `
-                                <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${file_key}" >
-                                    ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
-                                      file_key,
-                                      'modal-image-search-result-single-image-img-obj-class',
-                                      `modal-image-search-result-single-image-img-id-${file_key}`
-                                    )}
-                                </div>
-                                `;
-  }
-  search_image_results_output.innerHTML = search_display_inner_tmp;
-  //search meme results
-  search_meme_results_output = document.getElementById('modal-search-meme-images-results-grid-div-area-id');
-  search_meme_results_output.innerHTML = '';
-  search_display_inner_tmp = '';
-  for (let file_key of search_meme_results) {
-    search_display_inner_tmp += `
-                                <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${file_key}" >
-                                    ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
-                                      file_key,
-                                      'modal-image-search-result-single-image-img-obj-class',
-                                      `modal-image-search-result-single-meme-image-img-id-${file_key}`
-                                    )}
-                                    </div>                                
-                            `;
-  }
-  search_meme_results_output.innerHTML = search_display_inner_tmp;
-
-  //user presses an image to select it from the images section, add onclick event listener
-  search_results.forEach((file) => {
-    if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true) {
-      document.getElementById(`modal-image-search-result-single-image-img-id-${file}`).onclick = async function () {
-        current_image_annotation = DB_MODULE.Get_Tagging_Record_From_DB(file);
-        Load_Image_State();
-        document.getElementById('search-modal-click-top-id').style.display = 'none';
-      };
-    }
-  });
-  search_meme_results.forEach((file) => {
-    if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true) {
-      document.getElementById(`modal-image-search-result-single-meme-image-img-id-${file}`).onclick = async function () {
-        current_image_annotation = DB_MODULE.Get_Tagging_Record_From_DB(file);
-        Load_Image_State();
-        document.getElementById('search-modal-click-top-id').style.display = 'none';
-      };
-    }
-  });
+  await Populate_Search_Results();
 }
 
 //search similar images to the current image annotation using the face recognition api
@@ -1406,6 +1356,7 @@ async function Modal_Search_Similar() {
   Modal_Search_Entry(true, search_obj_similar_tmp);
 }
 
+//TODO: refactor from here! check the parameters on single line event listeners
 /******************************
 MEME SEARCH STUFF SEARCH FOR MEMES TO ADD THEM AS AN ANNOTATION
 ******************************/
