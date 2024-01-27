@@ -752,8 +752,13 @@ async function Load_New_Image(filename) {
     last_user_image_directory_chosen = PATH.dirname(result.filePaths[0]);
     filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result, TAGA_DATA_DIRECTORY);
   } else {
-    const result = { filePaths: [filename] };
-    filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result, TAGA_DATA_DIRECTORY);
+    try {
+      const result = { filePaths: [filename] };
+      filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result, TAGA_DATA_DIRECTORY);
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
   }
 
   if (filenames.length == 0) {
@@ -766,7 +771,7 @@ async function Load_New_Image(filename) {
   let tagging_entry = null;
   for (const filename of filenames) {
     let tmp = Object.assign({}, TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION);
-    const filepath = PATH.join(TAGA_DATA_DIRECTORY, filename);
+    let filepath = PATH.join(TAGA_DATA_DIRECTORY, filename);
 
     tmp.fileName = filename;
     tmp.fileHash = MY_FILE_HELPER.Return_File_Hash(filepath);
@@ -804,6 +809,7 @@ async function Load_New_Image(filename) {
           //if not mp4, mkv, mov then translate to mp4
           const base_name = PATH.parse(filename).name;
           const output_name = base_name + '.mp4';
+
           await ipcRenderer.invoke('ffmpegDecode', {
             base_dir: TAGA_DATA_DIRECTORY,
             file_in: filename,
@@ -815,6 +821,7 @@ async function Load_New_Image(filename) {
           });
 
           tmp.fileName = output_name;
+          filepath = PATH.join(TAGA_DATA_DIRECTORY, output_name);
         }
 
         if (default_auto_fill_emotions) {
@@ -840,6 +847,7 @@ async function Load_New_Image(filename) {
           });
 
           tmp.fileName = output_name;
+          filepath = PATH.join(TAGA_DATA_DIRECTORY, output_name);
         }
       } else if (filetype.mime.includes('pdf') == true) {
       } else {
@@ -866,10 +874,10 @@ async function Load_New_Image(filename) {
     current_image_annotation = tagging_entry;
     Load_Image_State();
   }
+
+  return tagging_entry;
 }
 
-//SAVING, LOADING, DELETING, ETC END<<<
-//TODO: refactor from here
 //utility for the adding the mouse hover icon events in the mouseovers for the emotions
 function addMouseOverIconSwitch(emotion_div) {
   // Add button hover event listeners to each inage tag.
@@ -881,9 +889,14 @@ function addMouseOverIconSwitch(emotion_div) {
   }
 }
 
-document.addEventListener('drop', (ev) => {
+document.addEventListener('drop', async (ev) => {
   ev.preventDefault();
   ev.stopPropagation();
+
+  // if (ev.dataTransfer.files.length == 0) {
+  //   alert('unidentified object dropped, only valid media files, eg (png,pdf,mp4,mp3...)');
+  //   return;
+  // }
 
   if (ev.dataTransfer.files.length > 1) {
     alert('only 1 file at a time');
@@ -891,7 +904,9 @@ document.addEventListener('drop', (ev) => {
   }
 
   const { path } = ev.dataTransfer.files[0];
-  Load_New_Image(path);
+  if ((await Load_New_Image(path)) === null) {
+    alert('unidentified object dropped, only valid media files, eg (png,pdf,mp4,mp3...)');
+  }
 });
 
 document.addEventListener('dragover', (ev) => {
@@ -899,64 +914,47 @@ document.addEventListener('dragover', (ev) => {
   ev.stopPropagation();
 });
 
-//using the WEBCAM
 document.getElementById('load-webcam-input-button-id').onclick = async function () {
-  let modal_meme_click_top_id_element = document.getElementById('modal-webcam-clicked-top-id');
-  modal_meme_click_top_id_element.style.display = 'block';
+  const outer_modal = document.getElementById('modal-webcam-clicked-top-id');
+  outer_modal.style.display = 'block';
   document.getElementById('webcam-video-id').style.display = 'block';
 
-  let meme_modal_close_btn = document.getElementById('modal-webcam-clicked-close-button-id');
-  // When the user clicks on the button, close the modal
-  meme_modal_close_btn.onclick = function () {
-    Close_Modal();
-  };
-  // When the user clicks anywhere outside of the modal, close it
-  window.onclick = function (event) {
-    if (event.target == modal_meme_click_top_id_element) {
+  const close_btn = document.getElementById('modal-webcam-clicked-close-button-id');
+  close_btn.onclick = Close_Modal;
+  window.onclick = (event) => {
+    if (event.target == outer_modal) {
       Close_Modal();
     }
   };
 
-  let capture_button = document.getElementById('capture-button-id');
-  let stream_again_btn = document.getElementById('back-capture-button-id');
-  let select_capture_button = document.getElementById('select-capture-button-id');
-  let video = document.getElementById('webcam-video-id');
-  let canvas = document.getElementById('canvas-webcam-id');
-  canvas.style.display = 'none';
-  let photo = document.getElementById('webcam-webcam-clicked-displayimg-id');
-  let record_video_btn = document.getElementById('capture-video-button-id');
-  record_video_btn.onclick = record_video;
-  let display_area_element = document.getElementById('modal-webcam-clicked-image-gridbox-id');
+  const capture_btn = document.getElementById('capture-button-id');
+  const stream_again_btn = document.getElementById('back-capture-button-id');
+  const select_capture_button = document.getElementById('select-capture-button-id');
+  const video = document.getElementById('webcam-video-id');
+  const canvas = document.getElementById('canvas-webcam-id');
+  const photo = document.getElementById('webcam-webcam-clicked-displayimg-id');
+  const record_video_btn = document.getElementById('capture-video-button-id');
+  const stop_video_btn = document.getElementById('stop-video-button-id');
+  const cancel_video_btn = document.getElementById('cancel-video-button-id');
 
   let width;
   let height;
-
   let data;
-  let stream = await capture_media_devices(); // navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+  let recording = false;
+  let stream = await capture_media_devices();
+  let recorder = null;
+  let canceled = false;
+  let streaming;
+
   video.srcObject = stream;
   video.play();
-  let recording = false;
-  //record video from webcam now!
-  const stop_video_btn = document.getElementById('stop-video-button-id');
-  stop_video_btn.onclick = stop_record_video;
-  const cancel_video_btn = document.getElementById('cancel-video-button-id');
-  //cancel_video_btn.onclick = stop_record_video
-  let recorder = null;
+  canvas.style.display = 'none';
+  record_video_btn.onclick = record_video;
+  stop_video_btn.onclick = stop_recording_video;
 
-  let canceled = false;
-
-  async function capture_media_devices() {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
-    return stream;
-  }
-
-  let streaming;
   video.addEventListener(
     'canplay',
-    function (ev) {
+    (ev) => {
       if (!streaming) {
         height = video.videoHeight;
         width = video.videoWidth;
@@ -970,8 +968,8 @@ document.getElementById('load-webcam-input-button-id').onclick = async function 
     false
   );
 
-  document.onkeydown = function (e) {
-    if (recording == false) {
+  document.onkeydown = (e) => {
+    if (!recording) {
       if (e.keyCode == 32 || e.code == 'Space') {
         canvas.style.display = 'block';
         Take_Picture(e);
@@ -979,10 +977,45 @@ document.getElementById('load-webcam-input-button-id').onclick = async function 
     }
   };
 
-  capture_button.onclick = function (ev) {
+  capture_btn.onclick = (ev) => {
     canvas.style.display = 'block';
     Take_Picture(ev);
   };
+
+  select_capture_button.onclick = async function () {
+    const base64Data = data.replace(/^data:image\/png;base64,/, '');
+    const outputname = `w${crypto.randomUUID()}${Date.now()}.png`;
+    const final_path = PATH.join(await IPC_RENDERER.invoke('getDownloadsFolder'), outputname);
+    FS.writeFileSync(final_path, base64Data, 'base64');
+    await Load_New_Image(final_path);
+    FS.unlinkSync(final_path);
+    Close_Modal();
+  };
+
+  stream_again_btn.onclick = () => {
+    select_capture_button.style.display = 'none';
+    captured = false;
+    video.style.display = 'block';
+    stream_again_btn.style.display = 'none';
+    canvas.style.display = 'none';
+    record_video_btn.style.display = 'block';
+  };
+
+  cancel_video_btn.onclick = async () => {
+    canceled = true;
+    recording = false;
+    recorder.stream.getTracks().forEach((track) => track.stop());
+    stream = await capture_media_devices();
+    video.srcObject = stream;
+    video.play();
+  };
+
+  async function capture_media_devices() {
+    return await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true,
+    });
+  }
 
   function clearphoto() {
     const context = canvas.getContext('2d');
@@ -992,9 +1025,11 @@ document.getElementById('load-webcam-input-button-id').onclick = async function 
     data = canvas.toDataURL('image/png');
     photo.setAttribute('src', data);
   }
+
   function Take_Picture(ev) {
     ev.preventDefault();
     const context = canvas.getContext('2d');
+
     if (width && height) {
       canvas.width = width;
       canvas.height = height;
@@ -1014,31 +1049,19 @@ document.getElementById('load-webcam-input-button-id').onclick = async function 
     }
   }
 
-  //
-  select_capture_button.onclick = async function () {
-    const base64Data = data.replace(/^data:image\/png;base64,/, '');
-    let outputname = `w${crypto.randomUUID()}${Date.now()}.png`;
-    const final_path = PATH.join(await IPC_RENDERER.invoke('getDownloadsFolder'), outputname);
-    FS.writeFileSync(final_path, base64Data, 'base64');
-    await Load_New_Image(final_path);
-    FS.unlinkSync(final_path);
-    Close_Modal();
-  };
-
   function Close_Modal() {
-    if (stream) {
-      stream.getTracks().forEach((track) => {
-        track.stop();
-      });
+    for (const track of stream?.getTracks()) {
+      track.stop();
     }
+
     streaming = false;
     captured = false;
     recording = false;
     select_capture_button.style.display = 'none';
-    modal_meme_click_top_id_element.style.display = 'none';
+    outer_modal.style.display = 'none';
     photo.src = '';
     stream_again_btn.style.display = 'none';
-    capture_button.style.display = 'block';
+    capture_btn.style.display = 'block';
     stop_video_btn.style.display = 'none';
     record_video_btn.style.display = 'block';
     cancel_video_btn.style.display = 'none';
@@ -1046,25 +1069,16 @@ document.getElementById('load-webcam-input-button-id').onclick = async function 
     document.onkeydown = null;
   }
 
-  stream_again_btn.onclick = function () {
-    select_capture_button.style.display = 'none';
-    captured = false;
-    video.style.display = 'block';
-    stream_again_btn.style.display = 'none';
-    canvas.style.display = 'none';
-    record_video_btn.style.display = 'block';
-  };
-
   async function record_video() {
-    //alert("record video!")
+    let chunks = [];
+
     recording = true;
-    capture_button.style.display = 'none';
+    capture_btn.style.display = 'none';
     stop_video_btn.style.display = 'block';
     cancel_video_btn.style.display = 'block';
     record_video_btn.style.display = 'none';
     video.style.borderColor = 'red';
     recorder = new MediaRecorder(stream);
-    let chunks = [];
 
     recorder.ondataavailable = (ev) => {
       if (ev.data.size > 0) {
@@ -1078,48 +1092,39 @@ document.getElementById('load-webcam-input-button-id').onclick = async function 
           const blob = new Blob(chunks, {
             type: 'video/webm',
           });
-          chunks = [];
-          let outputname = `w${crypto.randomUUID()}${Date.now()}.webm`;
+
+          const outputname = `w${crypto.randomUUID()}${Date.now()}.webm`;
           const bytes = new Uint8Array(await blob.arrayBuffer());
           const final_path = PATH.join(await IPC_RENDERER.invoke('getDownloadsFolder'), outputname);
+
           FS.writeFileSync(final_path, bytes);
           await Load_New_Image(final_path);
           FS.unlinkSync(final_path);
+          chunks = [];
         }
 
         Close_Modal();
       } else {
         chunks = [];
         stream_again_btn.style.display = 'none';
-        capture_button.style.display = 'block';
+        capture_btn.style.display = 'block';
         stop_video_btn.style.display = 'none';
         record_video_btn.style.display = 'block';
         cancel_video_btn.style.display = 'none';
         video.style.borderColor = 'transparent';
         canceled = false;
-        //video.play()  //
-        //recorder.start()
       }
     };
+
     recorder.start();
   }
 
-  function stop_record_video() {
+  function stop_recording_video() {
     recording = false;
     stop_video_btn.style.display = 'none';
     cancel_video_btn.style.display = 'none';
     recorder.stream.getTracks().forEach((track) => track.stop());
-    //alert("in stop recording video")
   }
-
-  cancel_video_btn.onclick = async () => {
-    canceled = true;
-    recording = false;
-    recorder.stream.getTracks().forEach((track) => track.stop());
-    stream = await capture_media_devices(); // navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    video.srcObject = stream;
-    video.play();
-  };
 };
 
 /*
@@ -1133,28 +1138,29 @@ let tagging_search_obj = {
 //functionality for the searching of the images
 async function Search_Images() {
   // Show the modal
-  let modal_search_click = document.getElementById('search-modal-click-top-id');
-  modal_search_click.style.display = 'block';
-  // Get the button that opens the modal
-  let meme_modal_close_btn = document.getElementById('modal-search-close-exit-view-button-id');
-  // When the user clicks on the button, close the modal
-  meme_modal_close_btn.onclick = function () {
+  const outer_modal = document.getElementById('search-modal-click-top-id');
+  const close_btn = document.getElementById('modal-search-close-exit-view-button-id');
+
+  outer_modal.style.display = 'block';
+  close_btn.onclick = () => {
     const search_res_children = document.getElementById('modal-search-images-results-grid-div-area-id').children;
     const search_meme_res_children = document.getElementById('modal-search-meme-images-results-grid-div-area-id').children;
     const children_tmp = [...search_res_children, ...search_meme_res_children];
     GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp);
-    modal_search_click.style.display = 'none';
+    outer_modal.style.display = 'none';
   };
+
   // When the user clicks anywhere outside of the modal, close it
-  window.onclick = function (event) {
-    if (event.target == modal_search_click) {
+  window.onclick = (event) => {
+    if (event.target == outer_modal) {
       const search_res_children = document.getElementById('modal-search-images-results-grid-div-area-id').children;
       const search_meme_res_children = document.getElementById('modal-search-meme-images-results-grid-div-area-id').children;
       const children_tmp = [...search_res_children, ...search_meme_res_children];
       GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp);
-      modal_search_click.style.display = 'none';
+      outer_modal.style.display = 'none';
     }
   };
+
   //clear the search obj to make it fresh and reset the fields
   document.getElementById('modal-search-tag-textarea-entry-id').value = '';
   document.getElementById('modal-search-meme-tag-textarea-entry-id').value = '';
@@ -1168,8 +1174,9 @@ async function Search_Images() {
     searchTags: [],
     searchMemeTags: [],
   };
+
   //user presses 'reset' button so the fields of the modal become the default
-  document.getElementById('modal-search-main-reset-button-id').onclick = function () {
+  document.getElementById('modal-search-main-reset-button-id').onclick = () => {
     document.getElementById('modal-search-tag-textarea-entry-id').value = '';
     document.getElementById('modal-search-meme-tag-textarea-entry-id').value = '';
     document.getElementById('modal-search-emotion-label-value-textarea-entry-id').value = '';
@@ -1184,41 +1191,40 @@ async function Search_Images() {
     };
   };
 
-  //handler for the emotion label and value entry additions and then the deletion handling, all emotions are added by default and handled
-  document.getElementById('modal-search-emotion-entry-button-id').onclick = function () {
-    let entered_emotion_label = document.getElementById('modal-search-emotion-label-value-textarea-entry-id').value;
-    let emotion_search_entry_value = document.getElementById('modal-search-emotion-value-range-entry-id').value;
-    if (entered_emotion_label != '') {
-      tagging_search_obj['emotions'][entered_emotion_label] = emotion_search_entry_value;
+  document.getElementById('modal-search-emotion-entry-button-id').onclick = () => {
+    const emotion_label = document.getElementById('modal-search-emotion-label-value-textarea-entry-id').value;
+    const search_value = document.getElementById('modal-search-emotion-value-range-entry-id').value;
+
+    if (emotion_label != '') {
+      tagging_search_obj.emotions[emotion_label] = search_value;
     }
+
     document.getElementById('modal-search-emotion-label-value-textarea-entry-id').value = '';
     document.getElementById('modal-search-emotion-value-range-entry-id').value = '0';
-    let image_emotions_div_id = document.getElementById('modal-search-emotion-label-value-display-container-div-id');
-    image_emotions_div_id.innerHTML = '';
+    const emotions_div = document.getElementById('modal-search-emotion-label-value-display-container-div-id');
+    emotions_div.innerHTML = '';
     //Populate for the emotions of the images
-    Object.keys(tagging_search_obj['emotions']).forEach((emotion_key) => {
-      image_emotions_div_id.innerHTML += `
-                                    <span id="modal-search-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
-                                    <img class="modal-search-emotion-remove-button-class" id="modal-search-emotion-remove-button-id-${emotion_key}"
+    Object.keys(tagging_search_obj.emotions).forEach((key) => {
+      emotions_div.innerHTML += `
+                                    <span id="modal-search-emotion-label-value-span-id-${key}" style="white-space:nowrap">
+                                    <img class="modal-search-emotion-remove-button-class" id="modal-search-emotion-remove-button-id-${key}"
                                         src="${CLOSE_ICON_BLACK}" title="close" />
-                                    (${emotion_key},${tagging_search_obj['emotions'][emotion_key]})
+                                    (${key},${tagging_search_obj.emotions[key]})
                                     </span>
                                     `;
     });
 
-    // Add button hover event listeners to each inage tag.!!!
-    addMouseOverIconSwitch(image_emotions_div_id);
+    addMouseOverIconSwitch(emotions_div);
 
     //action listener for the removal of emotions populated from user entry
-    Object.keys(tagging_search_obj['emotions']).forEach((emotion_key) => {
-      document.getElementById(`modal-search-emotion-remove-button-id-${emotion_key}`).addEventListener('click', function () {
-        let search_emotion_search_span_html_obj = document.getElementById(`modal-search-emotion-label-value-span-id-${emotion_key}`);
-        search_emotion_search_span_html_obj.remove();
-        delete tagging_search_obj['emotions'][emotion_key];
+    Object.keys(tagging_search_obj.emotions).forEach((key) => {
+      document.getElementById(`modal-search-emotion-remove-button-id-${key}`).addEventListener('click', () => {
+        const html_row = document.getElementById(`modal-search-emotion-label-value-span-id-${key}`);
+        html_row.remove();
+        delete tagging_search_obj.emotions[key];
       });
     });
   };
-  // always provide a new search random
 
   Show_Loading_Spinner();
 
@@ -1228,11 +1234,12 @@ async function Search_Images() {
   Hide_Loading_Spinner();
 
   //display default ordering first
-  let search_image_results_output = document.getElementById('modal-search-images-results-grid-div-area-id');
-  search_image_results_output.innerHTML = '';
-  let search_display_inner_tmp = '';
-  for (let file_key of search_results) {
-    search_display_inner_tmp += `
+  const output_div = document.getElementById('modal-search-images-results-grid-div-area-id');
+  output_div.innerHTML = '';
+  let search_html = '';
+
+  for (const file_key of search_results) {
+    search_html += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${file_key}" >
                                     ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
                                       file_key,
@@ -1242,13 +1249,15 @@ async function Search_Images() {
                                 </div>
                                 `;
   }
-  search_image_results_output.innerHTML += search_display_inner_tmp;
-  //search meme results
-  let search_meme_results_output = document.getElementById('modal-search-meme-images-results-grid-div-area-id');
-  search_meme_results_output.innerHTML = '';
-  search_display_inner_tmp = '';
-  for (let file_key of search_meme_results) {
-    search_display_inner_tmp += `
+
+  output_div.innerHTML += search_html;
+
+  const meme_output_div = document.getElementById('modal-search-meme-images-results-grid-div-area-id');
+  meme_output_div.innerHTML = '';
+  search_html = '';
+
+  for (const file_key of search_meme_results) {
+    search_html += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${file_key}" >
                                     ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
                                       file_key,
@@ -1258,15 +1267,17 @@ async function Search_Images() {
                                 </div>                                
                             `;
   }
-  search_meme_results_output.innerHTML += search_display_inner_tmp;
+
+  meme_output_div.innerHTML += search_html;
 
   //user presses an image to select it from the images section, add onclick event listener
   search_results.forEach((file) => {
-    if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true) {
-      document.getElementById(`modal-image-search-result-single-image-img-id-${file}`).onclick = async function () {
+    if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`)) {
+      document.getElementById(`modal-image-search-result-single-image-img-id-${file}`).onclick = async () => {
         const search_res_children = document.getElementById('modal-search-images-results-grid-div-area-id').children;
         const search_meme_res_children = document.getElementById('modal-search-meme-images-results-grid-div-area-id').children;
         const children_tmp = [...search_res_children, ...search_meme_res_children];
+
         GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp);
 
         current_image_annotation = DB_MODULE.Get_Tagging_Record_From_DB(file);
@@ -1275,12 +1286,14 @@ async function Search_Images() {
       };
     }
   });
+
   search_meme_results.forEach((file) => {
-    if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true) {
-      document.getElementById(`modal-image-search-result-single-meme-image-img-id-${file}`).onclick = async function () {
+    if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`)) {
+      document.getElementById(`modal-image-search-result-single-meme-image-img-id-${file}`).onclick = async () => {
         const search_res_children = document.getElementById('modal-search-images-results-grid-div-area-id').children;
         const search_meme_res_children = document.getElementById('modal-search-meme-images-results-grid-div-area-id').children;
         const children_tmp = [...search_res_children, ...search_meme_res_children];
+
         GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp);
 
         current_image_annotation = DB_MODULE.Get_Tagging_Record_From_DB(file);
@@ -1291,13 +1304,12 @@ async function Search_Images() {
   });
 
   //user presses the main search button for the add memes search modal
-  document.getElementById('modal-search-main-button-id').onclick = function () {
-    Modal_Search_Entry();
-  };
-  document.getElementById('modal-search-similar-button-id').onclick = function () {
-    Modal_Search_Similar();
-  };
+  document.getElementById('modal-search-main-button-id').onclick = Modal_Search_Entry;
+  document.getElementById('modal-search-similar-button-id').onclick = Modal_Search_Similar;
 }
+
+function Populate_Search_Results() {}
+
 //when the tagging search modal 'search' button is pressed
 async function Modal_Search_Entry(search_similar = false, search_obj_similar_tmp = {}) {
   search_obj_tmp = tagging_search_obj;

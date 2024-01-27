@@ -398,13 +398,13 @@ async function extractFramesFromVideo(videoUrl, get_emotions = false, get_only_e
         photo.setAttribute('src', data);
 
         if (get_emotions == false) {
-          res = faceapi.detectAllFaces(photo).withFaceLandmarks().withFaceDescriptors();
+          res = await faceapi.detectAllFaces(photo).withFaceLandmarks().withFaceDescriptors();
           res = Normalize_Face_Descriptors(res);
         } else if (get_only_emotions == true) {
-          res = faceapi.detectAllFaces(photo).withFaceLandmarks().withFaceExpressions();
+          res = await faceapi.detectAllFaces(photo).withFaceLandmarks().withFaceExpressions();
           res = Normalize_Face_Descriptors(res);
         } else {
-          res = faceapi.detectAllFaces(photo).withFaceLandmarks().withFaceExpressions().withFaceDescriptors();
+          res = await faceapi.detectAllFaces(photo).withFaceLandmarks().withFaceExpressions().withFaceDescriptors();
           res = Normalize_Face_Descriptors(res);
         }
 

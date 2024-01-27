@@ -206,10 +206,10 @@ async function PopulateDefaultTaggingEntries() {
   tagging_entry.fileType = 'image';
   tagging_entry.taggingRawDescription =
     `This is Taga, Tagasaurus` +
-    `\nTaga heard this:` +
+    `\n\nTaga heard this:` +
     `\n\nLinus Torvalds, "Talk is cheap, show me the code" >why-is-it-cheap?` +
-    `\nMartti Malmi, "Code speaks louder than Words" >again-why?` +
-    `\nMarshall McLuhan, "the-Medium-is-the-Message` +
+    `\n\nMartti Malmi, "Code speaks louder than Words" >again-why?` +
+    `\n\nMarshall McLuhan, "the-Medium-is-the-Message"` +
     `\n\n\nChaos. Good news.`;
 
   INSERT_TAGGING_STMT = DB.prepare(
