@@ -63,6 +63,7 @@ window.DB_MODULE = require(PATH.join(__dirname, 'AppCode', 'taga-DB', 'db-fns.js
 //FACE RECOGNITION STUFF!!!
 const tf = require('@tensorflow/tfjs-node');
 const faceapi = require('@vladmandic/face-api');
+window.faceapi_loaded = false;
 //let faceapi = require('face-api.js');
 //require('@tensorflow/tfjs-node')
 //package.json    "@tensorflow/tfjs": "^4.1.0",
@@ -91,6 +92,7 @@ async function Load_Face_Api_Model() {
   await faceapi.loadFaceLandmarkModel(weight_path);
   await faceapi.loadFaceExpressionModel(weight_path);
   await faceapi.loadFaceRecognitionModel(weight_path);
+  window.faceapi_loaded = true;
 }
 Load_Face_Api_Model();
 
@@ -130,6 +132,7 @@ async function Get_Image_Face_Descriptors_From_File(imagePath) {
   let img = document.createElement('img'); // Use DOM HTMLImageElement
   img.src = imagePath;
   const res = await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceDescriptors();
+
   return Normalize_Face_Descriptors(res);
 }
 window.Get_Image_Face_Descriptors_From_File = Get_Image_Face_Descriptors_From_File;

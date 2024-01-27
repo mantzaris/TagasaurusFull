@@ -1,7 +1,7 @@
 const { GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
 const { ipcRenderer } = require('electron');
 
-const default_filename = 'fr2.jpg';
+const default_filename = 'jd4.jpg';
 const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 const container = document.getElementById('network-view');
@@ -18,29 +18,78 @@ let springLength = containerWidth * 0.05;
 const init_radius = Math.min(containerHeight, containerWidth) * 0.3;
 const spawn_num = 8;
 
-function Initialize_FirstView() {
+function Make_IMG_El(src) {
+  return new Promise((resolve, reject) => {
+    const image_tmp = new Image();
+    image_tmp.onload = () => resolve(image_tmp);
+    image_tmp.onerror = reject;
+    image_tmp.src = src;
+  });
+}
+
+async function Detection_Face_URL(x, y, width, height, imagePath) {
+  const originalImage = await Make_IMG_El(imagePath);
+
+  const scaleFactor = 1.5;
+
+  const newWidth = width * scaleFactor;
+  const newHeight = height * scaleFactor;
+
+  const deltaX = (newWidth - width) / 2;
+  const deltaY = (newHeight - height) / 2;
+  let newX = x - deltaX;
+  let newY = y - deltaY;
+
+  newX = Math.max(0, Math.min(newX, originalImage.width - newWidth));
+  newY = Math.max(0, Math.min(newY, originalImage.height - newHeight));
+
+  const detection_canvas = document.createElement('canvas');
+  const ctx2 = detection_canvas.getContext('2d');
+  detection_canvas.width = newWidth;
+  detection_canvas.height = newHeight;
+  ctx2.drawImage(originalImage, newX, newY, newWidth, newHeight, 0, 0, newWidth, newHeight);
+  return detection_canvas.toDataURL('image/jpeg');
+}
+
+async function Initial_Node_Selection() {
   for (let i = 0; i < spawn_num; i++) {
     const angle = (2 * Math.PI * i) / spawn_num; // Angle for each node
-    const x = init_radius * Math.cos(angle);
-    const y = init_radius * Math.sin(angle);
+    const node_x = init_radius * Math.cos(angle);
+    const node_y = init_radius * Math.sin(angle);
 
-    // DOES NOT WORK widthConstraint: { minimum: 5, maximum: 5 },
-    // DOES NOT WORK heightConstraint: { minimum: 5, maximum: 5 },
     const childId = Rand_Node_ID();
-    id2filename_map.set(childId, default_filename);
+
+    const imagePath = GENERAL_HELPER_FNS.Full_Path_From_File_Name(default_filename);
+    const faces = await Get_Image_Face_Descriptors_From_File(imagePath);
+    let face;
+
+    if (!faces) {
+      continue;
+    } else if (faces.length == 1) {
+      face = faces[0];
+    } else {
+      face = faces[Math.floor(Math.random() * faces.length)];
+    }
+
+    const { x, y, width, height } = face.detection.box;
+    const faceThumbnailUrl = await Detection_Face_URL(x, y, width, height, imagePath);
+
     nodes.add({
       id: childId,
       shape: 'image',
-      image: GENERAL_HELPER_FNS.Full_Path_From_File_Name(default_filename),
-      x: x,
-      y: y,
+      image: faceThumbnailUrl,
+      x: node_x,
+      y: node_y,
     });
+
+    //mapping later on helps us know details about the image from the node id
+    id2filename_map.set(childId, default_filename);
   }
 
   network_options = {
     nodes: {
       shape: 'image',
-      size: 30,
+      size: 50,
     },
     edges: {
       arrows: 'to',
@@ -64,36 +113,37 @@ function Initialize_FirstView() {
   };
 
   network_data = { nodes, edges };
+  network = new vis.Network(container, network_data, network_options);
 }
 
-Initialize_FirstView();
+// Initialize_FirstView();
 
-const network = new vis.Network(container, network_data, network_options);
+// const network = new vis.Network(container, network_data, network_options);
 
 ////////////////////////////////////////////////////////////
 // now the dynamic functions
 ////////////////////////////////////////////////////////////
 // Event listener for node clicks
-network.on('click', function (params) {
-  const nodeId = params.nodes[0];
+// network.on('click', function (params) {
+//   const nodeId = params.nodes[0];
 
-  if (nodeId) {
-    //if one or more nodes selected
-    const connectedEdges = network_data.edges.get({
-      filter: (edge) => {
-        return edge.from === nodeId;
-      },
-    });
+//   if (nodeId) {
+//     //if one or more nodes selected
+//     const connectedEdges = network_data.edges.get({
+//       filter: (edge) => {
+//         return edge.from === nodeId;
+//       },
+//     });
 
-    //it is a leaf node without connections outwards
-    if (connectedEdges.length === 0) {
-      Spawn_Children(nodeId);
-    }
+//     //it is a leaf node without connections outwards
+//     if (connectedEdges.length === 0) {
+//       Spawn_Children(nodeId);
+//     }
 
-    //display the clicked node image/video etc separately
-    Present_Node_Locality(id2filename_map.get(nodeId));
-  }
-});
+//     //display the clicked node image/video etc separately
+//     Present_Node_Locality(id2filename_map.get(nodeId));
+//   }
+// });
 
 function Spawn_Children(parentNodeId) {
   const parentNodePosition = network.getPositions([parentNodeId])[parentNodeId];
@@ -157,15 +207,15 @@ document.getElementById('restart-btn').onclick = () => {
   edges.clear();
   id2filename_map.clear();
 
-  Initialize_FirstView();
+  Initial_Node_Selection();
 };
 
 async function Present_Node_Locality(filename) {
   const record = DB_MODULE.Get_Tagging_Record_From_DB(filename);
 
   let search_results = [filename, filename];
-  const { distances, rowids } = await ipcRenderer.invoke('faiss-search', selected.descriptor, 6);
-  console.log('distances=', distances, `rowids = ${rowids}`);
+  // const { distances, rowids } = await ipcRenderer.invoke('faiss-search', selected.descriptor, 6);
+  // console.log('distances=', distances, `rowids = ${rowids}`);
 
   let search_results_output = document.getElementById('media-container');
   search_results_output.innerHTML = '';
@@ -205,3 +255,23 @@ async function Present_Node_Locality(filename) {
   //   }
   // });
 }
+
+/////////////////////////////////////////////
+//Initialization controller
+/////////////////////////////////////////////
+async function Initialize() {
+  try {
+    if (window.faceapi_loaded) {
+      console.log('ready');
+      Initial_Node_Selection();
+    } else {
+      //models are not loaded yet, retry after a delay
+      setTimeout(Initialize, 100);
+    }
+  } catch (error) {
+    console.error('Data is not ready yet:', error);
+    setTimeout(Initialize, 100); // Retry on error
+  }
+}
+
+Initialize();
