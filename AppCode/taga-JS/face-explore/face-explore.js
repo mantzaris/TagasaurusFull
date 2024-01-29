@@ -50,6 +50,7 @@ async function Detection_Face_URL(x, y, width, height, imagePath) {
 }
 
 async function Initial_Node_Selection() {
+  Show_Loading_Spinner();
   const sample_records = DB_MODULE.Tagging_Random_DB_Records_With_Faces(spawn_num);
 
   for (const [index, record] of sample_records.entries()) {
@@ -73,7 +74,6 @@ async function Initial_Node_Selection() {
 
     const { x, y, width, height } = face.detection.box;
     const faceThumbnailUrl = await Detection_Face_URL(x, y, width, height, imagePath);
-    console.log('face', face.length, face[0], face);
 
     nodes.add({
       id: childId,
@@ -118,6 +118,7 @@ async function Initial_Node_Selection() {
   network.on('click', (params) => {
     Network_OnClick_Handler(params);
   });
+  Hide_Loading_Spinner();
 }
 
 ////////////////////////////////////////////////////////////
@@ -215,7 +216,7 @@ async function Present_Node_Locality(nodeId) {
   const { fileName, descriptor } = id2filename_map.get(nodeId);
   let fileName_Set = new Set([fileName]);
 
-  const { distances, rowids } = await ipcRenderer.invoke('faiss-search', descriptor, candidate_num);
+  const { rowids } = await ipcRenderer.invoke('faiss-search', descriptor, candidate_num);
   for (const rowid of rowids) {
     const fileName_tmp = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowid)[0].fileName;
     fileName_Set.add(fileName_tmp);
@@ -258,6 +259,8 @@ async function Present_Node_Locality(nodeId) {
   //     };
   //   }
   // });
+
+  document.getElementById('media-container').scrollTop = 0;
 }
 
 /////////////////////////////////////////////
