@@ -1,8 +1,8 @@
 const { GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
 const { ipcRenderer } = require('electron');
 
-const default_filename = 'jd4.jpg';
-const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const default_filename = 'friendsCropped.jpg';
+const alpha_numeric_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 const container = document.getElementById('network-view');
 const nodes = new vis.DataSet([]);
@@ -17,6 +17,7 @@ let springLength = containerWidth * 0.05;
 
 const init_radius = Math.min(containerHeight, containerWidth) * 0.3;
 const spawn_num = 8;
+const candidate_num = 25;
 
 function Make_IMG_El(src) {
   return new Promise((resolve, reject) => {
@@ -31,15 +32,12 @@ async function Detection_Face_URL(x, y, width, height, imagePath) {
   const originalImage = await Make_IMG_El(imagePath);
 
   const scaleFactor = 1.5;
-
   const newWidth = width * scaleFactor;
   const newHeight = height * scaleFactor;
-
   const deltaX = (newWidth - width) / 2;
   const deltaY = (newHeight - height) / 2;
   let newX = x - deltaX;
   let newY = y - deltaY;
-
   newX = Math.max(0, Math.min(newX, originalImage.width - newWidth));
   newY = Math.max(0, Math.min(newY, originalImage.height - newHeight));
 
@@ -52,15 +50,17 @@ async function Detection_Face_URL(x, y, width, height, imagePath) {
 }
 
 async function Initial_Node_Selection() {
-  for (let i = 0; i < spawn_num; i++) {
-    const angle = (2 * Math.PI * i) / spawn_num; // Angle for each node
+  const sample_records = DB_MODULE.Tagging_Random_DB_Records_With_Faces(spawn_num);
+
+  for (const [index, record] of sample_records.entries()) {
+    const angle = (2 * Math.PI * index) / sample_records.length; //angle for each node
     const node_x = init_radius * Math.cos(angle);
     const node_y = init_radius * Math.sin(angle);
 
     const childId = Rand_Node_ID();
 
-    const imagePath = GENERAL_HELPER_FNS.Full_Path_From_File_Name(default_filename);
-    const faces = await Get_Image_Face_Descriptors_From_File(imagePath);
+    const imagePath = GENERAL_HELPER_FNS.Full_Path_From_File_Name(record.fileName);
+    const faces = await Get_Image_Face_Descriptors_From_File(imagePath); //needs to run face api fresh to get the detection box coordinates which the DB does not store
     let face;
 
     if (!faces) {
@@ -73,6 +73,7 @@ async function Initial_Node_Selection() {
 
     const { x, y, width, height } = face.detection.box;
     const faceThumbnailUrl = await Detection_Face_URL(x, y, width, height, imagePath);
+    console.log('face', face.length, face[0], face);
 
     nodes.add({
       id: childId,
@@ -83,7 +84,7 @@ async function Initial_Node_Selection() {
     });
 
     //mapping later on helps us know details about the image from the node id
-    id2filename_map.set(childId, default_filename);
+    id2filename_map.set(childId, { fileName: record.fileName, descriptor: face.descriptor });
   }
 
   network_options = {
@@ -114,36 +115,36 @@ async function Initial_Node_Selection() {
 
   network_data = { nodes, edges };
   network = new vis.Network(container, network_data, network_options);
+  network.on('click', (params) => {
+    Network_OnClick_Handler(params);
+  });
 }
-
-// Initialize_FirstView();
-
-// const network = new vis.Network(container, network_data, network_options);
 
 ////////////////////////////////////////////////////////////
 // now the dynamic functions
 ////////////////////////////////////////////////////////////
-// Event listener for node clicks
-// network.on('click', function (params) {
-//   const nodeId = params.nodes[0];
+function Network_OnClick_Handler(params) {
+  const nodeId = params.nodes[0];
 
-//   if (nodeId) {
-//     //if one or more nodes selected
-//     const connectedEdges = network_data.edges.get({
-//       filter: (edge) => {
-//         return edge.from === nodeId;
-//       },
-//     });
+  if (nodeId) {
+    //if one or more nodes selected
+    const connectedEdges = network_data.edges.get({
+      filter: (edge) => {
+        return edge.from === nodeId;
+      },
+    });
 
-//     //it is a leaf node without connections outwards
-//     if (connectedEdges.length === 0) {
-//       Spawn_Children(nodeId);
-//     }
+    console.log(id2filename_map.get(nodeId));
 
-//     //display the clicked node image/video etc separately
-//     Present_Node_Locality(id2filename_map.get(nodeId));
-//   }
-// });
+    //it is a leaf node without connections outwards
+    if (connectedEdges.length === 0) {
+      //Spawn_Children(nodeId);
+    }
+
+    //display the clicked node image/video etc separately
+    Present_Node_Locality(nodeId);
+  }
+}
 
 function Spawn_Children(parentNodeId) {
   const parentNodePosition = network.getPositions([parentNodeId])[parentNodeId];
@@ -192,9 +193,9 @@ window.addEventListener('resize', function () {
 
 function Rand_Node_ID(length = 7) {
   let result = '';
-  const charactersLength = characters.length;
+  const charactersLength = alpha_numeric_chars.length;
   for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    result += alpha_numeric_chars.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
 }
@@ -210,28 +211,31 @@ document.getElementById('restart-btn').onclick = () => {
   Initial_Node_Selection();
 };
 
-async function Present_Node_Locality(filename) {
-  const record = DB_MODULE.Get_Tagging_Record_From_DB(filename);
+async function Present_Node_Locality(nodeId) {
+  const { fileName, descriptor } = id2filename_map.get(nodeId);
+  let fileName_Set = new Set([fileName]);
 
-  let search_results = [filename, filename];
-  // const { distances, rowids } = await ipcRenderer.invoke('faiss-search', selected.descriptor, 6);
-  // console.log('distances=', distances, `rowids = ${rowids}`);
+  const { distances, rowids } = await ipcRenderer.invoke('faiss-search', descriptor, candidate_num);
+  for (const rowid of rowids) {
+    const fileName_tmp = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowid)[0].fileName;
+    fileName_Set.add(fileName_tmp);
+  }
 
   let search_results_output = document.getElementById('media-container');
   search_results_output.innerHTML = '';
 
-  for (const fn_result of search_results) {
-    const file_type = DB_MODULE.Get_Tagging_Record_From_DB(fn_result).fileType;
+  for (const fn of fileName_Set) {
+    const file_type = DB_MODULE.Get_Tagging_Record_From_DB(fn).fileType;
 
     if (file_type == 'image') {
       const image = document.createElement('img');
-      image.src = GENERAL_HELPER_FNS.Full_Path_From_File_Name(fn_result);
+      image.src = GENERAL_HELPER_FNS.Full_Path_From_File_Name(fn);
       image.classList.add('media-style');
-      image.id = `candidate-${fn_result}`;
+      image.id = `candidate-${fn}`;
       image.alt = 'image';
       document.getElementById('media-container').appendChild(image);
-      document.getElementById(`candidate-${fn_result}`).onclick = () => {
-        GENERAL_HELPER_FNS.Goto_Tagging_Entry(fn_result);
+      document.getElementById(`candidate-${fn}`).onclick = () => {
+        GENERAL_HELPER_FNS.Goto_Tagging_Entry(fn);
       };
     } else if (file_type == 'video') {
       return `<video class="${class_name} ${VIDEO_IDENTIFIER}" id="${id_tmp}" src="${file_path}" controls muted alt="${type}" />`;
@@ -262,7 +266,6 @@ async function Present_Node_Locality(filename) {
 async function Initialize() {
   try {
     if (window.faceapi_loaded) {
-      console.log('ready');
       Initial_Node_Selection();
     } else {
       //models are not loaded yet, retry after a delay

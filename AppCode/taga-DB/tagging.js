@@ -1,3 +1,4 @@
+//TODO: make all rowid statements BigInt safe
 const GET_FILENAME_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE fileName=?`);
 const GET_RECORD_FROM_HASH_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE fileHash=?`);
 const GET_HASH_TAGGING_STMT = DB.prepare(`SELECT fileHash FROM ${TAGGING_TABLE_NAME} WHERE fileHash=?`);
@@ -22,6 +23,16 @@ const GET_PREV_ROWID_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} 
 const GET_MAX_ROWID_STMT = DB.prepare(`SELECT MAX(ROWID) AS rowid FROM ${TAGGING_TABLE_NAME}`);
 const GET_MIN_ROWID_STMT = DB.prepare(`SELECT MIN(ROWID) AS rowid FROM ${TAGGING_TABLE_NAME}`);
 const GET_TAGGING_ROW_COUNT = DB.prepare(`SELECT COUNT(*) AS rownum FROM ${TAGGING_TABLE_NAME}`);
+
+const GET_N_RAND_TAGGING_FILENAMES_STMT = DB.prepare(
+  `SELECT fileName FROM ${TAGGING_TABLE_NAME} WHERE rowid > (ABS(RANDOM()) % (SELECT max(rowid) FROM ${TAGGING_TABLE_NAME})) LIMIT ?;`
+);
+const GET_N_RAND_TAGGING_ENTRIES_WITH_FACES_STMT = DB.prepare(
+  `SELECT * FROM ${TAGGING_TABLE_NAME} 
+   WHERE LENGTH(faceDescriptors) > 2 
+     AND rowid > (ABS(RANDOM()) % (SELECT max(rowid) FROM ${TAGGING_TABLE_NAME})) 
+   LIMIT ?;`
+);
 
 let rowid_current;
 let rowid_max;
@@ -232,13 +243,7 @@ function Delete_Tagging_Annotation_DB(filename) {
 
 exports.Delete_Tagging_Annotation_DB = Delete_Tagging_Annotation_DB;
 
-//get random image filenames from the tagging image records
-//`SELECT * FROM table WHERE rowid > (ABS(RANDOM()) % (SELECT max(rowid) FROM table)) LIMIT 1;` OR select * from quest order by RANDOM() LIMIT 1;
-const GET_N_RAND_TAGGING_FILENAMES_STMT = DB.prepare(
-  `SELECT fileName FROM ${TAGGING_TABLE_NAME} WHERE rowid > (ABS(RANDOM()) % (SELECT max(rowid) FROM ${TAGGING_TABLE_NAME})) LIMIT ?;`
-);
-
-function Tagging_Random_DB_Images(num_of_records) {
+function Tagging_Random_DB_FileNames(num_of_records) {
   let filenames = [];
   for (let ii = 0; ii < num_of_records; ii++) {
     let filename_tmp = GET_N_RAND_TAGGING_FILENAMES_STMT.all(1);
@@ -248,7 +253,32 @@ function Tagging_Random_DB_Images(num_of_records) {
   return filenames;
 }
 
-exports.Tagging_Random_DB_Images = Tagging_Random_DB_Images;
+exports.Tagging_Random_DB_FileNames = Tagging_Random_DB_FileNames;
+
+function Tagging_Random_DB_Records_With_Faces(num_of_records) {
+  let entries = [];
+  let seen = new Set();
+  let attempts = 0;
+
+  while (entries.length < num_of_records) {
+    const entry = GET_N_RAND_TAGGING_ENTRIES_WITH_FACES_STMT.all(1)[0];
+
+    if (!seen.has(entry.fileName)) {
+      seen.add(entry.fileName);
+      entries.push(entry);
+    }
+
+    attempts++;
+
+    if (attempts > num_of_records * 2) {
+      break;
+    }
+  }
+
+  return entries;
+}
+
+exports.Tagging_Random_DB_Records_With_Faces = Tagging_Random_DB_Records_With_Faces;
 
 //change the stored obj to pure json obj on all the fields so no parsing at the controller side is needed
 function Get_Obj_Fields_From_Record(record) {

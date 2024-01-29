@@ -81,8 +81,8 @@ function Check_Tagging_Hash_From_DB(hash) {
   return DB_MODULE.Check_Tagging_Hash_From_DB(hash);
 }
 
-function Tagging_Random_DB_Images(num_of_records) {
-  return DB_MODULE.Tagging_Random_DB_Images(num_of_records);
+function Tagging_Random_DB_FileNames(num_of_records) {
+  return DB_MODULE.Tagging_Random_DB_FileNames(num_of_records);
 }
 function Meme_Tagging_Random_DB_Images(num_of_records) {
   return DB_MODULE.Meme_Tagging_Random_DB_Images(num_of_records);
@@ -1116,7 +1116,7 @@ async function Add_Gallery_Images() {
   if (search_image_results == '' && search_image_meme_results == '') {
     Show_Loading_Spinner();
 
-    search_image_results = Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+    search_image_results = Tagging_Random_DB_FileNames(MAX_COUNT_SEARCH_RESULTS);
     search_image_meme_results = Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
 
     Hide_Loading_Spinner();
@@ -1477,7 +1477,7 @@ async function Add_Meme_Images() {
   if (meme_search_image_results == '' && meme_search_image_meme_results == '') {
     Show_Loading_Spinner();
 
-    meme_search_image_results = Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+    meme_search_image_results = Tagging_Random_DB_FileNames(MAX_COUNT_SEARCH_RESULTS);
     meme_search_image_meme_results = Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
 
     Hide_Loading_Spinner();

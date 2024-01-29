@@ -1228,7 +1228,7 @@ async function Search_Images() {
 
   Show_Loading_Spinner();
 
-  search_results = DB_MODULE.Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+  search_results = DB_MODULE.Tagging_Random_DB_FileNames(MAX_COUNT_SEARCH_RESULTS);
   search_meme_results = DB_MODULE.Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
 
   Hide_Loading_Spinner();
@@ -1555,7 +1555,7 @@ async function Add_New_Meme() {
 
   Show_Loading_Spinner();
 
-  meme_search_results = DB_MODULE.Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+  meme_search_results = DB_MODULE.Tagging_Random_DB_FileNames(MAX_COUNT_SEARCH_RESULTS);
   meme_search_meme_results = DB_MODULE.Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
 
   Hide_Loading_Spinner();

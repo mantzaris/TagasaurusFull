@@ -9,8 +9,8 @@ let sample_num;
 async function Number_of_Tagging_Records() {
   return await DB_MODULE.Number_of_Tagging_Records();
 }
-function Tagging_Random_DB_Images(num_of_records) {
-  return DB_MODULE.Tagging_Random_DB_Images(num_of_records);
+function Tagging_Random_DB_FileNames(num_of_records) {
+  return DB_MODULE.Tagging_Random_DB_FileNames(num_of_records);
 }
 function Get_Tagging_Annotation_From_DB(image_name) {
   //
@@ -38,7 +38,7 @@ function Harmonic_Mean(arr) {
 }
 
 async function Display_Skill_Levels() {
-  let random_filenames = Tagging_Random_DB_Images(sample_num);
+  let random_filenames = Tagging_Random_DB_FileNames(sample_num);
   let total_tagged_images = 0;
   let meme_connected_images = 0;
   let emotion_stamped_images = 0;

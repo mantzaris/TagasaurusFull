@@ -48,8 +48,8 @@ function Get_Collection_Record_From_DB(collectionname) {
   return DB_MODULE.Get_Collection_Record_From_DB(collectionname);
 }
 
-function Tagging_Random_DB_Images(num_of_records) {
-  return DB_MODULE.Tagging_Random_DB_Images(num_of_records);
+function Tagging_Random_DB_FileNames(num_of_records) {
+  return DB_MODULE.Tagging_Random_DB_FileNames(num_of_records);
 }
 function Meme_Tagging_Random_DB_Images(num_of_records) {
   return DB_MODULE.Meme_Tagging_Random_DB_Images(num_of_records);
@@ -624,7 +624,7 @@ async function Change_Profile_Image() {
   };
   //present default ordering first
   if (profile_search_image_results == '') {
-    profile_search_image_results = Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+    profile_search_image_results = Tagging_Random_DB_FileNames(MAX_COUNT_SEARCH_RESULTS);
   }
 
   let profile_search_display_div = document.getElementById('modal-search-profileimage-images-results-grid-div-area-id');
@@ -872,7 +872,7 @@ async function Add_Images_To_New_Collection() {
   };
   //display default ordering first
   if (search_image_results == '' && search_image_meme_results == '') {
-    search_image_results = await Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+    search_image_results = await Tagging_Random_DB_FileNames(MAX_COUNT_SEARCH_RESULTS);
     search_image_meme_results = Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
   }
 
@@ -1268,7 +1268,7 @@ async function Add_Meme_Images() {
   };
   //display default ordering first
   if (meme_search_image_results == '' && meme_search_image_meme_results == '') {
-    meme_search_image_results = Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+    meme_search_image_results = Tagging_Random_DB_FileNames(MAX_COUNT_SEARCH_RESULTS);
     meme_search_image_meme_results = Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
   }
 
