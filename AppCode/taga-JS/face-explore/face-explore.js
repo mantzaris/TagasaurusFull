@@ -60,31 +60,47 @@ async function Initial_Node_Selection() {
 
     const childId = Rand_Node_ID();
 
-    const imagePath = GENERAL_HELPER_FNS.Full_Path_From_File_Name(record.fileName);
-    const faces = await Get_Image_Face_Descriptors_From_File(imagePath); //needs to run face api fresh to get the detection box coordinates which the DB does not store
-    let face;
+    if (record.fileType != 'image') {
+      const label_tmp = record.fileType;
+      nodes.add({
+        id: childId,
+        shape: 'box',
+        label: label_tmp,
+        x: node_x,
+        y: node_y,
+      });
 
-    if (!faces) {
-      continue;
-    } else if (faces.length == 1) {
-      face = faces[0];
+      const descriptors = JSON.parse(record.faceDescriptors);
+      const desciptor = descriptors[Math.floor(Math.random() * descriptors.length)];
+
+      id2filename_map.set(childId, { fileName: record.fileName, descriptor: desciptor });
     } else {
-      face = faces[Math.floor(Math.random() * faces.length)];
+      const imagePath = GENERAL_HELPER_FNS.Full_Path_From_File_Name(record.fileName);
+      const faces = await Get_Image_Face_Descriptors_From_File(imagePath); //needs to run face api fresh to get the detection box coordinates which the DB does not store
+      let face;
+
+      if (!faces) {
+        continue;
+      } else if (faces.length == 1) {
+        face = faces[0];
+      } else {
+        face = faces[Math.floor(Math.random() * faces.length)];
+      }
+
+      const { x, y, width, height } = face.detection.box;
+      const faceThumbnailUrl = await Detection_Face_URL(x, y, width, height, imagePath);
+
+      nodes.add({
+        id: childId,
+        shape: 'image',
+        image: faceThumbnailUrl,
+        x: node_x,
+        y: node_y,
+      });
+
+      //mapping later on helps us know details about the image from the node id
+      id2filename_map.set(childId, { fileName: record.fileName, descriptor: face.descriptor });
     }
-
-    const { x, y, width, height } = face.detection.box;
-    const faceThumbnailUrl = await Detection_Face_URL(x, y, width, height, imagePath);
-
-    nodes.add({
-      id: childId,
-      shape: 'image',
-      image: faceThumbnailUrl,
-      x: node_x,
-      y: node_y,
-    });
-
-    //mapping later on helps us know details about the image from the node id
-    id2filename_map.set(childId, { fileName: record.fileName, descriptor: face.descriptor });
   }
 
   network_options = {
@@ -228,18 +244,28 @@ async function Present_Node_Locality(nodeId) {
   for (const fn of fileName_Set) {
     const file_type = DB_MODULE.Get_Tagging_Record_From_DB(fn).fileType;
 
-    if (file_type == 'image') {
+    if (file_type == 'image' || file_type == 'gif') {
       const image = document.createElement('img');
       image.src = GENERAL_HELPER_FNS.Full_Path_From_File_Name(fn);
       image.classList.add('media-style');
       image.id = `candidate-${fn}`;
       image.alt = 'image';
-      document.getElementById('media-container').appendChild(image);
-      document.getElementById(`candidate-${fn}`).onclick = () => {
+      image.onclick = () => {
         GENERAL_HELPER_FNS.Goto_Tagging_Entry(fn);
       };
+      document.getElementById('media-container').appendChild(image);
     } else if (file_type == 'video') {
-      return `<video class="${class_name} ${VIDEO_IDENTIFIER}" id="${id_tmp}" src="${file_path}" controls muted alt="${type}" />`;
+      const video = document.createElement('video');
+      video.src = GENERAL_HELPER_FNS.Full_Path_From_File_Name(fn);
+      video.classList.add('media-style');
+      video.id = `candidate-${fn}`;
+      video.alt = 'video';
+      video.controls = true; // Add controls to the video player
+      video.muted = true; // Mute the video by default (you can change this)
+      video.onclick = () => {
+        GENERAL_HELPER_FNS.Goto_Tagging_Entry(fn);
+      };
+      document.getElementById('media-container').appendChild(video);
     }
   }
 
