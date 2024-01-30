@@ -263,7 +263,8 @@ function Tagging_Random_DB_Records_With_Faces(num_of_records) {
   while (entries.length < num_of_records) {
     const entry = GET_N_RAND_TAGGING_ENTRIES_WITH_FACES_STMT.all(1)[0];
 
-    if (!seen.has(entry.fileName)) {
+    if (entry && !seen.has(entry.fileName)) {
+      //entry can be undefined
       seen.add(entry.fileName);
       entries.push(entry);
     }

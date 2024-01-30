@@ -1,3 +1,5 @@
+const fileType = require('file-type');
+
 const { GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
 const { ipcRenderer } = require('electron');
 
@@ -53,54 +55,44 @@ async function Initial_Node_Selection() {
   Show_Loading_Spinner();
   const sample_records = DB_MODULE.Tagging_Random_DB_Records_With_Faces(spawn_num);
 
+  if (!sample_records || sample_records.length < 1) {
+    alert('add and save images with people, currently empty');
+  }
+
   for (const [index, record] of sample_records.entries()) {
+    if (record.fileType == 'video') continue; //do not put the videos on the network diagram
+
+    const imagePath = GENERAL_HELPER_FNS.Full_Path_From_File_Name(record.fileName);
+    const childId = Rand_Node_ID();
+
     const angle = (2 * Math.PI * index) / sample_records.length; //angle for each node
     const node_x = init_radius * Math.cos(angle);
     const node_y = init_radius * Math.sin(angle);
 
-    const childId = Rand_Node_ID();
+    const faces = await Get_Image_Face_Descriptors_From_File(imagePath); //needs to run face api fresh to get the detection box coordinates which the DB does not store
+    let face;
 
-    if (record.fileType != 'image') {
-      const label_tmp = record.fileType;
-      nodes.add({
-        id: childId,
-        shape: 'box',
-        label: label_tmp,
-        x: node_x,
-        y: node_y,
-      });
-
-      const descriptors = JSON.parse(record.faceDescriptors);
-      const desciptor = descriptors[Math.floor(Math.random() * descriptors.length)];
-
-      id2filename_map.set(childId, { fileName: record.fileName, descriptor: desciptor });
+    if (!faces || faces.length == 0) {
+      continue;
+    } else if (faces.length == 1) {
+      face = faces[0];
     } else {
-      const imagePath = GENERAL_HELPER_FNS.Full_Path_From_File_Name(record.fileName);
-      const faces = await Get_Image_Face_Descriptors_From_File(imagePath); //needs to run face api fresh to get the detection box coordinates which the DB does not store
-      let face;
-
-      if (!faces) {
-        continue;
-      } else if (faces.length == 1) {
-        face = faces[0];
-      } else {
-        face = faces[Math.floor(Math.random() * faces.length)];
-      }
-
-      const { x, y, width, height } = face.detection.box;
-      const faceThumbnailUrl = await Detection_Face_URL(x, y, width, height, imagePath);
-
-      nodes.add({
-        id: childId,
-        shape: 'image',
-        image: faceThumbnailUrl,
-        x: node_x,
-        y: node_y,
-      });
-
-      //mapping later on helps us know details about the image from the node id
-      id2filename_map.set(childId, { fileName: record.fileName, descriptor: face.descriptor });
+      face = faces[Math.floor(Math.random() * faces.length)];
     }
+
+    const { x, y, width, height } = face.detection.box;
+    const faceThumbnailUrl = await Detection_Face_URL(x, y, width, height, imagePath);
+
+    nodes.add({
+      id: childId,
+      shape: 'image',
+      image: faceThumbnailUrl,
+      x: node_x,
+      y: node_y,
+    });
+
+    //mapping later on helps us know details about the image from the node id
+    id2filename_map.set(childId, { fileName: record.fileName, descriptor: face.descriptor });
   }
 
   network_options = {
@@ -151,11 +143,9 @@ function Network_OnClick_Handler(params) {
       },
     });
 
-    console.log(id2filename_map.get(nodeId));
-
     //it is a leaf node without connections outwards
     if (connectedEdges.length === 0) {
-      //Spawn_Children(nodeId);
+      Spawn_Children(nodeId);
     }
 
     //display the clicked node image/video etc separately
@@ -166,6 +156,8 @@ function Network_OnClick_Handler(params) {
 function Spawn_Children(parentNodeId) {
   const parentNodePosition = network.getPositions([parentNodeId])[parentNodeId];
   const child_IDs = fetchChildNodesFromDatabase(parentNodeId);
+
+  console.log(child_IDs);
 
   for (let i = 0; i < spawn_num; i++) {
     const childId = child_IDs[i];
