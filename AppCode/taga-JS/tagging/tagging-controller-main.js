@@ -1142,20 +1142,13 @@ async function Search_Images() {
   const close_btn = document.getElementById('modal-search-close-exit-view-button-id');
 
   outer_modal.style.display = 'block';
-  close_btn.onclick = () => {
-    const search_res_children = document.getElementById('modal-search-images-results-grid-div-area-id').children;
-    const search_meme_res_children = document.getElementById('modal-search-meme-images-results-grid-div-area-id').children;
-    const children_tmp = [...search_res_children, ...search_meme_res_children];
-    GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp);
-    outer_modal.style.display = 'none';
-  };
 
   // When the user clicks anywhere outside of the modal, close it
   window.onclick = (event) => {
-    if (event.target == outer_modal) {
-      const search_res_children = document.getElementById('modal-search-images-results-grid-div-area-id').children;
-      const search_meme_res_children = document.getElementById('modal-search-meme-images-results-grid-div-area-id').children;
-      const children_tmp = [...search_res_children, ...search_meme_res_children];
+    if (event.target == outer_modal || event.target == close_btn) {
+      const search_children = document.getElementById('modal-search-images-results-grid-div-area-id').children;
+      const meme_children = document.getElementById('modal-search-meme-images-results-grid-div-area-id').children;
+      const children_tmp = [...search_children, ...meme_children];
       GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp);
       outer_modal.style.display = 'none';
     }
@@ -1356,7 +1349,6 @@ async function Modal_Search_Similar() {
   Modal_Search_Entry(true, search_obj_similar_tmp);
 }
 
-//TODO: refactor from here! check the parameters on single line event listeners
 /******************************
 MEME SEARCH STUFF SEARCH FOR MEMES TO ADD THEM AS AN ANNOTATION
 ******************************/
@@ -1368,165 +1360,129 @@ let meme_tagging_search_obj = {
 };
 //called from the HTML button onclik, add a new meme which is searched for by the user
 async function Add_New_Meme() {
-  // Show the modal
-  let modal_add_memes_search_click = document.getElementById('search-add-memes-modal-click-top-id');
-  modal_add_memes_search_click.style.display = 'block';
-  // Get the button that opens the modal
-  let meme_modal_close_btn = document.getElementById('modal-search-add-memes-close-exit-view-button-id');
-  // When the user clicks on the button, close the modal
-  meme_modal_close_btn.onclick = function () {
-    const search_res_children = document.getElementById('modal-search-add-memes-images-results-grid-div-area-id').children;
-    const search_meme_res_children = document.getElementById('modal-search-add-memes-meme-images-results-grid-div-area-id').children;
-    const children_tmp = [...search_res_children, ...search_meme_res_children];
-    GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp);
-    modal_add_memes_search_click.style.display = 'none';
-  };
-  // When the user clicks anywhere outside of the modal, close it
+  const outer_modal = document.getElementById('search-add-memes-modal-click-top-id');
+  const close_btn = document.getElementById('modal-search-add-memes-close-exit-view-button-id');
+
+  outer_modal.style.display = 'block';
+
   window.onclick = function (event) {
-    if (event.target == modal_add_memes_search_click) {
+    if (event.target == outer_modal || event.target == close_btn) {
       const search_res_children = document.getElementById('modal-search-add-memes-images-results-grid-div-area-id').children;
       const search_meme_res_children = document.getElementById('modal-search-add-memes-meme-images-results-grid-div-area-id').children;
       const children_tmp = [...search_res_children, ...search_meme_res_children];
       GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp);
-      modal_add_memes_search_click.style.display = 'none';
+      outer_modal.style.display = 'none';
     }
   };
-  //clear the search form from previous entries
-  document.getElementById('modal-search-add-memes-tag-textarea-entry-id').value = '';
-  document.getElementById('modal-search-add-memes-tag-textarea-memes-entry-id').value = '';
-  document.getElementById('modal-search-add-memes-emotion-label-value-textarea-entry-id').value = '';
-  document.getElementById('modal-search-add-memes-emotion-meme-label-value-textarea-entry-id').value = '';
-  document.getElementById('modal-search-add-memes-emotion-value-range-entry-id').value = '0';
-  document.getElementById('modal-search-add-memes-emotion-label-value-display-container-div-id').value = '';
-  document.getElementById('modal-search-add-memes-emotion-meme-value-range-entry-id').value = '0';
-  document.getElementById('modal-search-add-memes-emotion-label-value-display-container-div-id').innerHTML = '';
-  document.getElementById('modal-search-add-memes-emotion-meme-label-value-display-container-div-id').innerHTML = '';
-  document.getElementById('modal-search-add-memes-images-results-grid-div-area-id').innerHTML = '';
-  document.getElementById('modal-search-add-memes-meme-images-results-grid-div-area-id').innerHTML = '';
-  meme_tagging_search_obj = {
-    meme_emotions: {},
-    emotions: {},
-    searchTags: [],
-    searchMemeTags: [],
-  };
-  document.getElementById('modal-search-add-memes-reset-button-id').onclick = function () {
-    document.getElementById('modal-search-add-memes-tag-textarea-entry-id').value = '';
-    document.getElementById('modal-search-add-memes-tag-textarea-memes-entry-id').value = '';
-    document.getElementById('modal-search-add-memes-emotion-label-value-textarea-entry-id').value = '';
-    document.getElementById('modal-search-add-memes-emotion-meme-label-value-textarea-entry-id').value = '';
-    document.getElementById('modal-search-add-memes-emotion-value-range-entry-id').value = '0';
-    document.getElementById('modal-search-add-memes-emotion-label-value-display-container-div-id').value = '';
-    document.getElementById('modal-search-add-memes-emotion-meme-value-range-entry-id').value = '0';
-    document.getElementById('modal-search-add-memes-emotion-label-value-display-container-div-id').innerHTML = '';
-    document.getElementById('modal-search-add-memes-emotion-meme-label-value-display-container-div-id').innerHTML = '';
-    document.getElementById('modal-search-add-memes-images-results-grid-div-area-id').innerHTML = '';
-    document.getElementById('modal-search-add-memes-meme-images-results-grid-div-area-id').innerHTML = '';
-    meme_tagging_search_obj = {
-      meme_emotions: {},
-      emotions: {},
-      searchTags: [],
-      searchMemeTags: [],
-    };
-  };
+
+  Reset_Meme_Search();
+
+  document.getElementById('modal-search-add-memes-reset-button-id').onclick = Reset_Meme_Search;
 
   //user adds emotions for the 'images' of the search criteria (not meme images)
-  document.getElementById('modal-search-add-memes-emotion-entry-button-id').onclick = function () {
-    let entered_emotion_label = document.getElementById('modal-search-add-memes-emotion-label-value-textarea-entry-id').value;
-    let emotion_search_entry_value = document.getElementById('modal-search-add-memes-emotion-value-range-entry-id').value;
-    if (entered_emotion_label != '') {
-      meme_tagging_search_obj['emotions'][entered_emotion_label] = emotion_search_entry_value;
-      let image_emotions_div_id = document.getElementById('modal-search-add-memes-emotion-label-value-display-container-div-id');
-      image_emotions_div_id.innerHTML = '';
-      //Populate for the emotions of the images
-      Object.keys(meme_tagging_search_obj['emotions']).forEach((emotion_key) => {
-        image_emotions_div_id.innerHTML += `
-                                        <span id="modal-search-add-memes-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
-                                        <img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-remove-button-id-${emotion_key}"
-                                            src="${CLOSE_ICON_BLACK}" title="close" />
-                                        (${emotion_key},${meme_tagging_search_obj['emotions'][emotion_key]})
-                                        </span>
-                                        `;
-      });
+  document.getElementById('modal-search-add-memes-emotion-entry-button-id').onclick = () => {
+    const emotion_el = document.getElementById('modal-search-add-memes-emotion-label-value-textarea-entry-id');
+    const emotion_value_el = document.getElementById('modal-search-add-memes-emotion-value-range-entry-id');
+    const emotion = emotion_el.value;
+    const emotion_value = emotion_value_el.value;
+    const emotion_keys = Object.keys(meme_tagging_search_obj.emotions);
 
-      // Add button hover event listeners to each inage tag.!!!
-      addMouseOverIconSwitch(image_emotions_div_id);
+    if (emotion != '') {
+      meme_tagging_search_obj.emotions[emotion] = emotion_value;
+      const emotions_div = document.getElementById('modal-search-add-memes-emotion-label-value-display-container-div-id');
+      emotions_div.innerHTML = '';
 
-      //action listener for the removal of emotions populated from user entry
-      Object.keys(meme_tagging_search_obj['emotions']).forEach((emotion_key) => {
-        document.getElementById(`modal-search-add-memes-emotion-remove-button-id-${emotion_key}`).onclick = function () {
-          let search_emotion_search_span_html_obj = document.getElementById(`modal-search-add-memes-emotion-label-value-span-id-${emotion_key}`);
-          search_emotion_search_span_html_obj.remove();
-          delete meme_tagging_search_obj['emotions'][emotion_key];
+      for (const key of emotion_keys) {
+        emotions_div.innerHTML += `
+              <span id="modal-search-add-memes-emotion-label-value-span-id-${key}" style="white-space:nowrap">
+              <img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-remove-button-id-${key}"
+                  src="${CLOSE_ICON_BLACK}" title="close" />
+              (${key},${meme_tagging_search_obj.emotions[key]})
+              </span>
+              `;
+      }
+
+      addMouseOverIconSwitch(emotions_div);
+
+      for (const key of emotion_keys) {
+        document.getElementById(`modal-search-add-memes-emotion-remove-button-id-${key}`).onclick = () => {
+          const span = document.getElementById(`modal-search-add-memes-emotion-label-value-span-id-${key}`);
+          span.remove();
+          delete meme_tagging_search_obj.emotions[key];
         };
-      });
+      }
     }
-    document.getElementById('modal-search-add-memes-emotion-label-value-textarea-entry-id').value = '';
-    document.getElementById('modal-search-add-memes-emotion-value-range-entry-id').value = '0';
+
+    emotion_el.value = '';
+    emotion_value_el.value = '0';
   };
+
   //user adds emotions of the 'memes' of the search criteria
-  document.getElementById('modal-search-add-memes-emotion-meme-entry-button-id').onclick = function () {
-    let entered_emotion_label = document.getElementById('modal-search-add-memes-emotion-meme-label-value-textarea-entry-id').value;
-    let emotion_search_entry_value = document.getElementById('modal-search-add-memes-emotion-meme-value-range-entry-id').value;
-    if (entered_emotion_label != '') {
-      meme_tagging_search_obj['meme_emotions'][entered_emotion_label] = emotion_search_entry_value;
-      let image_memes_emotions_div_id = document.getElementById('modal-search-add-memes-emotion-meme-label-value-display-container-div-id');
-      image_memes_emotions_div_id.innerHTML = '';
-      //Populate for the emotions of the memes of the images
-      Object.keys(meme_tagging_search_obj['meme_emotions']).forEach((emotion_key) => {
-        image_memes_emotions_div_id.innerHTML += `
-                                        <span id="modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}" style="white-space:nowrap">
-                                            <img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}"
-                                                src="${CLOSE_ICON_BLACK}" title="close" />
-                                            (${emotion_key},${meme_tagging_search_obj['meme_emotions'][emotion_key]})
-                                        </span>
-                                        `;
-      });
+  document.getElementById('modal-search-add-memes-emotion-meme-entry-button-id').onclick = () => {
+    const emotion_el = document.getElementById('modal-search-add-memes-emotion-meme-label-value-textarea-entry-id');
+    const emotion_value_el = document.getElementById('modal-search-add-memes-emotion-meme-value-range-entry-id');
+    const emotion = emotion_el.value;
+    const emotion_value = emotion_value_el.value;
+    const emotion_keys = Object.keys(meme_tagging_search_obj.meme_emotions);
 
-      // Add button hover event listeners to each inage tag.!!!
-      addMouseOverIconSwitch(image_memes_emotions_div_id);
+    if (emotion != '') {
+      meme_tagging_search_obj.meme_emotions[emotion] = emotion_value;
+      const emotions_div = document.getElementById('modal-search-add-memes-emotion-meme-label-value-display-container-div-id');
+      emotions_div.innerHTML = '';
 
-      //action listener for the removal of meme emotions populated from user entry
-      Object.keys(meme_tagging_search_obj['meme_emotions']).forEach((emotion_key) => {
-        document.getElementById(`modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}`).addEventListener('click', function () {
-          let search_meme_emotion_search_span_html_obj = document.getElementById(`modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}`);
-          search_meme_emotion_search_span_html_obj.remove();
-          delete meme_tagging_search_obj['meme_emotions'][emotion_key];
+      for (const key of emotion_keys) {
+        emotions_div.innerHTML += `
+                <span id="modal-search-add-memes-emotion-meme-label-value-span-id-${key}" style="white-space:nowrap">
+                    <img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-meme-remove-button-id-${key}"
+                        src="${CLOSE_ICON_BLACK}" title="close" />
+                    (${key},${meme_tagging_search_obj['meme_emotions'][key]})
+                </span>
+                `;
+      }
+
+      addMouseOverIconSwitch(emotions_div);
+
+      for (const emotion_key of emotion_keys) {
+        document.getElementById(`modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}`).addEventListener('click', () => {
+          let span = document.getElementById(`modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}`);
+          span.remove();
+          delete meme_tagging_search_obj.meme_emotions[emotion_key];
         });
-      });
+      }
     }
-    document.getElementById('modal-search-add-memes-emotion-meme-label-value-textarea-entry-id').value = '';
-    document.getElementById('modal-search-add-memes-emotion-meme-value-range-entry-id').value = '0';
+
+    emotion_el.value = '';
+    emotion_value_el.value = '0';
   };
 
   //user presses it after the fields have been entered to search the images to then add memes
   //after the search is done and user has made the meme selection (or not) and they are to be added to the current annotation object
-  document.getElementById('modal-search-add-memes-images-results-select-images-order-button-id').onclick = async function () {
-    let origMemes = current_image_annotation.taggingMemeChoices;
-    const { fileName, faceClusters, taggingTags, fileType } = current_image_annotation;
+  document.getElementById('modal-search-add-memes-images-results-select-images-order-button-id').onclick = async () => {
+    const origMemes = current_image_annotation.taggingMemeChoices;
+    const { fileName, faceClusters, taggingTags } = current_image_annotation;
 
     //meme selection switch check boxes
-    //!!!simplify by getting the checked meme list and then append and get unique array
-    // the list will be from the
-    let meme_switch_booleans = [];
+    const meme_switch_booleans = [];
     for (let ii = 0; ii < meme_search_results.length; ii++) {
       if (origMemes.includes(meme_search_results[ii]) == false && fileName != meme_search_results[ii]) {
         //exclude memes already present
-        let meme_boolean_tmp1 = document.getElementById(`add-memes-images-toggle-id-${meme_search_results[ii]}`).checked;
-        if (meme_boolean_tmp1 == true) {
+        const meme_bool = document.getElementById(`add-memes-images-toggle-id-${meme_search_results[ii]}`).checked;
+        if (meme_bool) {
           meme_switch_booleans.push(meme_search_results[ii]);
         }
       }
     }
+
     for (let ii = 0; ii < meme_search_meme_results.length; ii++) {
       if (origMemes.includes(meme_search_meme_results[ii]) == false && fileName != meme_search_meme_results[ii]) {
-        //exclude memes already present
-        let meme_boolean_tmp2 = document.getElementById(`add-memes-meme-toggle-id-${meme_search_meme_results[ii]}`).checked;
-        if (meme_boolean_tmp2 == true) {
+        const meme_bool = document.getElementById(`add-memes-meme-toggle-id-${meme_search_meme_results[ii]}`).checked;
+        if (meme_bool) {
           meme_switch_booleans.push(meme_search_meme_results[ii]);
         }
       }
     }
-    await DB_MODULE.Update_Tagging_MEME_Connections(fileName, JSON.parse(JSON.stringify(origMemes)), JSON.parse(JSON.stringify(meme_switch_booleans)));
+
+    await DB_MODULE.Update_Tagging_MEME_Connections(fileName, Array.from(origMemes), Array.from(meme_switch_booleans));
     meme_switch_booleans.push(...current_image_annotation.taggingMemeChoices);
     current_image_annotation.taggingMemeChoices = [...new Set(meme_switch_booleans)]; //add a 'unique' set of memes as the 'new Set' has unique contents
     DB_MODULE.Update_Tagging_Annotation_DB(current_image_annotation);
@@ -1538,20 +1494,14 @@ async function Add_New_Meme() {
 
     Load_Image_State();
 
-    const search_res_children = document.getElementById('modal-search-add-memes-images-results-grid-div-area-id').children;
-    const search_meme_res_children = document.getElementById('modal-search-add-memes-meme-images-results-grid-div-area-id').children;
-    const children_tmp = [...search_res_children, ...search_meme_res_children];
-    GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp);
+    const search_children = document.getElementById('modal-search-add-memes-images-results-grid-div-area-id').children;
+    const meme_children = document.getElementById('modal-search-add-memes-meme-images-results-grid-div-area-id').children;
+    GENERAL_HELPER_FNS.Pause_Media_From_Modals([...search_children, ...meme_children]);
 
-    modal_add_memes_search_click = document.getElementById('search-add-memes-modal-click-top-id');
-    modal_add_memes_search_click.style.display = 'none';
-  };
-  //user presses the main search button for the add memes search
-  document.getElementById('modal-search-add-memes-main-button-id').onclick = function () {
-    Modal_Meme_Search_Btn();
+    outer_modal.style.display = 'none';
   };
 
-  // always fresh random search
+  document.getElementById('modal-search-add-memes-main-button-id').onclick = Modal_Meme_Search_Btn;
 
   Show_Loading_Spinner();
 
@@ -1561,128 +1511,114 @@ async function Add_New_Meme() {
   Hide_Loading_Spinner();
 
   //display meme candidates
-  let memes_current = current_image_annotation.taggingMemeChoices;
-  let search_meme_images_results_output = document.getElementById('modal-search-add-memes-images-results-grid-div-area-id');
-  search_meme_images_results_output.innerHTML = '';
-  for (let file_key of meme_search_results) {
-    if (memes_current.includes(file_key) == false && current_image_annotation.fileName != file_key) {
+  const current_memes = current_image_annotation.taggingMemeChoices;
+  const search_results_output = document.getElementById('modal-search-add-memes-images-results-grid-div-area-id');
+  search_results_output.innerHTML = '';
+
+  for (const key of meme_search_results) {
+    if (!current_memes.includes(key) && current_image_annotation.fileName != key) {
       //exclude memes already present
-      search_meme_images_results_output.insertAdjacentHTML(
+      search_results_output.insertAdjacentHTML(
         'beforeend',
         `
                 <label class="add-memes-memeswitch" title="deselect / include" >   
-                    <input id="add-memes-images-toggle-id-${file_key}" type="checkbox" > 
+                    <input id="add-memes-images-toggle-id-${key}" type="checkbox" > 
                     <span class="add-memes-slider"></span>   
                 </label>
-                <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${file_key}" >
+                <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${key}" >
                 ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
-                  file_key,
+                  key,
                   'modal-image-search-add-memes-result-single-image-img-obj-class',
-                  `modal-image-search-add-memes-result-single-image-img-id-${file_key}`
+                  `modal-image-search-add-memes-result-single-image-img-id-${key}`
                 )}
                 </div>
                 `
       );
-      //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
-      document.getElementById(`modal-image-search-add-memes-result-single-image-img-id-${file_key}`).onclick = function () {
-        if (document.getElementById(`add-memes-images-toggle-id-${file_key}`).checked == true) {
-          document.getElementById(`add-memes-images-toggle-id-${file_key}`).checked = false;
-        } else {
-          document.getElementById(`add-memes-images-toggle-id-${file_key}`).checked = true;
-        } //
+
+      document.getElementById(`modal-image-search-add-memes-result-single-image-img-id-${key}`).onclick = () => {
+        Toggle_HTML_Checkbox(`add-memes-images-toggle-id-${key}`);
       };
     }
   }
+
   //search results display image memes
-  let search_meme_images_memes_results_output = document.getElementById('modal-search-add-memes-meme-images-results-grid-div-area-id');
-  search_meme_images_memes_results_output.innerHTML = '';
-  for (let file_key of meme_search_meme_results) {
-    if (memes_current.includes(file_key) == false && current_image_annotation.fileName != file_key) {
-      //exclude memes already present
-      search_meme_images_memes_results_output.insertAdjacentHTML(
+  const search_memes_output = document.getElementById('modal-search-add-memes-meme-images-results-grid-div-area-id');
+  search_memes_output.innerHTML = '';
+
+  for (const key of meme_search_meme_results) {
+    if (!current_memes.includes(key) && current_image_annotation.fileName != key) {
+      search_memes_output.insertAdjacentHTML(
         'beforeend',
         `
                 <label class="add-memes-memeswitch" title="deselect / include" >   
-                    <input id="add-memes-meme-toggle-id-${file_key}" type="checkbox" > 
+                    <input id="add-memes-meme-toggle-id-${key}" type="checkbox" > 
                     <span class="add-memes-slider"></span>   
                 </label>
-                <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${file_key}" >
+                <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${key}" >
                 ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
-                  file_key,
+                  key,
                   'modal-image-search-add-memes-result-single-image-img-obj-class',
-                  `modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}`
+                  `modal-image-search-add-memes-result-single-meme-image-img-id-${key}`
                 )}
                 </div>
                 `
       );
-      //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
-      document.getElementById(`modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}`).onclick = function () {
-        if (document.getElementById(`add-memes-meme-toggle-id-${file_key}`).checked == true) {
-          document.getElementById(`add-memes-meme-toggle-id-${file_key}`).checked = false;
-        } else {
-          document.getElementById(`add-memes-meme-toggle-id-${file_key}`).checked = true;
-        } //
+
+      document.getElementById(`modal-image-search-add-memes-result-single-meme-image-img-id-${key}`).onclick = () => {
+        Toggle_HTML_Checkbox(`add-memes-meme-toggle-id-${key}`);
       };
     }
   }
 }
+
 //the functionality to use the object to search the DB for relevant memes
 async function Modal_Meme_Search_Btn() {
   //image annotation tags
-  let search_tags_input = document.getElementById('modal-search-add-memes-tag-textarea-entry-id').value;
-  let split_search_string = search_tags_input.split(reg_exp_delims);
-  let search_unique_search_terms = [...new Set(split_search_string)];
-  search_unique_search_terms = search_unique_search_terms.filter((tag) => tag !== '');
-  meme_tagging_search_obj['searchTags'] = search_unique_search_terms;
-  //meme tags now
-  let search_meme_tags_input = document.getElementById('modal-search-add-memes-tag-textarea-memes-entry-id').value;
-  let split_meme_search_string = search_meme_tags_input.split(reg_exp_delims);
-  let search_unique_meme_search_terms = [...new Set(split_meme_search_string)];
-  search_unique_meme_search_terms = search_unique_meme_search_terms.filter((tag) => tag !== '');
-  meme_tagging_search_obj['searchMemeTags'] = search_unique_meme_search_terms;
+  const search_tags_input = document.getElementById('modal-search-add-memes-tag-textarea-entry-id').value;
+  const split_search_string = search_tags_input.split(reg_exp_delims);
+  meme_tagging_search_obj.searchTags = [...new Set(split_search_string)].filter((tag) => tag !== '');
+
+  const search_meme_tags_input = document.getElementById('modal-search-add-memes-tag-textarea-memes-entry-id').value;
+  const split_meme_search_string = search_meme_tags_input.split(reg_exp_delims);
+  meme_tagging_search_obj.searchMemeTags = [...new Set(split_meme_search_string)].filter((tag) => tag !== '');
 
   //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
   //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
   Show_Loading_Spinner();
 
   meme_search_results = await SEARCH_MODULE.Meme_Addition_Image_Search_DB(meme_tagging_search_obj);
-
   meme_search_meme_results = await SEARCH_MODULE.Meme_Addition_Image_Meme_Search_DB(meme_tagging_search_obj);
 
   Hide_Loading_Spinner();
 
-  //get the record to know the memes that are present to not present any redundancy
-  let memes_current = current_image_annotation.taggingMemeChoices;
+  const memes_current = current_image_annotation.taggingMemeChoices;
 
   //search results display images
-  let search_meme_images_results_output = document.getElementById('modal-search-add-memes-images-results-grid-div-area-id');
-  search_meme_images_results_output.innerHTML = '';
-  for (let file_key of meme_search_results) {
-    if (memes_current.includes(file_key) == false && current_image_annotation.fileName != file_key) {
+  const search_images_output = document.getElementById('modal-search-add-memes-images-results-grid-div-area-id');
+  search_images_output.innerHTML = '';
+
+  for (const key of meme_search_results) {
+    if (!memes_current.includes(key) && current_image_annotation.fileName != key) {
       //exclude memes already present
-      search_meme_images_results_output.insertAdjacentHTML(
+      search_images_output.insertAdjacentHTML(
         'beforeend',
         `
                 <label class="add-memes-memeswitch" title="deselect / include" >   
-                    <input id="add-memes-images-toggle-id-${file_key}" type="checkbox" > 
+                    <input id="add-memes-images-toggle-id-${key}" type="checkbox" > 
                     <span class="add-memes-slider"></span>   
                 </label>
-                <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${file_key}" >
+                <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${key}" >
                 ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
-                  file_key,
+                  key,
                   'modal-image-search-add-memes-result-single-image-img-obj-class',
-                  `modal-image-search-add-memes-result-single-image-img-id-${file_key}`
+                  `modal-image-search-add-memes-result-single-image-img-id-${key}`
                 )}
                 </div>
                 `
       );
       //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
-      document.getElementById(`modal-image-search-add-memes-result-single-image-img-id-${file_key}`).onclick = function () {
-        if (document.getElementById(`add-memes-images-toggle-id-${file_key}`).checked == true) {
-          document.getElementById(`add-memes-images-toggle-id-${file_key}`).checked = false;
-        } else {
-          document.getElementById(`add-memes-images-toggle-id-${file_key}`).checked = true;
-        } //
+      document.getElementById(`modal-image-search-add-memes-result-single-image-img-id-${key}`).onclick = () => {
+        Toggle_HTML_Checkbox(`add-memes-images-toggle-id-${key}`);
       };
     }
   }
@@ -1709,71 +1645,61 @@ async function Modal_Meme_Search_Btn() {
                 </div>
                 `
       );
-      //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
+
       document.getElementById(`modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}`).onclick = function () {
-        if (document.getElementById(`add-memes-meme-toggle-id-${file_key}`).checked == true) {
-          document.getElementById(`add-memes-meme-toggle-id-${file_key}`).checked = false;
-        } else {
-          document.getElementById(`add-memes-meme-toggle-id-${file_key}`).checked = true;
-        } //
+        Toggle_HTML_Checkbox(`add-memes-meme-toggle-id-${file_key}`);
       };
     }
-    //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
   }
 }
 
 //START SAVING CONTENT (EXPORTING) RIGHT CLICK CONTENT >>>>>>>>>>>>>>
-let center_div = document.getElementById('center-gallery-area-div-id');
-let save_modal_center_tagging = document.getElementById('right-click-modal-tagging-center');
-save_modal_center_tagging.style.display = 'none';
+const center_div = document.getElementById('center-gallery-area-div-id');
+const save_modal_center_div = document.getElementById('right-click-modal-tagging-center');
+const meme_modal_image_div = document.getElementById('modal-meme-clicked-image-gridbox-id');
+const save_modal_meme_div = document.getElementById('right-click-modal-tagging-meme');
+const meme_set_div = document.getElementById('memes-innerbox-displaymemes-id'); //for the memes of the tagging view
+const rc_meme_modal_div = document.getElementById('right-click-tagging-meme');
+
+let recent_meme_thumbnail = '';
+
+save_modal_center_div.style.display = 'none';
 center_div.addEventListener('contextmenu', (ev) => {
   //show the save file modal if right clicked on the center div for tagging
-  const positionX = ev.clientX;
-  const positionY = ev.clientY;
-  save_modal_center_tagging.style.left = positionX + 'px';
-  save_modal_center_tagging.style.top = positionY + 'px';
-  save_modal_center_tagging.style.display = 'block';
-  save_meme_tagging.style.display = 'none'; //turn off the meme button view
+  save_modal_center_div.style.left = ev.clientX + 'px';
+  save_modal_center_div.style.top = ev.clientY + 'px';
+  save_modal_center_div.style.display = 'block';
+  rc_meme_modal_div.style.display = 'none'; //turn off the meme button view
 });
-let meme_modal_image_div = document.getElementById('modal-meme-clicked-image-gridbox-id');
-let save_modal_meme_tagging = document.getElementById('right-click-modal-tagging-meme');
-save_modal_meme_tagging.style.display = 'none';
+
+save_modal_meme_div.style.display = 'none';
 meme_modal_image_div.addEventListener('contextmenu', (ev) => {
   //show the save file modal if right clicked on the center div for tagging
-  const positionX = ev.clientX;
-  const positionY = ev.clientY;
-  save_modal_meme_tagging.style.left = positionX + 'px';
-  save_modal_meme_tagging.style.top = positionY + 'px';
-  save_modal_meme_tagging.style.display = 'block';
+  save_modal_meme_div.style.left = ev.clientX + 'px';
+  save_modal_meme_div.style.top = ev.clientY + 'px';
+  save_modal_meme_div.style.display = 'block';
 });
-let meme_set_div = document.getElementById('memes-innerbox-displaymemes-id'); //for the memes of the tagging view
-let save_meme_tagging = document.getElementById('right-click-tagging-meme');
-save_meme_tagging.style.display = 'none';
-let recent_meme_thumbnail_context = '';
+rc_meme_modal_div.style.display = 'none';
+
 meme_set_div.addEventListener('contextmenu', (ev) => {
   //get the save button for this meme, show the button for this meme
   if (ev.target.id.substring(0, 19) == 'memes-image-img-id-') {
-    const positionX = ev.clientX;
-    const positionY = ev.clientY;
-    save_meme_tagging.style.left = positionX + 'px';
-    save_meme_tagging.style.top = positionY + 'px';
-    recent_meme_thumbnail_context = ev.target.id.substring(19);
-    save_meme_tagging.style.display = 'block';
-    save_modal_center_tagging.style.display = 'none'; //turn off the center button view
+    rc_meme_modal_div.style.left = ev.clientX + 'px';
+    rc_meme_modal_div.style.top = ev.clientY + 'px';
+    recent_meme_thumbnail = ev.target.id.substring(19);
+    rc_meme_modal_div.style.display = 'block';
+    save_modal_center_div.style.display = 'none'; //turn off the center button view
   }
 });
 
 document.body.addEventListener('mousedown', async (ev) => {
-  //catch the mouse downs to handle them
   if (ev.button == 0) {
     //left clicked
-    if (save_modal_center_tagging.style.display == 'block') {
+    if (save_modal_center_div.style.display == 'block') {
       switch (ev.target.id) {
         case 'save-file-tagging-center': {
-          // save button clicked from the tagging center modal,
-
           const results = await IPC_RENDERER.invoke('dialog:saveFile');
-          if (results.canceled == false) {
+          if (!results.canceled) {
             const output_name = results.filePath;
             FS.copyFileSync(PATH.join(TAGA_DATA_DIRECTORY, current_image_annotation.fileName), output_name, FS.constants.COPYFILE_EXCL);
             alert('saved file to download');
@@ -1781,6 +1707,7 @@ document.body.addEventListener('mousedown', async (ev) => {
           break;
         }
         case 'show-faces-tagging-center': {
+          //show faces similar to this one
           const photo = document.getElementById('center-gallery-image-id');
           let width,
             height = 0;
@@ -1843,51 +1770,73 @@ document.body.addEventListener('mousedown', async (ev) => {
         }
       }
 
-      save_modal_center_tagging.style.display = 'none';
+      save_modal_center_div.style.display = 'none';
     }
-    if (save_modal_meme_tagging.style.display == 'block') {
-      if (ev.target.id == 'save-file-tagging-modal-meme') {
-        // save button clicked from the tagging center modal,
 
+    if (save_modal_meme_div.style.display == 'block') {
+      if (ev.target.id == 'save-file-tagging-modal-meme') {
         const results = await IPC_RENDERER.invoke('dialog:saveFile');
-        if (results.canceled == false) {
+
+        if (!results.canceled) {
           const output_name = results.filePath;
           FS.copyFileSync(
             PATH.join(TAGA_DATA_DIRECTORY, PATH.basename(document.getElementById('modal-meme-clicked-displayimg-id').src)),
             output_name,
             FS.constants.COPYFILE_EXCL
           );
+
           alert('saved file to download');
         }
-        save_modal_meme_tagging.style.display = 'none';
-      } else {
-        // clicked but not on the button so get rid of the button
-
-        save_modal_meme_tagging.style.display = 'none';
       }
+
+      save_modal_meme_div.style.display = 'none';
     }
-    if (save_meme_tagging.style.display == 'block') {
-      if (ev.target.id == 'save-file-tagging-meme') {
-        // save button clicked from the tagging center modal,
 
+    if (rc_meme_modal_div.style.display == 'block') {
+      if (ev.target.id == 'save-file-tagging-meme') {
         const results = await IPC_RENDERER.invoke('dialog:saveFile');
-        if (results.canceled == false) {
+
+        if (!results.canceled) {
           const output_name = results.filePath;
-          FS.copyFileSync(PATH.join(TAGA_DATA_DIRECTORY, recent_meme_thumbnail_context), output_name, FS.constants.COPYFILE_EXCL);
+          FS.copyFileSync(PATH.join(TAGA_DATA_DIRECTORY, recent_meme_thumbnail), output_name, FS.constants.COPYFILE_EXCL);
           alert('saved file to download');
         }
-        save_meme_tagging.style.display = 'none';
-        recent_meme_thumbnail_context = '';
-      } else {
-        // clicked but not on the button so get rid of the button
-
-        save_meme_tagging.style.display = 'none';
-        recent_meme_thumbnail_context = '';
       }
+
+      rc_meme_modal_div.style.display = 'none';
+      recent_meme_thumbnail = '';
     }
   }
 });
 
+function Toggle_HTML_Checkbox(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.checked = !el.checked;
+  }
+}
+
+function Reset_Meme_Search() {
+  document.getElementById('modal-search-add-memes-tag-textarea-entry-id').value = '';
+  document.getElementById('modal-search-add-memes-tag-textarea-memes-entry-id').value = '';
+  document.getElementById('modal-search-add-memes-emotion-label-value-textarea-entry-id').value = '';
+  document.getElementById('modal-search-add-memes-emotion-meme-label-value-textarea-entry-id').value = '';
+  document.getElementById('modal-search-add-memes-emotion-value-range-entry-id').value = '0';
+  document.getElementById('modal-search-add-memes-emotion-label-value-display-container-div-id').value = '';
+  document.getElementById('modal-search-add-memes-emotion-meme-value-range-entry-id').value = '0';
+  document.getElementById('modal-search-add-memes-emotion-label-value-display-container-div-id').innerHTML = '';
+  document.getElementById('modal-search-add-memes-emotion-meme-label-value-display-container-div-id').innerHTML = '';
+  document.getElementById('modal-search-add-memes-images-results-grid-div-area-id').innerHTML = '';
+  document.getElementById('modal-search-add-memes-meme-images-results-grid-div-area-id').innerHTML = '';
+  meme_tagging_search_obj = {
+    meme_emotions: {},
+    emotions: {},
+    searchTags: [],
+    searchMemeTags: [],
+  };
+}
+
+//TODO:
 document.getElementById('modal-facesearch-close-exit-view-button-id').onclick = () => {
   let modal_search_click = document.getElementById('facesearch-modal-click-top-id');
   modal_search_click.style.display = 'none';
