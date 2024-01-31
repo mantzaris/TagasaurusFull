@@ -61,6 +61,7 @@
     "json": "^11.0.0",
     "lodash": "^4.17.21",
     "masonry-layout": "^4.2.2",
+    "ml-kmeans": "^6.0.0",
     "natural": "^6.10.4",
     "path": "^0.12.7",
     "stopword": "^3.0.1"

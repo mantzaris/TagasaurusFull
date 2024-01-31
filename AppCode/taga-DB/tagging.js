@@ -255,12 +255,16 @@ function Tagging_Random_DB_FileNames(num_of_records) {
 
 exports.Tagging_Random_DB_FileNames = Tagging_Random_DB_FileNames;
 
-function Tagging_Random_DB_Records_With_Faces(num_of_records) {
+function Tagging_Random_DB_Records_With_Faces(request_num) {
   let entries = [];
   let seen = new Set();
   let attempts = 0;
 
-  while (entries.length < num_of_records) {
+  if (record_num_tagging < request_num) {
+    request_num = record_num_tagging;
+  }
+
+  while (entries.length < request_num) {
     const entry = GET_N_RAND_TAGGING_ENTRIES_WITH_FACES_STMT.all(1)[0];
 
     if (entry && !seen.has(entry.fileName)) {
@@ -271,12 +275,12 @@ function Tagging_Random_DB_Records_With_Faces(num_of_records) {
 
     attempts++;
 
-    if (attempts > num_of_records * 2) {
+    if (attempts > request_num * 2) {
       break;
     }
   }
 
-  return entries;
+  return entries.map((entry) => Get_Obj_Fields_From_Record(entry));
 }
 
 exports.Tagging_Random_DB_Records_With_Faces = Tagging_Random_DB_Records_With_Faces;

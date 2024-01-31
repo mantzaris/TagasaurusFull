@@ -1,7 +1,6 @@
-const fileType = require('file-type');
-
-const { GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
 const { ipcRenderer } = require('electron');
+const mlKmeans = require('ml-kmeans');
+const { GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
 
 const default_filename = 'friendsCropped.jpg';
 const alpha_numeric_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -18,54 +17,27 @@ let containerHeight = container.offsetHeight;
 let springLength = containerWidth * 0.05;
 
 const init_radius = Math.min(containerHeight, containerWidth) * 0.3;
-const spawn_num = 8;
+let spawn_num = 8;
 const candidate_num = 25;
-
-function Make_IMG_El(src) {
-  return new Promise((resolve, reject) => {
-    const image_tmp = new Image();
-    image_tmp.onload = () => resolve(image_tmp);
-    image_tmp.onerror = reject;
-    image_tmp.src = src;
-  });
-}
-
-async function Detection_Face_URL(x, y, width, height, imagePath) {
-  const originalImage = await Make_IMG_El(imagePath);
-
-  const scaleFactor = 1.5;
-  const newWidth = width * scaleFactor;
-  const newHeight = height * scaleFactor;
-  const deltaX = (newWidth - width) / 2;
-  const deltaY = (newHeight - height) / 2;
-  let newX = x - deltaX;
-  let newY = y - deltaY;
-  newX = Math.max(0, Math.min(newX, originalImage.width - newWidth));
-  newY = Math.max(0, Math.min(newY, originalImage.height - newHeight));
-
-  const detection_canvas = document.createElement('canvas');
-  const ctx2 = detection_canvas.getContext('2d');
-  detection_canvas.width = newWidth;
-  detection_canvas.height = newHeight;
-  ctx2.drawImage(originalImage, newX, newY, newWidth, newHeight, 0, 0, newWidth, newHeight);
-  return detection_canvas.toDataURL('image/jpeg');
-}
 
 async function Initial_Node_Selection() {
   Show_Loading_Spinner();
-  const sample_records = DB_MODULE.Tagging_Random_DB_Records_With_Faces(spawn_num);
 
-  if (!sample_records || sample_records.length < 1) {
-    alert('add and save images with people, currently empty');
+  const init_records = await Centroid_Sample_Records();
+
+  if (!init_records) {
+    return;
   }
 
-  for (const [index, record] of sample_records.entries()) {
+  //const sample_records = DB_MODULE.Tagging_Random_DB_Records_With_Faces(spawn_num);
+
+  for (const [index, record] of init_records.entries()) {
     if (record.fileType == 'video') continue; //do not put the videos on the network diagram
 
     const imagePath = GENERAL_HELPER_FNS.Full_Path_From_File_Name(record.fileName);
     const childId = Rand_Node_ID();
 
-    const angle = (2 * Math.PI * index) / sample_records.length; //angle for each node
+    const angle = (2 * Math.PI * index) / init_records.length; //angle for each node
     const node_x = init_radius * Math.cos(angle);
     const node_y = init_radius * Math.sin(angle);
 
@@ -95,31 +67,7 @@ async function Initial_Node_Selection() {
     id2filename_map.set(childId, { fileName: record.fileName, descriptor: face.descriptor });
   }
 
-  network_options = {
-    nodes: {
-      shape: 'image',
-      size: 50,
-    },
-    edges: {
-      arrows: 'to',
-    },
-    interaction: {
-      dragNodes: true,
-      zoomView: true,
-    },
-    physics: {
-      enabled: true,
-      barnesHut: {
-        gravitationalConstant: -2000,
-        centralGravity: 0.2,
-        springLength: springLength,
-        springConstant: 0.06,
-        damping: 0.3,
-        avoidOverlap: 0.6,
-      },
-      solver: 'barnesHut',
-    },
-  };
+  Set_Network_Options();
 
   network_data = { nodes, edges };
   network = new vis.Network(container, network_data, network_options);
@@ -184,47 +132,16 @@ function fetchChildNodesFromDatabase(parentNodeId) {
   return Array.from({ length: spawn_num }, Rand_Node_ID);
 }
 
-window.addEventListener('resize', function () {
-  const newWidth = container.offsetWidth;
-  const newSpringLength = newWidth * 0.05; // 5% of the new width
-
-  containerWidth = container.offsetWidth;
-  containerHeight = container.offsetHeight;
-
-  network.setOptions({
-    physics: {
-      barnesHut: {
-        springLength: newSpringLength,
-      },
-    },
-  });
-});
-
-function Rand_Node_ID(length = 7) {
-  let result = '';
-  const charactersLength = alpha_numeric_chars.length;
-  for (let i = 0; i < length; i++) {
-    result += alpha_numeric_chars.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
-
 ////////////////////////////////////////////
 //UI interactivity
 ////////////////////////////////////////////
-document.getElementById('restart-btn').onclick = () => {
-  nodes.clear();
-  edges.clear();
-  id2filename_map.clear();
-
-  Initial_Node_Selection();
-};
 
 async function Present_Node_Locality(nodeId) {
   const { fileName, descriptor } = id2filename_map.get(nodeId);
   let fileName_Set = new Set([fileName]);
 
   const { rowids } = await ipcRenderer.invoke('faiss-search', descriptor, candidate_num);
+
   for (const rowid of rowids) {
     const fileName_tmp = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowid)[0].fileName;
     fileName_Set.add(fileName_tmp);
@@ -261,23 +178,6 @@ async function Present_Node_Locality(nodeId) {
     }
   }
 
-  // search_results_output.innerHTML += search_display_inner_tmp;
-
-  // search_results.forEach((file) => {
-  //   if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`) == true) {
-  //     document.getElementById(`modal-image-search-result-single-image-img-id-${file}`).onclick = async function () {
-  //       const search_res_children = document.getElementById('modal-search-images-results-grid-div-area-id').children;
-  //       const search_meme_res_children = document.getElementById('modal-search-meme-images-results-grid-div-area-id').children;
-  //       const children_tmp = [...search_res_children, ...search_meme_res_children];
-  //       GENERAL_HELPER_FNS.Pause_Media_From_Modals(children_tmp);
-  //function Pause_Media_From_Modals() {
-  //       current_image_annotation = DB_MODULE.Get_Tagging_Record_From_DB(file);
-  //       Load_State_Of_Image_IDB();
-  //       document.getElementById('search-modal-click-top-id').style.display = 'none';
-  //     };
-  //   }
-  // });
-
   document.getElementById('media-container').scrollTop = 0;
 }
 
@@ -298,4 +198,145 @@ async function Initialize() {
   }
 }
 
+document.getElementById('restart-btn').onclick = () => {
+  nodes.clear();
+  edges.clear();
+  id2filename_map.clear();
+
+  let search_results_output = document.getElementById('media-container');
+  search_results_output.innerHTML = '';
+
+  Initial_Node_Selection();
+};
+
 Initialize();
+
+//////////////////////////////////////////////
+//helper function for small tasks
+//////////////////////////////////////////////
+window.addEventListener('resize', function () {
+  const newWidth = container.offsetWidth;
+  const newSpringLength = newWidth * 0.05; // 5% of the new width
+
+  containerWidth = container.offsetWidth;
+  containerHeight = container.offsetHeight;
+
+  network.setOptions({
+    physics: {
+      barnesHut: {
+        springLength: newSpringLength,
+      },
+    },
+  });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  const slider = document.getElementById('branching-slider');
+  const output = document.getElementById('branching-value');
+
+  slider.oninput = function () {
+    output.textContent = this.value;
+    spawn_num = parseInt(this.value);
+  };
+});
+
+function Make_IMG_El(src) {
+  return new Promise((resolve, reject) => {
+    const image_tmp = new Image();
+    image_tmp.onload = () => resolve(image_tmp);
+    image_tmp.onerror = reject;
+    image_tmp.src = src;
+  });
+}
+
+async function Detection_Face_URL(x, y, width, height, imagePath) {
+  const originalImage = await Make_IMG_El(imagePath);
+
+  const scaleFactor = 1.5;
+  const newWidth = width * scaleFactor;
+  const newHeight = height * scaleFactor;
+  const deltaX = (newWidth - width) / 2;
+  const deltaY = (newHeight - height) / 2;
+  let newX = x - deltaX;
+  let newY = y - deltaY;
+  newX = Math.max(0, Math.min(newX, originalImage.width - newWidth));
+  newY = Math.max(0, Math.min(newY, originalImage.height - newHeight));
+
+  const detection_canvas = document.createElement('canvas');
+  const ctx2 = detection_canvas.getContext('2d');
+  detection_canvas.width = newWidth;
+  detection_canvas.height = newHeight;
+  ctx2.drawImage(originalImage, newX, newY, newWidth, newHeight, 0, 0, newWidth, newHeight);
+  return detection_canvas.toDataURL('image/jpeg');
+}
+
+function Set_Network_Options() {
+  network_options = {
+    nodes: {
+      shape: 'image',
+      size: 50,
+    },
+    edges: {
+      arrows: 'to',
+    },
+    interaction: {
+      dragNodes: true,
+      zoomView: true,
+    },
+    physics: {
+      enabled: true,
+      barnesHut: {
+        gravitationalConstant: -2000,
+        centralGravity: 0.2,
+        springLength: springLength,
+        springConstant: 0.06,
+        damping: 0.3,
+        avoidOverlap: 0.6,
+      },
+      solver: 'barnesHut',
+    },
+  };
+}
+
+function Rand_Node_ID(length = 7) {
+  let result = '';
+  const charactersLength = alpha_numeric_chars.length;
+  for (let i = 0; i < length; i++) {
+    result += alpha_numeric_chars.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
+
+async function Centroid_Sample_Records() {
+  const sample_size = 2000;
+  const K = spawn_num;
+  const options = {
+    maxIterations: 40,
+  };
+
+  const sample_records = DB_MODULE.Tagging_Random_DB_Records_With_Faces(sample_size);
+
+  if (!sample_records || sample_records.length < 1) {
+    alert('add and save images with people, currently empty');
+    return null;
+  }
+
+  if (sample_records.length <= K) return sample_records;
+
+  const sample_embeddings = sample_records.flatMap((record) => record.faceDescriptors);
+  const clustering = mlKmeans.kmeans(sample_embeddings, K, options);
+  const sample_rowids = new Set();
+
+  for (const centroid of clustering.centroids) {
+    const { rowids } = await ipcRenderer.invoke('faiss-search', centroid, 3);
+
+    for (const rowid of rowids) {
+      if (sample_rowids.has(rowid) == false) {
+        sample_rowids.add(rowid);
+        break;
+      }
+    }
+  }
+
+  return DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt([...sample_rowids]);
+}
