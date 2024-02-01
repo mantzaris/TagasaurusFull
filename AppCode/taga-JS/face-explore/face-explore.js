@@ -4,6 +4,7 @@ const { GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', '
 
 const default_filename = 'friendsCropped.jpg';
 const alpha_numeric_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const play_icon_path = PATH.join(__dirname, '..', 'Assets', 'various-icons', 'videoplay512.png');
 
 const container = document.getElementById('network-view');
 const nodes = new vis.DataSet([]);
@@ -39,27 +40,23 @@ async function Initial_Node_Selection() {
 
     if (record.fileType == 'video') {
       //select random face descriptor from the available
-      console.log(`video faceDescriptor length = ${record.faceDescriptors.length}`);
       const selected_face_descriptor = record.faceDescriptors[Math.floor(Math.random() * record.faceDescriptors.length)];
-
-      console.log(PATH.join(__dirname, '..', 'Assets', 'various-icons', 'videoplay512.png'));
-
-      nodes.add({
-        id: childId,
-        shape: 'image',
-        image: PATH.join(__dirname, '..', 'Assets', 'various-icons', 'videoplay512.png'),
-        x: node_x,
-        y: node_y,
-      });
+      Add_Node_To_Network(childId, play_icon_path, node_x, node_y);
 
       id2filename_map.set(childId, { fileName: record.fileName, descriptor: selected_face_descriptor });
       continue;
     }
 
+    //IMAGE or GIF
     const faces = await Get_Image_Face_Descriptors_From_File(imagePath); //needs to run face api fresh to get the detection box coordinates which the DB does not store
     let face;
 
     if (!faces || faces.length == 0) {
+      //gif where frame 1 has no face
+      const selected_face_descriptor = record.faceDescriptors[Math.floor(Math.random() * record.faceDescriptors.length)];
+      Add_Node_To_Network(childId, play_icon_path, node_x, node_y);
+
+      id2filename_map.set(childId, { fileName: record.fileName, descriptor: selected_face_descriptor });
       continue;
     } else if (faces.length == 1) {
       face = faces[0];
@@ -70,13 +67,14 @@ async function Initial_Node_Selection() {
     const { x, y, width, height } = face.detection.box;
     const faceThumbnailUrl = await Detection_Face_URL(x, y, width, height, imagePath);
 
-    nodes.add({
-      id: childId,
-      shape: 'image',
-      image: faceThumbnailUrl,
-      x: node_x,
-      y: node_y,
-    });
+    Add_Node_To_Network(childId, faceThumbnailUrl, node_x, node_y);
+    // nodes.add({
+    //   id: childId,
+    //   shape: 'image',
+    //   image: faceThumbnailUrl,
+    //   x: node_x,
+    //   y: node_y,
+    // });
 
     //mapping later on helps us know details about the image from the node id
     id2filename_map.set(childId, { fileName: record.fileName, descriptor: face.descriptor });
@@ -229,6 +227,16 @@ Initialize();
 //////////////////////////////////////////////
 //helper function for small tasks
 //////////////////////////////////////////////
+function Add_Node_To_Network(childId, image_url = play_icon_path, node_x, node_y) {
+  nodes.add({
+    id: childId,
+    shape: 'image',
+    image: image_url,
+    x: node_x,
+    y: node_y,
+  });
+}
+
 window.addEventListener('resize', function () {
   const newWidth = container.offsetWidth;
   const newSpringLength = newWidth * 0.05; // 5% of the new width
