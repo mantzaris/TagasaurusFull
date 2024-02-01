@@ -18,28 +18,43 @@ let springLength = containerWidth * 0.05;
 
 const init_radius = Math.min(containerHeight, containerWidth) * 0.3;
 let spawn_num = 8;
-const candidate_num = 25;
+let candidate_num = 25;
 
 async function Initial_Node_Selection() {
   Show_Loading_Spinner();
 
-  const init_records = await Centroid_Sample_Records();
+  const init_records = await Centroid_Face_Sample_Records(); //records with faces from centroids of samples
 
   if (!init_records) {
     return;
   }
 
-  //const sample_records = DB_MODULE.Tagging_Random_DB_Records_With_Faces(spawn_num);
-
   for (const [index, record] of init_records.entries()) {
-    if (record.fileType == 'video') continue; //do not put the videos on the network diagram
-
     const imagePath = GENERAL_HELPER_FNS.Full_Path_From_File_Name(record.fileName);
     const childId = Rand_Node_ID();
 
     const angle = (2 * Math.PI * index) / init_records.length; //angle for each node
     const node_x = init_radius * Math.cos(angle);
     const node_y = init_radius * Math.sin(angle);
+
+    if (record.fileType == 'video') {
+      //select random face descriptor from the available
+      console.log(`video faceDescriptor length = ${record.faceDescriptors.length}`);
+      const selected_face_descriptor = record.faceDescriptors[Math.floor(Math.random() * record.faceDescriptors.length)];
+
+      console.log(PATH.join(__dirname, '..', 'Assets', 'various-icons', 'videoplay512.png'));
+
+      nodes.add({
+        id: childId,
+        shape: 'image',
+        image: PATH.join(__dirname, '..', 'Assets', 'various-icons', 'videoplay512.png'),
+        x: node_x,
+        y: node_y,
+      });
+
+      id2filename_map.set(childId, { fileName: record.fileName, descriptor: selected_face_descriptor });
+      continue;
+    }
 
     const faces = await Get_Image_Face_Descriptors_From_File(imagePath); //needs to run face api fresh to get the detection box coordinates which the DB does not store
     let face;
@@ -231,12 +246,20 @@ window.addEventListener('resize', function () {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-  const slider = document.getElementById('branching-slider');
-  const output = document.getElementById('branching-value');
+  const spawn_slider = document.getElementById('branching-slider');
+  const spawn_slider_value = document.getElementById('branching-value');
+  const preview_slider = document.getElementById('preview-slider');
+  const preview_slider_value = document.getElementById('preview-value');
 
-  slider.oninput = function () {
-    output.textContent = this.value;
+  spawn_slider.oninput = function () {
+    spawn_slider_value.textContent = this.value;
     spawn_num = parseInt(this.value);
+  };
+
+  preview_slider.oninput = function () {
+    //the html calls the 'candidate number' the 'preview number'
+    preview_slider_value.textContent = this.value;
+    candidate_num = parseInt(this.value);
   };
 });
 
@@ -307,7 +330,7 @@ function Rand_Node_ID(length = 7) {
   return result;
 }
 
-async function Centroid_Sample_Records() {
+async function Centroid_Face_Sample_Records() {
   const sample_size = 2000;
   const K = spawn_num;
   const options = {

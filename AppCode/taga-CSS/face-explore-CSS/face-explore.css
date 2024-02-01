@@ -35,7 +35,7 @@ html {
 
 #media-container {
   flex-grow: 1;
-  max-height: 85vh;
+  max-height: 80vh;
 
   overflow-y: auto;
   padding-bottom: 3px;
