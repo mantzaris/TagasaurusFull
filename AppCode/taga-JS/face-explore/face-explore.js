@@ -114,27 +114,47 @@ async function Spawn_Children(parentNodeId) {
   const parentNodePosition = network.getPositions([parentNodeId])[parentNodeId];
   const parent_data = id2filename_map.get(parentNodeId);
   const parent_node = nodes.get(parentNodeId);
-  console.log('foo');
-  const child_num = parent_data.siblings.length + 1; //+1 because of the parent included
-  let child_Ids = Array.from({ length: child_num }, Rand_Node_ID);
 
-  //dont' do the parent copy here, child_num-1, and do later
+  const child_num = parent_data.siblings.length + 1; //+1 because of the parent included
+  let midpoint_records = []; //only include data from parent_data.siblings that does not clash
+  let midpoint_unique_num = 0;
   for (let i = 0; i < child_num - 1; i++) {
-    const childId = child_Ids[i];
     const parent_sibling_id = parent_data.siblings[i];
     const parent_sibling_embedding = id2filename_map.get(parent_sibling_id).descriptor;
-    const child_sibling_ids = child_Ids.filter((id) => id !== childId);
-
-    const node_x = parentNodePosition.x + (Math.random() - 0.5);
-    const node_y = parentNodePosition.y + (Math.random() - 0.5);
-
     const mid_pnt_embedding = Normalized_Embedding_Midpoint(parent_data.descriptor, parent_sibling_embedding);
     const { rowids } = await ipcRenderer.invoke('faiss-search', mid_pnt_embedding, 1);
     const midpoint_record = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowids[0])[0];
 
     if (midpoint_record.fileName == parent_data.fileName) {
-      //TODO:
+      //skip repetitions that are not direct clones
+      continue;
     }
+  }
+  //get the childnum by making sure that each midpoint is not the same as the parent
+
+  let child_Ids = Array.from({ length: child_num }, Rand_Node_ID);
+
+  //dont' do the parent copy here, child_num-1, and do later
+  for (let i = 0; i < child_num - 1; i++) {
+    const childId = child_Ids[i];
+
+    //>>>>>>>>REMOVE
+    const parent_sibling_id = parent_data.siblings[i];
+    const parent_sibling_embedding = id2filename_map.get(parent_sibling_id).descriptor;
+    const mid_pnt_embedding = Normalized_Embedding_Midpoint(parent_data.descriptor, parent_sibling_embedding);
+    const { rowids } = await ipcRenderer.invoke('faiss-search', mid_pnt_embedding, 1);
+    const midpoint_record = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowids[0])[0];
+
+    if (midpoint_record.fileName == parent_data.fileName) {
+      //skip repetitions that are not direct clones
+      continue;
+    }
+
+    const child_sibling_ids = child_Ids.filter((id) => id !== childId);
+    //<<<<<<<<<<<REMOVE
+
+    const node_x = parentNodePosition.x + (Math.random() - 0.5);
+    const node_y = parentNodePosition.y + (Math.random() - 0.5);
 
     if (midpoint_record.fileType == 'video') {
       const mid_pnt_descriptor = midpoint_record.faceDescriptors[Math.floor(Math.random() * midpoint_record.faceDescriptors.length)];
@@ -292,7 +312,7 @@ function Add_Node_To_Network(childId, image_url = play_icon_path, node_x, node_y
   }
 }
 
-window.addEventListener('resize', function () {
+window.addEventListener('resize', () => {
   const newWidth = container.offsetWidth;
   const newSpringLength = newWidth * 0.05; // 5% of the new width
 
@@ -308,7 +328,7 @@ window.addEventListener('resize', function () {
   });
 });
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
   const spawn_slider = document.getElementById('branching-slider');
   const spawn_slider_value = document.getElementById('branching-value');
   const preview_slider = document.getElementById('preview-slider');
