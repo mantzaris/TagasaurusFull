@@ -30,9 +30,12 @@ async function Initial_Node_Selection() {
     return;
   }
 
+  let rand_node_ids = Array.from({ length: init_records.length }, () => Rand_Node_ID());
+
   for (const [index, record] of init_records.entries()) {
     const imagePath = GENERAL_HELPER_FNS.Full_Path_From_File_Name(record.fileName);
-    const childId = Rand_Node_ID();
+    const nodeId = rand_node_ids[index];
+    const sibling_ids = rand_node_ids.filter((id) => id !== nodeId);
 
     const angle = (2 * Math.PI * index) / init_records.length; //angle for each node
     const node_x = init_radius * Math.cos(angle);
@@ -41,9 +44,9 @@ async function Initial_Node_Selection() {
     if (record.fileType == 'video') {
       //select random face descriptor from the available
       const selected_face_descriptor = record.faceDescriptors[Math.floor(Math.random() * record.faceDescriptors.length)];
-      Add_Node_To_Network(childId, play_icon_path, node_x, node_y);
+      Add_Node_To_Network(nodeId, play_icon_path, node_x, node_y);
 
-      id2filename_map.set(childId, { fileName: record.fileName, descriptor: selected_face_descriptor });
+      id2filename_map.set(nodeId, { fileName: record.fileName, descriptor: selected_face_descriptor, parent: undefined, siblings: sibling_ids });
       continue;
     }
 
@@ -54,9 +57,9 @@ async function Initial_Node_Selection() {
     if (!faces || faces.length == 0) {
       //gif where frame 1 has no face
       const selected_face_descriptor = record.faceDescriptors[Math.floor(Math.random() * record.faceDescriptors.length)];
-      Add_Node_To_Network(childId, play_icon_path, node_x, node_y);
+      Add_Node_To_Network(nodeId, play_icon_path, node_x, node_y);
 
-      id2filename_map.set(childId, { fileName: record.fileName, descriptor: selected_face_descriptor });
+      id2filename_map.set(nodeId, { fileName: record.fileName, descriptor: selected_face_descriptor, parent: undefined, siblings: sibling_ids });
       continue;
     } else if (faces.length == 1) {
       face = faces[0];
@@ -64,20 +67,12 @@ async function Initial_Node_Selection() {
       face = faces[Math.floor(Math.random() * faces.length)];
     }
 
-    const { x, y, width, height } = face.detection.box;
+    const { x, y, width, height } = face.detection.box; //make a face from the detection box
     const faceThumbnailUrl = await Detection_Face_URL(x, y, width, height, imagePath);
 
-    Add_Node_To_Network(childId, faceThumbnailUrl, node_x, node_y);
-    // nodes.add({
-    //   id: childId,
-    //   shape: 'image',
-    //   image: faceThumbnailUrl,
-    //   x: node_x,
-    //   y: node_y,
-    // });
+    Add_Node_To_Network(nodeId, faceThumbnailUrl, node_x, node_y);
 
-    //mapping later on helps us know details about the image from the node id
-    id2filename_map.set(childId, { fileName: record.fileName, descriptor: face.descriptor });
+    id2filename_map.set(nodeId, { fileName: record.fileName, descriptor: face.descriptor, parent: undefined, siblings: sibling_ids });
   }
 
   Set_Network_Options();
@@ -93,7 +88,7 @@ async function Initial_Node_Selection() {
 ////////////////////////////////////////////////////////////
 // now the dynamic functions
 ////////////////////////////////////////////////////////////
-function Network_OnClick_Handler(params) {
+async function Network_OnClick_Handler(params) {
   const nodeId = params.nodes[0];
 
   if (nodeId) {
@@ -104,9 +99,9 @@ function Network_OnClick_Handler(params) {
       },
     });
 
-    //it is a leaf node without connections outwards
+    //it is a leaf node without connections outwards, then spawn leaf
     if (connectedEdges.length === 0) {
-      Spawn_Children(nodeId);
+      await Spawn_Children(nodeId);
     }
 
     //display the clicked node image/video etc separately
@@ -114,35 +109,86 @@ function Network_OnClick_Handler(params) {
   }
 }
 
-function Spawn_Children(parentNodeId) {
+//midpoints between parent siblings
+async function Spawn_Children(parentNodeId) {
   const parentNodePosition = network.getPositions([parentNodeId])[parentNodeId];
-  const child_IDs = fetchChildNodesFromDatabase(parentNodeId);
+  const parent_data = id2filename_map.get(parentNodeId);
+  const parent_node = nodes.get(parentNodeId);
+  console.log('foo');
+  const child_num = parent_data.siblings.length + 1; //+1 because of the parent included
+  let child_Ids = Array.from({ length: child_num }, Rand_Node_ID);
 
-  console.log(child_IDs);
+  //dont' do the parent copy here, child_num-1, and do later
+  for (let i = 0; i < child_num - 1; i++) {
+    const childId = child_Ids[i];
+    const parent_sibling_id = parent_data.siblings[i];
+    const parent_sibling_embedding = id2filename_map.get(parent_sibling_id).descriptor;
+    const child_sibling_ids = child_Ids.filter((id) => id !== childId);
 
-  for (let i = 0; i < spawn_num; i++) {
-    const childId = child_IDs[i];
-    id2filename_map.set(childId, default_filename);
+    const node_x = parentNodePosition.x + (Math.random() - 0.5);
+    const node_y = parentNodePosition.y + (Math.random() - 0.5);
 
-    const childNode = {
-      id: childId,
-      shape: 'image',
-      image: GENERAL_HELPER_FNS.Full_Path_From_File_Name(default_filename),
-      label: ``,
-      x: parentNodePosition.x + (Math.random() - 0.5),
-      y: parentNodePosition.y + (Math.random() - 0.5),
-    };
+    const mid_pnt_embedding = Normalized_Embedding_Midpoint(parent_data.descriptor, parent_sibling_embedding);
+    const { rowids } = await ipcRenderer.invoke('faiss-search', mid_pnt_embedding, 1);
+    const midpoint_record = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowids[0])[0];
 
-    // Add child node and edge to the network if it doesn't already exist
-    if (!network_data.nodes.get(childNode.id)) {
-      network_data.nodes.add(childNode);
-      network_data.edges.add({ from: parentNodeId, to: childNode.id });
+    if (midpoint_record.fileName == parent_data.fileName) {
+      //TODO:
     }
+
+    if (midpoint_record.fileType == 'video') {
+      const mid_pnt_descriptor = midpoint_record.faceDescriptors[Math.floor(Math.random() * midpoint_record.faceDescriptors.length)];
+
+      Add_Node_To_Network(childId, play_icon_path, node_x, node_y, true, parentNodeId);
+      id2filename_map.set(childId, { fileName: midpoint_record.fileName, descriptor: mid_pnt_descriptor, parent: parentNodeId, siblings: child_sibling_ids });
+      continue;
+    }
+
+    const imagePath = GENERAL_HELPER_FNS.Full_Path_From_File_Name(midpoint_record.fileName);
+
+    //IMAGE or GIF
+    const faces = await Get_Image_Face_Descriptors_From_File(imagePath); //needs to run face api fresh to get the detection box coordinates which the DB does not store
+    let face;
+
+    if (!faces || faces.length == 0) {
+      const mid_pnt_descriptor = midpoint_record.faceDescriptors[Math.floor(Math.random() * midpoint_record.faceDescriptors.length)];
+
+      Add_Node_To_Network(childId, play_icon_path, node_x, node_y, true, parentNodeId);
+      id2filename_map.set(childId, { fileName: midpoint_record.fileName, descriptor: mid_pnt_descriptor, parent: parentNodeId, siblings: child_sibling_ids });
+      continue;
+    } else if (faces.length == 1) {
+      face = faces[0];
+    } else {
+      face = faces[Math.floor(Math.random() * faces.length)];
+    }
+
+    const { x, y, width, height } = face.detection.box; //make a face from the detection box
+    const faceThumbnailUrl = await Detection_Face_URL(x, y, width, height, imagePath);
+
+    Add_Node_To_Network(childId, faceThumbnailUrl, node_x, node_y, true, parentNodeId);
+    id2filename_map.set(childId, { fileName: midpoint_record.fileName, descriptor: face.descriptor, parent: parentNodeId, siblings: child_sibling_ids });
   }
+
+  //clone parent
+  const node_x = parentNodePosition.x + (Math.random() - 0.5);
+  const node_y = parentNodePosition.y + (Math.random() - 0.5);
+  const child_sibling_ids = child_Ids.filter((id) => id !== child_Ids[child_num - 1]);
+  Add_Node_To_Network(child_Ids[child_num - 1], parent_node.image, node_x, node_y, true, parentNodeId);
+  id2filename_map.set(child_Ids[child_num - 1], {
+    fileName: parent_data.fileName,
+    descriptor: parent_data.descriptor,
+    parent: parentNodeId,
+    siblings: child_sibling_ids,
+  });
 }
 
-function fetchChildNodesFromDatabase(parentNodeId) {
-  return Array.from({ length: spawn_num }, Rand_Node_ID);
+function Normalized_Embedding_Midpoint(embedding1, embedding2) {
+  //find the midpoint
+  const midpoint = embedding1.map((element, index) => (element + embedding2[index]) / 2);
+  //magnitude (length) of the midpoint vector
+  const magnitude = Math.sqrt(midpoint.reduce((acc, val) => acc + val * val, 0));
+  //normalize the midpoint vector to turn it into a unit vector
+  return midpoint.map((element) => element / magnitude);
 }
 
 ////////////////////////////////////////////
@@ -227,14 +273,23 @@ Initialize();
 //////////////////////////////////////////////
 //helper function for small tasks
 //////////////////////////////////////////////
-function Add_Node_To_Network(childId, image_url = play_icon_path, node_x, node_y) {
-  nodes.add({
+function Add_Node_To_Network(childId, image_url = play_icon_path, node_x, node_y, isUpdate = false, parentNodeId = undefined) {
+  const newNode = {
     id: childId,
     shape: 'image',
     image: image_url,
     x: node_x,
     y: node_y,
-  });
+  };
+
+  if (isUpdate) {
+    network_data.nodes.add(newNode);
+    if (parentNodeId !== undefined) {
+      network_data.edges.add({ from: parentNodeId, to: childId });
+    }
+  } else {
+    nodes.add(newNode);
+  }
 }
 
 window.addEventListener('resize', function () {
