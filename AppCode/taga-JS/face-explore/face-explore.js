@@ -115,43 +115,56 @@ async function Spawn_Children(parentNodeId) {
   const parent_data = id2filename_map.get(parentNodeId);
   const parent_node = nodes.get(parentNodeId);
 
-  const child_num = parent_data.siblings.length + 1; //+1 because of the parent included
-  let midpoint_records = []; //only include data from parent_data.siblings that does not clash
-  let midpoint_unique_num = 0;
-  for (let i = 0; i < child_num - 1; i++) {
-    const parent_sibling_id = parent_data.siblings[i];
-    const parent_sibling_embedding = id2filename_map.get(parent_sibling_id).descriptor;
-    const mid_pnt_embedding = Normalized_Embedding_Midpoint(parent_data.descriptor, parent_sibling_embedding);
-    const { rowids } = await ipcRenderer.invoke('faiss-search', mid_pnt_embedding, 1);
-    const midpoint_record = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowids[0])[0];
+  const mid_pnt_embeddings = [];
+  const mid_pnt_records = [];
+  const childIds = [];
 
-    if (midpoint_record.fileName == parent_data.fileName) {
-      //skip repetitions that are not direct clones
-      continue;
+  console.log(parent_data, parent_node);
+
+  //parent-parent, grandparent, midpoint
+  if (parent_data.parent) {
+    const grand_parent_data = id2filename_map.get(parent_data.parent);
+    const grand_parent_embedding = grand_parent_data.descriptor;
+
+    const mid_pnt_embedding = Normalized_Embedding_Midpoint(parent_data.descriptor, grand_parent_embedding);
+    const { rowids } = await ipcRenderer.invoke('faiss-search', mid_pnt_embedding, 1);
+    const mid_pnt_record = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowids[0])[0];
+    //skip repetitions that are not direct clones
+    if (mid_pnt_record.fileName != parent_data.fileName) {
+      mid_pnt_embeddings.push(mid_pnt_embedding);
+      mid_pnt_records.push(mid_pnt_record);
+      childIds.push(Rand_Node_ID());
     }
   }
-  //get the childnum by making sure that each midpoint is not the same as the parent
 
-  let child_Ids = Array.from({ length: child_num }, Rand_Node_ID);
-
-  //dont' do the parent copy here, child_num-1, and do later
-  for (let i = 0; i < child_num - 1; i++) {
-    const childId = child_Ids[i];
-
-    //>>>>>>>>REMOVE
-    const parent_sibling_id = parent_data.siblings[i];
-    const parent_sibling_embedding = id2filename_map.get(parent_sibling_id).descriptor;
+  //sibling midpoint candidates
+  for (const sibling_id of parent_data.siblings) {
+    const parent_sibling_embedding = id2filename_map.get(sibling_id).descriptor;
     const mid_pnt_embedding = Normalized_Embedding_Midpoint(parent_data.descriptor, parent_sibling_embedding);
     const { rowids } = await ipcRenderer.invoke('faiss-search', mid_pnt_embedding, 1);
-    const midpoint_record = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowids[0])[0];
+    const mid_pnt_record = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowids[0])[0];
+    //skip repetitions that are not direct clones
 
-    if (midpoint_record.fileName == parent_data.fileName) {
-      //skip repetitions that are not direct clones
+    if (mid_pnt_record.fileName == parent_data.fileName || mid_pnt_records.some((r) => r.fileName === mid_pnt_record.fileName)) {
       continue;
     }
 
-    const child_sibling_ids = child_Ids.filter((id) => id !== childId);
-    //<<<<<<<<<<<REMOVE
+    mid_pnt_embeddings.push(mid_pnt_embedding);
+    mid_pnt_records.push(mid_pnt_record);
+    childIds.push(Rand_Node_ID());
+  }
+
+  //clone parent, see siblings but siblings don't see it for midpoints
+  const node_x = parentNodePosition.x + (Math.random() - 0.5);
+  const node_y = parentNodePosition.y + (Math.random() - 0.5);
+  const self_clone_Id = Rand_Node_ID();
+  Add_Node_To_Network(self_clone_Id, parent_node.image, node_x, node_y, true, parentNodeId);
+  id2filename_map.set(self_clone_Id, { fileName: parent_data.fileName, descriptor: parent_data.descriptor, parent: undefined, siblings: childIds });
+
+  for (let i = 0; i < childIds.length; i++) {
+    const childId = childIds[i];
+    const child_sibling_ids = childIds.filter((id) => id !== childId);
+    const midpoint_record = mid_pnt_records[i];
 
     const node_x = parentNodePosition.x + (Math.random() - 0.5);
     const node_y = parentNodePosition.y + (Math.random() - 0.5);
@@ -188,18 +201,6 @@ async function Spawn_Children(parentNodeId) {
     Add_Node_To_Network(childId, faceThumbnailUrl, node_x, node_y, true, parentNodeId);
     id2filename_map.set(childId, { fileName: midpoint_record.fileName, descriptor: face.descriptor, parent: parentNodeId, siblings: child_sibling_ids });
   }
-
-  //clone parent
-  const node_x = parentNodePosition.x + (Math.random() - 0.5);
-  const node_y = parentNodePosition.y + (Math.random() - 0.5);
-  const child_sibling_ids = child_Ids.filter((id) => id !== child_Ids[child_num - 1]);
-  Add_Node_To_Network(child_Ids[child_num - 1], parent_node.image, node_x, node_y, true, parentNodeId);
-  id2filename_map.set(child_Ids[child_num - 1], {
-    fileName: parent_data.fileName,
-    descriptor: parent_data.descriptor,
-    parent: parentNodeId,
-    siblings: child_sibling_ids,
-  });
 }
 
 function Normalized_Embedding_Midpoint(embedding1, embedding2) {
