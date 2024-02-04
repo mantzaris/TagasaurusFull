@@ -135,9 +135,9 @@ async function Spawn_Children(parentNodeId) {
     const mid_pnt_embedding = Normalized_Embedding_Midpoint(parent_data.descriptor, grand_parent_embedding);
 
     const { rowids, distances } = await ipcRenderer.invoke('faiss-search', mid_pnt_embedding, FAISS_SEARCH_SIZE);
-    let rowids_sorted = GENERAL_HELPER_FNS.Sort_Based_On_Scores_DES(distances, rowids);
+    let rowids_sorted = GENERAL_HELPER_FNS.Sort_Based_On_Scores_DES(distances, rowids); //TODO: test if this makes it better or not!!!
 
-    for (const rowid of rowids_sorted) {
+    for (const rowid of rowids) {
       const mid_pnt_record = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowid)[0];
       //skip repetitions that are not direct clones
       if (mid_pnt_record.fileName != parent_data.fileName && !fileNamesSet.has(mid_pnt_record.fileName)) {
@@ -161,9 +161,9 @@ async function Spawn_Children(parentNodeId) {
     const parent_sibling_embedding = id2filename_map.get(sibling_id).descriptor;
     const mid_pnt_embedding = Normalized_Embedding_Midpoint(parent_data.descriptor, parent_sibling_embedding);
     const { rowids, distances } = await ipcRenderer.invoke('faiss-search', mid_pnt_embedding, FAISS_SEARCH_SIZE);
-    let rowids_sorted = GENERAL_HELPER_FNS.Sort_Based_On_Scores_DES(distances, rowids);
+    let rowids_sorted = GENERAL_HELPER_FNS.Sort_Based_On_Scores_DES(distances, rowids); //TODO: test if this makes it better or not!!!
 
-    for (const rowid of rowids_sorted) {
+    for (const rowid of rowids) {
       const mid_pnt_record = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowid)[0];
       //skip repetitions that are not direct clones
 
