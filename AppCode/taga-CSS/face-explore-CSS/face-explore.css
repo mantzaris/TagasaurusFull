@@ -39,7 +39,7 @@ html {
 
   overflow-y: auto;
   padding-bottom: 3px;
-  background-color: blue;
+  /* background-color: blue; */
 }
 
 .media-style {

@@ -2,7 +2,6 @@ const { ipcRenderer } = require('electron');
 const mlKmeans = require('ml-kmeans');
 const { GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
 
-const default_filename = 'friendsCropped.jpg';
 const alpha_numeric_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 const play_icon_path = PATH.join(__dirname, '..', 'Assets', 'various-icons', 'videoplay512.png');
 
@@ -10,14 +9,18 @@ const container = document.getElementById('network-view');
 const nodes = new vis.DataSet([]);
 const edges = new vis.DataSet([]);
 
+const fileNamesSet = new Set();
+
 let network_data;
 let network_options;
 let id2filename_map = new Map();
 let containerWidth = container.offsetWidth;
 let containerHeight = container.offsetHeight;
-let springLength = containerWidth * 0.05;
+let springLength = containerWidth * 0.25;
 
-const init_radius = Math.min(containerHeight, containerWidth) * 0.3;
+const init_radius = Math.min(containerHeight, containerWidth) * 0.5;
+const FAISS_SEARCH_SIZE = 30;
+const bias = 1.25;
 let spawn_num = 8;
 let candidate_num = 25;
 
@@ -40,6 +43,8 @@ async function Initial_Node_Selection() {
     const angle = (2 * Math.PI * index) / init_records.length; //angle for each node
     const node_x = init_radius * Math.cos(angle);
     const node_y = init_radius * Math.sin(angle);
+
+    fileNamesSet.add(record.fileName);
 
     if (record.fileType == 'video') {
       //select random face descriptor from the available
@@ -119,21 +124,27 @@ async function Spawn_Children(parentNodeId) {
   const mid_pnt_records = [];
   const childIds = [];
 
-  console.log(parent_data, parent_node);
-
   //parent-parent, grandparent, midpoint
   if (parent_data.parent) {
     const grand_parent_data = id2filename_map.get(parent_data.parent);
     const grand_parent_embedding = grand_parent_data.descriptor;
 
     const mid_pnt_embedding = Normalized_Embedding_Midpoint(parent_data.descriptor, grand_parent_embedding);
-    const { rowids } = await ipcRenderer.invoke('faiss-search', mid_pnt_embedding, 1);
-    const mid_pnt_record = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowids[0])[0];
-    //skip repetitions that are not direct clones
-    if (mid_pnt_record.fileName != parent_data.fileName) {
-      mid_pnt_embeddings.push(mid_pnt_embedding);
-      mid_pnt_records.push(mid_pnt_record);
-      childIds.push(Rand_Node_ID());
+    const { rowids } = await ipcRenderer.invoke('faiss-search', mid_pnt_embedding, FAISS_SEARCH_SIZE);
+
+    for (const rowid of rowids) {
+      const mid_pnt_record = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowid)[0];
+      //skip repetitions that are not direct clones
+      if (mid_pnt_record.fileName != parent_data.fileName && !fileNamesSet.has(mid_pnt_record.fileName)) {
+        //console.log(mid_pnt_record);
+        //mid_pnt_embeddings.push(mid_pnt_embedding);
+        const ind = Closest_Embedding_Index(mid_pnt_embedding, mid_pnt_record.faceDescriptors);
+        mid_pnt_embeddings.push(mid_pnt_record.faceDescriptors[ind]);
+        mid_pnt_records.push(mid_pnt_record);
+        childIds.push(Rand_Node_ID());
+        fileNamesSet.add(mid_pnt_record.fileName);
+        break;
+      }
     }
   }
 
@@ -141,17 +152,28 @@ async function Spawn_Children(parentNodeId) {
   for (const sibling_id of parent_data.siblings) {
     const parent_sibling_embedding = id2filename_map.get(sibling_id).descriptor;
     const mid_pnt_embedding = Normalized_Embedding_Midpoint(parent_data.descriptor, parent_sibling_embedding);
-    const { rowids } = await ipcRenderer.invoke('faiss-search', mid_pnt_embedding, 1);
-    const mid_pnt_record = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowids[0])[0];
-    //skip repetitions that are not direct clones
+    const { rowids } = await ipcRenderer.invoke('faiss-search', mid_pnt_embedding, FAISS_SEARCH_SIZE);
 
-    if (mid_pnt_record.fileName == parent_data.fileName || mid_pnt_records.some((r) => r.fileName === mid_pnt_record.fileName)) {
-      continue;
+    for (const rowid of rowids) {
+      const mid_pnt_record = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowid)[0];
+      //skip repetitions that are not direct clones
+
+      if (
+        mid_pnt_record.fileName == parent_data.fileName ||
+        mid_pnt_records.some((r) => r.fileName === mid_pnt_record.fileName) ||
+        fileNamesSet.has(mid_pnt_record.fileName)
+      ) {
+        continue;
+      }
+
+      //mid_pnt_embeddings.push(mid_pnt_embedding);
+      const ind = Closest_Embedding_Index(mid_pnt_embedding, mid_pnt_record.faceDescriptors);
+      mid_pnt_embeddings.push(mid_pnt_record.faceDescriptors[ind]);
+      mid_pnt_records.push(mid_pnt_record);
+      childIds.push(Rand_Node_ID());
+      fileNamesSet.add(mid_pnt_record.fileName);
+      break;
     }
-
-    mid_pnt_embeddings.push(mid_pnt_embedding);
-    mid_pnt_records.push(mid_pnt_record);
-    childIds.push(Rand_Node_ID());
   }
 
   //clone parent, see siblings but siblings don't see it for midpoints
@@ -160,20 +182,23 @@ async function Spawn_Children(parentNodeId) {
   const self_clone_Id = Rand_Node_ID();
   Add_Node_To_Network(self_clone_Id, parent_node.image, node_x, node_y, true, parentNodeId);
   id2filename_map.set(self_clone_Id, { fileName: parent_data.fileName, descriptor: parent_data.descriptor, parent: undefined, siblings: childIds });
+  //fileNamesSet.add(parent_data.fileName);
 
+  //add the non-cloned children
   for (let i = 0; i < childIds.length; i++) {
     const childId = childIds[i];
     const child_sibling_ids = childIds.filter((id) => id !== childId);
     const midpoint_record = mid_pnt_records[i];
+    const mid_pnt_embedding = mid_pnt_embeddings[i];
 
     const node_x = parentNodePosition.x + (Math.random() - 0.5);
     const node_y = parentNodePosition.y + (Math.random() - 0.5);
 
     if (midpoint_record.fileType == 'video') {
-      const mid_pnt_descriptor = midpoint_record.faceDescriptors[Math.floor(Math.random() * midpoint_record.faceDescriptors.length)];
+      //const mid_pnt_descriptor = midpoint_record.faceDescriptors[Math.floor(Math.random() * midpoint_record.faceDescriptors.length)];
 
       Add_Node_To_Network(childId, play_icon_path, node_x, node_y, true, parentNodeId);
-      id2filename_map.set(childId, { fileName: midpoint_record.fileName, descriptor: mid_pnt_descriptor, parent: parentNodeId, siblings: child_sibling_ids });
+      id2filename_map.set(childId, { fileName: midpoint_record.fileName, descriptor: mid_pnt_embedding, parent: parentNodeId, siblings: child_sibling_ids });
       continue;
     }
 
@@ -184,28 +209,51 @@ async function Spawn_Children(parentNodeId) {
     let face;
 
     if (!faces || faces.length == 0) {
-      const mid_pnt_descriptor = midpoint_record.faceDescriptors[Math.floor(Math.random() * midpoint_record.faceDescriptors.length)];
+      //const mid_pnt_descriptor = midpoint_record.faceDescriptors[Math.floor(Math.random() * midpoint_record.faceDescriptors.length)];
 
       Add_Node_To_Network(childId, play_icon_path, node_x, node_y, true, parentNodeId);
-      id2filename_map.set(childId, { fileName: midpoint_record.fileName, descriptor: mid_pnt_descriptor, parent: parentNodeId, siblings: child_sibling_ids });
+      id2filename_map.set(childId, { fileName: midpoint_record.fileName, descriptor: mid_pnt_embedding, parent: parentNodeId, siblings: child_sibling_ids });
       continue;
     } else if (faces.length == 1) {
       face = faces[0];
     } else {
-      face = faces[Math.floor(Math.random() * faces.length)];
+      let minDistance = Infinity;
+      for (const faceTmp of faces) {
+        const distance = L2_Distance(faceTmp.descriptor, mid_pnt_embedding);
+        if (distance < minDistance) {
+          minDistance = distance;
+          face = faceTmp;
+        }
+      }
+      //face = faces[Math.floor(Math.random() * faces.length)];
     }
 
     const { x, y, width, height } = face.detection.box; //make a face from the detection box
     const faceThumbnailUrl = await Detection_Face_URL(x, y, width, height, imagePath);
 
     Add_Node_To_Network(childId, faceThumbnailUrl, node_x, node_y, true, parentNodeId);
-    id2filename_map.set(childId, { fileName: midpoint_record.fileName, descriptor: face.descriptor, parent: parentNodeId, siblings: child_sibling_ids });
+    id2filename_map.set(childId, { fileName: midpoint_record.fileName, descriptor: mid_pnt_embedding, parent: parentNodeId, siblings: child_sibling_ids });
   }
+}
+
+function L2_Distance(vecA, vecB) {
+  let sum = 0;
+  for (let i = 0; i < vecA.length; i++) {
+    sum += (vecA[i] - vecB[i]) ** 2;
+  }
+  return Math.sqrt(sum);
+}
+
+function Raw_Embedding_Midpoint(embedding1, embedding2) {
+  // Find the raw midpoint
+  const bias = 1.5;
+  const midpoint = embedding1.map((element, index) => (bias * element + embedding2[index]) / 2);
+  return midpoint;
 }
 
 function Normalized_Embedding_Midpoint(embedding1, embedding2) {
   //find the midpoint
-  const midpoint = embedding1.map((element, index) => (element + embedding2[index]) / 2);
+  const midpoint = embedding1.map((element, index) => (bias * element + embedding2[index]) / 2);
   //magnitude (length) of the midpoint vector
   const magnitude = Math.sqrt(midpoint.reduce((acc, val) => acc + val * val, 0));
   //normalize the midpoint vector to turn it into a unit vector
@@ -446,4 +494,20 @@ async function Centroid_Face_Sample_Records() {
   }
 
   return DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt([...sample_rowids]);
+}
+
+function Closest_Embedding_Index(mid_pnt_embedding, descriptors) {
+  let minDistance = Infinity;
+  let minIndex = -1;
+
+  for (let i = 0; i < descriptors.length; i++) {
+    const distance = L2_Distance(mid_pnt_embedding, descriptors[i]);
+
+    if (distance < minDistance) {
+      minDistance = distance;
+      minIndex = i;
+    }
+  }
+
+  return minIndex;
 }
