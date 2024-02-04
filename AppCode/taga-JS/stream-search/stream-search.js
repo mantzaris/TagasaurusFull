@@ -446,7 +446,7 @@ async function UpdateSearchResults() {
     const { distances, rowids } = await ipcRenderer.invoke('faiss-search', selected.descriptor, 6);
     console.log('distances=', distances);
     // descending when using inner produce and ascending using euclidean
-    rowids_sorted = GENERAL_HELPER_FNS.Sort_Based_On_Scores_DES(distances, rowids);
+    let rowids_sorted = GENERAL_HELPER_FNS.Sort_Based_On_Scores_DES(distances, rowids);
     //remove duplicates
     let uniqueRowidsSorted = [];
     let seen = new Set();

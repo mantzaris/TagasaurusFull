@@ -16,13 +16,13 @@ let network_options;
 let id2filename_map = new Map();
 let containerWidth = container.offsetWidth;
 let containerHeight = container.offsetHeight;
-let springLength = containerWidth * 0.25;
+let springLength = containerWidth * 0.4;
 
 const init_radius = Math.min(containerHeight, containerWidth) * 0.5;
-const FAISS_SEARCH_SIZE = 30;
-const bias = 1.25;
+const bias = 1.0;
 let spawn_num = 8;
 let candidate_num = 25;
+let FAISS_SEARCH_SIZE = 100;
 
 async function Initial_Node_Selection() {
   Show_Loading_Spinner();
@@ -114,7 +114,7 @@ async function Network_OnClick_Handler(params) {
   }
 }
 
-//midpoints between parent siblings
+//
 async function Spawn_Children(parentNodeId) {
   const parentNodePosition = network.getPositions([parentNodeId])[parentNodeId];
   const parent_data = id2filename_map.get(parentNodeId);
@@ -124,15 +124,20 @@ async function Spawn_Children(parentNodeId) {
   const mid_pnt_records = [];
   const childIds = [];
 
-  //parent-parent, grandparent, midpoint
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  //parent-parent, grandparent, midpoint, produces a single child, most important child
+  //it is the difference between the node and the parent to produce a new node: Child_1
+  ////////////////////////////////////////////////////////////////////////////////////////////
   if (parent_data.parent) {
     const grand_parent_data = id2filename_map.get(parent_data.parent);
     const grand_parent_embedding = grand_parent_data.descriptor;
 
     const mid_pnt_embedding = Normalized_Embedding_Midpoint(parent_data.descriptor, grand_parent_embedding);
-    const { rowids } = await ipcRenderer.invoke('faiss-search', mid_pnt_embedding, FAISS_SEARCH_SIZE);
 
-    for (const rowid of rowids) {
+    const { rowids, distances } = await ipcRenderer.invoke('faiss-search', mid_pnt_embedding, FAISS_SEARCH_SIZE);
+    let rowids_sorted = GENERAL_HELPER_FNS.Sort_Based_On_Scores_DES(distances, rowids);
+
+    for (const rowid of rowids_sorted) {
       const mid_pnt_record = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowid)[0];
       //skip repetitions that are not direct clones
       if (mid_pnt_record.fileName != parent_data.fileName && !fileNamesSet.has(mid_pnt_record.fileName)) {
@@ -148,13 +153,17 @@ async function Spawn_Children(parentNodeId) {
     }
   }
 
-  //sibling midpoint candidates
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  //sibling midpoint candidates, siblings of Child_1, midpoints from parent to its siblings
+  //make the seed points for the new
+  ////////////////////////////////////////////////////////////////////////////////////////////
   for (const sibling_id of parent_data.siblings) {
     const parent_sibling_embedding = id2filename_map.get(sibling_id).descriptor;
     const mid_pnt_embedding = Normalized_Embedding_Midpoint(parent_data.descriptor, parent_sibling_embedding);
-    const { rowids } = await ipcRenderer.invoke('faiss-search', mid_pnt_embedding, FAISS_SEARCH_SIZE);
+    const { rowids, distances } = await ipcRenderer.invoke('faiss-search', mid_pnt_embedding, FAISS_SEARCH_SIZE);
+    let rowids_sorted = GENERAL_HELPER_FNS.Sort_Based_On_Scores_DES(distances, rowids);
 
-    for (const rowid of rowids) {
+    for (const rowid of rowids_sorted) {
       const mid_pnt_record = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowid)[0];
       //skip repetitions that are not direct clones
 
@@ -172,16 +181,17 @@ async function Spawn_Children(parentNodeId) {
       mid_pnt_records.push(mid_pnt_record);
       childIds.push(Rand_Node_ID());
       fileNamesSet.add(mid_pnt_record.fileName);
+      //child_distances.push(distances[index]);
       break;
     }
   }
 
   //clone parent, see siblings but siblings don't see it for midpoints
-  const node_x = parentNodePosition.x + (Math.random() - 0.5);
-  const node_y = parentNodePosition.y + (Math.random() - 0.5);
+  const node_x = parentNodePosition.x + Rand_Axis_Dim(); //(Math.random() - 0.5);
+  const node_y = parentNodePosition.y + Rand_Axis_Dim(); //(Math.random() - 0.5);
   const self_clone_Id = Rand_Node_ID();
   Add_Node_To_Network(self_clone_Id, parent_node.image, node_x, node_y, true, parentNodeId);
-  id2filename_map.set(self_clone_Id, { fileName: parent_data.fileName, descriptor: parent_data.descriptor, parent: undefined, siblings: childIds });
+  id2filename_map.set(self_clone_Id, { fileName: parent_data.fileName, descriptor: parent_data.descriptor, parent: undefined, siblings: childIds, label: '0' });
   //fileNamesSet.add(parent_data.fileName);
 
   //add the non-cloned children
@@ -191,8 +201,8 @@ async function Spawn_Children(parentNodeId) {
     const midpoint_record = mid_pnt_records[i];
     const mid_pnt_embedding = mid_pnt_embeddings[i];
 
-    const node_x = parentNodePosition.x + (Math.random() - 0.5);
-    const node_y = parentNodePosition.y + (Math.random() - 0.5);
+    const node_x = parentNodePosition.x + Rand_Axis_Dim(); //(Math.random() - 0.5);
+    const node_y = parentNodePosition.y + Rand_Axis_Dim(); //(Math.random() - 0.5);
 
     if (midpoint_record.fileType == 'video') {
       //const mid_pnt_descriptor = midpoint_record.faceDescriptors[Math.floor(Math.random() * midpoint_record.faceDescriptors.length)];
@@ -219,9 +229,9 @@ async function Spawn_Children(parentNodeId) {
     } else {
       let minDistance = Infinity;
       for (const faceTmp of faces) {
-        const distance = L2_Distance(faceTmp.descriptor, mid_pnt_embedding);
-        if (distance < minDistance) {
-          minDistance = distance;
+        const embedding_distance_tmp = L2_Distance(faceTmp.descriptor, mid_pnt_embedding);
+        if (embedding_distance_tmp < minDistance) {
+          minDistance = embedding_distance_tmp;
           face = faceTmp;
         }
       }
@@ -342,13 +352,14 @@ Initialize();
 //////////////////////////////////////////////
 //helper function for small tasks
 //////////////////////////////////////////////
-function Add_Node_To_Network(childId, image_url = play_icon_path, node_x, node_y, isUpdate = false, parentNodeId = undefined) {
+function Add_Node_To_Network(childId, image_url = play_icon_path, node_x, node_y, isUpdate = false, parentNodeId = undefined, label = undefined) {
   const newNode = {
     id: childId,
     shape: 'image',
     image: image_url,
     x: node_x,
     y: node_y,
+    label: '',
   };
 
   if (isUpdate) {
@@ -444,9 +455,9 @@ function Set_Network_Options() {
         gravitationalConstant: -2000,
         centralGravity: 0.2,
         springLength: springLength,
-        springConstant: 0.06,
-        damping: 0.3,
-        avoidOverlap: 0.6,
+        springConstant: 0.5,
+        damping: 0.4,
+        avoidOverlap: 0.9,
       },
       solver: 'barnesHut',
     },
@@ -510,4 +521,13 @@ function Closest_Embedding_Index(mid_pnt_embedding, descriptors) {
   }
 
   return minIndex;
+}
+
+function Rand_Axis_Dim() {
+  let random = Math.random();
+  if (random < 0.5) {
+    return random * 0.5 - 0.7;
+  } else {
+    return random * 0.5 + 0.2;
+  }
 }
