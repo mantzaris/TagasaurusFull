@@ -28,6 +28,8 @@ const TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
   faceClusters: [],
 };
 
+const reg_exp_delims = /[#:,;| ]+/;
+
 let current_image_annotation;
 
 //holds the last directory the user imported images from
@@ -39,9 +41,7 @@ let search_meme_results = ''; //meme search results
 let meme_search_results = ''; //when adding a meme the images panel (left)
 let meme_search_meme_results = ''; //when adding a meme the meme panel (right)
 
-let default_auto_fill_emotions = false;
-
-let reg_exp_delims = /[#:,;| ]+/;
+const auto_fill_emotions = new Store(false);
 
 //returns the obj with the extended emotions auto filled (the object is not a full annotation obj, but just the extended obj for emotions)
 function Auto_Fill_Emotions(face_results, tagging_entry) {
@@ -93,9 +93,8 @@ document.getElementById(`auto-fill-emotions-button-id`).onclick = async () => {
   }
 };
 
-//default_auto_fill_emotions = document.getElementById(`auto-fill-emotions-check-box-id`).checked
 document.getElementById(`auto-fill-emotions-check-box-id`).addEventListener('change', (ev) => {
-  default_auto_fill_emotions = ev.target.checked;
+  auto_fill_emotions.Set(ev.target.checked);
 });
 
 async function Display_PDF(display_path) {
@@ -786,7 +785,7 @@ async function Load_New_Image(filename) {
 
       if (filetype.mime.includes('image')) {
         if (filetype.ext == 'gif') {
-          if (default_auto_fill_emotions) {
+          if (auto_fill_emotions.Get()) {
             const { faceDescriptors, faceEmotions } = await Get_Image_Face_Expresssions_From_GIF(filepath, true);
             tmp.faceDescriptors = faceDescriptors;
             tmp.taggingEmotions = faceEmotions;
@@ -795,7 +794,7 @@ async function Load_New_Image(filename) {
             tmp.faceDescriptors = faceDescriptors;
           }
         } else {
-          if (default_auto_fill_emotions) {
+          if (auto_fill_emotions.Get()) {
             const faces = await Get_Image_Face_Descriptors_And_Expresssions_From_File(filepath);
             tmp.taggingEmotions = Auto_Fill_Emotions(faces, tmp);
             tmp.faceDescriptors = await Get_Face_Descriptors_Arrays(faces);
@@ -824,7 +823,7 @@ async function Load_New_Image(filename) {
           filepath = PATH.join(TAGA_DATA_DIRECTORY, output_name);
         }
 
-        if (default_auto_fill_emotions) {
+        if (auto_fill_emotions.Get()) {
           const { video_face_descriptors, emotions_total } = await Get_Image_FaceApi_From_VIDEO(filepath, true, false);
           tmp.faceDescriptors = video_face_descriptors;
           tmp.taggingEmotions = emotions_total;
@@ -1836,11 +1835,11 @@ function Reset_Meme_Search() {
   };
 }
 
-//TODO:
 document.getElementById('modal-facesearch-close-exit-view-button-id').onclick = () => {
   let modal_search_click = document.getElementById('facesearch-modal-click-top-id');
   modal_search_click.style.display = 'none';
 };
+
 window.addEventListener('click', (event) => {
   const div = document.getElementById('facesearch-modal-click-top-id');
 
@@ -1867,7 +1866,6 @@ async function Show_Similar_Faces(descriptor) {
       media_element.src = GENERAL_HELPER_FNS.Full_Path_From_File_Name(face);
       media_element.controls = true;
       media_element.muted = true;
-      //media_element.play();
     }
 
     const div = document.createElement('div');
@@ -1884,4 +1882,3 @@ async function Show_Similar_Faces(descriptor) {
 
   return similar_faces;
 }
-//END SAVING CONTENT (EXPORTING) RIGHT CLICK CONTENT <<<<<<<<<<<<<<

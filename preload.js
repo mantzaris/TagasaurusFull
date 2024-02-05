@@ -3,6 +3,9 @@
 window.PATH = require('path');
 const FS = require('fs');
 require('dotenv').config();
+const { Store, ObjectStore } = require(PATH.join(__dirname, 'AppCode', 'taga-JS', 'utilities', 'stores.js'));
+window.Store = Store;
+window.ObjectStore = ObjectStore;
 require(PATH.join(__dirname, 'AppCode', 'taga-JS', 'settings', 'settings-fns.js'));
 
 //clear the console on a new start of the app
