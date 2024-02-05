@@ -20,6 +20,7 @@
     'settings-button'
     'support-button';
   background-color: var(--bg);
+  overflow-x: hidden;
 }
 #title-div-id {
   grid-area: title;
@@ -131,4 +132,13 @@
 .progress-container {
   width: 80%;
   margin: auto; /* Center the progress bar containers */
+}
+
+.progress-container label {
+  font-size: clamp(5px, 3vh, 25px); /* min, preferred, max */
+}
+
+.progress {
+  height: clamp(5px, 3vh, 40px) !important; /* important overrides bootstrap */
+  font-size: clamp(3px, 1rem, 20px) !important; /* min, preferred, max */
 }
