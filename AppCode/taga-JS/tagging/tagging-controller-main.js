@@ -35,11 +35,11 @@ let current_image_annotation;
 //holds the last directory the user imported images from
 let last_user_image_directory_chosen = '';
 
-let search_results = ''; //For the search results of image searchees
-let search_meme_results = ''; //meme search results
+const search_results_left = new Store([]);
+const search_results_right = new Store([]);
 
-let meme_search_results = ''; //when adding a meme the images panel (left)
-let meme_search_meme_results = ''; //when adding a meme the meme panel (right)
+const meme_results_left = new Store([]);
+const meme_results_right = new Store([]);
 
 const auto_fill_emotions = new Store(false);
 
@@ -1220,8 +1220,8 @@ async function Search_Images() {
 
   Show_Loading_Spinner();
 
-  search_results = DB_MODULE.Tagging_Random_DB_FileNames(MAX_COUNT_SEARCH_RESULTS);
-  search_meme_results = DB_MODULE.Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+  search_results_left.Set(DB_MODULE.Tagging_Random_DB_FileNames(MAX_COUNT_SEARCH_RESULTS));
+  search_results_right.Set(DB_MODULE.Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS));
 
   Hide_Loading_Spinner();
 
@@ -1237,7 +1237,7 @@ async function Populate_Search_Results() {
   output_div.innerHTML = '';
   let search_html = '';
 
-  for (const file_key of search_results) {
+  for (const file_key of search_results_left.Get()) {
     search_html += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${file_key}" >
                                     ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
@@ -1255,7 +1255,7 @@ async function Populate_Search_Results() {
   meme_output_div.innerHTML = '';
   search_html = '';
 
-  for (const file_key of search_meme_results) {
+  for (const file_key of search_results_right.Get()) {
     search_html += `
                                 <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${file_key}" >
                                     ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
@@ -1270,7 +1270,7 @@ async function Populate_Search_Results() {
   meme_output_div.innerHTML += search_html;
 
   //user presses an image to select it from the images section, add onclick event listener
-  search_results.forEach((file) => {
+  search_results_left.Get().forEach((file) => {
     if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`)) {
       document.getElementById(`modal-image-search-result-single-image-img-id-${file}`).onclick = async () => {
         const search_res_children = document.getElementById('modal-search-images-results-grid-div-area-id').children;
@@ -1286,7 +1286,7 @@ async function Populate_Search_Results() {
     }
   });
 
-  search_meme_results.forEach((file) => {
+  search_results_right.Get().forEach((file) => {
     if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file}`)) {
       document.getElementById(`modal-image-search-result-single-meme-image-img-id-${file}`).onclick = async () => {
         const search_res_children = document.getElementById('modal-search-images-results-grid-div-area-id').children;
@@ -1328,8 +1328,8 @@ async function Modal_Search_Entry(search_similar = false, search_obj_similar_tmp
 
   Show_Loading_Spinner();
 
-  search_results = await SEARCH_MODULE.Image_Search_DB(search_obj_tmp);
-  search_meme_results = await SEARCH_MODULE.Image_Meme_Search_DB(search_obj_tmp);
+  search_results_left.Set(await SEARCH_MODULE.Image_Search_DB(search_obj_tmp));
+  search_results_right.Set(await SEARCH_MODULE.Image_Meme_Search_DB(search_obj_tmp));
 
   Hide_Loading_Spinner();
 
@@ -1462,21 +1462,23 @@ async function Add_New_Meme() {
 
     //meme selection switch check boxes
     const meme_switch_booleans = [];
-    for (let ii = 0; ii < meme_search_results.length; ii++) {
-      if (origMemes.includes(meme_search_results[ii]) == false && fileName != meme_search_results[ii]) {
-        //exclude memes already present
-        const meme_bool = document.getElementById(`add-memes-images-toggle-id-${meme_search_results[ii]}`).checked;
+
+    for (const meme of meme_results_left.Get()) {
+      if (origMemes.includes(meme) == false && fileName != meme) {
+        const meme_bool = document.getElementById(`add-memes-images-toggle-id-${meme}`).checked;
+
         if (meme_bool) {
-          meme_switch_booleans.push(meme_search_results[ii]);
+          meme_switch_booleans.push(meme);
         }
       }
     }
 
-    for (let ii = 0; ii < meme_search_meme_results.length; ii++) {
-      if (origMemes.includes(meme_search_meme_results[ii]) == false && fileName != meme_search_meme_results[ii]) {
-        const meme_bool = document.getElementById(`add-memes-meme-toggle-id-${meme_search_meme_results[ii]}`).checked;
+    for (const meme of meme_results_right.Get()) {
+      if (origMemes.includes(meme) == false && fileName != meme) {
+        const meme_bool = document.getElementById(`add-memes-meme-toggle-id-${meme}`).checked;
+
         if (meme_bool) {
-          meme_switch_booleans.push(meme_search_meme_results[ii]);
+          meme_switch_booleans.push(meme);
         }
       }
     }
@@ -1504,8 +1506,8 @@ async function Add_New_Meme() {
 
   Show_Loading_Spinner();
 
-  meme_search_results = DB_MODULE.Tagging_Random_DB_FileNames(MAX_COUNT_SEARCH_RESULTS);
-  meme_search_meme_results = DB_MODULE.Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS);
+  meme_results_left.Set(DB_MODULE.Tagging_Random_DB_FileNames(MAX_COUNT_SEARCH_RESULTS));
+  meme_results_right.Set(DB_MODULE.Meme_Tagging_Random_DB_Images(MAX_COUNT_SEARCH_RESULTS));
 
   Hide_Loading_Spinner();
 
@@ -1514,7 +1516,7 @@ async function Add_New_Meme() {
   const search_results_output = document.getElementById('modal-search-add-memes-images-results-grid-div-area-id');
   search_results_output.innerHTML = '';
 
-  for (const key of meme_search_results) {
+  for (const key of meme_results_left.Get()) {
     if (!current_memes.includes(key) && current_image_annotation.fileName != key) {
       //exclude memes already present
       search_results_output.insertAdjacentHTML(
@@ -1544,7 +1546,7 @@ async function Add_New_Meme() {
   const search_memes_output = document.getElementById('modal-search-add-memes-meme-images-results-grid-div-area-id');
   search_memes_output.innerHTML = '';
 
-  for (const key of meme_search_meme_results) {
+  for (const key of meme_results_right.Get()) {
     if (!current_memes.includes(key) && current_image_annotation.fileName != key) {
       search_memes_output.insertAdjacentHTML(
         'beforeend',
@@ -1585,8 +1587,8 @@ async function Modal_Meme_Search_Btn() {
   //for the meme addition search and returns an object (JSON) for the image inds and the meme inds
   Show_Loading_Spinner();
 
-  meme_search_results = await SEARCH_MODULE.Meme_Addition_Image_Search_DB(meme_tagging_search_obj);
-  meme_search_meme_results = await SEARCH_MODULE.Meme_Addition_Image_Meme_Search_DB(meme_tagging_search_obj);
+  meme_results_left.Set(await SEARCH_MODULE.Meme_Addition_Image_Search_DB(meme_tagging_search_obj));
+  meme_results_right.Set(await SEARCH_MODULE.Meme_Addition_Image_Meme_Search_DB(meme_tagging_search_obj));
 
   Hide_Loading_Spinner();
 
@@ -1596,7 +1598,7 @@ async function Modal_Meme_Search_Btn() {
   const search_images_output = document.getElementById('modal-search-add-memes-images-results-grid-div-area-id');
   search_images_output.innerHTML = '';
 
-  for (const key of meme_search_results) {
+  for (const key of meme_results_left.Get()) {
     if (!memes_current.includes(key) && current_image_annotation.fileName != key) {
       //exclude memes already present
       search_images_output.insertAdjacentHTML(
@@ -1625,7 +1627,7 @@ async function Modal_Meme_Search_Btn() {
   let search_meme_images_memes_results_output = document.getElementById('modal-search-add-memes-meme-images-results-grid-div-area-id');
   search_meme_images_memes_results_output.innerHTML = '';
 
-  for (let file_key of meme_search_meme_results) {
+  for (const file_key of meme_results_right.Get()) {
     if (memes_current.includes(file_key) == false && current_image_annotation.fileName != file_key) {
       //exclude memes already present
       search_meme_images_memes_results_output.insertAdjacentHTML(
