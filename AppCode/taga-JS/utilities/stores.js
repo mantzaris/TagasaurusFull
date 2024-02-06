@@ -5,18 +5,25 @@ class Store {
   }
 
   Subscribe(handler) {
+    if (typeof handler !== 'function') {
+      throw new Error(`Subscription expects function but received handler of type ${typeof handler}`);
+    }
+
     let id = crypto.randomUUID();
 
     this.subscriptions.push({ id, handler });
 
-    return () => {
-      this.subscriptions.filter((s) => s.id != id);
+    const Unsubscribe_fn = () => {
+      this.subscriptions = this.subscriptions.filter((s) => s.id != id);
     };
+
+    return Unsubscribe_fn;
   }
 
   Notify() {
+    const val = this.Get();
     for (const subscription of this.subscriptions) {
-      subscription.handler(this.Get());
+      subscription.handler(val);
     }
   }
 

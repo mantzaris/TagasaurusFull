@@ -76,6 +76,12 @@
       "!.prettierrc.json",
       "!tgdev.sh"
     ],
+    "extraResources": [
+      {
+        "from": "./Assets/lib",
+        "to": "lib"
+      }
+    ],
     "linux": {
       "icon": "Assets/taga-icon/TagaIcon512x512.png",
       "asarUnpack": [

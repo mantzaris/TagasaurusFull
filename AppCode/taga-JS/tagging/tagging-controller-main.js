@@ -3,6 +3,7 @@ const PATH = require('path');
 const fileType = require('file-type');
 const IPC_RENDERER = require('electron').ipcRenderer;
 const { ipcRenderer } = require('electron');
+//const { Store } = require(PATH.join(__dirname, 'taga-JS', 'utilities', 'stores.js'));
 
 const { CreateTaggingEntryCluster, ComputeAvgFaceDescriptor } = require(PATH.join(__dirname, 'taga-JS', 'utilities', 'cluster.js'));
 const { GetFileTypeFromFileName, GetFileTypeFromMimeType } = require(PATH.join(__dirname, 'taga-JS', 'utilities', 'files.js'));
@@ -33,7 +34,7 @@ const reg_exp_delims = /[#:,;| ]+/;
 let current_image_annotation;
 
 //holds the last directory the user imported images from
-let last_user_image_directory_chosen = '';
+const last_directory_chosen = new Store('');
 
 const search_results_left = new Store([]);
 const search_results_right = new Store([]);
@@ -521,7 +522,7 @@ document.getElementById(`reset-button-id`).addEventListener('click', Reset_Image
 document.getElementById(`save-button-id`).addEventListener('click', Save_Image_Annotation_Changes, false);
 document.getElementById(`add-new-memes-button-id`).addEventListener('click', Add_New_Meme, false);
 document.getElementById(`return-to-main-button-id`).addEventListener('click', () => (location.href = 'welcome-screen.html'), false);
-document.getElementById(`load-new-image-button-id`).addEventListener('click', Load_New_Image, false);
+document.getElementById(`load-new-image-button-id`).addEventListener('click', () => Load_New_Image(), false);
 document.getElementById(`search-images-button-id`).addEventListener('click', Search_Images, false);
 document.getElementById(`delete-image-button-id`).addEventListener(
   'click',
@@ -740,7 +741,7 @@ async function Load_New_Image(filename) {
   let filenames = [];
   if (!filename) {
     const result = await IPC_RENDERER.invoke('dialog:tagging-new-file-select', {
-      directory: last_user_image_directory_chosen,
+      directory: last_directory_chosen.Get(),
     });
 
     //ignore selections from the taga image folder store
@@ -748,7 +749,7 @@ async function Load_New_Image(filename) {
       return;
     }
 
-    last_user_image_directory_chosen = PATH.dirname(result.filePaths[0]);
+    last_directory_chosen.Set(PATH.dirname(result.filePaths[0]));
     filenames = await MY_FILE_HELPER.Copy_Non_Taga_Files(result, TAGA_DATA_DIRECTORY);
   } else {
     try {
