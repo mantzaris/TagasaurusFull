@@ -1,33 +1,14 @@
 #welcome-screen-body-div-id {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 1fr 4fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-  min-width: 0;
-  min-height: 0;
-  height: 100vh;
-  width: 100vw;
-  box-sizing: border-box;
-  grid-template-areas:
-    'title'
-    'skill-bars'
-    'tagging-button'
-    'collection-button'
-    'super-search-button'
-    'stream-search-button'
-    'faceexplore-button'
-    'export-button'
-    'import-button'
-    'settings-button'
-    'support-button';
   background-color: var(--bg);
   overflow-x: hidden;
 }
+
 #title-div-id {
-  grid-area: title;
+  /* grid-area: title; */
   width: 100%;
-  height: 100%;
+  max-height: 15vh;
   font-weight: bold;
-  font-size: 6vmin;
+  font-size: clamp(20px, 5rem, 80px);
 
   color: var(--primary);
   display: flex;
@@ -37,91 +18,6 @@
   text-shadow: 7px 12px 12px var(--primary-400), -3px 10px 12px var(--primary-300);
 }
 
-#skill-bars-div-id {
-  grid-area: skill-bars;
-  display: grid;
-  min-height: 0;
-  min-width: 0;
-  width: 100%;
-  height: 100%;
-
-  grid-template-columns: 1fr;
-  grid-template-rows: 1fr 1fr 1fr 1fr;
-
-  box-sizing: border-box;
-  grid-template-areas:
-    'tagging-score'
-    'emotions-score'
-    'meme-score'
-    'awesomeness-score';
-}
-#tagging-score-div-id {
-  grid-area: tagging-score;
-}
-#emotion-score-div-id {
-  grid-area: emotions-score;
-}
-#meme-score-div-id {
-  grid-area: meme-score;
-}
-#awesome-score-div-id {
-  grid-area: awesomeness-score;
-}
-
-#tagging-button-div-id {
-  grid-area: tagging-button;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-#collection-button-div-id {
-  grid-area: collection-button;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-#super-search-button-div-id {
-  grid-area: super-search-button;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-#stream-search-button-div-id {
-  grid-area: stream-search-button;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-#faceexplore-button-div-id {
-  grid-area: faceexplore-button;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-#export-button-div-id {
-  grid-area: export-button;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-#import-button-div-id {
-  grid-area: import-button;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-#settings-button-div-id {
-  grid-area: settings-button;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-#support-button-div-id {
-  grid-area: support-button;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
 .main-screen-button-styles {
   width: 80%;
   height: 80%;
@@ -135,10 +31,25 @@
 }
 
 .progress-container label {
-  font-size: clamp(5px, 3vh, 25px); /* min, preferred, max */
+  font-size: clamp(5px, 3.5vh, 50px) !important; /* min, preferred, max */
 }
 
 .progress {
-  height: clamp(5px, 3vh, 40px) !important; /* important overrides bootstrap */
-  font-size: clamp(3px, 1rem, 20px) !important; /* min, preferred, max */
+  height: clamp(5px, 3vh, 50px) !important; /* important overrides bootstrap */
+  font-size: clamp(3px, 1.2rem, 35px) !important; /* min, preferred, max */
+}
+
+.label-bold-larger {
+  font-size: larger;
+  font-weight: bold;
+}
+
+.btn-primary.main-screen-button-styles {
+  border-radius: 1.25rem;
+  font-size: calc(2.15vh + 1vmin);
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }

@@ -9,8 +9,6 @@
     <!-- The general cross app style sheet for things like button design -->
     <link rel="stylesheet" href="../AppCode/taga-CSS/welcome-screen-CSS/welcome-screen-main-ui.css" />
 
-    <!-- The general cross app style sheet for things like button design -->
-    <link rel="stylesheet" href="../AppCode/taga-CSS/general-styles.css" />
 
     <!-- style sheet for the processing message modal -->
     <link rel="stylesheet" href="./taga-CSS/processing-message-modal.css" />
@@ -23,81 +21,124 @@
   </head>
 
   <body>
-    <div id="welcome-screen-body-div-id">
-      <div id="title-div-id">Tagasaurus</div>
+    <div id="welcome-screen-body-div-id" class="container-fluid min-vh-100 d-flex flex-column align-items-center">
+      
+      <div id="title-div-id" class="row flex-grow-1">
+        <div class="col text-center d-flex align-items-center justify-content-center">
+          Tagasaurus
+        </div>
+      </div>
 
+      <div class="container mt-1">
+        <div id="tagging-score-div-id" class="row mb-2">
+          <div class="col">
+            <label for="tagging-score" class="label-bold-larger">TAGGED #</label>
+            <div class="progress">
+              <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="" aria-valuemin="0" aria-valuemax="100" id="tagging-score-id"></div>
+            </div>
+          </div>
+        </div>
 
-      <div class="container mt-3">
-        <div id="tagging-score-div-id" class="mb-2 progress-container">
-          <label for="tagging-score">TAGGED #</label>
-          <div class="progress">
-            <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="" aria-valuemin="0" aria-valuemax="100" id="tagging-score-id"></div>
+        <div id="emotion-score-div-id" class="row mb-2">
+          <div class="col">
+            <label for="emotion-score" class="label-bold-larger">WITH EMOTIONS *</label>
+            <div class="progress">
+              <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="" aria-valuemin="0" aria-valuemax="100" id="emotion-score-id"></div>
+            </div>
           </div>
         </div>
-      
-        <div id="emotion-score-div-id" class="mb-2 progress-container">
-          <label for="emotion-score">WITH EMOTIONS *</label>
-          <div class="progress">
-            <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="" aria-valuemin="0" aria-valuemax="100" id="emotion-score-id"></div>
+
+        <div id="meme-score-div-id" class="row mb-2">
+          <div class="col">
+            <label for="meme-score" class="label-bold-larger">MEME CONNECTED -></label>
+            <div class="progress">
+              <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="" aria-valuemin="0" aria-valuemax="100" id="meme-score-id"></div>
+            </div>
           </div>
         </div>
-      
-        <div id="meme-score-div-id" class="mb-2 progress-container">
-          <label for="meme-score">MEME CONNECTED -></label>
-          <div class="progress">
-            <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="" aria-valuemin="0" aria-valuemax="100" id="meme-score-id"></div>
+
+        <div id="awesome-score-div-id" class="row mb-4">
+          <div class="col">
+            <label for="awesome-score" class="label-bold-larger">AWESOMENESS SCORE</label>
+            <div class="progress">
+              <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="" aria-valuemin="0" aria-valuemax="100" id="awesome-score-id"></div>
+            </div>
           </div>
         </div>
-      
-        <div id="awesome-score-div-id" class="mb-2 progress-container">
-          <label for="awesomeness-score">AWESOMENESS SCORE</label>
-          <div class="progress">
-            <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="" aria-valuemin="0" aria-valuemax="100" id="awesome-score-id"></div>
-          </div>
-        </div>
+
       </div>
       
 
-      <div id="tagging-button-div-id">
-        <button onclick="window.location.href='./tagging.html'" type="button" class="fun-button-blue main-screen-button-styles" id="tagging-button-id">TAGGING</button>
+      <div class="row w-100 justify-content-center">
+        <div class="col d-flex justify-content-center">
+          <button onclick="window.location.href='./tagging.html'" type="button" class="btn btn-primary main-screen-button-styles" id="tagging-button-id">
+            TAGGING
+          </button>
+        </div>
       </div>
-      <br />
-      <div id="collection-button-div-id">
-        <button onclick="window.location.href='./collections.html'" type="button" class="fun-button-blue main-screen-button-styles" id="collections-button-id">
-          COLLECTIONS
-        </button>
+
+      <div class="row w-100 justify-content-center">
+        <div class="col d-flex justify-content-center">
+          <button onclick="window.location.href='./collections.html'" type="button" class="btn btn-primary main-screen-button-styles" id="collections-button-id">
+            COLLECTIONS
+          </button>
+        </div>
       </div>
-      <br />
-      <div id="super-search-button-div-id">
-        <button onclick="window.location.href='./super-search.html'" type="button" class="fun-button-blue main-screen-button-styles" id="super-search-button-id">
-          SUPER SEARCH
-        </button>
+
+      <div class="row w-100 justify-content-center">
+        <div class="col d-flex justify-content-center">
+          <button onclick="window.location.href='./super-search.html'" type="button" class="btn btn-primary main-screen-button-styles" id="super-search-button-id">
+            SUPER SEARCH
+          </button>
+        </div>
       </div>
-      <div id="stream-search-button-div-id">
-        <button onclick="window.location.href='./stream-search.html'" type="button" class="fun-button-blue main-screen-button-styles" id="stream-search-button-id">
-          STREAM SEARCH
-        </button>
+
+      <div class="row w-100 justify-content-center">
+        <div class="col d-flex justify-content-center">
+          <button onclick="window.location.href='./stream-search.html'" type="button" class="btn btn-primary main-screen-button-styles" id="stream-search-button-id">
+            STREAM SEARCH
+          </button>
+        </div>
       </div>
-      <div id="faceexplore-button-div-id">
-        <button onclick="window.location.href='./face-explore.html'" type="button" class="fun-button-blue main-screen-button-styles" id="faceexplore-button-id">
-          FACE EXPLORE
-        </button>
+
+      <div class="row w-100 justify-content-center">
+        <div class="col d-flex justify-content-center">
+          <button onclick="window.location.href='./face-explore.html'" type="button" class="btn btn-primary main-screen-button-styles" id="faceexplore-button-id">
+            FACE EXPLORE
+          </button>
+        </div>
       </div>
-      <br />
-      <div id="export-button-div-id">
-        <button onclick="window.location.href='./export.html'" type="button" class="fun-button-blue main-screen-button-styles" id="export-button-id">
-          EXPORT TAGA DATA
-        </button>
-        <!-- <button onclick="Export_User_Annotation_Data()" type="button" class="fun-button-blue main-screen-button-styles" id="export-button-id">EXPORT TAGA DATA</button> -->
+
+      <div class="row w-100 justify-content-center">
+        <div class="col d-flex justify-content-center">
+          <button onclick="window.location.href='./export.html'" type="button" class="btn btn-primary main-screen-button-styles" id="export-button-id">
+            EXPORT TAGA DATA
+          </button>
+        </div>
       </div>
-      <div id="import-button-div-id">
-        <button onclick="window.location.href='./import.html'" type="button" class="fun-button-blue main-screen-button-styles" id="import-button-id">IMPORT TAGA DATASET</button>
+
+      <div class="row w-100 justify-content-center">
+        <div class="col d-flex justify-content-center">
+          <button onclick="window.location.href='./import.html'" type="button" class="btn btn-primary main-screen-button-styles" id="import-button-id">
+            IMPORT TAGA DATASET
+          </button>
+        </div>
       </div>
-      <div id="support-button-div-id">
-        <button onclick="window.location.href='./support.html'" type="button" class="fun-button-blue main-screen-button-styles" id="support-button-id">LINKS</button>
+
+      <div class="row w-100 justify-content-center">
+        <div class="col d-flex justify-content-center">
+          <button onclick="window.location.href='./support.html'" type="button" class="btn btn-primary main-screen-button-styles" id="support-button-id">
+            LINKS
+          </button>
+        </div>
       </div>
-      <div id="settings-button-div-id">
-        <button onclick="window.location.href='./settings.html'" type="button" class="fun-button-blue main-screen-button-styles" id="settings-button-id">SETTINGS</button>
+
+      <div class="row w-100 justify-content-center">
+        <div class="col d-flex justify-content-center">
+          <button onclick="window.location.href='./settings.html'" type="button" class="btn btn-primary main-screen-button-styles" id="settings-button-id">
+            SETTINGS
+          </button>
+        </div>
       </div>
 
     </div>
@@ -111,9 +152,7 @@
     </div>
 
     <script src="./taga-JS/utilities/db-analytics.js"></script>
-    <!-- <script src="./taga-JS/utilities/taga-export.js"></script> -->
     
 
-    <!-- <script src="../faceTest.js"> </script> -->
   </body>
 </html>
