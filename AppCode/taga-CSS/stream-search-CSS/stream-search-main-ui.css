@@ -1,17 +1,28 @@
+#top-div {
+  background-color: var(--bg);
+  height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
 #selection-screen {
+  overflow-x: hidden;
   width: 80%;
   margin: auto;
   margin-top: 10%;
 }
+
+.form-label {
+  font-size: 1.25rem; /* Adjust as needed */
+}
+
 #search-type-label,
 #source-label,
 #accuracy-label {
   font-size: 4vmin;
   font-weight: bold;
 }
-#mlAccuracy {
-  width: 25%;
-}
+
 #search-type,
 #source-type,
 #accuracy-description {

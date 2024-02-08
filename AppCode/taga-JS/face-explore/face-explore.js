@@ -374,7 +374,7 @@ function Add_Node_To_Network(childId, image_url = play_icon_path, node_x, node_y
 
 window.addEventListener('resize', () => {
   const newWidth = container.offsetWidth;
-  const newSpringLength = newWidth * 0.05; // 5% of the new width
+  const newSpringLength = newWidth * 0.4; // 5% of the new width
 
   containerWidth = container.offsetWidth;
   containerHeight = container.offsetHeight;
@@ -452,12 +452,12 @@ function Set_Network_Options() {
     physics: {
       enabled: true,
       barnesHut: {
-        gravitationalConstant: -2000,
-        centralGravity: 0.2,
+        gravitationalConstant: -500,
+        centralGravity: 0.1,
         springLength: springLength,
-        springConstant: 0.5,
-        damping: 0.4,
-        avoidOverlap: 0.9,
+        springConstant: 0.75,
+        damping: 0.25,
+        avoidOverlap: 0.75,
       },
       solver: 'barnesHut',
     },

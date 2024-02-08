@@ -15,117 +15,122 @@
     <!-- The stream search specific styles -->
     <link rel="stylesheet" href="../AppCode/taga-CSS/stream-search-CSS/stream-search-main-ui.css" />
     <!-- <meta charset="UTF-8" http-equiv="Content-Security-Policy" content="script-src self unsafe-inline;"> -->
+
+    <script src="../Assets/bootstrap/popper.min.js" defer></script>
+    <script src="../Assets/bootstrap/bootstrap.min.js" defer></script> 
+    <link href="../Assets/bootstrap/bootstrap.min.css" rel="stylesheet" > 
+
   </head>
+  
   <body>
-    <div id="selection-screen">
-      <!-- <label id="accuracy-label" for="">Face Accuracy Sensitivity:</label>
-        <div id="accuracy-description">
-            Control how close faces must match those in the database.
+    <div id="top-div">
+
+      <div class="container mt-5" id="selection-screen">
+        <div class="row">
+          <div class="col-12">
+            <label for="search-type" class="form-label">Choose a stream search type:</label>
+            <select class="form-select" id="search-type">
+              <option value="keywords-only">Keywords only</option>
+              <option value="keywords-images">Keywords and Images</option>
+                <!-- <option value="keywords-images-memes">Keywords, Images and Memes</option> -->
+            </select>
+            <div id="stream-type-description" class="mt-2"></div>
+            <hr class="my-4">
+      
+            <!-- Button commented out similar to your original HTML -->      
+            <label for="source-type" class="form-label">Choose video source</label>
+            <select class="form-select" id="source-type">
+              <!-- Option commented out similar to your original HTML -->
+            </select>
+            <hr class="my-4">
+            
+            <button class="btn btn-primary disabled" id="continue-btn">START</button>
+            <button class="btn btn-primary" id="main-menu-btn">Return</button>
+          </div>
         </div>
-        <br>
-        very low
-        <input type="range" min="0" max="100" value="60" class="slider" id="mlAccuracy">
-        very high
-        <div class="separator"></div> -->
-      <label id="search-type-label" for="search-type">Choose a stream search type:</label>
-      <br />
-      <select name="" id="search-type">
-        <option value="keywords-only">Keywords only</option>
-        <option value="keywords-images">Keywords and Images</option>
-        <!-- <option value="keywords-images-memes">Keywords, Images and Memes</option> -->
-      </select>
-      <div id="stream-type-description"></div>
-      <div class="separator"></div>
-      <br />
+        <div class="text-muted mt-4">*choppy depending on system capabilities</div>
+      </div>
+      
 
-      <!--<button class='fun-button-blue' id="screen-capture-btn"> SCREEN INPUT </button> -->
 
-      <label id="source-label" for="">Choose video source</label>
-      <br />
-      <select name="" id="source-type">
-        <!-- <option value="keywords-images-memes">Keywords, Images and Memes</option>       -->
-      </select>
-      <br />
-      <div class="separator"></div>
-      <button class="fun-button-blue" disabled id="continue-btn">START</button>
-      <button class="fun-button-blue" id="main-menu-btn">Main Menu</button>
-      <div class="separator"></div>
-      *choppy depending on system capabilities
-    </div>
+      <!-- ----------------------------------------------------------- -->
+      <!-- STREAM VIEW -->
+      <!-- ----------------------------------------------------------- -->
+      <!-- START THE HTML STREAM VIEW OF VIEW1 -->
+      <div id="stream-view1">
+        <div id="stream-btns-div1">
+          <button class="fun-button-blue" id="return-stream-btn1">Return/Stop</button>
+          <button class="fun-button-blue pause-btn" >Toggle Freeze</button>
+        </div>
+        <div id="keyword-display1-div">
+          <!-- <div class="keyword">
+                  keyword1
+              </div> -->
+        </div>
+        <div class="canvas-wrapper" id="stream-view1-video" >
+          <canvas class="stream-search-canvas" id="overlay1" />
+          <video id="inputVideo1" autoplay muted></video>
+        </div>
+      </div>
 
-    <!-- START THE HTML STREAM VIEW OF VIEW1 -->
-    <div id="stream-view1">
-      <div id="stream-btns-div1">
-        <button class="fun-button-blue" id="return-stream-btn1">Return/Stop</button>
-        <button class="fun-button-blue pause-btn" >Toggle Freeze</button>
+      <!-- START THE HTML STREAM VIEW OF VIEW2 -->
+      <div id="stream-view2">
+        <div id="stream-btns-div2">
+          <button class="fun-button-blue" id="return-stream-btn2">Return/Stop</button>
+          <button class="fun-button-blue pause-btn" >Toggle Freeze</button>
+        </div>
+        <div id="keyword-display2-div">
+          <!-- <div class="keyword">
+                  keyword1
+              </div> -->
+        </div>
+        <div class="canvas-wrapper" id="stream-view2-video" >
+          <canvas class="stream-search-canvas" id="overlay2" />
+          <video id="inputVideo2" autoplay muted></video>
+        </div>
+        <div id="images-display2-div">
+          <!-- <div class="image-thumbnail-div">
+                  <img class="image-thumbnail" id="" src="../../Taga.png" title="view" alt="meme" />
+              </div>
+              <div class="image-thumbnail-div">
+                  <img class="image-thumbnail" id="" src="../../Taga.png" title="view" alt="meme" />
+              </div> -->
+        </div>
       </div>
-      <div id="keyword-display1-div">
-        <!-- <div class="keyword">
-                keyword1
-            </div> -->
-      </div>
-      <div class="canvas-wrapper" id="stream-view1-video" >
-        <canvas class="stream-search-canvas" id="overlay1" />
-        <video id="inputVideo1" autoplay muted></video>
-      </div>
-    </div>
 
-    <!-- START THE HTML STREAM VIEW OF VIEW2 -->
-    <div id="stream-view2">
-      <div id="stream-btns-div2">
-        <button class="fun-button-blue" id="return-stream-btn2">Return/Stop</button>
-        <button class="fun-button-blue pause-btn" >Toggle Freeze</button>
+      <!-- START THE HTML STREAM VIEW OF VIEW3 -->
+      <div id="stream-view3">
+        <div id="stream-btns-div3">
+          <button class="fun-button-blue" id="return-stream-btn3">Return/Stop</button>
+          <button class="fun-button-blue pause-btn" >Toggle Freeze</button>
+        </div>
+        <div id="keyword-display3-div">
+          <!-- <div class="keyword">
+                  keyword1
+              </div> -->
+        </div>
+        <div class="canvas-wrapper" id="stream-view3-video" >
+          <canvas class="stream-search-canvas" id="overlay3" />
+          <video id="inputVideo3" autoplay muted></video>
+        </div>
+        <div id="images-display3-div">
+          <!-- <div class="image-thumbnail-div">
+                  <img class="image-thumbnail" id="" src="../../Taga.png" title="view" alt="meme" />
+              </div>
+              <div class="image-thumbnail-div">
+                  <img class="image-thumbnail" id="" src="../../Taga.png" title="view" alt="meme" />
+              </div> -->
+        </div>
+        <div id="memes-display3-div">
+          <!-- <div class="meme-thumbnail-div">
+                  <img class="meme-thumbnail" id="" src="../../Taga.png" title="view" alt="meme" />
+              </div>
+              <div class="meme-thumbnail-div">
+                  <img class="meme-thumbnail" id="" src="../../Taga.png" title="view" alt="meme" />
+              </div> -->
+        </div>
       </div>
-      <div id="keyword-display2-div">
-        <!-- <div class="keyword">
-                keyword1
-            </div> -->
-      </div>
-      <div class="canvas-wrapper" id="stream-view2-video" >
-        <canvas class="stream-search-canvas" id="overlay2" />
-        <video id="inputVideo2" autoplay muted></video>
-      </div>
-      <div id="images-display2-div">
-        <!-- <div class="image-thumbnail-div">
-                <img class="image-thumbnail" id="" src="../../Taga.png" title="view" alt="meme" />
-            </div>
-            <div class="image-thumbnail-div">
-                <img class="image-thumbnail" id="" src="../../Taga.png" title="view" alt="meme" />
-            </div> -->
-      </div>
-    </div>
 
-    <!-- START THE HTML STREAM VIEW OF VIEW3 -->
-    <div id="stream-view3">
-      <div id="stream-btns-div3">
-        <button class="fun-button-blue" id="return-stream-btn3">Return/Stop</button>
-        <button class="fun-button-blue pause-btn" >Toggle Freeze</button>
-      </div>
-      <div id="keyword-display3-div">
-        <!-- <div class="keyword">
-                keyword1
-            </div> -->
-      </div>
-      <div class="canvas-wrapper" id="stream-view3-video" >
-        <canvas class="stream-search-canvas" id="overlay3" />
-        <video id="inputVideo3" autoplay muted></video>
-      </div>
-      <div id="images-display3-div">
-        <!-- <div class="image-thumbnail-div">
-                <img class="image-thumbnail" id="" src="../../Taga.png" title="view" alt="meme" />
-            </div>
-            <div class="image-thumbnail-div">
-                <img class="image-thumbnail" id="" src="../../Taga.png" title="view" alt="meme" />
-            </div> -->
-      </div>
-      <div id="memes-display3-div">
-        <!-- <div class="meme-thumbnail-div">
-                <img class="meme-thumbnail" id="" src="../../Taga.png" title="view" alt="meme" />
-            </div>
-            <div class="meme-thumbnail-div">
-                <img class="meme-thumbnail" id="" src="../../Taga.png" title="view" alt="meme" />
-            </div> -->
-      </div>
     </div>
   </body>
 
