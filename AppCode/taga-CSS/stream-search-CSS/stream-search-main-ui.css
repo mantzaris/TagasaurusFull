@@ -62,11 +62,9 @@
   display: flex;
   justify-content: center;
   border-bottom: 4px solid var(--primary);
+  background-color: aqua;
 }
-#return-stream-btn1 {
-  height: 100%;
-  font-size: 3.5vmin;
-}
+
 #keyword-display1-div {
   grid-area: keyword-display1-div;
   height: 100%;
@@ -76,12 +74,14 @@
   overflow-x: hidden;
   word-break: break-all;
   hyphens: auto;
+  background-color: red;
 }
 #stream-view1-video {
   grid-area: stream-view1-video;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
+  background-color: green;
 }
 
 #overlay1 {
@@ -111,11 +111,6 @@
   border-bottom: 4px solid var(--primary);
 }
 #return-stream-btn2 {
-  height: 100%;
-  font-size: 3.5vmin;
-}
-
-.pause-btn {
   height: 100%;
   font-size: 3.5vmin;
 }
@@ -209,9 +204,18 @@
   overflow: overlay;
 }
 
-.keyword {
-  border-bottom: 4px dotted var(--primary);
+.top-btns {
+  height: 100%;
+  font-size: clamp(0.5rem, 7.5vmin, 3.5rem);
 }
+
+.keyword {
+  word-break: break-word; /* Ensures long words do not overflow */
+  hyphens: auto; /* Automatically adds hyphens where appropriate */
+  margin-bottom: 0.2rem;
+  font-size: clamp(0.5rem, 3vmin, 2.5rem);
+}
+
 .image-thumbnail-div,
 .meme-thumbnail-div {
   height: 15vh;

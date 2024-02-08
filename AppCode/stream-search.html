@@ -59,21 +59,24 @@
       <!-- START THE HTML STREAM VIEW OF VIEW1 -->
       <div id="stream-view1">
         <div id="stream-btns-div1">
-          <button class="fun-button-blue" id="return-stream-btn1">Return/Stop</button>
-          <button class="fun-button-blue pause-btn" >Toggle Freeze</button>
+          <div class="d-flex flex-row align-items-center py-2">
+            <button class="btn btn-primary my-1 top-btns me-4" id="return-stream-btn1">Return/Stop</button>
+            <button class="btn btn-primary my-1 top-btns pause-btn">Toggle Freeze</button>
+          </div>          
         </div>
         <div id="keyword-display1-div">
           <!-- <div class="keyword">
-                  keyword1
-              </div> -->
+              keyword1
+          </div> -->
         </div>
         <div class="canvas-wrapper" id="stream-view1-video" >
-          <canvas class="stream-search-canvas" id="overlay1" />
-          <video id="inputVideo1" autoplay muted></video>
+            <canvas class="stream-search-canvas" id="overlay1" />
+            <video id="inputVideo1" autoplay muted></video>
+          </div>
         </div>
-      </div>
 
-      <!-- START THE HTML STREAM VIEW OF VIEW2 -->
+      
+        <!-- START THE HTML STREAM VIEW OF VIEW2 -->
       <div id="stream-view2">
         <div id="stream-btns-div2">
           <button class="fun-button-blue" id="return-stream-btn2">Return/Stop</button>

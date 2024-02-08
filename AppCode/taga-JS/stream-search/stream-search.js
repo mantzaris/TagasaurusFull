@@ -204,13 +204,15 @@ ipcRenderer.invoke('getCaptureID').then((sources) => {
   src.innerHTML = 'Webcam';
   src.value = 'webcam';
   selection_sources.appendChild(src);
+
   for (const source of sources) {
     const src = document.createElement('option');
     src.innerHTML = source.name;
     src.value = source.id;
     selection_sources.appendChild(src);
   }
-  webcam_selection_btn.removeAttribute('disabled');
+
+  webcam_selection_btn.classList.remove('disabled');
 });
 
 webcam_selection_btn.onclick = async () => {
@@ -440,11 +442,11 @@ async function UpdateSearchResults() {
 
   const selected = rect_face_selected; //homing_mode ? homing_face_selected : rect_face_selected;
   if (selected.descriptor.length == 128) {
-    console.log(`L2 selected.descriptor = ${calculateL2Norm(selected.descriptor)}`);
+    //console.log(`L2 selected.descriptor = ${calculateL2Norm(selected.descriptor)}`);
 
     //TODO: L2 distances threshold at around 0.17 and IP at 0.92
     const { distances, rowids } = await ipcRenderer.invoke('faiss-search', selected.descriptor, 6);
-    console.log('distances=', distances);
+    //console.log('distances=', distances);
     // descending when using inner produce and ascending using euclidean
     let rowids_sorted = GENERAL_HELPER_FNS.Sort_Based_On_Scores_DES(distances, rowids);
     //remove duplicates
@@ -527,9 +529,10 @@ async function Detect_Faces() {
 
 function Display_Keywords() {
   keyword_div.innerHTML = '';
-  let keywords_html = 'Keywords: <br>';
+  let keywords_html = '<strong>Keywords:</strong><br>';
+  const unique_keywords_flat = [...new Set(keywords.flat())];
 
-  for (const keyword of keywords) {
+  for (const keyword of unique_keywords_flat) {
     keywords_html += `
                           <div class="keyword">
                               ${keyword}
