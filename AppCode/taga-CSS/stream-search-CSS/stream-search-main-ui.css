@@ -18,8 +18,8 @@
   font-size: clamp(0.75rem, 3.5vmin, 4rem);
 }
 
-#continue-btn,
-#main-menu-btn,
+#start-btn,
+#home-btn,
 #stream-type-description,
 #search-type,
 #source-type {
@@ -87,7 +87,7 @@
   display: none;
 }
 
-#overlay {
+#canvas-stream {
   display: block;
   width: 100%;
   height: 100%;
@@ -173,9 +173,6 @@
   left: 0;
   right: 0;
   margin: auto auto;
-}
-.separator {
-  height: 5vh;
 }
 
 .thumbnail-with-goto {

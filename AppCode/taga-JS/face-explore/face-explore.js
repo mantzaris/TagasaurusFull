@@ -340,6 +340,9 @@ document.getElementById('restart-btn').onclick = () => {
   nodes.clear();
   edges.clear();
   id2filename_map.clear();
+  fileNamesSet.clear();
+  network_data = { nodes, edges };
+  network = undefined;
 
   let search_results_output = document.getElementById('media-container');
   search_results_output.innerHTML = '';

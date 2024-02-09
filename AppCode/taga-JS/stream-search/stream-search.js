@@ -8,7 +8,7 @@ let kind = 'webcam';
 let media_source;
 let video_el = document.getElementById('inputVideo');
 let photo_frozen;
-let canvas_el = document.getElementById('overlay');
+let canvas_el = document.getElementById('canvas-stream');
 let streaming = false;
 let ctx;
 let photo;
@@ -47,8 +47,8 @@ const keywords_images_memes_description =
 
 document.getElementById('stream-view').style.display = 'none';
 
-const webcam_selection_btn = document.getElementById('continue-btn'); //TODO: change btn id name, and variable name
-const main_menu_btn = document.getElementById('main-menu-btn'); //TODO: change btn id name
+const webcam_selection_btn = document.getElementById('start-btn'); //TODO: change name of the button element
+const main_menu_btn = document.getElementById('home-btn');
 const selection_set = document.getElementById('search-type');
 const selection_description = document.getElementById('stream-type-description');
 const return_from_stream_btn = document.getElementById('return-stream-btn');
@@ -63,84 +63,28 @@ const selection_mode = {
   memes: false,
 };
 
-document.querySelectorAll('.pause-btn').forEach((btn) => {
-  btn.onclick = () => {
-    stream_paused = !stream_paused;
-    btn.innerText = stream_paused ? 'Resume' : 'Freeze';
-    photo_frozen = photo.cloneNode(true);
-
-    ctx.clearRect(0, 0, canvas_el.width, canvas_el.height);
-    ctx.drawImage(video_el, 0, 0, width, height);
-
-    // Capture this frame as the photo_frozen
-    const data = canvas_el.toDataURL('image/png');
-    photo_frozen.src = data;
-  };
-});
-
-document.querySelectorAll('.stream-search-canvas').forEach((canvas) => {
-  canvas.onclick = (event) => {
-    const px = Math.floor(event.offsetX);
-    const py = Math.floor(event.offsetY);
-
-    let clicked_face = null;
-
-    for (const face of rect_face_array) {
-      if (isPointInsideBox(px, py, face.x, face.y, face.width, face.height)) {
-        clicked_face = face;
-        break;
-      }
-    }
-
-    if (clicked_face == null) return;
-
-    // if (JSON.stringify(clicked_face) === JSON.stringify(homing_face_selected)) {
-    //   homing_mode = false;
-    // }
-    if (homing_mode) {
-      const score = Get_Descriptors_DistanceScore([clicked_face.descriptor], [homing_face_selected.descriptor]);
-      if (score > FACE_DISTANCE_IMAGE) {
-        homing_mode = false;
-        Render_Bounding_Boxes();
-        return;
-      }
-    }
-
-    homing_mode = true;
-    Object.assign(homing_face_selected, clicked_face);
-
-    rect_face_selected = homing_face_selected;
-    Render_Bounding_Boxes();
-  };
-});
-
+selection_description.innerText = keywords_only_description;
 window.addEventListener('resize', ResizeCanvas);
 window.addEventListener('orientationchange', ResizeCanvas);
+main_menu_btn.onclick = () => {
+  location.href = 'welcome-screen.html';
+};
 
-function isPointInsideBox(x, y, bx, by, width, height) {
-  // Check if x is within the horizontal bounds of the box
-  const isInsideX = x >= bx && x <= bx + width;
-
-  // Check if y is within the vertical bounds of the box
-  const isInsideY = y >= by && y <= by + height;
-  // Return true if both x and y are inside the box, false otherwise
-  return isInsideX && isInsideY;
+function Stop_Stream_Search() {
+  window.location.reload();
 }
 
-//TODO: are these all necessary then there is the StartScreen fn below?
-selection_description.innerText = keywords_only_description;
 selection_set.onchange = () => {
   if (selection_set.value == 'keywords-only') {
     selection_description.innerText = keywords_only_description;
-    //keyword_div = document.getElementById('keyword-display-div'); //TODO: why is this here? if needed why not the others?
     selection_mode.keywords = true;
+    selection_mode.images = selection_mode.memes = false;
   } else if (selection_set.value == 'keywords-images') {
     selection_description.innerText = keywords_images_description;
-    //keyword_div = document.getElementById('keyword-display-div');
     selection_mode.keywords = selection_mode.images = true;
+    selection_mode.memes = false;
   } else if (selection_set.value == 'keywords-images-memes') {
     selection_description.innerText = keywords_images_memes_description;
-    //keyword_div = document.getElementById('keyword-display-div');
     selection_mode.keywords = selection_mode.images = selection_mode.memes = true;
   }
 };
@@ -150,34 +94,66 @@ function StartScreen() {
   document.getElementById('stream-view').className = '';
   document.getElementById('stream-view').style.display = 'grid';
   video_el = document.getElementById('inputVideo');
-  canvas_el = document.getElementById('overlay');
+  canvas_el = document.getElementById('canvas-stream');
 
   if (selection_mode.keywords && !selection_mode.images && !selection_mode.memes) {
     document.getElementById('stream-view').classList.add('grid-keywords');
-    Keywords_Only_Start();
+    keyword_div = document.getElementById('keyword-display-div');
   } else if (selection_mode.keywords && selection_mode.images && !selection_mode.memes) {
     document.getElementById('stream-view').classList.add('grid-keywords-images');
-    Keywords_Images_Start();
+    keyword_div = document.getElementById('keyword-display-div');
+    images_div = document.getElementById('images-display-div');
+    images_div.style.display = 'block';
   } else if (selection_mode.keywords && selection_mode.images && selection_mode.memes) {
-    Keywords_Images_Memes_Start();
+    keyword_div = document.getElementById('keyword-display-div');
+    images_div = document.getElementById('images-display-div');
+    memes_div = document.getElementById('memes-display-div');
   }
 }
 
-function Keywords_Only_Start() {
-  keyword_div = document.getElementById('keyword-display-div');
-}
+document.getElementById('pause-btn').onclick = () => {
+  stream_paused = !stream_paused;
+  document.getElementById('pause-btn').innerText = stream_paused ? 'Resume' : 'Freeze';
+  photo_frozen = photo.cloneNode(true);
 
-function Keywords_Images_Start() {
-  keyword_div = document.getElementById('keyword-display-div');
-  images_div = document.getElementById('images-display-div');
-  images_div.style.display = 'block';
-}
+  ctx.clearRect(0, 0, canvas_el.width, canvas_el.height);
+  ctx.drawImage(video_el, 0, 0, width, height);
 
-function Keywords_Images_Memes_Start() {
-  keyword_div = document.getElementById('keyword-display-div');
-  images_div = document.getElementById('images-display-div');
-  memes_div = document.getElementById('memes-display-div');
-}
+  // Capture this frame as the photo_frozen
+  const data = canvas_el.toDataURL('image/png');
+  photo_frozen.src = data;
+};
+
+canvas_el.onclick = (event) => {
+  const px = Math.floor(event.offsetX);
+  const py = Math.floor(event.offsetY);
+
+  let clicked_face = null;
+
+  for (const face of rect_face_array) {
+    if (isPointInsideBox(px, py, face.x, face.y, face.width, face.height)) {
+      clicked_face = face;
+      break;
+    }
+  }
+
+  if (clicked_face == null) return;
+
+  if (homing_mode) {
+    const score = Get_Descriptors_DistanceScore([clicked_face.descriptor], [homing_face_selected.descriptor]);
+    if (score > FACE_DISTANCE_IMAGE) {
+      homing_mode = false;
+      Render_Bounding_Boxes();
+      return;
+    }
+  }
+
+  homing_mode = true;
+  Object.assign(homing_face_selected, clicked_face);
+
+  rect_face_selected = homing_face_selected;
+  Render_Bounding_Boxes();
+};
 
 ipcRenderer.invoke('getCaptureID').then((sources) => {
   selection_sources = document.getElementById('source-type');
@@ -228,14 +204,6 @@ webcam_selection_btn.onclick = async () => {
   }
 };
 
-main_menu_btn.onclick = () => {
-  location.href = 'welcome-screen.html';
-};
-
-function Stop_Stream_Search() {
-  window.location.reload();
-}
-
 async function GetMediaStream(source) {
   const video_setup =
     'webcam' == source
@@ -260,26 +228,14 @@ async function GetMediaStream(source) {
   });
 }
 
-async function PullTaggingClusters() {
-  const all_face_clusters = DB_MODULE.Get_All_FaceClusters();
+function isPointInsideBox(x, y, bx, by, width, height) {
+  // Check if x is within the horizontal bounds of the box
+  const isInsideX = x >= bx && x <= bx + width;
 
-  for (const face_cluster of all_face_clusters) {
-    for (const [fileName, fileTypeAndMemes] of Object.entries(face_cluster.images)) {
-      if (fileTypeAndMemes.fileType != 'image' && fileTypeAndMemes.fileType != 'gif') {
-        delete face_cluster.images[fileName];
-
-        continue;
-      }
-
-      if (!face_cluster.memes) face_cluster.memes = [];
-
-      if (selection_mode.memes) {
-        face_cluster.memes = [...face_cluster.memes, ...fileTypeAndMemes.memes];
-      }
-
-      clusters.set(face_cluster.rowid, face_cluster);
-    }
-  }
+  // Check if y is within the vertical bounds of the box
+  const isInsideY = y >= by && y <= by + height;
+  // Return true if both x and y are inside the box, false otherwise
+  return isInsideX && isInsideY;
 }
 
 function SetUpVideo() {
@@ -584,4 +540,26 @@ function Display_Memes_Found() {
   }
 
   memes_div.innerHTML = memes_html;
+}
+
+async function PullTaggingClusters() {
+  const all_face_clusters = DB_MODULE.Get_All_FaceClusters();
+
+  for (const face_cluster of all_face_clusters) {
+    for (const [fileName, fileTypeAndMemes] of Object.entries(face_cluster.images)) {
+      if (fileTypeAndMemes.fileType != 'image' && fileTypeAndMemes.fileType != 'gif') {
+        delete face_cluster.images[fileName];
+
+        continue;
+      }
+
+      if (!face_cluster.memes) face_cluster.memes = [];
+
+      if (selection_mode.memes) {
+        face_cluster.memes = [...face_cluster.memes, ...fileTypeAndMemes.memes];
+      }
+
+      clusters.set(face_cluster.rowid, face_cluster);
+    }
+  }
 }

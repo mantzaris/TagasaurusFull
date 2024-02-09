@@ -44,8 +44,8 @@
             </select>
             <hr class="my-4">
             
-            <button class="btn btn-primary disabled mt-4" id="continue-btn">START</button>
-            <button class="btn btn-primary mt-4" id="main-menu-btn">Return</button>
+            <button class="btn btn-primary disabled mt-4" id="start-btn">START</button>
+            <button class="btn btn-primary mt-4" id="home-btn">Return</button>
           </div>
         </div>
         <div class="text-muted mt-4">*choppy depending on system capabilities</div>
@@ -60,7 +60,7 @@
         <div id="stream-btns-div">
           <div class="d-flex flex-row align-items-center py-2">
             <button class="btn btn-primary my-1 top-btns me-4" id="return-stream-btn">Return/Stop</button>
-            <button class="btn btn-primary my-1 top-btns pause-btn">Toggle Freeze</button>
+            <button class="btn btn-primary my-1 top-btns" id="pause-btn">Toggle Freeze</button>
             <!-- remove class pause-btn and make into 'id'-->
           </div>
         </div>
@@ -69,7 +69,7 @@
         </div>
 
         <div id="stream-view-video">
-          <canvas class="stream-search-canvas" id="overlay" />
+          <canvas class="stream-search-canvas" id="canvas-stream" />
           <video id="inputVideo" autoplay muted></video>
         </div>
 
@@ -77,9 +77,7 @@
           <!-- Images content goes here -->
         </div>
       
-      </div>
-      
-      
+      </div>      
       
 
     </div>
