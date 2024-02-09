@@ -6,9 +6,9 @@ const { DB_MODULE, GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'co
 let kind = 'webcam';
 
 let media_source;
-let video_el = document.getElementById('inputVideo1');
+let video_el = document.getElementById('inputVideo');
 let photo_frozen;
-let canvas_el = document.getElementById('overlay1');
+let canvas_el = document.getElementById('overlay');
 let streaming = false;
 let ctx;
 let photo;
@@ -45,24 +45,15 @@ const keywords_images_description =
 const keywords_images_memes_description =
   'Displays keywords, images and memes related to faces stored. Finds images/videos/gifs containing a similar face and displays the keywords from the description as well as images containing the face with a match. Connected memes will also be presented.';
 
-document.getElementById('stream-view1').style.display = 'none';
-document.getElementById('stream-view2').style.display = 'none';
-document.getElementById('stream-view3').style.display = 'none';
+document.getElementById('stream-view').style.display = 'none';
 
-const webcam_selection_btn = document.getElementById('continue-btn');
-const main_menu_btn = document.getElementById('main-menu-btn');
+const webcam_selection_btn = document.getElementById('continue-btn'); //TODO: change btn id name, and variable name
+const main_menu_btn = document.getElementById('main-menu-btn'); //TODO: change btn id name
 const selection_set = document.getElementById('search-type');
 const selection_description = document.getElementById('stream-type-description');
-const return_from_stream_btn1 = document.getElementById('return-stream-btn1');
-return_from_stream_btn1.onclick = () => {
-  Stop_Stream_Search();
-};
-const return_from_stream_btn2 = document.getElementById('return-stream-btn2');
-return_from_stream_btn2.onclick = () => {
-  Stop_Stream_Search();
-};
-const return_from_stream_btn3 = document.getElementById('return-stream-btn3');
-return_from_stream_btn3.onclick = () => {
+const return_from_stream_btn = document.getElementById('return-stream-btn');
+return_from_stream_btn.onclick = () => {
+  document.getElementById('images-display-div').style.display = 'none';
   Stop_Stream_Search();
 };
 
@@ -136,36 +127,36 @@ function isPointInsideBox(x, y, bx, by, width, height) {
   return isInsideX && isInsideY;
 }
 
+//TODO: are these all necessary then there is the StartScreen fn below?
 selection_description.innerText = keywords_only_description;
 selection_set.onchange = () => {
   if (selection_set.value == 'keywords-only') {
     selection_description.innerText = keywords_only_description;
-    video_el = document.getElementById('inputVideo1');
-    canvas_el = document.getElementById('overlay1');
-
-    keyword_div = document.getElementById('keyword-display1-div');
+    //keyword_div = document.getElementById('keyword-display-div'); //TODO: why is this here? if needed why not the others?
     selection_mode.keywords = true;
   } else if (selection_set.value == 'keywords-images') {
     selection_description.innerText = keywords_images_description;
-    video_el = document.getElementById('inputVideo2');
-    canvas_el = document.getElementById('overlay2');
-
-    keyword_div = document.getElementById('keyword-display1-div');
+    //keyword_div = document.getElementById('keyword-display-div');
     selection_mode.keywords = selection_mode.images = true;
   } else if (selection_set.value == 'keywords-images-memes') {
     selection_description.innerText = keywords_images_memes_description;
-    video_el = document.getElementById('inputVideo3');
-    canvas_el = document.getElementById('overlay3');
-
-    keyword_div = document.getElementById('keyword-display1-div');
+    //keyword_div = document.getElementById('keyword-display-div');
     selection_mode.keywords = selection_mode.images = selection_mode.memes = true;
   }
 };
 
 function StartScreen() {
+  document.getElementById('selection-screen').style.display = 'none';
+  document.getElementById('stream-view').className = '';
+  document.getElementById('stream-view').style.display = 'grid';
+  video_el = document.getElementById('inputVideo');
+  canvas_el = document.getElementById('overlay');
+
   if (selection_mode.keywords && !selection_mode.images && !selection_mode.memes) {
+    document.getElementById('stream-view').classList.add('grid-keywords');
     Keywords_Only_Start();
   } else if (selection_mode.keywords && selection_mode.images && !selection_mode.memes) {
+    document.getElementById('stream-view').classList.add('grid-keywords-images');
     Keywords_Images_Start();
   } else if (selection_mode.keywords && selection_mode.images && selection_mode.memes) {
     Keywords_Images_Memes_Start();
@@ -173,28 +164,19 @@ function StartScreen() {
 }
 
 function Keywords_Only_Start() {
-  document.getElementById('selection-screen').style.display = 'none';
-  document.getElementById('stream-view1').style.display = 'grid';
-  video_el = document.getElementById('inputVideo1');
-  keyword_div = document.getElementById('keyword-display1-div');
-  canvas_el = document.getElementById('overlay1');
+  keyword_div = document.getElementById('keyword-display-div');
 }
+
 function Keywords_Images_Start() {
-  document.getElementById('selection-screen').style.display = 'none';
-  document.getElementById('stream-view2').style.display = 'grid';
-  video_el = document.getElementById('inputVideo2');
-  keyword_div = document.getElementById('keyword-display2-div');
-  images_div = document.getElementById('images-display2-div');
-  canvas_el = document.getElementById('overlay2');
+  keyword_div = document.getElementById('keyword-display-div');
+  images_div = document.getElementById('images-display-div');
+  images_div.style.display = 'block';
 }
+
 function Keywords_Images_Memes_Start() {
-  document.getElementById('selection-screen').style.display = 'none';
-  document.getElementById('stream-view3').style.display = 'grid';
-  video_el = document.getElementById('inputVideo3');
-  keyword_div = document.getElementById('keyword-display3-div');
-  images_div = document.getElementById('images-display3-div');
-  memes_div = document.getElementById('memes-display3-div');
-  canvas_el = document.getElementById('overlay3');
+  keyword_div = document.getElementById('keyword-display-div');
+  images_div = document.getElementById('images-display-div');
+  memes_div = document.getElementById('memes-display-div');
 }
 
 ipcRenderer.invoke('getCaptureID').then((sources) => {
@@ -447,7 +429,7 @@ async function UpdateSearchResults() {
     //TODO: L2 distances threshold at around 0.17 and IP at 0.92
     const { distances, rowids } = await ipcRenderer.invoke('faiss-search', selected.descriptor, 6);
     //console.log('distances=', distances);
-    // descending when using inner produce and ascending using euclidean
+    // descending when using inner produce and ascending using euclidean TODO: it is reversed
     let rowids_sorted = GENERAL_HELPER_FNS.Sort_Based_On_Scores_DES(distances, rowids);
     //remove duplicates
     let uniqueRowidsSorted = [];
