@@ -3,6 +3,8 @@ const PATH = require('path');
 
 const { DB_MODULE, GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
 
+const IMAGE_SELECTION_NUM = 10;
+
 let kind = 'webcam';
 
 let media_source;
@@ -21,7 +23,7 @@ let stream_paused = false;
 let homing_mode = false;
 let homing_face_selected = { x: 0, y: 0, width: 0, height: 0, descriptor: [] };
 
-let clusters = new Map();
+//let clusters = new Map();
 let keywords = [];
 let images = [];
 let memes = [];
@@ -47,12 +49,12 @@ const keywords_images_memes_description =
 
 document.getElementById('stream-view').style.display = 'none';
 
-const webcam_selection_btn = document.getElementById('start-btn'); //TODO: change name of the button element
-const main_menu_btn = document.getElementById('home-btn');
+const start_btn = document.getElementById('start-btn');
+const home_btn = document.getElementById('home-btn');
 const selection_set = document.getElementById('search-type');
 const selection_description = document.getElementById('stream-type-description');
-const return_from_stream_btn = document.getElementById('return-stream-btn');
-return_from_stream_btn.onclick = () => {
+const stop_stream_btn = document.getElementById('return-stream-btn');
+stop_stream_btn.onclick = () => {
   document.getElementById('images-display-div').style.display = 'none';
   Stop_Stream_Search();
 };
@@ -66,7 +68,7 @@ const selection_mode = {
 selection_description.innerText = keywords_only_description;
 window.addEventListener('resize', ResizeCanvas);
 window.addEventListener('orientationchange', ResizeCanvas);
-main_menu_btn.onclick = () => {
+home_btn.onclick = () => {
   location.href = 'welcome-screen.html';
 };
 
@@ -103,11 +105,14 @@ function StartScreen() {
     document.getElementById('stream-view').classList.add('grid-keywords-images');
     keyword_div = document.getElementById('keyword-display-div');
     images_div = document.getElementById('images-display-div');
+
     images_div.style.display = 'block';
   } else if (selection_mode.keywords && selection_mode.images && selection_mode.memes) {
     keyword_div = document.getElementById('keyword-display-div');
     images_div = document.getElementById('images-display-div');
     memes_div = document.getElementById('memes-display-div');
+
+    images_div.style.display = 'block';
   }
 }
 
@@ -170,10 +175,10 @@ ipcRenderer.invoke('getCaptureID').then((sources) => {
     selection_sources.appendChild(src);
   }
 
-  webcam_selection_btn.classList.remove('disabled');
+  start_btn.classList.remove('disabled');
 });
 
-webcam_selection_btn.onclick = async () => {
+start_btn.onclick = async () => {
   try {
     kind = selection_sources.value;
 
@@ -193,7 +198,7 @@ webcam_selection_btn.onclick = async () => {
           SetUpVideo();
           streaming = true;
 
-          await PullTaggingClusters();
+          //await PullTaggingClusters();
           await MainLoop();
         }
       },
@@ -228,16 +233,6 @@ async function GetMediaStream(source) {
   });
 }
 
-function isPointInsideBox(x, y, bx, by, width, height) {
-  // Check if x is within the horizontal bounds of the box
-  const isInsideX = x >= bx && x <= bx + width;
-
-  // Check if y is within the vertical bounds of the box
-  const isInsideY = y >= by && y <= by + height;
-  // Return true if both x and y are inside the box, false otherwise
-  return isInsideX && isInsideY;
-}
-
 function SetUpVideo() {
   height = video_el.videoHeight;
   width = video_el.videoWidth;
@@ -249,6 +244,35 @@ function SetUpVideo() {
   canvas_el.setAttribute('height', height.toString());
 
   ResizeCanvas();
+}
+
+function ResizeCanvas() {
+  const canvas_parent = canvas_el.parentNode;
+  width = canvas_parent.clientWidth;
+  height = canvas_parent.clientHeight;
+
+  canvas_el.width = width;
+  canvas_el.height = height;
+  canvas_el.style.width = width + 'px';
+  canvas_el.style.height = height + 'px';
+  video_el.width = width;
+  video_el.height = height;
+  video_el.style.width = width + 'px';
+  video_el.style.height = height + 'px';
+
+  if (stream_paused) {
+    ctx.drawImage(video_el, 0, 0, width, height);
+  }
+}
+
+function isPointInsideBox(x, y, bx, by, width, height) {
+  // Check if x is within the horizontal bounds of the box
+  const isInsideX = x >= bx && x <= bx + width;
+
+  // Check if y is within the vertical bounds of the box
+  const isInsideY = y >= by && y <= by + height;
+  // Return true if both x and y are inside the box, false otherwise
+  return isInsideX && isInsideY;
 }
 
 function Take_Picture() {
@@ -310,12 +334,10 @@ async function Handle_Default_Search() {
 }
 
 function Find_Most_Similar_Descriptor(descriptor, threshold) {
-  //!!
   let best_score = -1;
   let best_index = -1;
 
   for (let i = 0; i < rect_face_array.length; i++) {
-    //!!!
     //const score = Get_Descriptors_InnerProduct(rect_face_array[i].descriptor,descriptor);
     const score = Get_Descriptors_DistanceScore([rect_face_array[i].descriptor], [descriptor]);
 
@@ -367,13 +389,8 @@ function Render_Bounding_Boxes() {
   ctx.stroke();
 }
 
-function calculateL2Norm(vector) {
-  let sumOfSquares = vector.reduce((sum, value) => sum + value * value, 0);
-  return Math.sqrt(sumOfSquares);
-}
-
 async function UpdateSearchResults() {
-  //do this less frequently
+  //do this less frequently not every possible frame, like 1/second TODO:
   keywords = [];
   images = [];
   memes = [];
@@ -383,10 +400,10 @@ async function UpdateSearchResults() {
     //console.log(`L2 selected.descriptor = ${calculateL2Norm(selected.descriptor)}`);
 
     //TODO: L2 distances threshold at around 0.17 and IP at 0.92
-    const { distances, rowids } = await ipcRenderer.invoke('faiss-search', selected.descriptor, 6);
-    //console.log('distances=', distances);
-    // descending when using inner produce and ascending using euclidean TODO: it is reversed
-    let rowids_sorted = GENERAL_HELPER_FNS.Sort_Based_On_Scores_DES(distances, rowids);
+    const { distances, rowids } = await ipcRenderer.invoke('faiss-search', selected.descriptor, IMAGE_SELECTION_NUM);
+
+    // descending when using inner produce and ascending using euclidean
+    let rowids_sorted = GENERAL_HELPER_FNS.Sort_Based_On_Scores_ASC(distances, rowids);
     //remove duplicates
     let uniqueRowidsSorted = [];
     let seen = new Set();
@@ -406,8 +423,14 @@ async function UpdateSearchResults() {
       const index = tagging_entries.findIndex((entry) => entry.rowid === rowid);
       if (index !== -1) {
         const entry = tagging_entries[index];
+
+        //keywords
         if (entry.taggingTags.length > 0) keywords.push(entry.taggingTags);
-        images.push(entry.fileName);
+
+        //memes
+        images.push(entry.fileName); //check filetype? TODO: if video use thumbnail else normal file
+
+        //memes
         if (entry.taggingMemeChoices.length > 0) memes.push(entry.taggingMemeChoices);
       }
     }
@@ -422,25 +445,6 @@ async function UpdateSearchResults() {
   Display_Images_Found();
   Display_Memes_Found();
   Create_Thumbnail_Events();
-}
-
-function ResizeCanvas() {
-  const canvas_parent = canvas_el.parentNode;
-  width = canvas_parent.clientWidth;
-  height = canvas_parent.clientHeight;
-
-  canvas_el.width = width;
-  canvas_el.height = height;
-  canvas_el.style.width = width + 'px';
-  canvas_el.style.height = height + 'px';
-  video_el.width = width;
-  video_el.height = height;
-  video_el.style.width = width + 'px';
-  video_el.style.height = height + 'px';
-
-  if (stream_paused) {
-    ctx.drawImage(video_el, 0, 0, width, height);
-  }
 }
 
 async function Detect_Faces() {
@@ -542,6 +546,9 @@ function Display_Memes_Found() {
   memes_div.innerHTML = memes_html;
 }
 
+////////////////////
+// OLD CODE
+///////////////////
 async function PullTaggingClusters() {
   const all_face_clusters = DB_MODULE.Get_All_FaceClusters();
 
@@ -562,4 +569,9 @@ async function PullTaggingClusters() {
       clusters.set(face_cluster.rowid, face_cluster);
     }
   }
+}
+
+function calculateL2Norm(vector) {
+  let sumOfSquares = vector.reduce((sum, value) => sum + value * value, 0);
+  return Math.sqrt(sumOfSquares);
 }
