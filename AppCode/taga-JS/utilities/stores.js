@@ -1,3 +1,6 @@
+/**
+ * @type {Store }
+ */
 class Store {
   constructor(initial) {
     this.value = initial;
@@ -39,10 +42,6 @@ class Store {
   Get() {
     return this.value;
   }
-
-  get Value() {
-    return this.Get();
-  }
 }
 
 exports.Store = Store;
@@ -70,6 +69,10 @@ class ObjectStore extends Store {
   }
 
   Set(new_value) {
+    if (!this.value || !(this.value instanceof Object)) {
+      this.value = {};
+    }
+
     Object.assign(this.value, new_value);
     this.Notify();
   }

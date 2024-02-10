@@ -45,7 +45,7 @@
 }
 
 .btn-primary.main-screen-button-styles {
-  border-radius: 1.25rem;
+  /* border-radius: 1.25rem; */
   font-size: calc(2.15vh + 1vmin);
   font-weight: bold;
   display: flex;
