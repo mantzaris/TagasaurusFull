@@ -1505,7 +1505,7 @@ async function Add_New_Meme() {
     meme_switch_booleans.push(...entry.taggingMemeChoices);
     entry.taggingMemeChoices = [...new Set(meme_switch_booleans)]; //add a 'unique' set of memes as the 'new Set' has unique contents
     current_tagging_entry.Set(entry);
-    DB_MODULE.Update_Tagging_Annotation_DB(current_tagging_entry);
+    DB_MODULE.Update_Tagging_Annotation_DB(entry);
 
     await Update_Cluster_For_Updated_TaggingEntry({ newTags: taggingTags, origTags: taggingTags, fileName, newMemes: entry.taggingMemeChoices }, faceClusters);
 

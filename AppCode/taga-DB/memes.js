@@ -1,4 +1,4 @@
-const { Get_Tagging_Record_From_DB } = require('./tagging.js');
+const { Get_Tagging_Record_From_DB, Update_Tagging_Annotation_DB } = require('./tagging.js');
 
 const { GetFileTypeFromFileName } = require(PATH.join(__dirname, '..', 'taga-JS', 'utilities', 'files.js'));
 
