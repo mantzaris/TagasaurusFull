@@ -36,14 +36,14 @@ async function Update_Collection_MEME_Connections(collectionName, current_collec
   // get the right difference ([1,2,3] diff -> [1,3,4] => [4]) and from [4] include/add this imagefilename in the array: diff2 = b.filter(x => !a.includes(x));
   let add_as_memes_filenames = new_collection_memes.filter((x) => !current_collection_memes.includes(x)); //new meme connections to record
   for (let meme_filename of add_as_memes_filenames) {
-    let meme_table_record = await Get_Collection_MEME_Record_From_DB(meme_filename);
+    let meme_table_record = Get_Collection_MEME_Record_From_DB(meme_filename);
     meme_table_record['collectionNames'].push(collectionName);
     await UPDATE_FILENAME_MEME_TABLE_COLLECTION_STMT.run(JSON.stringify(meme_table_record['collectionNames']), meme_filename);
   }
   // get the memes which no longer include this file (left difference [1,2,3] diff-> [1,3,4] => [2]) and from [2] remove/subtract the image filename from the array: difference = arr1.filter(x => !arr2.includes(x));
   let remove_as_memes_filenames = current_collection_memes.filter((x) => !new_collection_memes.includes(x)); //remove from meme connection
   for (let meme_filename of remove_as_memes_filenames) {
-    let meme_table_record = await Get_Collection_MEME_Record_From_DB(meme_filename);
+    let meme_table_record = Get_Collection_MEME_Record_From_DB(meme_filename);
     let new_array_tmp = meme_table_record.collectionNames.filter((item) => item !== collectionName);
     if (new_array_tmp.length == 0) {
       await DELETE_COLLECTION_MEME_TABLE_ENTRY_STMT.run(meme_filename);
@@ -56,12 +56,12 @@ async function Update_Collection_MEME_Connections(collectionName, current_collec
 exports.Update_Collection_MEME_Connections = Update_Collection_MEME_Connections;
 
 //never returns undefined, if it is not present, it is inserted by default
-async function Get_Collection_MEME_Record_From_DB(memeFileName) {
-  let row_obj = await GET_MEME_COLLECTION_TABLE_STMT.get(memeFileName);
+function Get_Collection_MEME_Record_From_DB(memeFileName) {
+  let row_obj = GET_MEME_COLLECTION_TABLE_STMT.get(memeFileName);
   if (row_obj == undefined) {
     //record non-existant so make one
-    await INSERT_MEME_TABLE_COLLECTION_STMT.run(memeFileName, JSON.stringify([]));
-    row_obj = await GET_MEME_COLLECTION_TABLE_STMT.get(memeFileName);
+    INSERT_MEME_TABLE_COLLECTION_STMT.run(memeFileName, JSON.stringify([]));
+    row_obj = GET_MEME_COLLECTION_TABLE_STMT.get(memeFileName);
   }
   row_obj = Get_Obj_Fields_From_Collection_MEME_Record(row_obj);
   return row_obj;
@@ -78,9 +78,9 @@ exports.Get_Obj_Fields_From_Collection_MEME_Record = Get_Obj_Fields_From_Collect
 //fn for the update of the collection image table connections
 
 //when an image is deleted its ability to serve as a meme is removed and it must be removed from collection meme sets
-async function Handle_Delete_Collection_MEME_references(fileName) {
+function Handle_Delete_Collection_MEME_references(fileName) {
   //this image may be a meme, get the meme links and from those images remove the refs to this fileName
-  let meme_row_obj = await GET_MEME_COLLECTION_TABLE_STMT.get(fileName);
+  let meme_row_obj = GET_MEME_COLLECTION_TABLE_STMT.get(fileName);
   if (meme_row_obj == undefined) {
     //is not listed as a meme for any other image
     return;

@@ -18,10 +18,15 @@ const UPDATE_TAGGING_BY_FILEHASH_STMT = DB.prepare(
 
 const DELETE_FILENAME_TAGGING_STMT = DB.prepare(`DELETE FROM ${TAGGING_TABLE_NAME} WHERE fileName=?`);
 const GET_TAGGING_ROWID_FROM_FILENAME_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE fileName=?;`);
+GET_TAGGING_ROWID_FROM_FILENAME_STMT.safeIntegers(true);
 const GET_NEXT_ROWID_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
+GET_NEXT_ROWID_STMT.safeIntegers(true);
 const GET_PREV_ROWID_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE ROWID < ? ORDER BY ROWID DESC LIMIT 1`);
+GET_PREV_ROWID_STMT.safeIntegers(true);
 const GET_MAX_ROWID_STMT = DB.prepare(`SELECT MAX(ROWID) AS rowid FROM ${TAGGING_TABLE_NAME}`);
+GET_MAX_ROWID_STMT.safeIntegers(true);
 const GET_MIN_ROWID_STMT = DB.prepare(`SELECT MIN(ROWID) AS rowid FROM ${TAGGING_TABLE_NAME}`);
+GET_MIN_ROWID_STMT.safeIntegers(true);
 const GET_TAGGING_ROW_COUNT = DB.prepare(`SELECT COUNT(*) AS rownum FROM ${TAGGING_TABLE_NAME}`);
 
 const GET_N_RAND_TAGGING_FILENAMES_STMT = DB.prepare(
@@ -37,6 +42,7 @@ const GET_N_RAND_TAGGING_ENTRIES_WITH_FACES_STMT = DB.prepare(
 let rowid_current;
 let rowid_max;
 let rowid_min;
+let rowid_prev;
 let record_num_tagging;
 
 Set_Max_Min_Rowid();
@@ -58,7 +64,8 @@ function Set_Max_Min_Rowid() {
 }
 
 function Get_ROWID_From_Filename(filename) {
-  return GET_TAGGING_ROWID_FROM_FILENAME_STMT.get(filename).rowid;
+  const result = GET_TAGGING_ROWID_FROM_FILENAME_STMT.get(filename);
+  return result ? result.rowid : null;
 }
 
 exports.Get_ROWID_From_Filename = Get_ROWID_From_Filename;
@@ -68,6 +75,7 @@ function Get_Tagging_ROWID_From_FileHash_BigInt(fileHash) {
   GET_TAGGING_ROWID_FROM_FILEHASH_STMT.safeIntegers(true); // Safe integers ON
   return GET_TAGGING_ROWID_FROM_FILEHASH_STMT.get(fileHash).rowid;
 }
+
 exports.Get_Tagging_ROWID_From_FileHash_BigInt = Get_Tagging_ROWID_From_FileHash_BigInt;
 
 function Get_Tagging_Records_From_ROWIDs_BigInt(rowids) {
@@ -84,22 +92,26 @@ function Get_Tagging_Records_From_ROWIDs_BigInt(rowids) {
 exports.Get_Tagging_Records_From_ROWIDs_BigInt = Get_Tagging_Records_From_ROWIDs_BigInt;
 
 //the function expects a +1,-1,0 for movement about the current rowid
+//TODO:
 function Step_Get_Annotation(filename, step) {
   if (step == 0 && filename == '') {
     let record = GET_RECORD_FROM_ROWID_TAGGING_STMT.get(rowid_current);
     return Get_Obj_Fields_From_Record(record);
   }
 
-  rowid_current = Get_ROWID_From_Filename(filename);
+  rowid_filename = Get_ROWID_From_Filename(filename);
+
+  if (!rowid_filename && rowid_prev) rowid_filename = rowid_prev;
 
   if (step == 1) {
-    rowid_current = GET_NEXT_ROWID_STMT.get(rowid_current)?.rowid;
+    rowid_current = GET_NEXT_ROWID_STMT.get(rowid_filename)?.rowid;
     rowid_current ??= rowid_min;
   } else if (step == -1) {
-    rowid_current = GET_PREV_ROWID_STMT.get(rowid_current)?.rowid;
+    rowid_current = GET_PREV_ROWID_STMT.get(rowid_filename)?.rowid;
     rowid_current ??= rowid_max;
   }
 
+  rowid_prev = rowid_current;
   let record = GET_RECORD_FROM_ROWID_TAGGING_STMT.get(rowid_current);
   return Get_Obj_Fields_From_Record(record);
 }
@@ -145,6 +157,11 @@ function Get_Memes_From_FileNames(filenames) {
 
 exports.Get_Memes_From_FileNames = Get_Memes_From_FileNames;
 
+/**
+ *
+ * @param {string} filename
+ * @returns {TaggingEntry}
+ */
 function Get_Tagging_Record_From_DB(filename) {
   let row_obj = GET_FILENAME_TAGGING_STMT.get(filename);
 

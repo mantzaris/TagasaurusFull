@@ -505,11 +505,18 @@ async function Reset_Image_Annotations() {
 }
 
 function Load_Image_State() {
-  Make_Blank_Tagging_View(); //empty all parts to be ready to add the annotation information
-  Emotion_Display_Fill(); //display the emotion set annotations
-  Meme_View_Fill();
-  Description_Hashtags_Display_Fill();
-  Display_Image();
+  const entry = current_tagging_entry.Get();
+  const path = GENERAL_HELPER_FNS.Full_Path_From_File_Name(entry.fileName);
+
+  if (!FS.existsSync(path)) {
+    Delete_Image(entry);
+  } else {
+    Make_Blank_Tagging_View(); //empty all parts to be ready to add the annotation information
+    Emotion_Display_Fill(); //display the emotion set annotations
+    Meme_View_Fill();
+    Description_Hashtags_Display_Fill();
+    Display_Image();
+  }
 }
 
 //called from the gallery widget, where 'n' is the number of images forward or backwards to move
@@ -520,7 +527,8 @@ function New_Image_Display(n) {
   }
 
   if (!current_tagging_entry.Get() || n == 0) {
-    current_tagging_entry.Set(DB_MODULE.Step_Get_Annotation('', 0));
+    const entry = DB_MODULE.Step_Get_Annotation('', 0);
+    current_tagging_entry.Set(entry);
   } else {
     current_tagging_entry.Set(DB_MODULE.Step_Get_Annotation(current_tagging_entry.Get_Key('fileName'), n));
   }
@@ -651,102 +659,29 @@ async function Load_Default_Taga_Image() {
     FS.copyFileSync(taga_source_path, taga_path, FS.constants.COPYFILE_EXCL);
   }
 
-  const tagging_entry = Object.assign({}, TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION);
-  tagging_entry.fileName = 'Taga.png';
-  tagging_entry.fileHash = MY_FILE_HELPER.Return_File_Hash(taga_path);
-  tagging_entry.fileType = await GetFileTypeFromFileName(tagging_entry.fileName);
-  tagging_entry.faceClusters = [];
+  const entry = Object.assign({}, TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION);
+  entry.fileName = 'Taga.png';
+  entry.fileHash = MY_FILE_HELPER.Return_File_Hash(taga_path);
+  entry.fileType = await GetFileTypeFromFileName(entry.fileName);
+  entry.faceClusters = [];
+  current_tagging_entry.Set(entry);
 
-  DB_MODULE.Insert_Record_Into_DB(tagging_entry);
+  try {
+    DB_MODULE.Insert_Record_Into_DB(entry);
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 async function Delete_Image() {
-  // delete face clusters which reference this image
-  await Handle_Delete_FileFrom_Cluster();
-  const { fileName, fileHash, taggingMemeChoices, faceDescriptors } = current_tagging_entry.Get();
-  const img_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${fileName}`;
-
-  if (FS.existsSync(img_path)) {
-    FS.unlinkSync(img_path);
-  }
-
-  await DB_MODULE.Update_Tagging_MEME_Connections(fileName, taggingMemeChoices, []);
-  DB_MODULE.Handle_Delete_Image_MEME_References(fileName);
-
-  DB_MODULE.Handle_Delete_Collection_IMAGE_references(fileName);
-  await DB_MODULE.Handle_Delete_Collection_MEME_references(fileName);
-
-  if (faceDescriptors.length > 0) {
-    const rowid = DB_MODULE.Get_Tagging_ROWID_From_FileHash_BigInt(fileHash);
-    ipcRenderer.invoke('faiss-remove', rowid);
-  }
-
-  if (DB_MODULE.Number_of_Tagging_Records() == 0) {
-    await Load_Default_Taga_Image();
-    New_Image_Display(0);
-  } else {
-    New_Image_Display(1);
-  }
-
-  DB_MODULE.Delete_Tagging_Annotation_DB(fileName);
-}
-
-async function Handle_Delete_FileFrom_Cluster() {
-  const { fileName, taggingTags, faceClusters } = current_tagging_entry.Get();
-  const face_clusters = DB_MODULE.Get_FaceClusters_From_IDS(faceClusters);
-
-  const empty_clusters = [];
-  const updated_clusters = [];
-
-  for (let i = 0; i < face_clusters.length; i++) {
-    const cluster = face_clusters[i];
-
-    delete cluster.relatedFaces[fileName];
-
-    const remaining_related_faces = Object.values(cluster.relatedFaces).flatMap((v) => v);
-
-    if (remaining_related_faces.length == 0) {
-      empty_clusters.push(cluster.rowid);
-      continue;
+  GENERAL_HELPER_FNS.Remove_Relations_To_File(current_tagging_entry.Get(), async () => {
+    if (DB_MODULE.Number_of_Tagging_Records() == 0) {
+      await Load_Default_Taga_Image();
+      New_Image_Display(1);
+    } else {
+      New_Image_Display(1);
     }
-
-    const avg = ComputeAvgFaceDescriptor(remaining_related_faces);
-    cluster.avgDescriptor = avg;
-
-    for (const tag of taggingTags) {
-      cluster.keywords[tag] = (cluster.keywords[tag] || 1) - 1;
-      if (cluster.keywords[tag] == 0) delete cluster.keywords[tag];
-    }
-
-    delete cluster.images[fileName];
-
-    updated_clusters.push(cluster);
-
-    if (face_clusters[i].thumbnail == fileName) {
-      DB_MODULE.Update_FaceCluster_Thumbnail(face_clusters[i].rowid, null);
-    }
-  }
-
-  if (empty_clusters.length > 0) DB_MODULE.Delete_FaceClusters_By_IDS(empty_clusters);
-
-  for (const { rowid, avgDescriptor, relatedFaces, keywords, images } of updated_clusters) {
-    DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, rowid);
-  }
-
-  //deleting lingering meme references, images which use this image as a meme on their face cluster
-  const { fileNames } = await DB_MODULE.Get_Tagging_MEME_Record_From_DB(fileName);
-  const cluster_ids = DB_MODULE.Get_Tagging_ClusterIDS_From_FileNames(fileNames);
-
-  const clusters = DB_MODULE.Get_FaceClusters_From_IDS(cluster_ids);
-
-  for (let i = 0; i < clusters.length; i++) {
-    for (const [filename, data] of Object.entries(clusters[i].images)) {
-      clusters[i].images[filename].memes = data.memes.filter((filename) => filename != fileName);
-
-      const { rowid, avgDescriptor, relatedFaces, keywords, images } = clusters[i];
-      DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, rowid);
-    }
-  }
+  });
 }
 
 //dialog window explorer to select new images to import, and calls the functions to update the view

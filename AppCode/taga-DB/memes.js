@@ -25,6 +25,16 @@ exports.Get_All_TaggingMeme_Records_From_DB = Get_All_TaggingMeme_Records_From_D
 async function Get_Tagging_MEME_Record_From_DB(filename) {
   let record = GET_FILENAME_TAGGING_MEME_STMT.get(filename);
 
+  if (!record) return null;
+
+  return Get_Obj_Fields_From_MEME_Record(record);
+}
+
+exports.Get_Tagging_MEME_Record_From_DB = Get_Tagging_MEME_Record_From_DB;
+
+async function Get_or_Create_Tagging_MEME_Record_From_DB(filename) {
+  let record = GET_FILENAME_TAGGING_MEME_STMT.get(filename);
+
   if (!record) {
     const fileType = await GetFileTypeFromFileName(filename);
     INSERT_MEME_TABLE_TAGGING_STMT.run(filename, fileType, JSON.stringify([]));
@@ -34,7 +44,7 @@ async function Get_Tagging_MEME_Record_From_DB(filename) {
   return Get_Obj_Fields_From_MEME_Record(record);
 }
 
-exports.Get_Tagging_MEME_Record_From_DB = Get_Tagging_MEME_Record_From_DB;
+exports.Get_or_Create_Tagging_MEME_Record_From_DB = Get_or_Create_Tagging_MEME_Record_From_DB;
 
 function Update_Tagging_Meme_Entry(entry) {
   UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT.run(JSON.stringify(entry.fileNames), entry.fileName);
@@ -52,14 +62,14 @@ exports.Insert_Meme_Tagging_Entry = Insert_Meme_Tagging_Entry;
 async function Update_Tagging_MEME_Connections(file_name, current_memes, new_memes) {
   //add memes not already present in the current meme array
   for (const to_add_fn of new_memes.filter((x) => !current_memes.includes(x))) {
-    const meme_record = await Get_Tagging_MEME_Record_From_DB(to_add_fn);
+    const meme_record = await Get_or_Create_Tagging_MEME_Record_From_DB(to_add_fn);
     meme_record['fileNames'].push(file_name);
     UPDATE_FILENAME_MEME_TABLE_TAGGING_STMT.run(JSON.stringify(meme_record['fileNames']), to_add_fn);
   }
 
   // get the memes which no longer include this file (left difference [1,2,3] diff-> [1,3,4] => [2]) and from [2] remove/subtract the image filename from the array: difference = arr1.filter(x => !arr2.includes(x));
   for (const to_remove_fn of current_memes.filter((x) => !new_memes.includes(x))) {
-    const record = await Get_Tagging_MEME_Record_From_DB(to_remove_fn);
+    const record = await Get_or_Create_Tagging_MEME_Record_From_DB(to_remove_fn);
     const updated_memes = record.fileNames.filter((item) => item !== file_name);
 
     if (updated_memes.length == 0) {

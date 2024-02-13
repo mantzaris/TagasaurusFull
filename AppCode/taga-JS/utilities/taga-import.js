@@ -148,7 +148,7 @@ async function HandleImport() {
   for (const incoming_meme of meme_import) {
     const { _id, connected_to } = incoming_meme;
 
-    const existing_record = await DB_MODULE.Get_Tagging_MEME_Record_From_DB(file_hash_to_name_map.get(_id));
+    const existing_record = await DB_MODULE.Get_or_Create_Tagging_MEME_Record_From_DB(file_hash_to_name_map.get(_id));
     incoming_meme.connected_to = connected_to.map((m) => file_hash_to_name_map.get(m));
 
     if (existing_record) {
@@ -214,7 +214,7 @@ async function HandleImport() {
     for (const incoming of collection_memes_import) {
       const { _id, collection_names } = incoming;
       const file_name = file_hash_to_name_map.get(_id);
-      const entry_orig = await DB_MODULE.Get_Collection_MEME_Record_From_DB(file_name);
+      const entry_orig = DB_MODULE.Get_Collection_MEME_Record_From_DB(file_name);
 
       if (entry_orig) {
         entry_orig.collectionNames = MergeArrays(entry_orig.collectionNames, collection_names);
