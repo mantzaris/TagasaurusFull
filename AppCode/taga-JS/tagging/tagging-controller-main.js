@@ -588,27 +588,23 @@ function fromBinary(binary) {
   return result;
 }
 
+//TODO: deal with
 async function Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags, fileName, newMemes }, clustersIDS) {
-  const additions = newTags.filter((item) => !origTags.includes(item));
-  const subtractions = origTags.filter((item) => !newTags.includes(item));
-  const clusters = DB_MODULE.Get_FaceClusters_From_IDS(clustersIDS);
-
-  for (let i = 0; i < clusters.length; i++) {
-    for (const key of additions) {
-      clusters[i].keywords[key] = (clusters[i].keywords[key] || 0) + 1;
-    }
-
-    for (const key of subtractions) {
-      clusters[i].keywords[key] = (clusters[i].keywords[key] || 1) - 1;
-      if (clusters[i].keywords[key] == 0) delete clusters[i].keywords[key];
-    }
-
-    clusters[i].images[fileName].memes = newMemes;
-
-    const { rowid, avgDescriptor, relatedFaces, keywords, images } = clusters[i];
-
-    DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, rowid);
-  }
+  // const additions = newTags.filter((item) => !origTags.includes(item));
+  // const subtractions = origTags.filter((item) => !newTags.includes(item));
+  // const clusters = DB_MODULE.Get_FaceClusters_From_IDS(clustersIDS);
+  // for (let i = 0; i < clusters.length; i++) {
+  //   for (const key of additions) {
+  //     clusters[i].keywords[key] = (clusters[i].keywords[key] || 0) + 1;
+  //   }
+  //   for (const key of subtractions) {
+  //     clusters[i].keywords[key] = (clusters[i].keywords[key] || 1) - 1;
+  //     if (clusters[i].keywords[key] == 0) delete clusters[i].keywords[key];
+  //   }
+  //   clusters[i].images[fileName].memes = newMemes;
+  //   const { rowid, avgDescriptor, relatedFaces, keywords, images } = clusters[i];
+  //   DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, rowid);
+  // }
 }
 
 async function Save_Image_Annotation_Changes() {

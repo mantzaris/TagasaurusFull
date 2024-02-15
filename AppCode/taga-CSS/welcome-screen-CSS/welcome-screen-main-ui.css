@@ -18,6 +18,10 @@
   text-shadow: 7px 12px 12px var(--primary-400), -3px 10px 12px var(--primary-300);
 }
 
+#scores-div-id {
+  width: 80%;
+}
+
 .main-screen-button-styles {
   width: 80%;
   height: 80%;

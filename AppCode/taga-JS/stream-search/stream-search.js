@@ -108,11 +108,13 @@ function StartScreen() {
 
     images_div.style.display = 'block';
   } else if (selection_mode.keywords && selection_mode.images && selection_mode.memes) {
+    document.getElementById('stream-view').classList.add('grid-keywords-images-memes');
     keyword_div = document.getElementById('keyword-display-div');
     images_div = document.getElementById('images-display-div');
     memes_div = document.getElementById('memes-display-div');
 
     images_div.style.display = 'block';
+    memes_div.style.display = 'block';
   }
 }
 
@@ -431,7 +433,7 @@ async function UpdateSearchResults() {
         images.push(entry.fileName); //check filetype? TODO: if video use thumbnail else normal file
 
         //memes
-        if (entry.taggingMemeChoices.length > 0) memes.push(entry.taggingMemeChoices);
+        if (entry.taggingMemeChoices.length > 0) memes.push(...entry.taggingMemeChoices); //TODO: check filetype?
       }
     }
 
@@ -441,6 +443,7 @@ async function UpdateSearchResults() {
   }
 
   Remove_Thumbnail_Events();
+  //TODO: not call certain functions depending upon stream mode? eg no memes?
   Display_Keywords();
   Display_Images_Found();
   Display_Memes_Found();
@@ -467,22 +470,6 @@ async function Detect_Faces() {
     rect_face_array.push(rect_face_tmp);
   }
   detect_faces_time_stamp = Date.now();
-}
-
-function Display_Keywords() {
-  keyword_div.innerHTML = '';
-  let keywords_html = '<strong>Keywords:</strong><br>';
-  const unique_keywords_flat = [...new Set(keywords.flat())];
-
-  for (const keyword of unique_keywords_flat) {
-    keywords_html += `
-                          <div class="keyword">
-                              ${keyword}
-                          </div>
-                          `;
-  }
-
-  keyword_div.innerHTML = keywords_html;
 }
 
 let thumbnail_div_listeners = [];
@@ -512,13 +499,31 @@ function Create_Thumbnail_Events() {
   }
 }
 
+function Display_Keywords() {
+  keyword_div.innerHTML = '';
+  let keywords_html = '<span class="badge bg-secondary">Keywords</span><br>';
+
+  const unique_keywords_flat = [...new Set(keywords.flat())];
+
+  for (const keyword of unique_keywords_flat) {
+    keywords_html += `
+                          <div class="keyword">
+                              ${keyword}
+                          </div>
+                          `;
+  }
+
+  keyword_div.innerHTML = keywords_html;
+}
+
 function Display_Images_Found() {
   if (!selection_mode.images) return;
 
   images_div.innerHTML = '';
-  images_html = 'Images: <br>';
+  images_html = '<span class="badge bg-secondary">Images</span><br>';
 
   for (const image of images) {
+    //TODO: use PATH.join  instead of PATH.sep?
     images_html += `
                           <div class="image-thumbnail-div thumbnail-with-goto" data-filename="${image}">
                               <img class="image-thumbnail"  src="${TAGA_DATA_DIRECTORY}${PATH.sep}${image}" title="view" alt="img" />
@@ -532,12 +537,13 @@ function Display_Memes_Found() {
   if (!selection_mode.memes) return;
 
   memes_div.innerHTML = '';
-  memes_html = 'Memes: <br>';
+  memes_html = '<span class="badge bg-secondary">Memes</span><br>';
 
   // TODO: filter on filetype?..
   for (const meme of memes) {
+    //TODO: use PATH.join  instead of PATH.sep?
     memes_html += `
-                          <div class="meme-thumbnail-div thumbnail-with-goto">
+                          <div class="meme-thumbnail-div thumbnail-with-goto" data-filename="${meme}">
                               <img class="meme-thumbnail" id="" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme}" title="view" alt="meme" />
                           </div>
                           `;
