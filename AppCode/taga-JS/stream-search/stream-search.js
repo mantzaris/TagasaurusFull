@@ -3,25 +3,29 @@ const PATH = require('path');
 
 const { DB_MODULE, GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
 
-const IMAGE_SELECTION_NUM = 10;
+const MAX_SELECTION_NUM = 10;
 
-let kind = 'webcam';
+const selection_mode = {
+  keywords: true,
+  images: false,
+  memes: false,
+};
 
-let media_source;
+let kind = 'webcam'; //default video source
+
 let video_el = document.getElementById('inputVideo');
-let photo_frozen;
 let canvas_el = document.getElementById('canvas-stream');
-let streaming = false;
 let ctx;
 let photo;
 let width = 0;
 let height = 0;
+
+let media_source;
+let photo_frozen;
+let streaming = false;
 let stream_ok = false;
 let selection_sources;
 let stream_paused = false;
-
-let homing_mode = false;
-let homing_face_selected = { x: 0, y: 0, width: 0, height: 0, descriptor: [] };
 
 //let clusters = new Map();
 let keywords = [];
@@ -29,16 +33,22 @@ let images = [];
 let memes = [];
 
 let keyword_div;
-
-let outline_face_not_in_focus = false; //don't outline and highlight faces that are not being investigated
-let rect_face_selected = { x: 0, y: 0, width: 0, height: 0, descriptor: [] }; //holds the selected face which descriptors focus on in this cycle
-let detect_faces_time_stamp = 0; // Date.now();
-const detect_faces_interval = 300;
-const switch_face_interval = 4000;
-let switched_face_time_stamp = 0; //Date.now();
+let images_div;
+let memes_div;
 
 let rect_face_array = []; //storing the each face detected for that run of the face detection api (rewrites itself each time to be fresh)
 const EMPTY_RECT_FACE = { x: 0, y: 0, width: 0, height: 0, descriptor: [] }; //the outputs held from the faceapi run
+
+let homing_mode = false;
+let homing_face_selected = { x: 0, y: 0, width: 0, height: 0, descriptor: [] };
+
+let outline_face_not_in_focus = false; //don't outline and highlight faces that are not being investigated only the focus
+let rect_face_selected = { x: 0, y: 0, width: 0, height: 0, descriptor: [] }; //holds the selected face which descriptors focus on in this cycle
+
+const detect_faces_interval = 300;
+const switch_face_interval = 4000;
+let detect_faces_time_stamp = 0; // Date.now();
+let switched_face_time_stamp = 0; //Date.now();
 
 const keywords_only_description =
   'Displays keywords related to faces stored. Finds images/videos/gifs containing a similar face and displays the keywords from the description.';
@@ -54,18 +64,15 @@ const home_btn = document.getElementById('home-btn');
 const selection_set = document.getElementById('search-type');
 const selection_description = document.getElementById('stream-type-description');
 const stop_stream_btn = document.getElementById('return-stream-btn');
+
+selection_description.innerText = keywords_only_description; //set for the default
+
 stop_stream_btn.onclick = () => {
-  document.getElementById('images-display-div').style.display = 'none';
-  Stop_Stream_Search();
+  document.getElementById('stream-view').style.display = 'none';
+  document.getElementById('stream-view').className = '';
+  Stop_Stream_Search(); //reloads the whole page fresh
 };
 
-const selection_mode = {
-  keywords: true,
-  images: false,
-  memes: false,
-};
-
-selection_description.innerText = keywords_only_description;
 window.addEventListener('resize', ResizeCanvas);
 window.addEventListener('orientationchange', ResizeCanvas);
 home_btn.onclick = () => {
@@ -105,22 +112,18 @@ function StartScreen() {
     document.getElementById('stream-view').classList.add('grid-keywords-images');
     keyword_div = document.getElementById('keyword-display-div');
     images_div = document.getElementById('images-display-div');
-
-    images_div.style.display = 'block';
   } else if (selection_mode.keywords && selection_mode.images && selection_mode.memes) {
     document.getElementById('stream-view').classList.add('grid-keywords-images-memes');
     keyword_div = document.getElementById('keyword-display-div');
     images_div = document.getElementById('images-display-div');
     memes_div = document.getElementById('memes-display-div');
-
-    images_div.style.display = 'block';
-    memes_div.style.display = 'block';
   }
 }
 
-document.getElementById('pause-btn').onclick = () => {
+document.getElementById('freeze-btn').onclick = () => {
   stream_paused = !stream_paused;
-  document.getElementById('pause-btn').innerText = stream_paused ? 'Resume' : 'Freeze';
+  document.getElementById('freeze-btn').innerText = stream_paused ? 'Resume' : 'Freeze';
+
   photo_frozen = photo.cloneNode(true);
 
   ctx.clearRect(0, 0, canvas_el.width, canvas_el.height);
@@ -131,7 +134,10 @@ document.getElementById('pause-btn').onclick = () => {
   photo_frozen.src = data;
 };
 
-canvas_el.onclick = (event) => {
+/////////////////////////////////////////////////////////////
+//clicking on canvas toggles homing_mode, selects/deselects a face shown
+////////////////////////////////////////////////////////////
+canvas_el.onclick = async (event) => {
   const px = Math.floor(event.offsetX);
   const py = Math.floor(event.offsetY);
 
@@ -144,24 +150,24 @@ canvas_el.onclick = (event) => {
     }
   }
 
-  if (clicked_face == null) return;
-
-  if (homing_mode) {
-    const score = Get_Descriptors_DistanceScore([clicked_face.descriptor], [homing_face_selected.descriptor]);
-    if (score > FACE_DISTANCE_IMAGE) {
-      homing_mode = false;
-      Render_Bounding_Boxes();
-      return;
-    }
+  //clicking off of a face turns homing mo
+  if (clicked_face == null) {
+    homing_mode = false;
+    Render_Bounding_Boxes();
+    return;
   }
 
   homing_mode = true;
   Object.assign(homing_face_selected, clicked_face);
 
-  rect_face_selected = homing_face_selected;
+  // rect_face_selected = homing_face_selected;
+  Object.assign(rect_face_selected, clicked_face);
+
+  await UpdateSearchResults();
   Render_Bounding_Boxes();
 };
 
+//runs on page/window load
 ipcRenderer.invoke('getCaptureID').then((sources) => {
   selection_sources = document.getElementById('source-type');
   const src = document.createElement('option');
@@ -291,21 +297,58 @@ function Take_Picture() {
   photo.setAttribute('src', data);
 }
 
-async function MainLoop() {
-  Take_Picture();
-  await Detect_Faces();
+async function Detect_Faces() {
+  const elapsed_since_last_detection = Date.now() - detect_faces_time_stamp;
+  if (elapsed_since_last_detection < detect_faces_interval) return;
 
-  if (homing_mode) {
-    await Handle_Homing_Mode();
-  } else {
-    await Handle_Default_Search();
+  let detections = await Get_Image_Face_Descriptors_And_Expresssions_From_HTML_Image(photo);
+
+  rect_face_array = [];
+  for (const face of detections) {
+    let { x, y, width, height } = face.detection.box;
+    let rect_face_tmp = {
+      x,
+      y,
+      width,
+      height,
+      descriptor: face.descriptor,
+    };
+
+    rect_face_array.push(rect_face_tmp);
+  }
+  detect_faces_time_stamp = Date.now();
+}
+
+async function Handle_Homing_Mode() {
+  const best_scoring_face = Find_Most_Similar_Descriptor(homing_face_selected.descriptor, FACE_DISTANCE_IMAGE);
+
+  if (best_scoring_face) {
+    homing_face_selected = best_scoring_face;
+    return;
   }
 
-  await UpdateSearchResults();
+  homing_mode = false;
+}
 
-  Render_Bounding_Boxes();
+async function MainLoop() {
+  if (!stream_paused) {
+    Take_Picture();
+    await Detect_Faces(); //populates rect_face_array on interval internally
 
-  requestAnimationFrame(MainLoop);
+    if (homing_mode) {
+      await Handle_Homing_Mode();
+    } else {
+      await Handle_Default_Search();
+    }
+
+    // await UpdateSearchResults(); //moved to places where the face is changed.
+
+    Render_Bounding_Boxes();
+  }
+
+  setTimeout(() => {
+    requestAnimationFrame(MainLoop);
+  }, 100); //requestAnimationFrame(MainLoop);
 }
 
 function Select_Random_Face() {
@@ -321,6 +364,7 @@ async function Handle_Default_Search() {
   if (elapsed_since_face_switched >= switch_face_interval) {
     rect_face_selected = Select_Random_Face();
     switched_face_time_stamp = Date.now();
+    await UpdateSearchResults();
     return;
   }
 
@@ -332,6 +376,7 @@ async function Handle_Default_Search() {
   }
 
   rect_face_selected = Select_Random_Face();
+  await UpdateSearchResults();
   switched_face_time_stamp = Date.now();
 }
 
@@ -356,20 +401,9 @@ function Find_Most_Similar_Descriptor(descriptor, threshold) {
   return null;
 }
 
-async function Handle_Homing_Mode() {
-  const best_scoring_face = Find_Most_Similar_Descriptor(homing_face_selected.descriptor, FACE_DISTANCE_IMAGE);
-
-  if (best_scoring_face) {
-    homing_face_selected = best_scoring_face;
-    return;
-  }
-
-  homing_mode = false;
-}
-
 function Render_Bounding_Boxes() {
   if (stream_paused) {
-    // If the stream is paused, draw the photo_frozen and return
+    // If the stream is paused, draw the photo_frozen and return, no boxes for static image
     ctx.drawImage(photo_frozen, 0, 0, width, height);
     return;
   }
@@ -392,20 +426,26 @@ function Render_Bounding_Boxes() {
 }
 
 async function UpdateSearchResults() {
-  //do this less frequently not every possible frame, like 1/second TODO:
   keywords = [];
   images = [];
   memes = [];
 
   const selected = rect_face_selected; //homing_mode ? homing_face_selected : rect_face_selected;
-  if (selected.descriptor.length == 128) {
-    //console.log(`L2 selected.descriptor = ${calculateL2Norm(selected.descriptor)}`);
 
-    //TODO: L2 distances threshold at around 0.17 and IP at 0.92
-    const { distances, rowids } = await ipcRenderer.invoke('faiss-search', selected.descriptor, IMAGE_SELECTION_NUM);
+  if (selected.descriptor.length == 128) {
+    //L2 distances threshold at around 0.17 and IP at 0.92
+    const { distances, rowids } = await ipcRenderer.invoke('faiss-search', selected.descriptor, MAX_SELECTION_NUM);
+
+    const validIndices = distances
+      .map((distance, index) => ({ distance, index }))
+      .filter((item) => item.distance <= 0.2)
+      .map((item) => item.index);
+
+    const filteredRowids = validIndices.map((index) => rowids[index]);
+    const filteredDistances = validIndices.map((index) => distances[index]);
 
     // descending when using inner produce and ascending using euclidean
-    let rowids_sorted = GENERAL_HELPER_FNS.Sort_Based_On_Scores_ASC(distances, rowids);
+    let rowids_sorted = GENERAL_HELPER_FNS.Sort_Based_On_Scores_ASC(filteredDistances, filteredRowids);
     //remove duplicates
     let uniqueRowidsSorted = [];
     let seen = new Set();
@@ -426,14 +466,13 @@ async function UpdateSearchResults() {
       if (index !== -1) {
         const entry = tagging_entries[index];
 
-        //keywords
+        if (entry.fileType == 'video') continue; //TODO: maybe put a video thumbnail instead?
+
         if (entry.taggingTags.length > 0) keywords.push(entry.taggingTags);
 
-        //memes
-        images.push(entry.fileName); //check filetype? TODO: if video use thumbnail else normal file
+        images.push(entry.fileName);
 
-        //memes
-        if (entry.taggingMemeChoices.length > 0) memes.push(...entry.taggingMemeChoices); //TODO: check filetype?
+        if (entry.taggingMemeChoices.length > 0) memes.push(...entry.taggingMemeChoices);
       }
     }
 
@@ -443,33 +482,13 @@ async function UpdateSearchResults() {
   }
 
   Remove_Thumbnail_Events();
-  //TODO: not call certain functions depending upon stream mode? eg no memes?
   Display_Keywords();
-  Display_Images_Found();
-  Display_Memes_Found();
+
+  if (selection_mode.images) Display_Images_Found();
+
+  if (selection_mode.memes) Display_Memes_Found();
+
   Create_Thumbnail_Events();
-}
-
-async function Detect_Faces() {
-  const elapsed_since_last_detection = Date.now() - detect_faces_time_stamp;
-  if (elapsed_since_last_detection < detect_faces_interval) return;
-
-  let detections = await Get_Image_Face_Descriptors_And_Expresssions_From_HTML_Image(photo);
-
-  rect_face_array = [];
-  for (const face of detections) {
-    let { x, y, width, height } = face.detection.box;
-    let rect_face_tmp = {
-      x,
-      y,
-      width,
-      height,
-      descriptor: face.descriptor,
-    };
-
-    rect_face_array.push(rect_face_tmp);
-  }
-  detect_faces_time_stamp = Date.now();
 }
 
 let thumbnail_div_listeners = [];
@@ -523,7 +542,6 @@ function Display_Images_Found() {
   images_html = '<span class="badge bg-secondary">Images</span><br>';
 
   for (const image of images) {
-    //TODO: use PATH.join  instead of PATH.sep?
     images_html += `
                           <div class="image-thumbnail-div thumbnail-with-goto" data-filename="${image}">
                               <img class="image-thumbnail"  src="${TAGA_DATA_DIRECTORY}${PATH.sep}${image}" title="view" alt="img" />
@@ -539,9 +557,7 @@ function Display_Memes_Found() {
   memes_div.innerHTML = '';
   memes_html = '<span class="badge bg-secondary">Memes</span><br>';
 
-  // TODO: filter on filetype?..
   for (const meme of memes) {
-    //TODO: use PATH.join  instead of PATH.sep?
     memes_html += `
                           <div class="meme-thumbnail-div thumbnail-with-goto" data-filename="${meme}">
                               <img class="meme-thumbnail" id="" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme}" title="view" alt="meme" />
@@ -555,29 +571,39 @@ function Display_Memes_Found() {
 ////////////////////
 // OLD CODE
 ///////////////////
-async function PullTaggingClusters() {
-  const all_face_clusters = DB_MODULE.Get_All_FaceClusters();
+// async function PullTaggingClusters() {
+//   const all_face_clusters = DB_MODULE.Get_All_FaceClusters();
 
-  for (const face_cluster of all_face_clusters) {
-    for (const [fileName, fileTypeAndMemes] of Object.entries(face_cluster.images)) {
-      if (fileTypeAndMemes.fileType != 'image' && fileTypeAndMemes.fileType != 'gif') {
-        delete face_cluster.images[fileName];
+//   for (const face_cluster of all_face_clusters) {
+//     for (const [fileName, fileTypeAndMemes] of Object.entries(face_cluster.images)) {
+//       if (fileTypeAndMemes.fileType != 'image' && fileTypeAndMemes.fileType != 'gif') {
+//         delete face_cluster.images[fileName];
 
-        continue;
-      }
+//         continue;
+//       }
 
-      if (!face_cluster.memes) face_cluster.memes = [];
+//       if (!face_cluster.memes) face_cluster.memes = [];
 
-      if (selection_mode.memes) {
-        face_cluster.memes = [...face_cluster.memes, ...fileTypeAndMemes.memes];
-      }
+//       if (selection_mode.memes) {
+//         face_cluster.memes = [...face_cluster.memes, ...fileTypeAndMemes.memes];
+//       }
 
-      clusters.set(face_cluster.rowid, face_cluster);
-    }
-  }
-}
+//       clusters.set(face_cluster.rowid, face_cluster);
+//     }
+//   }
+// }
 
-function calculateL2Norm(vector) {
-  let sumOfSquares = vector.reduce((sum, value) => sum + value * value, 0);
-  return Math.sqrt(sumOfSquares);
-}
+// function calculateL2Norm(vector) {
+//   let sumOfSquares = vector.reduce((sum, value) => sum + value * value, 0);
+//   return Math.sqrt(sumOfSquares);
+// }
+
+//homing mode was on but the original face not close so it is turned off
+// if (homing_mode) {
+//   const score = Get_Descriptors_DistanceScore([clicked_face.descriptor], [homing_face_selected.descriptor]);
+//   if (score > FACE_DISTANCE_IMAGE) {
+//     homing_mode = false;
+//     Render_Bounding_Boxes();
+//     return;
+//   }
+// }
