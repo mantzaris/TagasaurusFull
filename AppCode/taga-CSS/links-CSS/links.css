@@ -1,0 +1,20 @@
+#link-items-div-id {
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--bg);
+  overflow-y: auto;
+}
+
+#return-to-main-btn-div-id {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+#return-to-main-btn-id {
+  height: 7vh;
+  width: 80%;
+  font-size: 3.5vmin;
+  font-weight: bold;
+}
