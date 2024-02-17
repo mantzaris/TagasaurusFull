@@ -6,7 +6,7 @@ body {
   overflow: hidden;
 }
 
-#export-screen-id {
+#import-screen-id {
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -24,7 +24,7 @@ body {
   gap: 3rem;
 }
 
-#export-button-id,
+#import-button-id,
 #mainmenu-button-id {
   font-size: clamp(1rem, 3vmin, 4rem);
 }

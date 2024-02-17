@@ -19,7 +19,10 @@
 }
 
 #scores-div-id {
-  width: 80%;
+  width: 80% !important;
+}
+#scores-div-id .row > .col {
+  width: 100% !important; /* Ensures the columns take full width of the parent */
 }
 
 .main-screen-button-styles {
@@ -30,8 +33,8 @@
 }
 
 .progress-container {
-  width: 80%;
-  margin: auto; /* Center the progress bar containers */
+  width: 100%;
+  margin: auto;
 }
 
 .progress-container label {
@@ -39,6 +42,8 @@
 }
 
 .progress {
+  background-color: #aaa !important;
+  width: 100% !important;
   height: clamp(5px, 3vh, 50px) !important; /* important overrides bootstrap */
   font-size: clamp(3px, 1.2rem, 35px) !important; /* min, preferred, max */
 }
@@ -56,4 +61,24 @@
   align-items: center;
   justify-content: center;
   transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+/* Override Bootstrap container for all sizes */
+.container,
+.container-sm,
+.container-md,
+.container-lg,
+.container-xl,
+.container-xxl {
+  max-width: none !important;
+}
+
+/* Or set a specific max-width for all sizes */
+.container,
+.container-sm,
+.container-md,
+.container-lg,
+.container-xl,
+.container-xxl {
+  max-width: 80% !important;
 }

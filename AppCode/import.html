@@ -6,34 +6,50 @@
     <!-- The CSS variables common to the app -->
     <link rel="stylesheet" href="../AppCode/taga-CSS/variables.css" />
 
-    <!-- general styles for buttons etc -->
-    <link rel="stylesheet" href="./taga-CSS/general-styles.css" />
-
-    <!-- css for this export page -->
-    <link rel="stylesheet" href="./taga-CSS/export-CSS/export-main-ui.css" />
+    <!-- css for this import page -->
+    <link rel="stylesheet" href="./taga-CSS/import-CSS/import.css" />
 
     <!-- style sheet for the processing message modal -->
     <link rel="stylesheet" href="./taga-CSS/processing-message-modal.css" />
+
+    <script src="../Assets/bootstrap/popper.min.js" defer></script>
+    <script src="../Assets/bootstrap/bootstrap.min.js" defer></script> 
+    <link href="../Assets/bootstrap/bootstrap.min.css" rel="stylesheet" > 
+
   </head>
 
   <body>
-    <div id="export-screen-id">
-      <div id="titleRow">
-        <div id="text-description">Import the annotation information from a Taga Export</div>
-        <div id="btn-row">
-          <button type="button" class="fun-button-blue" id="import-button-id">IMPORT DATA</button>
-          or
-          <button onclick="window.location.href='./welcome-screen.html'" type="button" class="fun-button-blue" id="mainmenu-button-id">Return to Main</button>
+    <div id="import-screen-id">
+
+      <div id="import-screen-id" class="d-flex flex-column">
+        <div class="container">
+          <div class="row">
+            <div class="col-12 text-center">
+              <div id="text-description" class="mb-3 fs-1">Import data from a prior Taga Export</div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 text-center">
+              <div id="btn-row" class="btn-group" role="group">
+                <button id="import-button-id" type="button" class="btn btn-primary btn-lg m-2">Import Data</button>
+                <button id="mainmenu-button-id" onclick="window.location.href='./welcome-screen.html'" type="button" class="btn btn-primary btn-lg m-2">Return to Main</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
 
-    <div id="processing-notice-modal-top-div-id" class="processing-notice-modal-top-div-class">
-      <div id="processing-notice-modal-content-div-id" class="processing-notice-modal-content-div-class">
-        <div class="spinner"></div>
+      <div id="processing-notice-modal-top-div-id" class="processing-notice-modal-top-div-class">
+        <div id="processing-notice-modal-content-div-id" class="processing-notice-modal-content-div-class">
+          <div class="spinner">
 
-        PROCESSING...
+          </div>
+
+          PROCESSING...
+        </div>
       </div>
+
     </div>
   </body>
 

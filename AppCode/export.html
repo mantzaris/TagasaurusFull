@@ -6,26 +6,43 @@
     <!-- The CSS variables common to the app -->
     <link rel="stylesheet" href="../AppCode/taga-CSS/variables.css" />
 
-    <!-- general styles for buttons etc -->
-    <link rel="stylesheet" href="./taga-CSS/general-styles.css" />
-
     <!-- css for this export page -->
     <link rel="stylesheet" href="./taga-CSS/export-CSS/export-main-ui.css" />
 
     <!-- style sheet for the processing message modal -->
     <link rel="stylesheet" href="./taga-CSS/processing-message-modal.css" />
+
+
+    <script src="../Assets/bootstrap/popper.min.js" defer></script>
+    <script src="../Assets/bootstrap/bootstrap.min.js" defer></script> 
+    <link href="../Assets/bootstrap/bootstrap.min.css" rel="stylesheet" > 
+
+
   </head>
 
   <body>
     <div id="export-screen-id">
-      <div id="titleRow">
-        <div id="text-description">Export the annotation information as a set of JSON files and the media files stored</div>
-        <div id="btn-row">
-          <button type="button" class="fun-button-blue" id="export-button-id">EXPORT DATA</button>
-          or
-          <button onclick="window.location.href='./welcome-screen.html'" type="button" class="fun-button-blue" id="mainmenu-button-id">Return to Main</button>
+      
+      
+      <div id="export-screen-id" class="d-flex flex-column">
+        <div class="container">
+          <div class="row">
+            <div class="col-12 text-center">
+              <div id="text-description" class="mb-3 fs-1">Export All Taga Data</div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 text-center">
+              <div id="btn-row" class="btn-group" role="group">
+                <button id="export-button-id" type="button" class="btn btn-primary btn-lg m-2">Export Data</button>
+                <button id="mainmenu-button-id" onclick="window.location.href='./welcome-screen.html'" type="button" class="btn btn-primary btn-lg m-2">Return to Main</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      
 
 
     <div id="processing-notice-modal-top-div-id" class="processing-notice-modal-top-div-class">
