@@ -454,7 +454,7 @@ document.getElementById('search-emotion-entry-button-id').onclick = function () 
   //Populate for the emotions of the images
   Object.keys(super_search_obj['emotions']).forEach((emotion_key) => {
     image_emotions_div_id.innerHTML += `
-                                <span id="search-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
+                                <span class="emotion-span" id="search-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
                                 <img class="search-emotion-remove-button-class" id="search-emotion-remove-button-id-${emotion_key}"
                                     src="${CLOSE_ICON_BLACK}" title="close" />
                                 (${emotion_key},${super_search_obj['emotions'][emotion_key]})

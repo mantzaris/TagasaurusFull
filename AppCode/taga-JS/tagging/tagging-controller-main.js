@@ -273,9 +273,10 @@ async function Add_New_Emotion() {
 
 async function Meme_View_Fill() {
   const meme_box = document.getElementById('memes-innerbox-displaymemes-id');
-  const meme_choices = current_tagging_entry.Get_Key('taggingMemeChoices');
+  let meme_choices = current_tagging_entry.Get_Key('taggingMemeChoices');
 
-  for (const meme of meme_choices) {
+  for (let i = 0; i < meme_choices.length; i++) {
+    const meme = meme_choices[i];
     const filepath = `${TAGA_DATA_DIRECTORY}${PATH.sep}${meme}`;
 
     if (FS.existsSync(filepath)) {
@@ -300,19 +301,21 @@ async function Meme_View_Fill() {
                                                 </div>
                                                 `
       );
+    } else {
+      const entry = DB_MODULE.Get_Tagging_Record_From_DB(meme);
+      GENERAL_HELPER_FNS.Remove_Relations_To_File(entry);
+      meme_choices[i] = null;
     }
   }
 
-  for (const meme of meme_choices) {
-    const filepath = `${TAGA_DATA_DIRECTORY}${PATH.sep}${meme}`;
+  meme_choices = meme_choices.filter((m) => m != null);
 
-    if (FS.existsSync(filepath)) {
-      document.getElementById(`meme-toggle-id-${meme}`).checked = true;
-      document.getElementById(`memes-image-img-id-${meme}`).onclick = (e) => {
-        e.preventDefault();
-        Meme_Image_Clicked(meme);
-      };
-    }
+  for (const meme of meme_choices) {
+    document.getElementById(`meme-toggle-id-${meme}`).checked = true;
+    document.getElementById(`memes-image-img-id-${meme}`).onclick = (e) => {
+      e.preventDefault();
+      Meme_Image_Clicked(meme);
+    };
   }
 }
 
@@ -529,6 +532,7 @@ function New_Image_Display(n) {
   if (!current_tagging_entry.Get() || n == 0) {
     const entry = DB_MODULE.Step_Get_Annotation('', 0);
     current_tagging_entry.Set(entry);
+    console.log(entry);
   } else {
     current_tagging_entry.Set(DB_MODULE.Step_Get_Annotation(current_tagging_entry.Get_Key('fileName'), n));
   }
@@ -609,7 +613,7 @@ async function Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags, file
 
 async function Save_Image_Annotation_Changes() {
   const entry = current_tagging_entry.Get();
-
+  console.log(`${JSON.stringify(entry)}, ${JSON.stringify(entry.taggingMemeChoices)}`);
   //save meme changes
   const current_memes = entry.taggingMemeChoices;
   const newMemes = []; //meme selection toggle switch check boxes
@@ -622,14 +626,14 @@ async function Save_Image_Annotation_Changes() {
       }
     }
   }
-
+  console.log(`${JSON.stringify(entry)}, ${JSON.stringify(entry.taggingMemeChoices)}`);
   //handle textual description, process for tag words
   const rawDescription = document.getElementById('description-textarea-id').value;
   const newTags = DESCRIPTION_PROCESS_MODULE.process_description(rawDescription);
   const origTags = entry.taggingTags;
-
+  console.log(`${JSON.stringify(entry)}, ${JSON.stringify(entry.taggingMemeChoices)}`);
   await Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags, fileName: entry.fileName, newMemes }, entry.faceClusters);
-
+  console.log(`${JSON.stringify(entry)}, ${JSON.stringify(entry.taggingMemeChoices)}`);
   entry.taggingMemeChoices = newMemes;
   entry.taggingRawDescription = rawDescription;
   entry.taggingTags = newTags;
@@ -637,11 +641,13 @@ async function Save_Image_Annotation_Changes() {
   for (let key of Object.keys(entry.taggingEmotions)) {
     entry.taggingEmotions[key] = document.getElementById(`emotion-range-id-${key}`).value;
   }
-
+  console.log(`${JSON.stringify(entry)}, ${JSON.stringify(entry.taggingMemeChoices)}`);
   current_tagging_entry.Set(entry);
+  console.log(`${JSON.stringify(entry)}, ${JSON.stringify(entry.taggingMemeChoices)}`);
   DB_MODULE.Update_Tagging_Annotation_DB(entry);
+  console.log(`${JSON.stringify(entry)}, ${JSON.stringify(entry.taggingMemeChoices)}`);
   await DB_MODULE.Update_Tagging_MEME_Connections(entry.fileName, current_memes, newMemes);
-
+  console.log(`${JSON.stringify(entry)}, ${JSON.stringify(entry.taggingMemeChoices)}`);
   Load_Image_State();
 }
 
@@ -1182,19 +1188,30 @@ async function Populate_Search_Results() {
   const output_div = document.getElementById('modal-search-images-results-grid-div-area-id');
   output_div.innerHTML = '';
   let search_html = '';
+  const left_search_results = [];
+  const right_search_results = [];
 
   for (const file_key of search_results_left.Get()) {
-    search_html += `
-                                <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${file_key}" >
-                                    ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
-                                      file_key,
-                                      'modal-image-search-result-single-image-img-obj-class',
-                                      `modal-image-search-result-single-image-img-id-${file_key}`
-                                    )}
-                                </div>
-                                `;
+    if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}`)) {
+      left_search_results.push(file_key);
+
+      search_html += `
+                                  <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-image-div-id-${file_key}" >
+                                      ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
+                                        file_key,
+                                        'modal-image-search-result-single-image-img-obj-class',
+                                        `modal-image-search-result-single-image-img-id-${file_key}`
+                                      )}
+                                  </div>
+                                  `;
+    } else {
+      const entry = DB_MODULE.Get_Tagging_Record_From_DB(file_key);
+      GENERAL_HELPER_FNS.Remove_Relations_To_File(entry);
+      console.log(file_key);
+    }
   }
 
+  search_results_left.Set(left_search_results);
   output_div.innerHTML += search_html;
 
   const meme_output_div = document.getElementById('modal-search-meme-images-results-grid-div-area-id');
@@ -1202,17 +1219,25 @@ async function Populate_Search_Results() {
   search_html = '';
 
   for (const file_key of search_results_right.Get()) {
-    search_html += `
-                                <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${file_key}" >
-                                    ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
-                                      file_key,
-                                      'modal-image-search-result-single-image-img-obj-class',
-                                      `modal-image-search-result-single-meme-image-img-id-${file_key}`
-                                    )}    
-                                </div>                                
-                            `;
+    if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}`)) {
+      right_search_results.push(file_key);
+      search_html += `
+                                  <div class="modal-image-search-result-single-image-div-class" id="modal-image-search-result-single-meme-image-div-id-${file_key}" >
+                                      ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
+                                        file_key,
+                                        'modal-image-search-result-single-image-img-obj-class',
+                                        `modal-image-search-result-single-meme-image-img-id-${file_key}`
+                                      )}    
+                                  </div>                                
+                              `;
+    } else {
+      const entry = DB_MODULE.Get_Tagging_Record_From_DB(file_key);
+      GENERAL_HELPER_FNS.Remove_Relations_To_File(entry);
+      console.log(file_key);
+    }
   }
 
+  search_results_right.Set(right_search_results);
   meme_output_div.innerHTML += search_html;
 
   //user presses an image to select it from the images section, add onclick event listener
@@ -1464,60 +1489,82 @@ async function Add_New_Meme() {
   const search_results_output = document.getElementById('modal-search-add-memes-images-results-grid-div-area-id');
   search_results_output.innerHTML = '';
 
-  for (const key of meme_results_left.Get()) {
-    if (!taggingMemeChoices.includes(key) && fileName != key) {
-      //exclude memes already present
-      search_results_output.insertAdjacentHTML(
-        'beforeend',
-        `
-                <label class="add-memes-memeswitch" title="deselect / include" >   
-                    <input id="add-memes-images-toggle-id-${key}" type="checkbox" > 
-                    <span class="add-memes-slider"></span>   
-                </label>
-                <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${key}" >
-                ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
-                  key,
-                  'modal-image-search-add-memes-result-single-image-img-obj-class',
-                  `modal-image-search-add-memes-result-single-image-img-id-${key}`
-                )}
-                </div>
-                `
-      );
+  let results_memes_left = [];
 
-      document.getElementById(`modal-image-search-add-memes-result-single-image-img-id-${key}`).onclick = () => {
-        Toggle_HTML_Checkbox(`add-memes-images-toggle-id-${key}`);
-      };
+  for (const key of meme_results_left.Get()) {
+    if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${key}`)) {
+      results_memes_left.push(key);
+
+      if (!taggingMemeChoices.includes(key) && fileName != key) {
+        //exclude memes already present
+        search_results_output.insertAdjacentHTML(
+          'beforeend',
+          `
+                  <label class="add-memes-memeswitch" title="deselect / include" >   
+                      <input id="add-memes-images-toggle-id-${key}" type="checkbox" > 
+                      <span class="add-memes-slider"></span>   
+                  </label>
+                  <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${key}" >
+                  ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
+                    key,
+                    'modal-image-search-add-memes-result-single-image-img-obj-class',
+                    `modal-image-search-add-memes-result-single-image-img-id-${key}`
+                  )}
+                  </div>
+                  `
+        );
+
+        document.getElementById(`modal-image-search-add-memes-result-single-image-img-id-${key}`).onclick = () => {
+          Toggle_HTML_Checkbox(`add-memes-images-toggle-id-${key}`);
+        };
+      }
+    } else {
+      const entry = DB_MODULE.Get_Tagging_Record_From_DB(key);
+      GENERAL_HELPER_FNS.Remove_Relations_To_File(entry);
     }
   }
+
+  meme_results_left.Set(results_memes_left);
 
   //search results display image memes
   const search_memes_output = document.getElementById('modal-search-add-memes-meme-images-results-grid-div-area-id');
   search_memes_output.innerHTML = '';
 
-  for (const key of meme_results_right.Get()) {
-    if (!taggingMemeChoices.includes(key) && fileName != key) {
-      search_memes_output.insertAdjacentHTML(
-        'beforeend',
-        `
-                <label class="add-memes-memeswitch" title="deselect / include" >   
-                    <input id="add-memes-meme-toggle-id-${key}" type="checkbox" > 
-                    <span class="add-memes-slider"></span>   
-                </label>
-                <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${key}" >
-                ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
-                  key,
-                  'modal-image-search-add-memes-result-single-image-img-obj-class',
-                  `modal-image-search-add-memes-result-single-meme-image-img-id-${key}`
-                )}
-                </div>
-                `
-      );
+  let results_memes_right = [];
 
-      document.getElementById(`modal-image-search-add-memes-result-single-meme-image-img-id-${key}`).onclick = () => {
-        Toggle_HTML_Checkbox(`add-memes-meme-toggle-id-${key}`);
-      };
+  for (const key of meme_results_right.Get()) {
+    if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${key}`)) {
+      results_memes_right.push(key);
+
+      if (!taggingMemeChoices.includes(key) && fileName != key) {
+        search_memes_output.insertAdjacentHTML(
+          'beforeend',
+          `
+                  <label class="add-memes-memeswitch" title="deselect / include" >   
+                      <input id="add-memes-meme-toggle-id-${key}" type="checkbox" > 
+                      <span class="add-memes-slider"></span>   
+                  </label>
+                  <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${key}" >
+                  ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
+                    key,
+                    'modal-image-search-add-memes-result-single-image-img-obj-class',
+                    `modal-image-search-add-memes-result-single-meme-image-img-id-${key}`
+                  )}
+                  </div>
+                  `
+        );
+
+        document.getElementById(`modal-image-search-add-memes-result-single-meme-image-img-id-${key}`).onclick = () => {
+          Toggle_HTML_Checkbox(`add-memes-meme-toggle-id-${key}`);
+        };
+      }
+    } else {
+      const entry = DB_MODULE.Get_Tagging_Record_From_DB(key);
+      GENERAL_HELPER_FNS.Remove_Relations_To_File(entry);
     }
   }
+
+  meme_results_right.Set(results_memes_right);
 }
 
 //the functionality to use the object to search the DB for relevant memes
@@ -1546,60 +1593,83 @@ async function Modal_Meme_Search_Btn() {
   const search_images_output = document.getElementById('modal-search-add-memes-images-results-grid-div-area-id');
   search_images_output.innerHTML = '';
 
+  let results_memes_left = [];
+
   for (const key of meme_results_left.Get()) {
-    if (!taggingMemeChoices.includes(key) && fileName != key) {
-      //exclude memes already present
-      search_images_output.insertAdjacentHTML(
-        'beforeend',
-        `
-                <label class="add-memes-memeswitch" title="deselect / include" >   
-                    <input id="add-memes-images-toggle-id-${key}" type="checkbox" > 
-                    <span class="add-memes-slider"></span>   
-                </label>
-                <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${key}" >
-                ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
-                  key,
-                  'modal-image-search-add-memes-result-single-image-img-obj-class',
-                  `modal-image-search-add-memes-result-single-image-img-id-${key}`
-                )}
-                </div>
-                `
-      );
-      //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
-      document.getElementById(`modal-image-search-add-memes-result-single-image-img-id-${key}`).onclick = () => {
-        Toggle_HTML_Checkbox(`add-memes-images-toggle-id-${key}`);
-      };
+    if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${key}`)) {
+      results_memes_left.push(key);
+
+      if (!taggingMemeChoices.includes(key) && fileName != key) {
+        //exclude memes already present
+        search_images_output.insertAdjacentHTML(
+          'beforeend',
+          `
+                  <label class="add-memes-memeswitch" title="deselect / include" >   
+                      <input id="add-memes-images-toggle-id-${key}" type="checkbox" > 
+                      <span class="add-memes-slider"></span>   
+                  </label>
+                  <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-image-div-id-${key}" >
+                  ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
+                    key,
+                    'modal-image-search-add-memes-result-single-image-img-obj-class',
+                    `modal-image-search-add-memes-result-single-image-img-id-${key}`
+                  )}
+                  </div>
+                  `
+        );
+        //add an event listener to each thumbnail so that clicking on the thumbnail moves the slider
+        document.getElementById(`modal-image-search-add-memes-result-single-image-img-id-${key}`).onclick = () => {
+          Toggle_HTML_Checkbox(`add-memes-images-toggle-id-${key}`);
+        };
+      }
+    } else {
+      const entry = DB_MODULE.Get_Tagging_Record_From_DB(key);
+      GENERAL_HELPER_FNS.Remove_Relations_To_File(entry);
     }
   }
+
+  meme_results_left.Set(results_memes_left);
+
   //search results display image memes
   let search_meme_images_memes_results_output = document.getElementById('modal-search-add-memes-meme-images-results-grid-div-area-id');
   search_meme_images_memes_results_output.innerHTML = '';
 
-  for (const file_key of meme_results_right.Get()) {
-    if (taggingMemeChoices.includes(file_key) == false && fileName != file_key) {
-      //exclude memes already present
-      search_meme_images_memes_results_output.insertAdjacentHTML(
-        'beforeend',
-        `
-                <label class="add-memes-memeswitch" title="deselect / include" >   
-                    <input id="add-memes-meme-toggle-id-${file_key}" type="checkbox" > 
-                    <span class="add-memes-slider"></span>   
-                </label>
-                <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${file_key}" >
-                    ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
-                      file_key,
-                      'modal-image-search-add-memes-result-single-image-img-obj-class',
-                      `modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}`
-                    )}
-                </div>
-                `
-      );
+  let results_memes_right = [];
 
-      document.getElementById(`modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}`).onclick = function () {
-        Toggle_HTML_Checkbox(`add-memes-meme-toggle-id-${file_key}`);
-      };
+  for (const file_key of meme_results_right.Get()) {
+    if (FS.existsSync(`${TAGA_DATA_DIRECTORY}${PATH.sep}${file_key}`)) {
+      results_memes_right.push(file_key);
+
+      if (taggingMemeChoices.includes(file_key) == false && fileName != file_key) {
+        //exclude memes already present
+        search_meme_images_memes_results_output.insertAdjacentHTML(
+          'beforeend',
+          `
+                  <label class="add-memes-memeswitch" title="deselect / include" >   
+                      <input id="add-memes-meme-toggle-id-${file_key}" type="checkbox" > 
+                      <span class="add-memes-slider"></span>   
+                  </label>
+                  <div class="modal-image-search-add-memes-result-single-image-div-class" id="modal-image-search-add-memes-result-single-meme-image-div-id-${file_key}" >
+                      ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
+                        file_key,
+                        'modal-image-search-add-memes-result-single-image-img-obj-class',
+                        `modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}`
+                      )}
+                  </div>
+                  `
+        );
+
+        document.getElementById(`modal-image-search-add-memes-result-single-meme-image-img-id-${file_key}`).onclick = function () {
+          Toggle_HTML_Checkbox(`add-memes-meme-toggle-id-${file_key}`);
+        };
+      }
+    } else {
+      const entry = DB_MODULE.Get_Tagging_Record_From_DB(file_key);
+      GENERAL_HELPER_FNS.Remove_Relations_To_File(entry);
     }
   }
+
+  meme_results_right.Set(results_memes_right);
 }
 
 //START SAVING CONTENT (EXPORTING) RIGHT CLICK CONTENT >>>>>>>>>>>>>>
@@ -1649,10 +1719,17 @@ document.body.addEventListener('mousedown', async (ev) => {
     if (save_modal_center_div.style.display == 'block') {
       switch (ev.target.id) {
         case 'save-file-tagging-center': {
+          const from_path = PATH.join(TAGA_DATA_DIRECTORY, fileName);
+
+          if (!FS.existsSync(from_path)) {
+            return Save_Image_Annotation_Changes();
+          }
+
           const results = await IPC_RENDERER.invoke('dialog:saveFile');
+
           if (!results.canceled) {
             const output_name = results.filePath;
-            FS.copyFileSync(PATH.join(TAGA_DATA_DIRECTORY, fileName), output_name, FS.constants.COPYFILE_EXCL);
+            FS.copyFileSync(from_path, output_name, FS.constants.COPYFILE_EXCL);
             alert('saved file to download');
           }
           break;
@@ -1722,35 +1799,43 @@ document.body.addEventListener('mousedown', async (ev) => {
       }
 
       save_modal_center_div.style.display = 'none';
-    }
-
-    if (save_modal_meme_div.style.display == 'block') {
+    } else if (save_modal_meme_div.style.display == 'block') {
       if (ev.target.id == 'save-file-tagging-modal-meme') {
-        const results = await IPC_RENDERER.invoke('dialog:saveFile');
+        const from_path = document.getElementById('modal-meme-clicked-displayimg-id').src;
+        const fileName = PATH.basename(from_path);
 
-        if (!results.canceled) {
-          const output_name = results.filePath;
-          FS.copyFileSync(
-            PATH.join(TAGA_DATA_DIRECTORY, PATH.basename(document.getElementById('modal-meme-clicked-displayimg-id').src)),
-            output_name,
-            FS.constants.COPYFILE_EXCL
-          );
+        if (!FS.existsSync(from_path)) {
+          save_modal_meme_div.style.display = 'none';
+          return Save_Image_Annotation_Changes();
+        } else {
+          const results = await IPC_RENDERER.invoke('dialog:saveFile');
 
-          alert('saved file to download');
+          if (!results.canceled) {
+            const output_name = results.filePath;
+            FS.copyFileSync(PATH.join(TAGA_DATA_DIRECTORY, from_path), output_name, FS.constants.COPYFILE_EXCL);
+
+            alert('saved file to download');
+          }
         }
       }
 
       save_modal_meme_div.style.display = 'none';
-    }
-
-    if (rc_meme_modal_div.style.display == 'block') {
+    } else if (rc_meme_modal_div.style.display == 'block') {
       if (ev.target.id == 'save-file-tagging-meme') {
-        const results = await IPC_RENDERER.invoke('dialog:saveFile');
+        const from_path = PATH.join(TAGA_DATA_DIRECTORY, recent_meme_thumbnail);
 
-        if (!results.canceled) {
-          const output_name = results.filePath;
-          FS.copyFileSync(PATH.join(TAGA_DATA_DIRECTORY, recent_meme_thumbnail), output_name, FS.constants.COPYFILE_EXCL);
-          alert('saved file to download');
+        if (!FS.existsSync(from_path)) {
+          rc_meme_modal_div.style.display = 'none';
+          recent_meme_thumbnail = '';
+          return Save_Image_Annotation_Changes();
+        } else {
+          const results = await IPC_RENDERER.invoke('dialog:saveFile');
+
+          if (!results.canceled) {
+            const output_name = results.filePath;
+            FS.copyFileSync(from_path, output_name, FS.constants.COPYFILE_EXCL);
+            alert('saved file to download');
+          }
         }
       }
 

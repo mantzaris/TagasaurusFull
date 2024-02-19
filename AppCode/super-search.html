@@ -19,52 +19,59 @@
     <!-- style sheet for the processing message modal -->
     <link rel="stylesheet" href="./taga-CSS/processing-message-modal.css">
 
+    <script src="../Assets/bootstrap/popper.min.js" defer></script>
+    <script src="../Assets/bootstrap/bootstrap.min.js" defer></script> 
+    <link href="../Assets/bootstrap/bootstrap.min.css" rel="stylesheet" > 
+
     <meta charset="UTF-8" http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
-
-
 </head>
 
 <body>
 
-
 <div id="tagging-screen-id">
-    <!-- page top area-->
-    <div id="top-div-id">
-        <label id="main-title-label" for="">SUPER SEARCH</label>
-        <button class="top-buttons fun-button-blue" type="button" id="super-search-button-id">SEARCH</button>
-        <button class="top-buttons fun-button-blue" type="button" id="return-to-main-button-id">RETURN TO MAIN</button>
-    </div>
     
+    <div id="top-div-id" class="row">
+        <div class="col" id="top-btns">
+            <button class="btn btn-primary me-4 mt-4 mb-2 ms-2 fat-button" type="button" id="super-search-button-id">SEARCH</button>
+            <button class="btn btn-primary me-4 mt-4 mb-2 ms-2 fat-button" type="button" id="return-to-main-button-id">RETURN</button>
+        </div>
+    </div>
+
     <!-- where the user enters the search criteria -->
     <div id="top-search-div-id">
         <div id="annotation-criteria-div-id">
-            <div id="descriptions-keywords-div-id">
-                <span id="search-tag-label-id">
-                    Image Tags:
-                </span>
-                <div id="search-tag-textarea-entry-div-id">
-                    <textarea id="search-tag-textarea-entry-id" placeholder="enter image #tags" style="resize: none;"
-                        name="search-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')"></textarea>
+            <div class="container">
+                <div class="row mt-2" id="descriptions-keywords-div-id">
+                    <div id="tag-label" class="col-2 d-flex align-items-center">
+                        <label id="search-tag-label-id" for="search-tag-textarea-entry-id" class=" form-label ms-2 mb-0">Image Tags:</label>
+                    </div>
+                    <div class="col-10">
+                        <textarea class="form-control" id="search-tag-textarea-entry-id" placeholder="" 
+                                  name="search-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')" 
+                                  style="resize: none;"></textarea>
+                    </div>
+                </div>
+                <div class="row mt-2" id="memes-keywords-div-id">
+                    <div class="col-2 d-flex align-items-center">
+                        <label id="search-tag-label-id" for="search-meme-tag-textarea-entry-id" class=" form-label ms-2 mb-0">Meme Tags:</label>
+                    </div>
+                    <div class="col-10">
+                        <textarea class="form-control" id="search-meme-tag-textarea-entry-id" placeholder="" 
+                                  name="search-meme-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')" 
+                                  style="resize: none;"></textarea>
+                    </div>
                 </div>
             </div>
-            <div id="meme-keywords-div-id">            
-                <span id="search-meme-tag-label-id">
-                    Meme Tags:
-                </span>
-                <div id="search-meme-tag-textarea-entry-div-id">
-                    <textarea id="search-meme-tag-textarea-entry-id" placeholder="enter meme #tags" style="resize: none;"
-                        name="search-meme-tag-textarea" oninput="this.value = this.value.replace(/\n/g,'')"></textarea>
-                </div>
-            </div>
+            
             
             <div id="search-emotion-entry-top-div-id">
 
                 <!-- <div id="grid-emotion-area-1-id"></div> -->
-                <button type="button" class="fun-button-blue" id="search-emotion-entry-button-id">INCLUDE EMOTION</button>
+                <button type="button" class="btn btn-primary me-2" id="search-emotion-entry-button-id">Include Emotion</button>
                 <!-- </div> -->
 
                 <!-- <div id="grid-emotion-area-2-id"> -->
-                <div id="search-emotion-label-and-value-entry-container-div-id">
+                <div class="me-1" id="search-emotion-label-and-value-entry-container-div-id">
                     <textarea list="emotion-recommend" id="search-emotion-label-value-textarea-entry-id" placeholder="emotion label" style="resize: none;"
                             name="search-emotion-tag-textarea" oninput="this.value = this.value.replace(/[ \n]/g,'')"></textarea>
                     <input id="search-emotion-value-range-entry-id" type="range" min="0" max="100" value="0">
@@ -93,19 +100,29 @@
 
         <div id="facial-images-div-id">
 
-            <div id="facial-row-one-div-id">
-                <label id="facial-title-label" for="">Provide Face Examples:</label>
-            </div>
-            <div id="facial-row-two-div-id">                
-                <button type="button" class="fun-button-blue search-row-two-buttons" id="use-new-image-button-id">USE NEW IMAGE(S)</button>
-                <button type="button" class="fun-button-blue search-row-two-buttons" id="use-webcam-button-id">USE WEBCAM</button>
-            </div>
-            <div id="facial-row-three-div-id">
-                <button type="button" class="fun-button-blue search-row-three-buttons" id="get-recommended-button-id">GET & SELECT RECOMMENDED</button>
-                <label id="row-three-label-id">Press to display images with -faces- using the annotation information above. Choosing images places them into the search selections.</label>
+
+            <div class="container">
+                <div id="facial-row-one-div-id" class="row py-1 ">
+                  <div class="col">
+                    <hr class="custom-hr">
+                    <label id="facial-title-label" class="font-weight-bold h6 mb-0">Provide Face Examples from Media:</label>
+                  </div>
+                </div>
             </div>
 
-            <div id="facial-row-four-div-id">
+            
+            <div id="facial-row-two-div-id">
+                <button type="button" class="btn btn-primary search-row-two-buttons" id="get-recommended-button-id">Explore Existing</button>
+                <button type="button" class="btn btn-primary search-row-two-buttons" id="use-new-image-button-id">Load New</button>
+                <button type="button" class="btn btn-primary search-row-two-buttons" id="use-webcam-button-id">Use Webcam</button>
+            </div>
+
+            <!-- <div id="facial-row-three-div-id"> -->
+                <!-- <button type="button" class="fun-button-blue search-row-three-buttons" id="get-recommended-button-id">GET & SELECT RECOMMENDED</button> -->
+                <!-- <label id="row-three-label-id">Press to display images with -faces- using the annotation information above. Choosing images places them into the search selections.</label> -->
+            <!-- </div> -->
+
+            <div id="facial-row-three-div-id">
 
                 <!-- <div class="recommended-img-div-class" id="recommended-result-image-div-id-Taga.png" >
                     <input type="checkbox" class="recommended-img-check-box" id="recommened-check-box-id-Taga.png" name="" value="">
@@ -129,11 +146,12 @@
                 
             </div>
 
-            <div id="facial-row-five-div-id">
-                <label for="">Selected images:</label>   
+            <div id="facial-row-four-div-id" class="me-2 ms-2 row py-1 ">
+                <hr class="custom-hr">
+                <label for="">Selected images:</label>
             </div>
 
-            <div id="facial-row-six-div-id">
+            <div id="facial-row-five-div-id">
                 
                 <!-- <div class="recommended-img-div-class" id="search-image-selected-div-id-Taga.png">
                     <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-Taga.png" name="" value="">
@@ -161,7 +179,7 @@
 
     <!-- place image search results here -->
     <div id="top-results-div-id">
-        <label id="results-title-label" for="">Results (click choice):</label>
+        <label id="results-title-label" class="fw-bold d-inline" for="">Results (click choice):</label>
 
         <!-- <div class="super-search-div-class" id="search-result-image-div-id-Taga.png" >
             <img class="super-search-obj-class" id="search-result-single-img-id-Taga.png" src="../Taga.png" title="view" alt="result" />

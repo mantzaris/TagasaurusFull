@@ -124,7 +124,9 @@ exports.Sort_Based_On_Scores_ASC = Sort_Based_On_Scores_ASC;
  * @param {TaggingEntry} entry
  */
 async function Remove_Relations_To_File(entry, call_back) {
-  await Handle_Delete_FileFrom_Cluster(entry);
+  if (!entry) return;
+
+  //await Handle_Delete_FileFrom_Cluster(entry);
   const { fileName, fileHash, taggingMemeChoices, faceDescriptors } = entry;
   const img_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${fileName}`;
 
