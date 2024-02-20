@@ -532,7 +532,6 @@ function New_Image_Display(n) {
   if (!current_tagging_entry.Get() || n == 0) {
     const entry = DB_MODULE.Step_Get_Annotation('', 0);
     current_tagging_entry.Set(entry);
-    console.log(entry);
   } else {
     current_tagging_entry.Set(DB_MODULE.Step_Get_Annotation(current_tagging_entry.Get_Key('fileName'), n));
   }
@@ -613,7 +612,6 @@ async function Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags, file
 
 async function Save_Image_Annotation_Changes() {
   const entry = current_tagging_entry.Get();
-  console.log(`${JSON.stringify(entry)}, ${JSON.stringify(entry.taggingMemeChoices)}`);
   //save meme changes
   const current_memes = entry.taggingMemeChoices;
   const newMemes = []; //meme selection toggle switch check boxes
@@ -626,14 +624,14 @@ async function Save_Image_Annotation_Changes() {
       }
     }
   }
-  console.log(`${JSON.stringify(entry)}, ${JSON.stringify(entry.taggingMemeChoices)}`);
+
   //handle textual description, process for tag words
   const rawDescription = document.getElementById('description-textarea-id').value;
   const newTags = DESCRIPTION_PROCESS_MODULE.process_description(rawDescription);
   const origTags = entry.taggingTags;
-  console.log(`${JSON.stringify(entry)}, ${JSON.stringify(entry.taggingMemeChoices)}`);
+
   await Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags, fileName: entry.fileName, newMemes }, entry.faceClusters);
-  console.log(`${JSON.stringify(entry)}, ${JSON.stringify(entry.taggingMemeChoices)}`);
+
   entry.taggingMemeChoices = newMemes;
   entry.taggingRawDescription = rawDescription;
   entry.taggingTags = newTags;
@@ -641,13 +639,13 @@ async function Save_Image_Annotation_Changes() {
   for (let key of Object.keys(entry.taggingEmotions)) {
     entry.taggingEmotions[key] = document.getElementById(`emotion-range-id-${key}`).value;
   }
-  console.log(`${JSON.stringify(entry)}, ${JSON.stringify(entry.taggingMemeChoices)}`);
+
   current_tagging_entry.Set(entry);
-  console.log(`${JSON.stringify(entry)}, ${JSON.stringify(entry.taggingMemeChoices)}`);
+
   DB_MODULE.Update_Tagging_Annotation_DB(entry);
-  console.log(`${JSON.stringify(entry)}, ${JSON.stringify(entry.taggingMemeChoices)}`);
+
   await DB_MODULE.Update_Tagging_MEME_Connections(entry.fileName, current_memes, newMemes);
-  console.log(`${JSON.stringify(entry)}, ${JSON.stringify(entry.taggingMemeChoices)}`);
+
   Load_Image_State();
 }
 
@@ -1207,7 +1205,6 @@ async function Populate_Search_Results() {
     } else {
       const entry = DB_MODULE.Get_Tagging_Record_From_DB(file_key);
       GENERAL_HELPER_FNS.Remove_Relations_To_File(entry);
-      console.log(file_key);
     }
   }
 
@@ -1233,7 +1230,6 @@ async function Populate_Search_Results() {
     } else {
       const entry = DB_MODULE.Get_Tagging_Record_From_DB(file_key);
       GENERAL_HELPER_FNS.Remove_Relations_To_File(entry);
-      console.log(file_key);
     }
   }
 

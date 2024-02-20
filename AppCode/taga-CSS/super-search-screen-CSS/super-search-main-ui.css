@@ -349,10 +349,10 @@
 }
 
 #modal-meme-clicked-tag-list-div-container-id {
-  background-color: var(--primary-300);
+  /* background-color: var(--primary-300); */
   grid-area: modal-meme-clicked-tag-list-div-container-id;
   font-weight: bold;
-  font-size: 3vmin;
+
   color: black;
   width: 100%;
   height: 100%;
@@ -360,13 +360,33 @@
   align-items: center;
   justify-content: space-evenly;
 }
+
 #capture-button-id,
 #select-capture-button-id,
 #back-capture-button-id {
-  font-size: 3vmin;
+  padding: 5px 5px;
+  border-radius: 5px;
+  font-size: clamp(0.75rem, 2.25vmin, 4rem) !important;
+}
+
+/* NEW to contain! */
+#webcam-video-id,
+#canvas-webcam-id {
+  height: 99999px;
+  object-fit: contain;
+  max-height: 100%;
+  max-width: 100%;
+  display: block;
+  margin: auto auto;
 }
 
 #modal-meme-clicked-image-gridbox-id {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* #modal-meme-clicked-image-gridbox-id {
   background-color: var(--primary);
   grid-area: modal-meme-clicked-image-gridbox-id;
   overflow-y: auto;
@@ -378,7 +398,6 @@
   min-width: 0;
   height: 100%;
   width: 100%;
-  /* box-sizing: border-box; */
   padding: 0%;
   grid-template-areas:
     'video-area'
@@ -388,14 +407,12 @@
   grid-area: canvas-area;
   height: 100%;
   width: 100%;
-  /* background-color: burlywood; */
 }
 #webcam-video-id {
   grid-area: video-area;
   height: 100%;
   width: 100%;
-  /* background-color: blueviolet; */
-}
+} */
 
 /* #modal-meme-clicked-displayimg-id {
     height: 99999px;

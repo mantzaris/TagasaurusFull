@@ -271,10 +271,11 @@ async function Get_Select_Recommended() {
   //send the keys of the images to score and sort accroding to score and pass the reference to the function that can access the DB to get the image annotation data
   search_results_recommended = await SEARCH_MODULE.Image_Search_DB(super_search_obj);
 
-  let search_image_results_output = document.getElementById('facial-row-four-div-id');
+  let search_image_results_output = document.getElementById('facial-row-three-div-id');
   search_image_results_output.innerHTML = '';
   let search_display_inner_tmp = '';
   let search_results_faces = [];
+
   for (let file_key of search_results_recommended) {
     let annotation_tmp = Get_Tagging_Annotation_From_DB(file_key);
     if (annotation_tmp.faceDescriptors.length > 0) {
@@ -295,6 +296,7 @@ async function Get_Select_Recommended() {
                                     </div>
                                 `;
   }
+
   search_image_results_output.innerHTML += search_display_inner_tmp;
 
   //user presses an image to select it from the images section, add onclick event listener
@@ -311,7 +313,7 @@ async function Handle_Get_Recommended_Image_Checked(filename) {
     // only splice array when item is found
     search_results_recommended.splice(index, 1); // 2nd parameter means remove one item only
   }
-  let search_image_results_output = document.getElementById('facial-row-four-div-id');
+  let search_image_results_output = document.getElementById('facial-row-three-div-id');
   search_image_results_output.innerHTML = '';
   let search_display_inner_tmp = '';
   let search_results_faces = [];
@@ -349,7 +351,7 @@ async function Handle_Get_Recommended_Image_Checked(filename) {
 
 async function Update_Selected_Images() {
   //now put the image in the selected set
-  let search_image_results_output = document.getElementById('facial-row-six-div-id');
+  let search_image_results_output = document.getElementById('facial-row-five-div-id');
   search_image_results_output.innerHTML = '';
   let search_display_inner_tmp = '';
 

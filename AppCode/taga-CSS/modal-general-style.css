@@ -15,7 +15,7 @@
 
 /* Modal Content/Box */
 .modal-content-container {
-  background-color: var(--primary-300);
+  background-color: var(--bg);
   margin: auto;
   position: relative;
   top: 5%;

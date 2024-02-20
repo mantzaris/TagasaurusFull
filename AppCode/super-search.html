@@ -221,20 +221,21 @@
     <!-- Modal content container -->
     <div class="modal-content-container">
         <div id="modal-meme-clicked-grid-container-id">
-            <div id="modal-meme-clicked-tag-list-div-container-id">
+            <div id="modal-meme-clicked-tag-list-div-container-id" class="pt-2 pb-2">
                 <!-- Tags: #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde #abc #bcd #cde  -->
-                <button style="display: none;" class="fun-button-blue" id="back-capture-button-id"> STREAM AGAIN </button>
-                <button class="fun-button-blue" id="capture-button-id"> CAPTURE (SPACE BAR) </button>
-                <button class="fun-button-blue" id="select-capture-button-id" style="display: none;"> SELECT IMAGE  </button>
+                <button style="display: none;" class="btn btn-primary custom-btn" id="back-capture-button-id"> STREAM AGAIN </button>
+                <button class="btn btn-primary custom-btn" id="capture-button-id"> CAPTURE (SPACE BAR) </button>
+                <button style="display: none;" class="btn btn-primary custom-btn" id="select-capture-button-id" > SELECT IMAGE  </button>
+                <!-- <hr class="custom-hr"> -->
             </div>
             
-            <div id="modal-meme-clicked-image-gridbox-id">
+            <hr class="custom-hr"> 
 
-                <canvas style="display: none;" id="canvas-webcam-id">  </canvas>
-                <img style="display: none;" id="webcam-meme-clicked-displayimg-id" src="" title="" alt="" />
+            <div id="modal-meme-clicked-image-gridbox-id" class="pt-2">
+                    <canvas style="display: none;" id="canvas-webcam-id">  </canvas>
+                    <img style="display: none;" id="webcam-meme-clicked-displayimg-id" src="" title="" alt="" />
 
-                <video src="" id="webcam-video-id" >  </video>   
-                                        
+                    <video src="" id="webcam-video-id" >  </video>   
                                 
             </div>
         </div>
