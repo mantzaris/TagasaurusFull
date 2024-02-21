@@ -942,8 +942,6 @@ async function Change_Profile_Image() {
                                                   `modal-image-search-profileimageresult-single-image-img-id-${image_filename}`
                                                 )}    
                                                 `;
-    } else {
-      console.log(image_path_tmp);
     }
   }
   profile_search_display_div.innerHTML += profile_search_display_inner_tmp;
@@ -970,8 +968,6 @@ async function Change_Profile_Image() {
         GENERAL_HELPER_FNS.Pause_Media_From_Modals();
         modal_profile_img_change.style.display = 'none';
       };
-    } else {
-      console.log(image_path_tmp);
     }
   });
   //add the event listener for the SEARCH BUTTON on the modal
@@ -1077,7 +1073,6 @@ async function Collection_Profile_Image_Search_Action() {
         const entry = DB_MODULE.Get_Tagging_Record_From_DB(image_filename);
         GENERAL_HELPER_FNS.Remove_Relations_To_File(entry);
         New_Collection_Display(0);
-        console.log(image_path_tmp);
       }
     };
   });
