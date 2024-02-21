@@ -1,10 +1,12 @@
 // const FS = require('fs');
 const PATH = require('path');
 const fileType = require('file-type');
+const FS = require('fs');
 const { GetFileTypeFromFilePath } = require(PATH.join(__dirname, 'taga-JS', 'utilities', 'files.js'));
 
 //the object for the window functionality
 const IPC_RENDERER = require('electron').ipcRenderer;
+const { ipcRenderer } = require('electron');
 
 const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, MY_FILE_HELPER, GENERAL_HELPER_FNS } = require(PATH.join(
   __dirname,
@@ -20,7 +22,7 @@ function Get_Tagging_Annotation_From_DB(image_name) {
   return DB_MODULE.Get_Tagging_Record_From_DB(image_name);
 }
 
-let reg_exp_delims = /[#:,;| ]+/;
+const reg_exp_delims = /[#:,;| ]+/;
 
 let search_results = '';
 let selected_images = [];
@@ -103,15 +105,24 @@ async function Super_Search() {
   search_image_results_output.innerHTML = '';
   let search_display_inner_tmp = '';
   search_display_inner_tmp += `<label id="results-title-label" for="">Results (click choice):</label>`;
+  let results_checked = [];
+
   for (let file_key of search_results) {
-    search_display_inner_tmp += `
+    if (FS.existsSync(PATH.join(TAGA_DATA_DIRECTORY, file_key))) {
+      results_checked.push(file_key);
+
+      search_display_inner_tmp += `
                                 <div class="super-search-div-class" id="search-result-image-div-id-${file_key}" >
                                     ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(file_key, 'super-search-obj-class', `search-result-single-img-id-${file_key}`)}
                                 </div>
                                 `;
+    } else {
+      const entry = DB_MODULE.Get_Tagging_Record_From_DB(file_key);
+      GENERAL_HELPER_FNS.Remove_Relations_To_File(entry);
+    }
   }
   search_image_results_output.innerHTML += search_display_inner_tmp;
-
+  search_results = results_checked;
   //user presses an image to select it from the images section, add onclick event listener
   search_results.forEach((file) => {
     document.getElementById(`search-result-single-img-id-${file}`).onclick = function () {
@@ -283,9 +294,13 @@ async function Get_Select_Recommended() {
     }
   }
   search_results_recommended = search_results_faces;
+  let results_checked = [];
 
   for (let file_key of search_results_faces) {
-    search_display_inner_tmp += `
+    if (FS.existsSync(PATH.join(TAGA_DATA_DIRECTORY, file_key))) {
+      results_checked.push(file_key);
+
+      search_display_inner_tmp += `
                                 <div class="recommended-img-div-class" id="recommended-result-image-div-id-${file_key}" >
                                     <input type="checkbox" class="recommended-img-check-box" id="recommened-check-box-id-${file_key}" name="" value="">
                                     ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
@@ -295,10 +310,14 @@ async function Get_Select_Recommended() {
                                     )}
                                     </div>
                                 `;
+    } else {
+      const entry = DB_MODULE.Get_Tagging_Record_From_DB(file_key);
+      GENERAL_HELPER_FNS.Remove_Relations_To_File(entry);
+    }
   }
 
   search_image_results_output.innerHTML += search_display_inner_tmp;
-
+  search_results_faces = results_checked;
   //user presses an image to select it from the images section, add onclick event listener
   search_results_faces.forEach((file) => {
     document.getElementById(`recommened-check-box-id-${file}`).onclick = function () {
@@ -317,6 +336,7 @@ async function Handle_Get_Recommended_Image_Checked(filename) {
   search_image_results_output.innerHTML = '';
   let search_display_inner_tmp = '';
   let search_results_faces = [];
+
   for (let file_key of search_results_recommended) {
     let annotation_tmp = Get_Tagging_Annotation_From_DB(file_key);
     if (annotation_tmp.faceDescriptors.length > 0) {
@@ -325,7 +345,8 @@ async function Handle_Get_Recommended_Image_Checked(filename) {
   }
 
   for (let file_key of search_results_faces) {
-    search_display_inner_tmp += `
+    if (FS.existsSync(PATH.join(TAGA_DATA_DIRECTORY, file_key))) {
+      search_display_inner_tmp += `
                                 <div class="recommended-img-div-class" id="recommended-result-image-div-id-${file_key}" >
                                     <input type="checkbox" class="recommended-img-check-box" id="recommened-check-box-id-${file_key}" name="" value="">
                                     ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
@@ -335,6 +356,10 @@ async function Handle_Get_Recommended_Image_Checked(filename) {
                                     )}
                                     </div>
                                 `;
+    } else {
+      const entry = DB_MODULE.Get_Tagging_Record_From_DB(file_key);
+      GENERAL_HELPER_FNS.Remove_Relations_To_File(entry);
+    }
   }
   search_image_results_output.innerHTML += search_display_inner_tmp;
   //user presses an image to select it from the images section, add onclick event listener
@@ -343,6 +368,7 @@ async function Handle_Get_Recommended_Image_Checked(filename) {
       Handle_Get_Recommended_Image_Checked(file);
     };
   });
+
   selected_images_type.unshift('stored');
   selected_images.unshift(filename); //add to the start of the array
   selected_images = [...new Set(selected_images)];
@@ -360,7 +386,14 @@ async function Update_Selected_Images() {
     //selected_images.forEach( (element, index) => {
 
     if (selected_images_type[index] == 'stored') {
-      let file_path_tmp = TAGA_DATA_DIRECTORY + PATH.sep + element;
+      let file_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, element);
+
+      if (!FS.existsSync(file_path_tmp)) {
+        const entry = DB_MODULE.Get_Tagging_Record_From_DB(element);
+        GENERAL_HELPER_FNS.Remove_Relations_To_File(entry);
+        continue;
+      }
+
       search_display_inner_tmp += `
                                     <div class="recommended-img-div-class" id="search-image-selected-div-id-${index}">
                                         <input type="checkbox" checked="true" class="recommended-img-check-box" id="selected-check-box-id-${index}" name="" value="">
