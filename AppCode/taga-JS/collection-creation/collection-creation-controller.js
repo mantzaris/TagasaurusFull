@@ -115,15 +115,23 @@ function Navbar_ViewHandle() {
 function Validate_Collection_Files() {
   if (creation_step_num == 1) return;
 
+  let missing_file = false;
+
   for (const image of [
     COLLECTION_DEFAULT_EMPTY_OBJECT.collectionImage,
     ...COLLECTION_DEFAULT_EMPTY_OBJECT.collectionGalleryFiles,
     ...COLLECTION_DEFAULT_EMPTY_OBJECT.collectionMemes,
   ]) {
     if (!FS.existsSync(PATH.join(TAGA_DATA_DIRECTORY, image))) {
-      alert('Files Deleted or Modified during creation of collection');
-      return window.location.reload();
+      missing_file = true;
+      const entry = DB_MODULE.Get_Tagging_Record_From_DB(image);
+      GENERAL_HELPER_FNS.Remove_Relations_To_File(entry);
     }
+  }
+
+  if (missing_file) {
+    alert('Files Deleted or Modified during creation of collection');
+    return window.location.reload();
   }
 }
 
