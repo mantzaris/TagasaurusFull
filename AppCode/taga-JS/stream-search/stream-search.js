@@ -1,5 +1,6 @@
 const { ipcRenderer } = require('electron');
 const PATH = require('path');
+const FS = require('fs');
 
 const { DB_MODULE, GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
 
@@ -540,15 +541,24 @@ function Display_Images_Found() {
 
   images_div.innerHTML = '';
   images_html = '<span class="badge bg-secondary">Images</span><br>';
+  let images_tmp = [];
 
   for (const image of images) {
-    images_html += `
+    if (FS.existsSync(PATH.join(TAGA_DATA_DIRECTORY, image))) {
+      images_tmp.push(image);
+
+      images_html += `
                           <div class="image-thumbnail-div thumbnail-with-goto" data-filename="${image}">
                               <img class="image-thumbnail"  src="${TAGA_DATA_DIRECTORY}${PATH.sep}${image}" title="view" alt="img" />
                           </div>
                           `;
+    } else {
+      const entry = DB_MODULE.Get_Tagging_Record_From_DB(image);
+      GENERAL_HELPER_FNS.Remove_Relations_To_File(entry);
+    }
   }
 
+  images = images_tmp;
   images_div.innerHTML = images_html;
 }
 function Display_Memes_Found() {
@@ -556,15 +566,24 @@ function Display_Memes_Found() {
 
   memes_div.innerHTML = '';
   memes_html = '<span class="badge bg-secondary">Memes</span><br>';
+  let memes_tmp = [];
 
   for (const meme of memes) {
-    memes_html += `
+    if (FS.existsSync(PATH.join(TAGA_DATA_DIRECTORY, meme))) {
+      memes_tmp.push(meme);
+
+      memes_html += `
                           <div class="meme-thumbnail-div thumbnail-with-goto" data-filename="${meme}">
                               <img class="meme-thumbnail" id="" src="${TAGA_DATA_DIRECTORY}${PATH.sep}${meme}" title="view" alt="meme" />
                           </div>
                           `;
+    } else {
+      const entry = DB_MODULE.Get_Tagging_Record_From_DB(meme);
+      GENERAL_HELPER_FNS.Remove_Relations_To_File(entry);
+    }
   }
 
+  memes = memes_tmp;
   memes_div.innerHTML = memes_html;
 }
 

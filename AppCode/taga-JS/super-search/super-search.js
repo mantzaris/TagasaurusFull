@@ -1,10 +1,8 @@
-// const FS = require('fs');
 const PATH = require('path');
 const fileType = require('file-type');
 const FS = require('fs');
 const { GetFileTypeFromFilePath } = require(PATH.join(__dirname, 'taga-JS', 'utilities', 'files.js'));
 
-//the object for the window functionality
 const IPC_RENDERER = require('electron').ipcRenderer;
 const { ipcRenderer } = require('electron');
 
@@ -13,7 +11,7 @@ const { DB_MODULE, TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE,
   '..',
   'constants',
   'constants-code.js'
-)); // require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
+));
 
 const { CLOSE_ICON_RED, CLOSE_ICON_BLACK, HASHTAG_ICON } = require(PATH.join(__dirname, '..', 'constants', 'constants-icons.js')); //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-icons.js');
 
@@ -53,6 +51,7 @@ async function Super_Search() {
   Show_Loading_Spinner();
 
   let faceDescriptors_search = [];
+
   for (let img_ind = 0; img_ind < selected_images.length; img_ind++) {
     //super_search_obj.faceDescriptors
     let faceDescriptors_tmp = [];
@@ -99,6 +98,7 @@ async function Super_Search() {
   super_search_obj.faceDescriptors = faceDescriptors_search;
 
   //perform the search
+
   search_results = await SEARCH_MODULE.Image_Search_DB(super_search_obj);
 
   let search_image_results_output = document.getElementById('top-results-div-id');

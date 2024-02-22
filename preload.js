@@ -155,6 +155,7 @@ window.Get_Image_Face_Descriptors_And_Expresssions_From_HTML_Image = Get_Image_F
 //distances are best at zero, so score on (1-dist)
 const FACE_DISTANCE_IMAGE = 0.67;
 window.FACE_DISTANCE_IMAGE = FACE_DISTANCE_IMAGE;
+//TODO:
 function Get_Descriptors_DistanceScore(descriptors_reference, descriptors_query) {
   let ref_faces_scores_array = new Array(descriptors_reference.length);
   for (let ref_ii = 0; ref_ii < descriptors_reference.length; ref_ii++) {

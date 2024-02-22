@@ -1,4 +1,6 @@
 const { ipcRenderer } = require('electron');
+const FS = require('fs');
+const PATH = require('path');
 const mlKmeans = require('ml-kmeans');
 const { GENERAL_HELPER_FNS } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js'));
 
@@ -204,6 +206,12 @@ async function Spawn_Children(parentNodeId) {
     const node_x = parentNodePosition.x + Rand_Axis_Dim(); //(Math.random() - 0.5);
     const node_y = parentNodePosition.y + Rand_Axis_Dim(); //(Math.random() - 0.5);
 
+    if (!FS.existsSync(PATH.join(TAGA_DATA_DIRECTORY, midpoint_record.fileName))) {
+      const entry = DB_MODULE.Get_Tagging_Record_From_DB(midpoint_record.fileName);
+      GENERAL_HELPER_FNS.Remove_Relations_To_File(entry);
+      continue;
+    }
+
     if (midpoint_record.fileType == 'video') {
       //const mid_pnt_descriptor = midpoint_record.faceDescriptors[Math.floor(Math.random() * midpoint_record.faceDescriptors.length)];
 
@@ -282,6 +290,13 @@ async function Present_Node_Locality(nodeId) {
 
   for (const rowid of rowids) {
     const fileName_tmp = DB_MODULE.Get_Tagging_Records_From_ROWIDs_BigInt(rowid)[0].fileName;
+
+    if (!FS.existsSync(PATH.join(TAGA_DATA_DIRECTORY, fileName_tmp))) {
+      const entry = DB_MODULE.Get_Tagging_Record_From_DB(fileName_tmp);
+      GENERAL_HELPER_FNS.Remove_Relations_To_File(entry);
+      continue;
+    }
+
     fileName_Set.add(fileName_tmp);
   }
 

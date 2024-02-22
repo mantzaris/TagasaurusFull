@@ -625,7 +625,6 @@ async function Handle_Empty_DB() {
     taga_source_path = PATH.join(app_path, 'Taga.png'); //PATH.resolve()+PATH.sep+'Taga.png';
     //taga_source_path = PATH.join(__dirname,'..','..','Taga.png') //PATH.resolve()+PATH.sep+'Taga.png';
     FS.copyFileSync(taga_source_path, `${PATH.join(TAGA_DATA_DIRECTORY, 'Taga.png')}`, FS.constants.COPYFILE_EXCL);
-    //TODO: or else get a random entry instead!
   }
   let taga_obj_tmp = await DB_MODULE.Get_Tagging_Record_From_DB('Taga.png');
   if (taga_obj_tmp == undefined) {

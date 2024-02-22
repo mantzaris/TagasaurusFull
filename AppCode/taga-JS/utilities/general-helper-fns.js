@@ -126,6 +126,9 @@ exports.Sort_Based_On_Scores_ASC = Sort_Based_On_Scores_ASC;
 async function Remove_Relations_To_File(entry, call_back) {
   if (!entry) return;
 
+  //TODO: remove in the future
+  console.info(`deleting entry: `);
+  console.table(entry);
   //await Handle_Delete_FileFrom_Cluster(entry);
   const { fileName, fileHash, taggingMemeChoices, faceDescriptors } = entry;
   const img_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${fileName}`;
