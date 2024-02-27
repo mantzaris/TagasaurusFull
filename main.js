@@ -14,11 +14,23 @@ const APP_PATH = app.getAppPath();
 ////////////////////////////////////////////////////////////////////////////////////
 //Dynamically Link the unpacked faiss-napi .so files from the node_modules
 ////////////////////////////////////////////////////////////////////////////////////
+// TODO: make sure this works for windows TEST!
 const unpackedPath = PATH.join(APP_PATH, '..', 'app.asar.unpacked');
 const soDir = PATH.join(unpackedPath, 'node_modules', 'faiss-napi', 'build', 'Release');
 
+const isWindows = process.platform === 'win32';
+
+if (isWindows) {
+  const dllDir = PATH.join(unpackedPath, 'node_modules', 'faiss-napi', 'build', 'Release');
+  if (FS.existsSync(dllDir)) {
+    process.env.PATH = `${dllDir};${process.env.PATH}`;
+  } else {
+    console.error('DLL directory does not exist:', dllDir);
+  }
+}
+
 // Optionally verify soDir exists
-if (FS.existsSync(soDir)) {
+if (!isWindows && FS.existsSync(soDir)) {
   // Prepend the directory to LD_LIBRARY_PATH
   process.env.LD_LIBRARY_PATH = `${soDir}:${process.env.LD_LIBRARY_PATH || ''}`;
 } else {

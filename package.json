@@ -79,21 +79,23 @@
     ],
     "extraResources": [
       {
-        "from": "./Assets/lib",
-        "to": "lib"
+        "from": "./LinuxRunOnExternalMedia",
+        "to": "../LinuxRunOnExternalMedia"
       }
     ],
     "linux": {
       "icon": "Assets/taga-icon/TagaIcon512x512.png",
       "asarUnpack": [
-        "LinuxRunOnExternalMedia/**",
         "node_modules/faiss-napi/build/Release/*"
       ],
       "maintainer": "mantzaris",
       "category": "utility"
     },
     "win": {
-      "icon": "Assets/taga-icon/TagaIcon512x512.png"
+      "icon": "Assets/taga-icon/TagaIcon512x512.png",
+      "asarUnpack": [
+        "node_modules/faiss-napi/build/Release/*"
+      ]
     },
     "portable": {
       "artifactName": "tagasaurus.app"
