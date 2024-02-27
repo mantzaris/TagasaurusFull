@@ -15,6 +15,7 @@ const APP_PATH = app.getAppPath();
 //Dynamically Link the unpacked faiss-napi .so files from the node_modules
 ////////////////////////////////////////////////////////////////////////////////////
 // TODO: make sure this works for windows TEST!
+console.log(`process.platform = ${process.platform}`);
 const unpackedPath = PATH.join(APP_PATH, '..', 'app.asar.unpacked');
 const soDir = PATH.join(unpackedPath, 'node_modules', 'faiss-napi', 'build', 'Release');
 

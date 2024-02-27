@@ -2,15 +2,29 @@ const FS = require('fs');
 const PATH = require('path');
 
 const stopword = require('stopword');
-const natural = require('natural');
-const tokenizer = new natural.WordTokenizer();
+
+const winkTokenizer = require('wink-tokenizer');
+const tokenizer = winkTokenizer();
+// const natural = require('natural');
+// const tokenizer = new natural.WordTokenizer();
 
 const combined_Stopwords = Get_StopWords();
 
-exports.process_description = function (text) {
+function process_description(text) {
+  console.log(text);
   const tokens = tokenizer.tokenize(text);
-  return stopword.removeStopwords(tokens, combined_Stopwords);
-};
+  console.log(tokens);
+
+  const words = tokens
+    .filter((token) => token.tag === 'word' || token.tag === 'alien' || token.tag == 'number' || token.tag == 'time' || token.tag == 'url' || token.tag == 'email')
+    .map((token) => token.value.toLowerCase());
+  console.log(words);
+  const filteredWords = stopword.removeStopwords(words, combined_Stopwords);
+  console.log(filteredWords);
+  return [...new Set(filteredWords)];
+}
+
+exports.process_description = process_description;
 
 function Get_StopWords() {
   const selectedLanguages = JSON.parse(localStorage.getItem('selected-stopword-languages')) || ['eng', 'ell'];

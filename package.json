@@ -64,7 +64,8 @@
     "ml-kmeans": "^6.0.0",
     "natural": "^6.10.4",
     "path": "^0.12.7",
-    "stopword": "^3.0.1"
+    "stopword": "^3.0.1",
+    "wink-tokenizer": "^5.3.0"
   },
   "selfUpdate": false,
   "build": {

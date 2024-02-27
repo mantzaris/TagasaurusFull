@@ -842,20 +842,24 @@ document.addEventListener('drop', async (ev) => {
   ev.preventDefault();
   ev.stopPropagation();
 
-  //TODO: this needs to come back, sometimes this is length == 0
-  // if (ev.dataTransfer.files.length == 0) {
-  //   alert('unidentified object dropped, only valid media files, eg (png,pdf,mp4,mp3...)');
-  //   return;
-  // }
+  if (ev.dataTransfer.files.length == 0) {
+    alert('issue with dropping, try again (make sure valid media, like png/pdf/mp4/mp3)');
+    return;
+  }
 
   if (ev.dataTransfer.files.length > 1) {
     alert('only 1 file at a time');
     return;
   }
 
-  const { path } = ev.dataTransfer.files[0];
-  if ((await Load_New_Image(path)) === null) {
-    alert('unidentified object dropped, only valid media files, eg (png,pdf,mp4,mp3...)');
+  try {
+    const { path } = ev.dataTransfer.files[0];
+    if ((await Load_New_Image(path)) === null) {
+      alert('unidentified object dropped, only valid media files, eg (png,pdf,mp4,mp3...)');
+    }
+  } catch (error) {
+    console.error('Error processing the dropped file:', error);
+    alert('An error occurred while processing dropped file. Please try again.');
   }
 });
 
