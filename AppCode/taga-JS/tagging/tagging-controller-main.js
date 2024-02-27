@@ -842,6 +842,7 @@ document.addEventListener('drop', async (ev) => {
   ev.preventDefault();
   ev.stopPropagation();
 
+  //TODO: this needs to come back, sometimes this is length == 0
   // if (ev.dataTransfer.files.length == 0) {
   //   alert('unidentified object dropped, only valid media files, eg (png,pdf,mp4,mp3...)');
   //   return;

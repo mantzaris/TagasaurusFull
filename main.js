@@ -4,10 +4,29 @@ const PATH = require('path');
 const FS = require('fs');
 const DATABASE = require('better-sqlite3');
 
-const { IndexFlatL2, Index, IndexFlatIP, MetricType } = require('faiss-napi');
-const { result } = require('lodash');
-
 const { GetFileTypeFromFileName } = require(PATH.join(__dirname, 'AppCode', 'taga-JS', 'utilities', 'files.js'));
+
+const APP_PATH = app.getAppPath();
+
+//for the main.js set up
+//const {  } = require(PATH.join(__dirname, 'AppCode', 'taga-MAIN', 'faiss-deps.js'));
+
+////////////////////////////////////////////////////////////////////////////////////
+//Dynamically Link the unpacked faiss-napi .so files from the node_modules
+////////////////////////////////////////////////////////////////////////////////////
+const unpackedPath = PATH.join(APP_PATH, '..', 'app.asar.unpacked');
+const soDir = PATH.join(unpackedPath, 'node_modules', 'faiss-napi', 'build', 'Release');
+
+// Optionally verify soDir exists
+if (FS.existsSync(soDir)) {
+  // Prepend the directory to LD_LIBRARY_PATH
+  process.env.LD_LIBRARY_PATH = `${soDir}:${process.env.LD_LIBRARY_PATH || ''}`;
+} else {
+  console.error('Shared library directory does not exist:', soDir);
+}
+////////////////////////////////////////////////////////////////////////////////////
+
+const { IndexFlatL2, Index, IndexFlatIP, MetricType } = require('faiss-napi');
 
 require('dotenv').config();
 
@@ -26,7 +45,6 @@ if (BUILD_INSTALLER) {
   TAGA_FILES_DIRECTORY = PATH.join(__dirname, '..', '..', '..', 'TagasaurusFiles');
 }
 
-const APP_PATH = app.getAppPath();
 const TAGA_DATA_DIRECTORY = PATH.join(TAGA_FILES_DIRECTORY, 'files'); //where the media files get stored
 //const USER_DATA_PATH = app.getPath('documents')
 
@@ -63,7 +81,7 @@ function createWindow() {
       nodeIntegrationInWorker: true,
       webgl: true,
       allowRunningInsecureContent: true,
-      devTools: DEBUG_BUILD,
+      devTools: true, //TODO: replace with DEBUG_BUILD,
     },
   }); //devTools: !app.isPackaged,
   //LOAD THE STARTING .html OF THE APP->

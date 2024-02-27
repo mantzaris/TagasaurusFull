@@ -69,6 +69,7 @@
   "selfUpdate": false,
   "build": {
     "appId": "tagasaurus",
+    "asar": true,
     "files": [
       "!.github",
       "!README.md",
@@ -85,7 +86,8 @@
     "linux": {
       "icon": "Assets/taga-icon/TagaIcon512x512.png",
       "asarUnpack": [
-        "LinuxRunOnExternalMedia/**"
+        "LinuxRunOnExternalMedia/**",
+        "node_modules/faiss-napi/build/Release/*"
       ],
       "maintainer": "mantzaris",
       "category": "utility"
