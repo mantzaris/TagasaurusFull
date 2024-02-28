@@ -178,7 +178,8 @@ async function Display_Image() {
     center_gallery_element.src = display_path;
     parent.appendChild(center_gallery_element);
   } else if (fileType == 'pdf') {
-    await Display_PDF(display_path);
+    await Display_PDF(display_path); //sets the center_gallery_element
+    return;
   } else {
     center_gallery_element = document.createElement('video');
     center_gallery_element.autoplay = true;
