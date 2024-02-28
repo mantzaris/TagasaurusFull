@@ -71,3 +71,15 @@ function Update_Stopword_Languages() {
 }
 
 window.addEventListener('DOMContentLoaded', Populate_StopWords_Langs);
+
+////////////////////
+//for FPS selection
+////////////////////
+let current_fps = parseFloat(localStorage.getItem('face-api-FPS'));
+document.getElementById('fps-selection').value = current_fps ? current_fps : 0.5;
+document.getElementById('fps-selection').addEventListener('change', Update_faceapi_FPS);
+
+function Update_faceapi_FPS(event) {
+  const fps = document.getElementById('fps-selection').value;
+  localStorage.setItem('face-api-FPS', fps);
+}

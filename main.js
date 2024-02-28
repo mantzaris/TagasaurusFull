@@ -9,7 +9,7 @@ const { GetFileTypeFromFileName } = require(PATH.join(__dirname, 'AppCode', 'tag
 const APP_PATH = app.getAppPath();
 
 //for the main.js set up
-//const {  } = require(PATH.join(__dirname, 'AppCode', 'taga-MAIN', 'faiss-deps.js'));
+//const {  } = require(PATH.join(__dirname, 'AppCode', 'taga-MAIN', 'main-setup.js'));
 
 ////////////////////////////////////////////////////////////////////////////////////
 //Dynamically Link the unpacked faiss-napi .so files from the node_modules

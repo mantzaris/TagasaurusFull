@@ -11,16 +11,13 @@ const tokenizer = winkTokenizer();
 const combined_Stopwords = Get_StopWords();
 
 function process_description(text) {
-  console.log(text);
   const tokens = tokenizer.tokenize(text);
-  console.log(tokens);
 
   const words = tokens
     .filter((token) => token.tag === 'word' || token.tag === 'alien' || token.tag == 'number' || token.tag == 'time' || token.tag == 'url' || token.tag == 'email')
     .map((token) => token.value.toLowerCase());
-  console.log(words);
+
   const filteredWords = stopword.removeStopwords(words, combined_Stopwords);
-  console.log(filteredWords);
   return [...new Set(filteredWords)];
 }
 

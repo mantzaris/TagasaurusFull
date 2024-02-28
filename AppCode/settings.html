@@ -62,6 +62,26 @@
     
     <hr>
 
+    <!-- SET THE INTERVAL FOR VIDEO FRAME PROCESSING -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="fps-selection" class="form-label">Number of frames per second for video face detection-processing (higher is slower but more granular)</label>
+                <select id="fps-selection" class="form-select" aria-label="Select FPS Rate">
+                    <option value="0.1">0.05</option>
+                    <option value="0.1">0.1</option>
+                    <option value="0.25">0.25</option>
+                    <option value="0.5">0.5</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="4">4</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <hr>
+
     <div class="row mt-4"> <!-- Adjust the number in mt-* to increase or decrease the space -->
         <div class="col-12">
             <button onclick="window.location.href='./welcome-screen.html'" type="button" class="btn btn-primary" id="mainmenu-button-id">Return to Main</button>

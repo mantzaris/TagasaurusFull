@@ -60,12 +60,14 @@ window.RECORD_PARSER_MAP = new Map();
 //DB INIT, sets the database and adds the obj ref to the window to not need to be loaded again
 window.DB_MODULE = require(PATH.join(__dirname, 'AppCode', 'taga-DB', 'db-fns.js'));
 
+const weight_path = PATH.join(__dirname, 'Assets', 'weights');
+const faceapi = require('@vladmandic/face-api');
+
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 //////////////////////////////
 //FACE RECOGNITION STUFF INIT
 //////////////////////////////
-const faceapi = require('@vladmandic/face-api');
 window.faceapi_loaded = false;
 //let faceapi = require('face-api.js');
 //const tf = require('@tensorflow/tfjs-node');
@@ -83,7 +85,6 @@ faceapi.env.monkeyPatch({
   createImageElement: () => document.createElement('img'),
 });
 
-const weight_path = PATH.join(__dirname, 'Assets', 'weights');
 async function Load_Face_Api_Model() {
   await detectionNet.load(weight_path);
   await faceapi.loadFaceLandmarkModel(weight_path);
@@ -94,21 +95,6 @@ async function Load_Face_Api_Model() {
 Load_Face_Api_Model();
 
 window.faceapi = faceapi;
-
-function Normalize_Vector(vector) {
-  // Convert Float32Array to a regular array if necessary
-  let arrayVector = vector instanceof Float32Array ? Array.from(vector) : vector;
-
-  let norm = Math.sqrt(arrayVector.reduce((sum, value) => sum + value * value, 0));
-  return arrayVector.map((component) => component / norm);
-}
-
-function Normalize_Face_Descriptors(res) {
-  return res.map((face) => ({
-    ...face,
-    descriptor: Normalize_Vector(face.descriptor),
-  }));
-}
 
 async function Get_Image_Face_Descriptors_And_Expresssions_From_File(imagePath) {
   let img = document.createElement('img'); // Use DOM HTMLImageElement
@@ -355,7 +341,12 @@ async function Get_Image_FaceApi_From_VIDEO(imagePath, get_emotions = false, get
 }
 window.Get_Image_FaceApi_From_VIDEO = Get_Image_FaceApi_From_VIDEO;
 
-let interval = 1; // 1 / 1 //fps;
+////////////////////////////////////////////////////
+//getting the face descriptors from video
+///////////////////////////////////////////////////
+let fps = parseFloat(localStorage.getItem('face-api-FPS'));
+let interval = fps > 0 ? 1 / fps : 2;
+
 async function extractFramesFromVideo(videoUrl, get_emotions = false, get_only_emotions = false) {
   return new Promise(async (resolve) => {
     // fully download it first (no buffering):
@@ -417,6 +408,21 @@ async function extractFramesFromVideo(videoUrl, get_emotions = false, get_only_e
     // that the events occur before we were listening.
     video.src = videoObjectUrl;
   });
+}
+
+function Normalize_Vector(vector) {
+  // Convert Float32Array to a regular array if necessary
+  let arrayVector = vector instanceof Float32Array ? Array.from(vector) : vector;
+
+  let norm = Math.sqrt(arrayVector.reduce((sum, value) => sum + value * value, 0));
+  return arrayVector.map((component) => component / norm);
+}
+
+function Normalize_Face_Descriptors(res) {
+  return res.map((face) => ({
+    ...face,
+    descriptor: Normalize_Vector(face.descriptor),
+  }));
 }
 
 function Show_Loading_Spinner() {
