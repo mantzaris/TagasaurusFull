@@ -61,7 +61,7 @@
               name="emotion-new-emotion-textarea-name"
               oninput="this.value = this.value.replace(/[ \n]/g,'')"
             ></textarea>
-            <span id="emotion-text-range-value-label-left-id">0</span> <input id="new-emotion-range-id" type="range" min="0" max="100" value="0" />
+            <span id="emotion-text-range-value-label-left-id">-100</span> <input id="new-emotion-range-id" type="range" min="-100" max="100" value="0" />
             <span id="emotion-text-range-value-label-right-id">100</span>
             <button type="button" class="fun-button-blue" id="add-new-emotion-button-id">ADD EMOTION</button>
           </div>
@@ -234,7 +234,7 @@
                 name="search-modal-emotion-tag-textarea"
                 oninput="this.value = this.value.replace(/[ \n]/g,'')"
               ></textarea>
-              <input id="modal-search-emotion-value-range-entry-id" type="range" min="0" max="100" value="0" />
+              <input id="modal-search-emotion-value-range-entry-id" type="range" min="-100" max="100" value="0" />
             </div>
             <!-- </div> -->
 
@@ -340,7 +340,7 @@
                   name="search-modal-emotion-tag-textarea"
                   oninput="this.value = this.value.replace(/[ \n]/g,'')"
                 ></textarea>
-                <input id="modal-search-add-memes-emotion-value-range-entry-id" type="range" min="0" max="100" value="0" />
+                <input id="modal-search-add-memes-emotion-value-range-entry-id" type="range" min="-100" max="100" value="0" />
               </div>
             </div>
 
@@ -357,7 +357,7 @@
                   name="search-modal-emotion-tag-textarea"
                   oninput="this.value = this.value.replace(/[ \n]/g,'')"
                 ></textarea>
-                <input id="modal-search-add-memes-emotion-meme-value-range-entry-id" type="range" min="0" max="100" value="0" />
+                <input id="modal-search-add-memes-emotion-meme-value-range-entry-id" type="range" min="-100" max="100" value="0" />
               </div>
             </div>
             <!-- the emotion label and value tuples displayed for the images of the search -->

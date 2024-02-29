@@ -277,8 +277,14 @@ function EmotionSimilarityScore(emotions, search_emotions) {
   search_emotions_keys.forEach((search_key_emotion_label) => {
     emotion_keys.forEach((record_emotion_key_label) => {
       if (search_key_emotion_label.toLowerCase() == record_emotion_key_label.toLowerCase()) {
-        let delta_tmp = (emotions[record_emotion_key_label] - search_emotions[search_key_emotion_label]) / 50;
-        let emotion_overlap_score_tmp = 1 - Math.abs(delta_tmp);
+        let emotion_overlap_score_tmp;
+
+        if (emotions[record_emotion_key_label] >= search_emotions[search_key_emotion_label]) {
+          emotion_overlap_score_tmp = 1 - (emotions[record_emotion_key_label] - search_emotions[search_key_emotion_label]) / 100;
+        } else {
+          emotion_overlap_score_tmp = 1 - (search_emotions[search_key_emotion_label] - emotions[record_emotion_key_label]) / 100;
+        }
+
         emotion_overlap_score += emotion_overlap_score_tmp; //scores range [-1,1]
       }
     });

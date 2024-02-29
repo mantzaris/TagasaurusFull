@@ -367,7 +367,7 @@ function New_Collection_Emotions_Handle() {
                             <img onclick="" class="emotion-delete-icon-class" id="emotion-delete-button-id-${key}" src="${CLOSE_ICON_BLACK}" alt="emotion-${key}" title="remove"/>
                             <span class="emotion-label-view-class" id="emotion-id-label-view-name-${key}">${key}</span>
                         </div>
-                        <input class="emotion-range-slider-class" id="emotion-range-id-${key}" type="range" min="0" max="100" value="0">
+                        <input class="emotion-range-slider-class" id="emotion-range-id-${key}" type="range" min="-100" max="100" value="0">
                         </div>
                         `;
   }

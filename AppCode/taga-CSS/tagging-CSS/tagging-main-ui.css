@@ -122,7 +122,7 @@
 
 #new-emotion-range-id {
   grid-area: emotion-range;
-  width: 60%;
+  width: 40%;
   background: var(--info);
 }
 

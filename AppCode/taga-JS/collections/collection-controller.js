@@ -201,7 +201,7 @@ function Collection_Emotion_Page() {
                                 <img onclick="" class="emotion-delete-icon-class" id="emotion-delete-button-id-${key}" src="${CLOSE_ICON_BLACK}" alt="emotion-${key}" title="remove"/>
                                 <span class="emotion-label-view-class" id="emotion-id-label-view-name-${key}">${key}</span>
                             </div>
-                            <input class="emotion-range-slider-class" id="emotion-range-id-${key}" type="range" min="0" max="100" value="0">
+                            <input class="emotion-range-slider-class" id="emotion-range-id-${key}" type="range" min="-100" max="100" value="0">
                         </div>
                         `;
   }
@@ -1359,7 +1359,7 @@ async function Collection_Add_Image_Search_Action() {
     //search_image_results.forEach( image_filename => {
 
     let image_path_tmp = PATH.join(TAGA_DATA_DIRECTORY, image_filename);
-    if (FS.existsSync(image_path_tmp) == true && current_collection_obj.collectionGalleryFiles.includes(image_filename) == false) {
+    if (FS.existsSync(image_path_tmp) == true) {
       search_results_tmp.push(image_filename);
 
       if (current_collection_obj.collectionGalleryFiles.includes(image_filename) == false) {
