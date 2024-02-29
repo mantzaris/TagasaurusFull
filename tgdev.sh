@@ -1,6 +1,7 @@
 #!/bin/bash
 BUILD_INSTALLER=true
 DEBUG_BUILD=true
+DEV=true
 
 # Check dependencies
 check_dependency() {
@@ -14,7 +15,7 @@ check_dependency npx
 #########
 
 set_config(){
-    echo "{ \"BUILD_INSTALLER\": $BUILD_INSTALLER, \"DEBUG_BUILD\": $DEBUG_BUILD }" > config.json
+    echo "{ \"BUILD_INSTALLER\": $BUILD_INSTALLER, \"DEBUG_BUILD\": $DEBUG_BUILD, \"DEV\": $DEV }" > config.json
 }
 
 if [ "$1" == "run" ]; then
@@ -27,6 +28,7 @@ if [ "$1" == "run" ]; then
 
 elif [ "$1" == "pack" ]; then
     DEBUG_BUILD=false
+    DEV=false
     echo "cleaning dependencies"
     npm run rebuild
 

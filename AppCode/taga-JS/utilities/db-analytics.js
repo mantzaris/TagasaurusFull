@@ -89,4 +89,28 @@ async function Init_Analytics() {
   Display_Skill_Levels(sample_num);
 }
 
+async function Init() {
+  Show_Loading_Spinner();
+
+  async function Check_Main_ProcessingState() {
+    const processing = await ipcRenderer.invoke('is-processing');
+    console.log(`processing = ${processing}`);
+
+    if (!processing) {
+      //complete, no spinner now
+      clearInterval(checkInterval);
+      console.log('Processing complete!');
+      Hide_Loading_Spinner();
+    } else {
+      //main still processing
+      console.log('Still processing...');
+    }
+  }
+
+  // Set up an interval to check the processing status every 300 milliseconds
+  const checkInterval = setInterval(Check_Main_ProcessingState, 200);
+}
+
+Init();
+
 Init_Analytics();

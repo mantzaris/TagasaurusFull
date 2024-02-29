@@ -204,7 +204,7 @@ async function Handle_Delete_FileFrom_Cluster(entry) {
   }
 
   //deleting lingering meme references, images which use this image as a meme on their face cluster
-  const meme_entry = await DB_MODULE.Get_Tagging_MEME_Record_From_DB(fileName);
+  const meme_entry = DB_MODULE.Get_Tagging_MEME_Record_From_DB(fileName);
 
   if (!meme_entry) return;
 

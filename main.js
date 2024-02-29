@@ -8,34 +8,44 @@ const { GetFileTypeFromFileName } = require(PATH.join(__dirname, 'AppCode', 'tag
 
 const APP_PATH = app.getAppPath();
 
+let mainWindow;
+let processing = true;
+
 //for the main.js set up
 //const {  } = require(PATH.join(__dirname, 'AppCode', 'taga-MAIN', 'main-setup.js'));
+
+//const BUILD_INSTALLER = false; //process.env.build_installer === 'true';
+const INSTALLER_CONFIG = JSON.parse(FS.readFileSync(PATH.join(__dirname, 'config.json'), 'utf-8'));
+const { BUILD_INSTALLER, DEBUG_BUILD, DEV } = INSTALLER_CONFIG;
 
 ////////////////////////////////////////////////////////////////////////////////////
 //Dynamically Link the unpacked faiss-napi .so files from the node_modules
 ////////////////////////////////////////////////////////////////////////////////////
 // TODO: make sure this works for windows TEST!
-console.log(`process.platform = ${process.platform}`);
-const unpackedPath = PATH.join(APP_PATH, '..', 'app.asar.unpacked');
-const soDir = PATH.join(unpackedPath, 'node_modules', 'faiss-napi', 'build', 'Release');
+console.log(`process.platform = ${process.platform}, DEV = ${DEV}`);
 
-const isWindows = process.platform === 'win32';
+if (!DEV) {
+  const unpackedPath = PATH.join(APP_PATH, '..', 'app.asar.unpacked');
+  const soDir = PATH.join(unpackedPath, 'node_modules', 'faiss-napi', 'build', 'Release');
 
-if (isWindows) {
-  const dllDir = PATH.join(unpackedPath, 'node_modules', 'faiss-napi', 'build', 'Release');
-  if (FS.existsSync(dllDir)) {
-    process.env.PATH = `${dllDir};${process.env.PATH}`;
-  } else {
-    console.error('DLL directory does not exist:', dllDir);
+  const isWindows = process.platform === 'win32';
+
+  if (isWindows) {
+    const dllDir = PATH.join(unpackedPath, 'node_modules', 'faiss-napi', 'build', 'Release');
+    if (FS.existsSync(dllDir)) {
+      process.env.PATH = `${dllDir};${process.env.PATH}`;
+    } else {
+      console.error('DLL directory does not exist:', dllDir);
+    }
   }
-}
 
-// Optionally verify soDir exists
-if (!isWindows && FS.existsSync(soDir)) {
-  // Prepend the directory to LD_LIBRARY_PATH
-  process.env.LD_LIBRARY_PATH = `${soDir}:${process.env.LD_LIBRARY_PATH || ''}`;
-} else {
-  console.error('Shared library directory does not exist:', soDir);
+  // Optionally verify soDir exists
+  if (!isWindows && FS.existsSync(soDir)) {
+    // Prepend the directory to LD_LIBRARY_PATH
+    process.env.LD_LIBRARY_PATH = `${soDir}:${process.env.LD_LIBRARY_PATH || ''}`;
+  } else {
+    console.error('Shared library directory does not exist:', soDir);
+  }
 }
 ////////////////////////////////////////////////////////////////////////////////////
 
@@ -45,10 +55,6 @@ require('dotenv').config();
 
 //needed for ffmpeg, the shared buffer was not there by default for some reason
 app.commandLine.appendSwitch('enable-features', 'SharedArrayBuffer');
-
-//const BUILD_INSTALLER = false; //process.env.build_installer === 'true';
-const INSTALLER_CONFIG = JSON.parse(FS.readFileSync(PATH.join(__dirname, 'config.json'), 'utf-8'));
-const { BUILD_INSTALLER, DEBUG_BUILD } = INSTALLER_CONFIG;
 
 let TAGA_FILES_DIRECTORY;
 if (BUILD_INSTALLER) {
@@ -74,8 +80,6 @@ console.log('icon path = ', tmp_icon_dir);
 let exists = FS.existsSync(tmp_icon_dir);
 console.log(`icon path exists = `, exists);
 
-let mainWindow;
-
 function createWindow() {
   // //tray stuff
   //const tray = new Tray(PATH.join(__dirname,"icon.png"))
@@ -99,7 +103,14 @@ function createWindow() {
   }); //devTools: !app.isPackaged,
   //LOAD THE STARTING .html OF THE APP->
   mainWindow.loadFile(PATH.join(__dirname, 'AppCode', 'welcome-screen.html')); //PATH.resolve(__dirname,'./AppCode/welcome-screen.html'))
-  //mainWindow.setIcon(tmp_icon_dir)
+
+  mainWindow.on('close', (e) => {
+    if (processing) {
+      e.preventDefault();
+      //TODO: inform user of processing delay
+    }
+  });
+
   // mainWindow.webContents.openDevTools()
 }
 
@@ -308,6 +319,10 @@ async function PopulateDefaultTaggingEntries() {
   }
 }
 
+ipcMain.handle('is-processing', (_) => {
+  return processing;
+});
+
 //FILE SELECTION DIALOGUE WINDOWS START>>>
 //for the ability to load a dialog window in selecting images/files
 ipcMain.handle('dialog:tagging-new-file-select', async (event, args) => {
@@ -355,6 +370,8 @@ ipcMain.handle('getDownloadsFolder', async () => app.getPath('downloads'));
 app.whenReady().then(() => {
   Init(); //createWindow();
   InitializeAndLoadFAISS();
+
+  processing = false;
 
   //tray stuff
   //const tray = new Tray(PATH.join(__dirname,"icon.png"))
@@ -510,7 +527,7 @@ function FAISS_Remove_Entries(rowids) {
 
 //puts waiting entries from DB into FAISS and then Deletes those entries from the DB
 function FAISS_Put_Queue_Into_Index() {
-  const all_queue_entries = FAISS_Queue_DB_Get_All_Entries();
+  const all_queue_entries = FAISS_Queue_DB_Get_All_Entries(); //TODO: make a generator instead to handle 1 by 1
   const max_search = 10;
 
   for (const { embedding, rowid } of all_queue_entries) {

@@ -22,7 +22,7 @@ function Get_All_TaggingMeme_Records_From_DB() {
 
 exports.Get_All_TaggingMeme_Records_From_DB = Get_All_TaggingMeme_Records_From_DB;
 
-async function Get_Tagging_MEME_Record_From_DB(filename) {
+function Get_Tagging_MEME_Record_From_DB(filename) {
   let record = GET_FILENAME_TAGGING_MEME_STMT.get(filename);
 
   if (!record) return null;
