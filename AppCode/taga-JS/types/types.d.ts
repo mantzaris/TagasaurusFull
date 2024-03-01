@@ -7,5 +7,4 @@ declare interface TaggingEntry {
   taggingEmotions: Record<string, string>;
   taggingMemeChoices: string[];
   faceDescriptors: number[][];
-  faceClusters: number[];
 }

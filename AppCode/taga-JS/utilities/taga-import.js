@@ -3,8 +3,6 @@ const IPC_Renderer3 = require('electron').ipcRenderer;
 const PATH = require('path');
 const { DB_MODULE } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js')); //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
-const { CreateTaggingEntryCluster } = require(PATH.join(__dirname, 'taga-JS', 'utilities', 'cluster.js'));
-
 const ft = require('file-type');
 const extract = require('extract-zip');
 const { existsSync, mkdirSync, readFileSync } = require('fs-extra');
@@ -131,8 +129,6 @@ async function HandleImport() {
     incoming.file_name = file_name;
 
     let tagging_entry = TranslateEntryFromSnakeCase(incoming);
-
-    tagging_entry = await CreateTaggingEntryCluster(tagging_entry);
 
     if (tagging_entry.faceDescriptors.length > 0) {
       const descriptors = Array.isArray(tagging_entry.faceDescriptors[0]) ? tagging_entry.faceDescriptors : [tagging_entry.faceDescriptors];

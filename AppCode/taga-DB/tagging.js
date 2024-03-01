@@ -5,15 +5,15 @@ const GET_HASH_TAGGING_STMT = DB.prepare(`SELECT fileHash FROM ${TAGGING_TABLE_N
 const GET_RECORD_FROM_ROWID_TAGGING_STMT = DB.prepare(`SELECT * FROM ${TAGGING_TABLE_NAME} WHERE ROWID=?`);
 
 const INSERT_TAGGING_STMT = DB.prepare(
-  `INSERT INTO ${TAGGING_TABLE_NAME} (fileName, fileHash, fileType, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors, faceClusters) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  `INSERT INTO ${TAGGING_TABLE_NAME} (fileName, fileHash, fileType, taggingRawDescription, taggingTags, taggingEmotions, taggingMemeChoices, faceDescriptors) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 );
 
 const UPDATE_FILENAME_TAGGING_STMT = DB.prepare(
-  `UPDATE ${TAGGING_TABLE_NAME} SET fileName=?, fileHash=?, fileType=?, taggingRawDescription=?, taggingTags=?, taggingEmotions=?, taggingMemeChoices=?, faceDescriptors=?, faceClusters=? WHERE fileName=?`
+  `UPDATE ${TAGGING_TABLE_NAME} SET fileName=?, fileHash=?, fileType=?, taggingRawDescription=?, taggingTags=?, taggingEmotions=?, taggingMemeChoices=?, faceDescriptors=? WHERE fileName=?`
 );
 
 const UPDATE_TAGGING_BY_FILEHASH_STMT = DB.prepare(
-  `UPDATE ${TAGGING_TABLE_NAME} SET fileName=?, fileHash=?, fileType=?, taggingRawDescription=?, taggingTags=?, taggingEmotions=?, taggingMemeChoices=?, faceDescriptors=?, faceClusters=? WHERE fileHash=?`
+  `UPDATE ${TAGGING_TABLE_NAME} SET fileName=?, fileHash=?, fileType=?, taggingRawDescription=?, taggingTags=?, taggingEmotions=?, taggingMemeChoices=?, faceDescriptors=? WHERE fileHash=?`
 );
 
 const DELETE_FILENAME_TAGGING_STMT = DB.prepare(`DELETE FROM ${TAGGING_TABLE_NAME} WHERE fileName=?`);
@@ -133,20 +133,6 @@ function Get_Hashes_From_FileNames(filenames) {
 
 exports.Get_Hashes_From_FileNames = Get_Hashes_From_FileNames;
 
-function Get_Tagging_ClusterIDS_From_FileNames(filenames) {
-  const placeholders = filenames.map((_) => '?').join(', ');
-  const stmt = DB.prepare(`SELECT faceClusters FROM ${TAGGING_TABLE_NAME} WHERE fileName IN (${placeholders})`);
-
-  const ids = stmt
-    .all(...filenames)
-    .map((r) => JSON.parse(r.faceClusters))
-    .flatMap((c) => c);
-
-  return [...new Set(ids)];
-}
-
-exports.Get_Tagging_ClusterIDS_From_FileNames = Get_Tagging_ClusterIDS_From_FileNames;
-
 function Get_Memes_From_FileNames(filenames) {
   const placeholders = filenames.map((_) => '?').join(', ');
   return DB.prepare(`SELECT taggingMemeChoices FROM ${TAGGING_TABLE_NAME} WHERE fileName IN (${placeholders})`)
@@ -208,8 +194,7 @@ function Insert_Record_Into_DB(tagging_obj) {
     JSON.stringify(tagging_obj.taggingTags),
     JSON.stringify(tagging_obj.taggingEmotions),
     JSON.stringify(tagging_obj.taggingMemeChoices),
-    JSON.stringify(tagging_obj.faceDescriptors),
-    JSON.stringify(tagging_obj.faceClusters)
+    JSON.stringify(tagging_obj.faceDescriptors)
   );
   Set_Max_Min_Rowid();
 }
@@ -227,7 +212,6 @@ function Update_Tagging_Annotation_DB(tagging_obj) {
     JSON.stringify(tagging_obj.taggingEmotions),
     JSON.stringify(tagging_obj.taggingMemeChoices),
     JSON.stringify(tagging_obj.faceDescriptors),
-    JSON.stringify(tagging_obj.faceClusters),
     tagging_obj.fileName
   );
 }
@@ -245,7 +229,6 @@ function Update_Tagging_Annotation_by_fileHash_DB(tagging_obj) {
     JSON.stringify(tagging_obj.taggingEmotions),
     JSON.stringify(tagging_obj.taggingMemeChoices),
     JSON.stringify(tagging_obj.faceDescriptors),
-    JSON.stringify(tagging_obj.faceClusters),
     tagging_obj.fileHash
   );
 }
@@ -308,6 +291,5 @@ function Get_Obj_Fields_From_Record(record) {
   record.taggingEmotions = JSON.parse(record.taggingEmotions);
   record.taggingMemeChoices = JSON.parse(record.taggingMemeChoices);
   record.faceDescriptors = JSON.parse(record.faceDescriptors);
-  record.faceClusters = JSON.parse(record.faceClusters);
   return record;
 }

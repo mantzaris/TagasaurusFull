@@ -83,6 +83,7 @@ export_button.onclick = async () => {
 };
 
 async function GenerateTaggingExportJSON() {
+  //TODO: use generator to avoid the all in one pull
   const all_tagging = Get_All_Tagging_Records_From_DB();
 
   const tagging = new Array(all_tagging.length);
@@ -98,7 +99,6 @@ async function GenerateTaggingExportJSON() {
       emotions: {},
       file_size: 0,
       meme_choices: [],
-      face_clusters: [],
       face_descriptors: [],
     };
 
@@ -123,6 +123,7 @@ async function GenerateTaggingExportJSON() {
 }
 
 async function GenerateTaggingMemesExportJSON() {
+  //TODO: use generator to get 1 by 1
   const all_tagging_memes = DB_MODULE.Get_All_TaggingMeme_Records_From_DB();
 
   const memes = new Array(all_tagging_memes.length);
@@ -145,6 +146,7 @@ async function GenerateTaggingMemesExportJSON() {
 }
 
 async function GenerateCollectionExportJSON() {
+  //TODO: use generator to get 1 by 1
   const db_entries = DB_MODULE.Get_All_Collections();
   const collections = new Array(db_entries.length);
 
@@ -184,6 +186,7 @@ async function GenerateCollectionExportJSON() {
 }
 
 async function GenerateCollectionMemesExportJSON() {
+  //TODO: use generator to get 1 by 1
   const db_entries = await DB_MODULE.Get_All_Collection_Memes();
   const collection_memes = new Array(db_entries.length);
 
@@ -205,6 +208,7 @@ async function GenerateCollectionMemesExportJSON() {
 }
 
 function GenerateCollectionGalleryExportJSON() {
+  //TODO: use generator to get 1 by 1
   const db_entries = DB_MODULE.Get_All_Collection_Galleries();
   const collection_galleries = new Array(db_entries.length);
 

@@ -5,7 +5,6 @@ const IPC_RENDERER = require('electron').ipcRenderer;
 const { ipcRenderer } = require('electron');
 //const { Store } = require(PATH.join(__dirname, 'taga-JS', 'utilities', 'stores.js'));
 
-const { CreateTaggingEntryCluster, ComputeAvgFaceDescriptor } = require(PATH.join(__dirname, 'taga-JS', 'utilities', 'cluster.js'));
 const { GetFileTypeFromFileName, GetFileTypeFromMimeType } = require(PATH.join(__dirname, 'taga-JS', 'utilities', 'files.js'));
 
 const { TAGA_DATA_DIRECTORY, MAX_COUNT_SEARCH_RESULTS, SEARCH_MODULE, DESCRIPTION_PROCESS_MODULE, MY_FILE_HELPER, GENERAL_HELPER_FNS } = require(PATH.join(
@@ -26,7 +25,6 @@ const TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION = {
   taggingEmotions: { good: '0', bad: '0' },
   taggingMemeChoices: [],
   faceDescriptors: [],
-  faceClusters: [],
 };
 
 const reg_exp_delims = /[#:,;| ]+/;
@@ -225,7 +223,7 @@ async function Emotion_Display_Fill() {
                                 <img class="emotion-delete-icon-class" id="emotion-delete-button-id-${key}" 
                                     src="${CLOSE_ICON_BLACK}" alt="emotions" title="remove"  />
                                 <span class="emotion-label-view-class" id="emotion-id-label-view-name-${key}">${key}</span>
-                                <input id="emotion-range-id-${key}" type="range" min="0" max="100" value="0">
+                                <input id="emotion-range-id-${key}" type="range" min="-100" max="100" value="0">
                             </div>
                             `;
   }
@@ -592,25 +590,6 @@ function fromBinary(binary) {
   return result;
 }
 
-//TODO: deal with
-async function Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags, fileName, newMemes }, clustersIDS) {
-  // const additions = newTags.filter((item) => !origTags.includes(item));
-  // const subtractions = origTags.filter((item) => !newTags.includes(item));
-  // const clusters = DB_MODULE.Get_FaceClusters_From_IDS(clustersIDS);
-  // for (let i = 0; i < clusters.length; i++) {
-  //   for (const key of additions) {
-  //     clusters[i].keywords[key] = (clusters[i].keywords[key] || 0) + 1;
-  //   }
-  //   for (const key of subtractions) {
-  //     clusters[i].keywords[key] = (clusters[i].keywords[key] || 1) - 1;
-  //     if (clusters[i].keywords[key] == 0) delete clusters[i].keywords[key];
-  //   }
-  //   clusters[i].images[fileName].memes = newMemes;
-  //   const { rowid, avgDescriptor, relatedFaces, keywords, images } = clusters[i];
-  //   DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, rowid);
-  // }
-}
-
 async function Save_Image_Annotation_Changes() {
   const entry = current_tagging_entry.Get();
   //save meme changes
@@ -630,8 +609,6 @@ async function Save_Image_Annotation_Changes() {
   const rawDescription = document.getElementById('description-textarea-id').value;
   const newTags = DESCRIPTION_PROCESS_MODULE.process_description(rawDescription);
   const origTags = entry.taggingTags;
-
-  await Update_Cluster_For_Updated_TaggingEntry({ newTags, origTags, fileName: entry.fileName, newMemes }, entry.faceClusters);
 
   entry.taggingMemeChoices = newMemes;
   entry.taggingRawDescription = rawDescription;
@@ -664,7 +641,7 @@ async function Load_Default_Taga_Image() {
   entry.fileName = 'Taga.png';
   entry.fileHash = MY_FILE_HELPER.Return_File_Hash(taga_path);
   entry.fileType = await GetFileTypeFromFileName(entry.fileName);
-  entry.faceClusters = [];
+
   current_tagging_entry.Set(entry);
 
   try {
@@ -719,39 +696,40 @@ async function Load_New_Image(filename) {
   Show_Loading_Spinner();
 
   let tagging_entry = null;
+
   for (const filename of filenames) {
-    let tmp = Object.assign({}, TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION);
+    let entry_tmp = Object.assign({}, TAGGING_DEFAULT_EMPTY_IMAGE_ANNOTATION);
     let filepath = PATH.join(TAGA_DATA_DIRECTORY, filename);
 
-    tmp.fileName = filename;
-    tmp.fileHash = MY_FILE_HELPER.Return_File_Hash(filepath);
+    entry_tmp.fileName = filename;
+    entry_tmp.fileHash = MY_FILE_HELPER.Return_File_Hash(filepath);
 
-    const hash_present = DB_MODULE.Check_Tagging_Hash_From_DB(tmp.fileHash);
+    const hash_present = DB_MODULE.Check_Tagging_Hash_From_DB(entry_tmp.fileHash);
 
     if (!hash_present) {
       const filetype = await fileType.fromFile(filepath);
       if (!filetype) continue;
 
-      tmp.fileType = GetFileTypeFromMimeType(filetype.mime);
+      entry_tmp.fileType = GetFileTypeFromMimeType(filetype.mime);
 
       if (filetype.mime.includes('image')) {
         if (filetype.ext == 'gif') {
           if (auto_fill_emotions.Get()) {
             const { faceDescriptors, faceEmotions } = await Get_Image_Face_Expresssions_From_GIF(filepath, true);
-            tmp.faceDescriptors = faceDescriptors;
-            tmp.taggingEmotions = faceEmotions;
+            entry_tmp.faceDescriptors = faceDescriptors;
+            entry_tmp.taggingEmotions = faceEmotions;
           } else {
             const { faceDescriptors } = await Get_Image_Face_Expresssions_From_GIF(filepath);
-            tmp.faceDescriptors = faceDescriptors;
+            entry_tmp.faceDescriptors = faceDescriptors;
           }
         } else {
           if (auto_fill_emotions.Get()) {
             const faces = await Get_Image_Face_Descriptors_And_Expresssions_From_File(filepath);
-            tmp.taggingEmotions = Auto_Fill_Emotions(faces, tmp);
-            tmp.faceDescriptors = await Get_Face_Descriptors_Arrays(faces);
+            entry_tmp.taggingEmotions = Auto_Fill_Emotions(faces, entry_tmp);
+            entry_tmp.faceDescriptors = await Get_Face_Descriptors_Arrays(faces);
           } else {
             const faces = await Get_Image_Face_Descriptors_From_File(filepath);
-            tmp.faceDescriptors = await Get_Face_Descriptors_Arrays(faces);
+            entry_tmp.faceDescriptors = await Get_Face_Descriptors_Arrays(faces);
           }
         }
       } else if (filetype.mime.includes('video')) {
@@ -770,25 +748,25 @@ async function Load_New_Image(filename) {
             if (err) console.error('problem deleting video copied after ffmpeg', err);
           });
 
-          tmp.fileName = output_name;
+          entry_tmp.fileName = output_name;
           filepath = PATH.join(TAGA_DATA_DIRECTORY, output_name);
         }
 
         if (auto_fill_emotions.Get()) {
           const { video_face_descriptors, emotions_total } = await Get_Image_FaceApi_From_VIDEO(filepath, true, false);
-          tmp.faceDescriptors = video_face_descriptors;
-          tmp.taggingEmotions = emotions_total;
+          entry_tmp.faceDescriptors = video_face_descriptors;
+          entry_tmp.taggingEmotions = emotions_total;
         } else {
           const { video_face_descriptors } = await Get_Image_FaceApi_From_VIDEO(filepath, false, false);
-          tmp.faceDescriptors = video_face_descriptors;
+          entry_tmp.faceDescriptors = video_face_descriptors;
         }
       } else if (filetype.mime.includes('audio')) {
         if (!(filetype.mime.includes('mp3') || filetype.mime.includes('wav') || filetype.mime.includes('mpeg'))) {
-          const base_name = PATH.parse(tmp.fileName).name;
+          const base_name = PATH.parse(entry_tmp.fileName).name;
           const output_name = base_name + '.mp3';
           await ipcRenderer.invoke('ffmpegDecode', {
             base_dir: TAGA_DATA_DIRECTORY,
-            file_in: tmp.fileName,
+            file_in: entry_tmp.fileName,
             file_out: output_name,
           });
 
@@ -796,7 +774,7 @@ async function Load_New_Image(filename) {
             if (err) console.error('problem deleting video copied after ffmpeg', err);
           });
 
-          tmp.fileName = output_name;
+          entry_tmp.fileName = output_name;
           filepath = PATH.join(TAGA_DATA_DIRECTORY, output_name);
         }
       } else if (filetype.mime.includes('pdf') == true) {
@@ -805,9 +783,7 @@ async function Load_New_Image(filename) {
         continue;
       }
 
-      //face cluster insertion code
-      tagging_entry = await CreateTaggingEntryCluster(tmp);
-
+      tagging_entry = entry_tmp;
       DB_MODULE.Insert_Record_Into_DB(tagging_entry);
 
       if (tagging_entry.faceDescriptors.length > 0) {
@@ -855,6 +831,7 @@ document.addEventListener('drop', async (ev) => {
 
   try {
     const { path } = ev.dataTransfer.files[0];
+
     if ((await Load_New_Image(path)) === null) {
       alert('unidentified object dropped, only valid media files, eg (png,pdf,mp4,mp3...)');
     }
@@ -1434,7 +1411,7 @@ async function Add_New_Meme() {
     const entry = current_tagging_entry.Get();
 
     const origMemes = entry.taggingMemeChoices;
-    const { fileName, faceClusters, taggingTags } = entry;
+    const { fileName, taggingTags } = entry;
 
     //meme selection switch check boxes
     const meme_switch_booleans = [];
@@ -1464,8 +1441,6 @@ async function Add_New_Meme() {
     entry.taggingMemeChoices = [...new Set(meme_switch_booleans)]; //add a 'unique' set of memes as the 'new Set' has unique contents
     current_tagging_entry.Set(entry);
     DB_MODULE.Update_Tagging_Annotation_DB(entry);
-
-    await Update_Cluster_For_Updated_TaggingEntry({ newTags: taggingTags, origTags: taggingTags, fileName, newMemes: entry.taggingMemeChoices }, faceClusters);
 
     Load_Image_State();
 

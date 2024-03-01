@@ -129,7 +129,7 @@ async function Remove_Relations_To_File(entry, call_back) {
   //TODO: remove in the future
   console.info(`deleting entry: `);
   console.table(entry);
-  //await Handle_Delete_FileFrom_Cluster(entry);
+
   const { fileName, fileHash, taggingMemeChoices, faceDescriptors } = entry;
   const img_path = `${TAGA_DATA_DIRECTORY}${PATH.sep}${fileName}`;
 
@@ -160,65 +160,3 @@ async function Remove_Relations_To_File(entry, call_back) {
 }
 
 exports.Remove_Relations_To_File = Remove_Relations_To_File;
-
-async function Handle_Delete_FileFrom_Cluster(entry) {
-  const { fileName, taggingTags, faceClusters } = entry;
-  const face_clusters = DB_MODULE.Get_FaceClusters_From_IDS(faceClusters);
-
-  const empty_clusters = [];
-  const updated_clusters = [];
-
-  for (let i = 0; i < face_clusters.length; i++) {
-    const cluster = face_clusters[i];
-
-    delete cluster.relatedFaces[fileName];
-
-    const remaining_related_faces = Object.values(cluster.relatedFaces).flatMap((v) => v);
-
-    if (remaining_related_faces.length == 0) {
-      empty_clusters.push(cluster.rowid);
-      continue;
-    }
-
-    const avg = ComputeAvgFaceDescriptor(remaining_related_faces);
-    cluster.avgDescriptor = avg;
-
-    for (const tag of taggingTags) {
-      cluster.keywords[tag] = (cluster.keywords[tag] || 1) - 1;
-      if (cluster.keywords[tag] == 0) delete cluster.keywords[tag];
-    }
-
-    delete cluster.images[fileName];
-
-    updated_clusters.push(cluster);
-
-    if (face_clusters[i].thumbnail == fileName) {
-      DB_MODULE.Update_FaceCluster_Thumbnail(face_clusters[i].rowid, null);
-    }
-  }
-
-  if (empty_clusters.length > 0) DB_MODULE.Delete_FaceClusters_By_IDS(empty_clusters);
-
-  for (const { rowid, avgDescriptor, relatedFaces, keywords, images } of updated_clusters) {
-    DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, rowid);
-  }
-
-  //deleting lingering meme references, images which use this image as a meme on their face cluster
-  const meme_entry = DB_MODULE.Get_Tagging_MEME_Record_From_DB(fileName);
-
-  if (!meme_entry) return;
-
-  const { fileNames } = meme_entry;
-  const cluster_ids = DB_MODULE.Get_Tagging_ClusterIDS_From_FileNames(fileNames);
-
-  const clusters = DB_MODULE.Get_FaceClusters_From_IDS(cluster_ids);
-
-  for (let i = 0; i < clusters.length; i++) {
-    for (const [filename, data] of Object.entries(clusters[i].images)) {
-      clusters[i].images[filename].memes = data.memes.filter((filename) => filename != fileName);
-
-      const { rowid, avgDescriptor, relatedFaces, keywords, images } = clusters[i];
-      DB_MODULE.Update_FaceCluster_ROWID(avgDescriptor, relatedFaces, keywords, images, rowid);
-    }
-  }
-}

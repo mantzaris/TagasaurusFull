@@ -590,28 +590,6 @@ function Display_Memes_Found() {
 ////////////////////
 // OLD CODE
 ///////////////////
-// async function PullTaggingClusters() {
-//   const all_face_clusters = DB_MODULE.Get_All_FaceClusters();
-
-//   for (const face_cluster of all_face_clusters) {
-//     for (const [fileName, fileTypeAndMemes] of Object.entries(face_cluster.images)) {
-//       if (fileTypeAndMemes.fileType != 'image' && fileTypeAndMemes.fileType != 'gif') {
-//         delete face_cluster.images[fileName];
-
-//         continue;
-//       }
-
-//       if (!face_cluster.memes) face_cluster.memes = [];
-
-//       if (selection_mode.memes) {
-//         face_cluster.memes = [...face_cluster.memes, ...fileTypeAndMemes.memes];
-//       }
-
-//       clusters.set(face_cluster.rowid, face_cluster);
-//     }
-//   }
-// }
-
 // function calculateL2Norm(vector) {
 //   let sumOfSquares = vector.reduce((sum, value) => sum + value * value, 0);
 //   return Math.sqrt(sumOfSquares);

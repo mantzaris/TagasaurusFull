@@ -94,16 +94,15 @@ async function Init() {
 
   async function Check_Main_ProcessingState() {
     const processing = await ipcRenderer.invoke('is-processing');
-    console.log(`processing = ${processing}`);
 
     if (!processing) {
       //complete, no spinner now
       clearInterval(checkInterval);
-      console.log('Processing complete!');
+
       Hide_Loading_Spinner();
     } else {
       //main still processing
-      console.log('Still processing...');
+      //console.log('Still processing...');
     }
   }
 
