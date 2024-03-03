@@ -147,3 +147,24 @@
 .thumbnail-with-goto {
   cursor: pointer;
 }
+
+/* the animation for the button to draw attention */
+@keyframes progressEffect {
+  0%,
+  100% {
+    background-size: 0% 100%;
+    background-color: #007bff; /* Bootstrap primary blue */
+  }
+  50% {
+    background-size: 100% 100%;
+    background-color: #28a745; /* Bootstrap success green */
+  }
+}
+
+.progress-effect {
+  background-image: linear-gradient(to right, #28a745 50%, #007bff 50%);
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: progressEffect 2s linear infinite;
+  color: white; /* Ensure text is visible on all backgrounds */
+}

@@ -28,7 +28,6 @@ let stream_ok = false;
 let selection_sources;
 let stream_paused = false;
 
-//let clusters = new Map();
 let keywords = [];
 let images = [];
 let memes = [];
@@ -43,11 +42,11 @@ const EMPTY_RECT_FACE = { x: 0, y: 0, width: 0, height: 0, descriptor: [] }; //t
 let homing_mode = false;
 let homing_face_selected = { x: 0, y: 0, width: 0, height: 0, descriptor: [] };
 
-let outline_face_not_in_focus = false; //don't outline and highlight faces that are not being investigated only the focus
+let outline_face_not_in_focus = false; //don't outline and highlight faces that are not being investigated only the focus (eg rectangles on all faces plus selected)
 let rect_face_selected = { x: 0, y: 0, width: 0, height: 0, descriptor: [] }; //holds the selected face which descriptors focus on in this cycle
 
-const detect_faces_interval = 300;
-const switch_face_interval = 4000;
+const detect_faces_interval = 300; //how often the ML is applied to the image view to find the current selected (not new search)
+const switch_face_interval = 4000; //how often the ML looks for a new face
 let detect_faces_time_stamp = 0; // Date.now();
 let switched_face_time_stamp = 0; //Date.now();
 
@@ -66,7 +65,7 @@ const selection_set = document.getElementById('search-type');
 const selection_description = document.getElementById('stream-type-description');
 const stop_stream_btn = document.getElementById('return-stream-btn');
 
-selection_description.innerText = keywords_only_description; //set for the default
+selection_description.innerText = keywords_only_description; //set for the default and keywords is a default as well
 
 stop_stream_btn.onclick = () => {
   document.getElementById('stream-view').style.display = 'none';
@@ -103,8 +102,8 @@ function StartScreen() {
   document.getElementById('selection-screen').style.display = 'none';
   document.getElementById('stream-view').className = '';
   document.getElementById('stream-view').style.display = 'grid';
-  video_el = document.getElementById('inputVideo');
-  canvas_el = document.getElementById('canvas-stream');
+  video_el = document.getElementById('inputVideo'); //redundant
+  canvas_el = document.getElementById('canvas-stream'); //redundant
 
   if (selection_mode.keywords && !selection_mode.images && !selection_mode.memes) {
     document.getElementById('stream-view').classList.add('grid-keywords');
@@ -123,7 +122,15 @@ function StartScreen() {
 
 document.getElementById('freeze-btn').onclick = () => {
   stream_paused = !stream_paused;
-  document.getElementById('freeze-btn').innerText = stream_paused ? 'Resume' : 'Freeze';
+
+  const freezeBtn = document.getElementById('freeze-btn');
+  freezeBtn.innerText = stream_paused ? 'Resume' : 'Freeze';
+
+  if (stream_paused) {
+    freezeBtn.classList.add('progress-effect');
+  } else {
+    freezeBtn.classList.remove('progress-effect');
+  }
 
   photo_frozen = photo.cloneNode(true);
 
