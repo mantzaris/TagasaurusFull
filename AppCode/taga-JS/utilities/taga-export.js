@@ -10,13 +10,25 @@ const archiver = require('archiver');
 const { TAGA_DATA_DIRECTORY, TAGA_FILES_DIRECTORY } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js')); // require(PATH2.resolve()+PATH2.sep+'constants'+PATH2.sep+'constants-code.js');
 //const DB_MODULE = require(PATH2.join(__dirname,'taga-DB','db-fns.js')) // require(PATH2.resolve()+PATH2.sep+'AppCode'+PATH2.sep+'taga-DB'+PATH2.sep+'db-fns.js');
 
+const export_button = document.getElementById('export-button-id');
+export_button.disabled = true;
+
+const db_toggle = document.getElementById('dbExport');
+const json_toggle = document.getElementById('jsonExport');
+
 const EXPORT_NAME = 'DesktopTagasaurusExport.zip';
 
 function Get_All_Tagging_Records_From_DB() {
   return DB_MODULE.Get_All_Tagging_Records_From_DB();
 }
 
-let export_button = document.getElementById('export-button-id');
+document.getElementById('checkbox-group').addEventListener('change', (event) => {
+  if (!db_toggle.checked && !json_toggle.checked) {
+    export_button.disabled = true;
+  } else {
+    export_button.disabled = false;
+  }
+});
 
 export_button.onclick = async () => {
   const path_chosen = await IPC_Renderer.invoke('dialog:export');
@@ -27,37 +39,46 @@ export_button.onclick = async () => {
 
     const destination = PATH.join(path_chosen.filePaths[0], EXPORT_NAME);
 
-    const tagging = await GenerateTaggingExportJSON();
-    const memes = await GenerateTaggingMemesExportJSON();
-    const collections = await GenerateCollectionExportJSON();
-    const collection_memes = await GenerateCollectionMemesExportJSON();
-    const collection_galleries = GenerateCollectionGalleryExportJSON();
-
     const archive = archiver('zip', {
       zlib: {
         level: 9,
       },
     });
 
-    archive.append(tagging, {
-      name: 'tagging.json',
-    });
+    if (json_toggle.checked) {
+      //for the json export
+      const tagging = await GenerateTaggingExportJSON();
+      const memes = await GenerateTaggingMemesExportJSON();
+      const collections = await GenerateCollectionExportJSON();
+      const collection_memes = await GenerateCollectionMemesExportJSON();
+      const collection_galleries = GenerateCollectionGalleryExportJSON();
 
-    archive.append(memes, {
-      name: 'memes.json',
-    });
+      archive.append(tagging, {
+        name: 'tagging.json',
+      });
 
-    archive.append(collections, {
-      name: 'collections.json',
-    });
+      archive.append(memes, {
+        name: 'memes.json',
+      });
 
-    archive.append(collection_memes, {
-      name: 'collection_memes.json',
-    });
+      archive.append(collections, {
+        name: 'collections.json',
+      });
 
-    archive.append(collection_galleries, {
-      name: 'collection_galleries.json',
-    });
+      archive.append(collection_memes, {
+        name: 'collection_memes.json',
+      });
+
+      archive.append(collection_galleries, {
+        name: 'collection_galleries.json',
+      });
+    }
+
+    if (db_toggle.checked) {
+      //for the direct .db file inclusion in the .zip export
+      const dbPath = PATH.join(TAGA_FILES_DIRECTORY, 'TagasaurusDB.db');
+      archive.file(dbPath, { name: 'TagasaurusDB.db' });
+    }
 
     archive.directory(TAGA_DATA_DIRECTORY, 'files');
 

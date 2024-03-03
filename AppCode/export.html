@@ -31,11 +31,29 @@
               <div id="text-description" class="mb-3 fs-1">Export All Taga Data</div>
             </div>
           </div>
+
+          <div class="row">
+            <div class="col-12">
+              <div id="checkbox-group" class="d-flex flex-column align-items-start mt-4 ms-4">
+                <div class="form-check mb-4">
+                  <input class="form-check-input" type="checkbox" id="jsonExport">
+                  <label class="form-check-label" for="jsonExport">.json of database data</label>
+                </div>
+                <div class="form-check mb-4">
+                  <input class="form-check-input" type="checkbox" id="dbExport">
+                  <label class="form-check-label" for="dbExport">.db for SQLite database export</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="row">
             <div class="col-12 text-center">
+
               <div id="btn-row" class="btn-group" role="group">
                 <button id="export-button-id" type="button" class="btn btn-primary btn-lg m-2">Export Data</button>
                 <button id="mainmenu-button-id" onclick="window.location.href='./welcome-screen.html'" type="button" class="btn btn-primary btn-lg m-2">Return to Main</button>
+                <label class="form-check-label" for="">*all exports include all media files in a .zip</label>
               </div>
             </div>
           </div>

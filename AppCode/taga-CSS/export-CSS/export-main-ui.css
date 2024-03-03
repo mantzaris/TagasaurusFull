@@ -32,3 +32,21 @@ body {
 #text-description {
   margin-top: 20vh;
 }
+
+.form-check-label {
+  font-size: 1.5rem; /* Larger font size for the label */
+}
+
+.form-check {
+  width: 100%;
+}
+
+.form-check-input {
+  width: 44px; /* Larger checkbox */
+  height: 44px; /* Larger checkbox */
+  margin-right: 10px; /* Space between checkbox and label */
+}
+
+.form-check-input {
+  transform: scale(1.5);
+}
