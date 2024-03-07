@@ -1,6 +1,8 @@
 const IPC_Renderer3 = require('electron').ipcRenderer;
 
+//TODO: needed as preload has it?
 const PATH = require('path');
+//TODO: no longer needed as preload has it
 const { DB_MODULE } = require(PATH.join(__dirname, '..', 'constants', 'constants-code.js')); //require(PATH.resolve()+PATH.sep+'constants'+PATH.sep+'constants-code.js');
 
 const ft = require('file-type');
@@ -84,9 +86,9 @@ async function HandleImport() {
 
   //loop to fill maps of names and hashes
   for (const incoming of tagging_import) {
-    const { _id } = incoming;
+    const { file_hash } = incoming;
     let file_rename = incoming.file_name;
-    const existing_record = DB_MODULE.Get_Record_With_Tagging_Hash_From_DB(_id);
+    const existing_record = DB_MODULE.Get_Record_With_Tagging_Hash_From_DB(file_hash);
 
     if (existing_record) {
       tagging_names_map.set(existing_record.fileName, existing_record.fileName);
@@ -101,54 +103,55 @@ async function HandleImport() {
     }
 
     tagging_names_map.set(incoming.file_name, file_rename);
-    file_hash_to_name_map.set(incoming._id, file_rename);
+    file_hash_to_name_map.set(incoming.file_hash, file_rename);
   }
 
   for (const incoming of tagging_import) {
-    let { _id, meme_choices, emotions, raw_description, tags } = incoming;
+    let { file_hash, meme_choices_hashes, emotions, raw_description, tags } = incoming;
 
-    const existing_record = DB_MODULE.Get_Record_With_Tagging_Hash_From_DB(_id);
+    const existing_record = DB_MODULE.Get_Record_With_Tagging_Hash_From_DB(file_hash);
 
-    meme_choices = incoming.meme_choices.map((m) => file_hash_to_name_map.get(m));
-    incoming.meme_choices = meme_choices;
+    let meme_choices_filenames = meme_choices_hashes.map((m) => file_hash_to_name_map.get(m));
+    incoming.meme_choices_filenames = meme_choices_filenames;
 
     if (existing_record) {
-      existing_record.taggingMemeChoices = MergeArrays(existing_record.taggingMemeChoices, meme_choices);
+      existing_record.taggingMemeChoices = MergeArrays(existing_record.taggingMemeChoices, meme_choices_filenames);
       existing_record.taggingEmotions = AverageEmotions(existing_record.taggingEmotions, emotions);
       existing_record.taggingRawDescription = DescriptionMerge(existing_record.taggingRawDescription, raw_description);
       existing_record.taggingTags = MergeArrays(existing_record.taggingTags, tags);
+      //assuming that the descriptors are ok for that hash (already set) we leave as is
 
       DB_MODULE.Update_Tagging_Annotation_by_fileHash_DB(existing_record);
 
       continue;
     }
 
-    const file_name = file_hash_to_name_map.get(_id);
+    const file_name = file_hash_to_name_map.get(file_hash);
 
     copyFileSync(PATH.join(temp_dir, 'files', incoming.file_name), PATH.join(TAGA_DATA_destination, file_name));
     incoming.file_name = file_name;
 
     let tagging_entry = TranslateEntryFromSnakeCase(incoming);
 
-    if (tagging_entry.faceDescriptors.length > 0) {
-      const descriptors = Array.isArray(tagging_entry.faceDescriptors[0]) ? tagging_entry.faceDescriptors : [tagging_entry.faceDescriptors];
-      //repeat the hash for each face descriptor, needed and then the replication/repeat of the vector is added
-      const hashes = new Array(descriptors.length).fill(tagging_entry.fileHash);
-
-      IPC_Renderer3.invoke('faiss-add', descriptors, hashes);
-    }
-
     DB_MODULE.Insert_Record_Into_DB(tagging_entry);
+
+    if (tagging_entry.faceDescriptors.length > 0) {
+      //copy over the descriptors
+      const descriptors = Array.isArray(tagging_entry.faceDescriptors[0]) ? tagging_entry.faceDescriptors : [tagging_entry.faceDescriptors];
+      const rowid = DB_MODULE.Get_Tagging_ROWID_From_FileHash_BigInt(tagging_entry.fileHash);
+
+      IPC_Renderer3.invoke('faiss-add', descriptors, rowid);
+    }
   }
 
   for (const incoming_meme of meme_import) {
-    const { _id, connected_to } = incoming_meme;
+    const { file_hash, connected_to_hashes } = incoming_meme;
 
-    const existing_record = await DB_MODULE.Get_or_Create_Tagging_MEME_Record_From_DB(file_hash_to_name_map.get(_id));
-    incoming_meme.connected_to = connected_to.map((m) => file_hash_to_name_map.get(m));
+    const existing_record = await DB_MODULE.Get_or_Create_Tagging_MEME_Record_From_DB(file_hash_to_name_map.get(file_hash));
+    incoming_meme.connected_to_filenames = connected_to_hashes.map((m) => file_hash_to_name_map.get(m));
 
     if (existing_record) {
-      existing_record.fileNames = MergeArrays(incoming_meme.connected_to, existing_record.fileNames);
+      existing_record.fileNames = MergeArrays(incoming_meme.connected_to_filenames, existing_record.fileNames);
       DB_MODULE.Update_Tagging_Meme_Entry(existing_record);
       continue;
     }
@@ -177,11 +180,11 @@ async function HandleImport() {
 
   if (handle_collections) {
     for (const incoming of collection_import) {
-      const { name, thumbnail, gallery, description, tags, memes, emotions } = incoming;
+      const { name, thumbnail, gallery_hashes, description, tags, memes_hashes, emotions } = incoming;
       const existing_collection = DB_MODULE.Get_Collection_Record_From_DB(name);
       const thumbnail_filename = file_hash_to_name_map.get(thumbnail);
-      const gallery_filenames = gallery.map((i) => file_hash_to_name_map.get(i));
-      const memes_filenames = memes.map((i) => file_hash_to_name_map.get(i));
+      const gallery_filenames = gallery_hashes.map((i) => file_hash_to_name_map.get(i));
+      const memes_filenames = memes_hashes.map((i) => file_hash_to_name_map.get(i));
 
       if (existing_collection) {
         existing_collection.collectionMemes = MergeArrays(existing_collection.collectionMemes, memes_filenames);
@@ -208,8 +211,8 @@ async function HandleImport() {
     }
 
     for (const incoming of collection_memes_import) {
-      const { _id, collection_names } = incoming;
-      const file_name = file_hash_to_name_map.get(_id);
+      const { file_hash, collection_names } = incoming;
+      const file_name = file_hash_to_name_map.get(file_hash);
       const entry_orig = DB_MODULE.Get_Collection_MEME_Record_From_DB(file_name);
 
       if (entry_orig) {
@@ -227,8 +230,8 @@ async function HandleImport() {
     }
 
     for (const incoming of collection_gallery_import) {
-      const { _id, collection_names } = incoming;
-      const file_name = file_hash_to_name_map.get(_id);
+      const { file_hash, collection_names } = incoming;
+      const file_name = file_hash_to_name_map.get(file_hash);
       const entry_orig = DB_MODULE.Get_Collection_IMAGE_Record_From_DB(file_name);
 
       if (entry_orig) {
@@ -256,23 +259,23 @@ async function HandleImport() {
   alert('successfully imported');
 }
 
-function TranslateMemeTaggingSnakeCase({ _id, file_type, connected_to }) {
+function TranslateMemeTaggingSnakeCase({ file_hash, file_type, connected_to_filenames }) {
   return (new_entry = {
-    memeFileName: file_hash_to_name_map.get(_id),
+    memeFileName: file_hash_to_name_map.get(file_hash),
     fileType: file_type,
-    fileNames: connected_to,
+    fileNames: connected_to_filenames,
   });
 }
 
-function TranslateEntryFromSnakeCase({ _id, meme_choices, tags, emotions, raw_description, file_name, file_type, face_descriptors }) {
+function TranslateEntryFromSnakeCase({ file_hash, meme_choices_filenames, tags, emotions, raw_description, file_name, file_type, face_descriptors }) {
   return (new_entry = {
     fileName: file_name,
-    fileHash: _id,
+    fileHash: file_hash,
     fileType: file_type,
     taggingRawDescription: raw_description,
     taggingTags: tags,
     taggingEmotions: emotions,
-    taggingMemeChoices: meme_choices,
+    taggingMemeChoices: meme_choices_filenames,
     faceDescriptors: face_descriptors,
   });
 }

@@ -53,6 +53,7 @@ window.COLLECTIONS_TABLE_NAME = 'COLLECTIONS';
 window.COLLECTION_MEME_TABLE_NAME = 'COLLECTIONMEMES';
 window.COLLECTION_GALLERY_TABLE_NAME = 'COLLECTIONGALLERY';
 
+//TODO: put into main.js to not have to load every time?
 window.DB = new DATABASE(PATH.join(TAGA_FILES_DIRECTORY, DB_FILE_NAME), {});
 window.RECORD_PARSER_MAP = new Map();
 

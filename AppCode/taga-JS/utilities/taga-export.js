@@ -15,6 +15,8 @@ export_button.disabled = true;
 
 const db_toggle = document.getElementById('dbExport');
 const json_toggle = document.getElementById('jsonExport');
+json_toggle.checked = true;
+json_toggle.disabled = true;
 
 const EXPORT_NAME = 'DesktopTagasaurusExport.zip';
 
@@ -112,14 +114,14 @@ async function GenerateTaggingExportJSON() {
   let i = 0;
   for (const { faceDescriptors, fileHash, fileName, fileType, taggingEmotions, taggingRawDescription, taggingTags, taggingMemeChoices } of all_tagging) {
     const entry = {
-      _id: fileHash,
+      file_hash: fileHash,
       file_name: fileName,
       file_type: fileType,
       raw_description: taggingRawDescription,
       tags: [],
       emotions: {},
       file_size: 0,
-      meme_choices: [],
+      meme_choices_hashes: [],
       face_descriptors: [],
     };
 
@@ -133,7 +135,7 @@ async function GenerateTaggingExportJSON() {
     entry.file_size = FS.statSync(PATH.join(TAGA_DATA_DIRECTORY, fileName)).size;
 
     const meme_filenames = JSON.parse(taggingMemeChoices);
-    entry.meme_choices = DB_MODULE.Get_Hashes_From_FileNames(meme_filenames);
+    entry.meme_choices_hashes = DB_MODULE.Get_Hashes_From_FileNames(meme_filenames);
 
     entry.face_descriptors = JSON.parse(faceDescriptors);
 
@@ -152,13 +154,13 @@ async function GenerateTaggingMemesExportJSON() {
   let i = 0;
   for (const { memeFileName, fileType, fileNames } of all_tagging_memes) {
     let entry = {
-      _id: '',
-      connected_to: [],
+      file_hash: '',
+      connected_to_hashes: [],
       file_type: fileType,
     };
 
-    entry._id = DB_MODULE.Get_Tagging_Record_From_DB(memeFileName).fileHash;
-    entry.connected_to = await DB_MODULE.Get_Hashes_From_FileNames(JSON.parse(fileNames));
+    entry.file_hash = DB_MODULE.Get_Tagging_Record_From_DB(memeFileName).fileHash;
+    entry.connected_to_hashes = await DB_MODULE.Get_Hashes_From_FileNames(JSON.parse(fileNames));
 
     memes[i++] = entry;
   }
@@ -184,17 +186,17 @@ async function GenerateCollectionExportJSON() {
     let entry = {
       name: collectionName,
       thumbnail: '',
-      gallery: [],
+      gallery_hashes: [],
       description: collectionDescription,
       tags: [],
-      memes: [],
+      memes_hashes: [],
       emotions: {},
     };
 
     entry.thumbnail = DB_MODULE.Get_Tagging_Record_From_DB(collectionImage).fileHash;
-    entry.gallery = DB_MODULE.Get_Hashes_From_FileNames(JSON.parse(collectionGalleryFiles));
+    entry.gallery_hashes = DB_MODULE.Get_Hashes_From_FileNames(JSON.parse(collectionGalleryFiles));
     entry.tags = JSON.parse(collectionDescriptionTags);
-    entry.memes = DB_MODULE.Get_Hashes_From_FileNames(JSON.parse(collectionMemes));
+    entry.memes_hashes = DB_MODULE.Get_Hashes_From_FileNames(JSON.parse(collectionMemes));
 
     for (const [k, v] of Object.entries(JSON.parse(collectionEmotions))) {
       entry.emotions[k] = parseFloat(v);
@@ -215,11 +217,11 @@ async function GenerateCollectionMemesExportJSON() {
   //(collectionMemeFileName TEXT, collectionNames TEXT)
   for (const { collectionMemeFileName, collectionNames } of db_entries) {
     let entry = {
-      _id: '',
+      file_hash: '',
       collection_names: [],
     };
 
-    entry._id = DB_MODULE.Get_Tagging_Record_From_DB(collectionMemeFileName).fileHash;
+    entry.file_hash = DB_MODULE.Get_Tagging_Record_From_DB(collectionMemeFileName).fileHash;
     entry.collection_names = JSON.parse(collectionNames);
 
     collection_memes[i++] = entry;
@@ -237,11 +239,11 @@ function GenerateCollectionGalleryExportJSON() {
   let i = 0;
   for (const { collectionGalleryFileName, collectionNames } of db_entries) {
     let entry = {
-      _id: '',
+      file_hash: '',
       collection_names: [],
     };
 
-    entry._id = DB_MODULE.Get_Tagging_Record_From_DB(collectionGalleryFileName).fileHash;
+    entry.file_hash = DB_MODULE.Get_Tagging_Record_From_DB(collectionGalleryFileName).fileHash;
     entry.collection_names = JSON.parse(collectionNames);
 
     collection_galleries[i++] = entry;
