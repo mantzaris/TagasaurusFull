@@ -63,23 +63,24 @@
   display: flex;
   flex-direction: row;
   justify-content: space-around;
-  font-size: min(2vw, 2vh);
+  /* font-size: min(2vw, 2vh); */
 }
 #collection-control-buttons-nextprev-div-id {
   display: flex;
   flex-direction: row;
-  font-size: min(2vw, 2vh);
+  /* font-size: min(2vw, 2vh); */
 }
 .center-buttons {
   font-weight: bold;
   /* width: 90%; */
-  font-size: min(1.8vw, 1.8vh); /* font-size: 2.5vmin; */
+  font-size: min(1.8vw, 1.8vh);
+  font-size: 2.5vmin;
   height: 100%;
   cursor: pointer;
 }
 @media screen and (max-width: 767px) {
   .center-buttons {
-    font-size: min(1vw, 1vh);
+    /* font-size: min(1vw, 1vh); */
   }
 }
 #collection-control-button-previous-id,
@@ -93,9 +94,8 @@
 #collection-control-button-returntomain-id,
 #collection-control-button-createcollection-id,
 #collection-control-button-searchcollections-id {
-  padding-left: 10px;
-  padding-right: 10px;
-  /* font-size: min(2vw, 2vh); */
+  border-radius: 0.5rem;
+  /* font-size: clamp(0.5rem, 1.5vmin, 3rem) !important; */
 }
 @media screen and (max-width: 767px) {
   #collection-control-button-delete-id,
@@ -143,7 +143,10 @@
 }
 #collection-profile-image-change-image-button-id {
   width: 100%;
-  font-size: 2vmin;
+  font-size: 0.8rem !important;
+  line-height: 1rem !important;
+  padding: 1px 2px !important;
+  /* font-size: 2vmin; */
 }
 /* COLLECTION PROFILE IMAGE END */
 
@@ -233,9 +236,11 @@
   align-items: center;
 }
 #collection-image-annotation-description-textarea-save-button-id {
-  height: 100%;
-  width: 90%;
-  font-size: 2.4vmin;
+  height: 80%;
+  width: 70%;
+  font-size: 1rem;
+  line-height: 1rem !important;
+  padding: 1px 2px !important;
 }
 /* hashtags */
 #collection-description-annotation-hashtags-label-div-id {
@@ -538,28 +543,31 @@ input:checked + .slider:before {
 
 #collection-image-annotation-memes-new-memes-add-button-div-id {
   grid-area: collection-image-annotation-memes-new-memes-add-button-div-id;
-  height: 100%;
-  width: 100%;
-  max-height: 10vh;
+  /* height: 100%;
+  width: 100%; */
+  line-height: 1rem !important;
+  padding: 1px 2px !important;
 }
 #collection-image-annotation-memes-new-memes-add-button-id {
-  height: 100%;
-  width: 100%;
-  font-size: 2.4vmin;
-  margin-right: 2px;
-  max-height: 10vh;
+  height: 70%;
+  width: 70%;
+  line-height: 1rem !important;
+  padding: 1px 2px !important;
+  /* font-size: 2.4vmin; */
+  /* margin-right: 2px; */
+  /* max-height: 10vh; */
 }
 #collection-image-annotation-memes-save-changes-button-div-id {
   grid-area: collection-image-annotation-memes-save-changes-button-div-id;
-  height: 100%;
-  width: 100%;
+  height: 70%;
+  width: 90%;
   max-height: 10vh;
 }
 #collection-image-annotation-memes-save-changes-button-id {
-  height: 100%;
-  width: 100%;
-  font-size: 2.4vmin;
-  margin-left: 2px;
+  /* height: 100%;
+  width: 100%; */
+  /* font-size: 2.4vmin; */
+  /* margin-left: 2px; */
   max-height: 10vh;
 }
 
@@ -590,20 +598,20 @@ input:checked + .slider:before {
   grid-area: collections-images-gallery-grid-button-addimages-div-id;
 }
 #collections-images-gallery-grid-button-addimages-id {
-  height: 100%;
-  width: 100%;
-  font-size: 2.4vmin;
-  margin-left: 2px;
+  height: 70%;
+  width: 70%;
+  /* font-size: 2.4vmin; */
+  /* margin-left: 2px; */
   max-height: 10vh;
 }
 #collections-images-gallery-grid-button-savechanges-div-id {
   grid-area: collections-images-gallery-grid-button-savechanges-div-id;
 }
 #collections-images-gallery-grid-button-savechanges-id {
-  height: 100%;
-  width: 100%;
-  font-size: 2.4vmin;
-  margin-left: 2px;
+  height: 70%;
+  width: 70%;
+  /* font-size: 2.4vmin; */
+  /* margin-left: 2px; */
   max-height: 10vh;
 }
 /* gallery grid start */

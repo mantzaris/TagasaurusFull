@@ -36,6 +36,10 @@
     <!-- style sheet for the right click options modal -->
     <link rel="stylesheet" href="./taga-CSS/right-click-modals.css" />
 
+    <script src="../Assets/bootstrap/popper.min.js" defer></script>
+    <script src="../Assets/bootstrap/bootstrap.min.js" defer></script> 
+    <link href="../Assets/bootstrap/bootstrap.min.css" rel="stylesheet" > 
+
     <script src="./taga-JS/pdfjs/build/pdf.js"></script>
 
     <!-- something to do with security -->
@@ -46,33 +50,33 @@
     <div id="collection-name-gridarea-id">
       <img id="collection-name-hashtags-icon-id" src="taga-ui-icons/HashtagGreen.png" alt="hashtags" />
       <span id="collection-name-text-label-id"></span>
-      <button class="center-buttons fun-button-blue" type="button" id="collection-control-button-searchcollections-id">SEARCH</button>
+      <button class="btn btn-primary  me-2 " type="button" id="collection-control-button-searchcollections-id">SEARCH</button>
     </div>
 
     <div id="collection-control-buttons-gridarea-id">
       <div id="collection-control-buttons-nextprev-div-id">
-        <button class="center-buttons fun-button-blue" type="button" id="collection-control-button-previous-id"><&lt;-PREVIOUS</button>
-        <button class="center-buttons fun-button-blue" type="button" id="collection-control-button-next-id">NEXT->></button>
+        <button class="btn btn-primary ms-2 me-1 mt-1 mb-1" type="button" id="collection-control-button-previous-id"><&lt;PREVIOUS</button>
+        <button class="btn btn-primary ms-1 me-2 mt-1 mb-1" type="button" id="collection-control-button-next-id">NEXT>&gt;</button>
       </div>
       <button
         onclick="location.href='collection-creation-page.html'"
-        class="center-buttons fun-button-blue"
+        class="btn btn-primary ms-1 me-2 mt-1 mb-1"
         type="button"
         id="collection-control-button-createcollection-id"
       >
-        CREATE COLLECTION
+        CREATE
       </button>
-      <button onclick="location.href='welcome-screen.html'" class="center-buttons fun-button-blue" type="button" id="collection-control-button-returntomain-id">
-        RETURN TO MAIN
+      <button onclick="location.href='welcome-screen.html'" class="btn btn-primary ms-1 me-2 mt-1 mb-1" type="button" id="collection-control-button-returntomain-id">
+        RETURN
       </button>
-      <button class="center-buttons fun-button-red" type="button" id="collection-control-button-delete-id">DELETE COLLECTION</button>
+      <button class="btn btn-danger ms-1 me-2 mt-1 mb-1"  type="button" id="collection-control-button-delete-id">DELETE</button>
     </div>
 
     <!-- COLLECTION PROFILE IMAGE START -->
     <div id="collection-profile-image-gridarea-id">
       <!-- id="modal-search-images-results-grid-div-area-id" -->
       <div id="collection-profile-image-button-div-id">
-        <button type="button" class="fun-button-blue" id="collection-profile-image-change-image-button-id">CHANGE IMAGE</button>
+        <button type="button" class="btn btn-primary ms-3 me-3" id="collection-profile-image-change-image-button-id">CHANGE</button>
       </div>
       <div id="collection-profile-image-display-div-id">
         <img id="collection-profile-image-img-id" src="" title="view" alt="collection-profile-image" />
@@ -95,7 +99,7 @@
             <textarea id="collection-image-annotation-description-textarea-id" placeholder="enter description..."></textarea>
           </div>
           <div id="collection-image-annotation-description-save-button-div-id">
-            <button class="fun-button-blue" id="collection-image-annotation-description-textarea-save-button-id">SAVE</button>
+            <button class="btn btn-primary ms-2 me-2 mb-2 mt-2" id="collection-image-annotation-description-textarea-save-button-id">SAVE</button>
           </div>
           <div id="collection-description-annotation-hashtags-label-div-id">
             <img id="hashtags-icon-id" src="taga-ui-icons/HashtagGreen.png" alt="hashtags" />
@@ -137,10 +141,10 @@
               <input id="collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id" type="range" min="-100" max="100" value="0" />
             </div>
             <div id="collection-image-annotation-emotions-new-entry-emotion-button-div-id">
-              <button type="button" class="fun-button-blue" id="collection-image-annotation-emotions-new-entry-add-emotion-button-id">ADD EMOTION</button>
+              <button type="button" class="btn btn-primary ms-2 me-2 mb-2 mt-2" id="collection-image-annotation-emotions-new-entry-add-emotion-button-id">ADD EMOTION</button>
             </div>
             <div id="collection-image-annotation-emotions-save-button-div-id">
-              <button type="button" class="fun-button-blue" id="collection-image-annotation-emotions-save-emotion-button-id">SAVE</button>
+              <button type="button" class="btn btn-primary ms-2 me-2 mb-2 mt-2" id="collection-image-annotation-emotions-save-emotion-button-id">SAVE</button>
             </div>
           </div>
         </div>
@@ -166,10 +170,10 @@
           </div>
 
           <div id="collection-image-annotation-memes-new-memes-add-button-div-id">
-            <button type="button" class="fun-button-blue" id="collection-image-annotation-memes-new-memes-add-button-id">ADD MEMES</button>
+            <button type="button" class="btn btn-primary ms-2 me-2 mb-2 mt-2" id="collection-image-annotation-memes-new-memes-add-button-id">ADD MEMES</button>
           </div>
           <div id="collection-image-annotation-memes-save-changes-button-div-id">
-            <button type="button" class="fun-button-blue" id="collection-image-annotation-memes-save-changes-button-id">SAVE CHANGES</button>
+            <button type="button" class="btn btn-primary ms-2 me-2 mb-2 mt-2" id="collection-image-annotation-memes-save-changes-button-id">SAVE CHANGES</button>
           </div>
         </div>
         <!-- EMOTION MEMES DIV END -->
@@ -193,10 +197,10 @@
       </div>
 
       <div id="collections-images-gallery-grid-button-addimages-div-id">
-        <button type="button" class="fun-button-blue" id="collections-images-gallery-grid-button-addimages-id">ADD IMAGES</button>
+        <button type="button" class="btn btn-primary ms-2 me-2 mb-2 mt-2" id="collections-images-gallery-grid-button-addimages-id">ADD IMAGES</button>
       </div>
       <div id="collections-images-gallery-grid-button-savechanges-div-id">
-        <button type="button" class="fun-button-blue" id="collections-images-gallery-grid-button-savechanges-id">SAVE CHANGES</button>
+        <button type="button" class="btn btn-primary ms-2 me-2 mb-2 mt-2" id="collections-images-gallery-grid-button-savechanges-id">SAVE CHANGES</button>
       </div>
     </div>
 

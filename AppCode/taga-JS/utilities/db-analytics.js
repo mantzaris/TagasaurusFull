@@ -86,7 +86,7 @@ async function Init_Analytics() {
 
   sample_num = number_of_records < MAX_SAMPLE_COUNT_RECORDS ? number_of_records : MAX_SAMPLE_COUNT_RECORDS;
 
-  Display_Skill_Levels(sample_num);
+  Display_Skill_Levels(Number(sample_num));
 }
 
 async function Init() {
