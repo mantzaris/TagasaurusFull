@@ -73,8 +73,7 @@
 .center-buttons {
   font-weight: bold;
   /* width: 90%; */
-  font-size: min(1.8vw, 1.8vh);
-  font-size: 2.5vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   height: 100%;
   cursor: pointer;
 }
@@ -83,11 +82,19 @@
     /* font-size: min(1vw, 1vh); */
   }
 }
+
+#collection-control-button-searchcollections-id {
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+  /* padding: 5px 5px !important; */
+  height: 85%;
+}
+
 #collection-control-button-previous-id,
 #collection-control-button-next-id {
   padding-left: 4px;
   padding-right: 4px;
   border-radius: 0.5rem;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   /* font-size: min(2vw, 2vh); */
 }
 #collection-control-button-delete-id,
@@ -95,6 +102,7 @@
 #collection-control-button-createcollection-id,
 #collection-control-button-searchcollections-id {
   border-radius: 0.5rem;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   /* font-size: clamp(0.5rem, 1.5vmin, 3rem) !important; */
 }
 @media screen and (max-width: 767px) {
@@ -169,15 +177,15 @@
 }
 #collection-image-annotation-navbar-description-button-id {
   grid-area: collection-image-annotation-navbar-description-button-id;
-  font-size: 2.5vmin;
+  font-size: clamp(0.5rem, 2vmin, 3rem);
 }
 #collection-image-annotation-navbar-emotion-button-id {
   grid-area: collection-image-annotation-navbar-emotion-button-id;
-  font-size: 2.5vmin;
+  font-size: clamp(0.5rem, 2vmin, 3rem);
 }
 #collection-image-annotation-navbar-meme-button-id {
   grid-area: collection-image-annotation-navbar-meme-button-id;
-  font-size: 2.5vmin;
+  font-size: clamp(0.5rem, 2vmin, 3rem);
 }
 #collection-image-annotation-mode-div-id {
   grid-area: collection-image-annotation-mode-div-id;
@@ -209,7 +217,7 @@
   resize: none;
   width: 100%;
   height: 98%;
-  font-size: 3vmin;
+  font-size: clamp(0.75rem, 2.2vmin, 3rem);
   outline: none;
 }
 @media screen and (max-height: 200px) {
@@ -238,7 +246,7 @@
 #collection-image-annotation-description-textarea-save-button-id {
   height: 80%;
   width: 70%;
-  font-size: 1rem;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   line-height: 1rem !important;
   padding: 1px 2px !important;
 }
@@ -326,7 +334,7 @@
 .emotion-label-view-class {
   /* font-size: 2.75vmin; */
   word-break: break-all;
-  font-size: 1.4rem;
+  font-size: clamp(0.75rem, 2.4vmin, 3rem);
 }
 .emotion-range-slider-class {
   max-width: 40%;
@@ -350,10 +358,10 @@
   margin-top: 5px;
 }
 #collection-image-annotation-emotions-new-entry-emotion-textarea-id {
-  height: 3vmin;
+  height: 3.5vmin;
   overflow: hidden;
   margin-top: 0.3rem;
-  font-size: 3vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   border-radius: 2px;
   white-space: nowrap;
   display: inline-block;
@@ -369,7 +377,7 @@
   text-align: center;
 }
 #collection-image-annotation-emotions-new-entry-add-emotion-button-id {
-  font-size: 2.4vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   height: 80%;
   width: 90%;
 }
@@ -380,7 +388,7 @@
   text-align: center;
 }
 #collection-image-annotation-emotions-save-emotion-button-id {
-  font-size: 2.4vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   height: 80%;
   width: 90%;
 }
@@ -545,30 +553,21 @@ input:checked + .slider:before {
   grid-area: collection-image-annotation-memes-new-memes-add-button-div-id;
   /* height: 100%;
   width: 100%; */
-  line-height: 1rem !important;
-  padding: 1px 2px !important;
+  /* line-height: 1rem !important;
+  padding: 1px 2px !important; */
 }
 #collection-image-annotation-memes-new-memes-add-button-id {
-  height: 70%;
+  height: 80%;
   width: 70%;
-  line-height: 1rem !important;
-  padding: 1px 2px !important;
-  /* font-size: 2.4vmin; */
-  /* margin-right: 2px; */
-  /* max-height: 10vh; */
+  font-size: clamp(0.75rem, 2vmin, 3rem);
 }
 #collection-image-annotation-memes-save-changes-button-div-id {
   grid-area: collection-image-annotation-memes-save-changes-button-div-id;
-  height: 70%;
-  width: 90%;
-  max-height: 10vh;
 }
 #collection-image-annotation-memes-save-changes-button-id {
-  /* height: 100%;
-  width: 100%; */
-  /* font-size: 2.4vmin; */
-  /* margin-left: 2px; */
-  max-height: 10vh;
+  width: 70%;
+  height: 80%;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
 }
 
 /* memes div end */
@@ -598,9 +597,9 @@ input:checked + .slider:before {
   grid-area: collections-images-gallery-grid-button-addimages-div-id;
 }
 #collections-images-gallery-grid-button-addimages-id {
-  height: 70%;
+  height: 80%;
   width: 70%;
-  /* font-size: 2.4vmin; */
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   /* margin-left: 2px; */
   max-height: 10vh;
 }
@@ -608,9 +607,9 @@ input:checked + .slider:before {
   grid-area: collections-images-gallery-grid-button-savechanges-div-id;
 }
 #collections-images-gallery-grid-button-savechanges-id {
-  height: 70%;
+  height: 80%;
   width: 70%;
-  /* font-size: 2.4vmin; */
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   /* margin-left: 2px; */
   max-height: 10vh;
 }
