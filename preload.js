@@ -54,7 +54,9 @@ window.COLLECTION_MEME_TABLE_NAME = 'COLLECTIONMEMES';
 window.COLLECTION_GALLERY_TABLE_NAME = 'COLLECTIONGALLERY';
 
 //TODO: put into main.js to not have to load every time?
-window.DB = new DATABASE(PATH.join(TAGA_FILES_DIRECTORY, DB_FILE_NAME), {});
+const DB = new DATABASE(PATH.join(TAGA_FILES_DIRECTORY, DB_FILE_NAME), {});
+DB.defaultSafeIntegers(true); // BigInts by default
+window.DB = DB; //new DATABASE(PATH.join(TAGA_FILES_DIRECTORY, DB_FILE_NAME), {});
 window.RECORD_PARSER_MAP = new Map();
 
 //DB INIT, sets the database and adds the obj ref to the window to not need to be loaded again

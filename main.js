@@ -130,9 +130,12 @@ async function Init() {
     FS.mkdirSync(TAGA_FILES_DIRECTORY);
     console.log('directory TAGA_FILES_DIRECTORY did not exist ');
   }
+
   DB = new DATABASE(PATH.join(TAGA_FILES_DIRECTORY, DB_FILE_NAME), {
     verbose: console.log,
   }); //open db in that directory
+  DB.defaultSafeIntegers(true);
+
   if (FS.existsSync(TAGA_FILES_DIRECTORY) == true && FS.existsSync(TAGA_DATA_DIRECTORY) == false) {
     //directory for data exists?
     FS.mkdirSync(TAGA_DATA_DIRECTORY);

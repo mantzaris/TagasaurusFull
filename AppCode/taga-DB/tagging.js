@@ -18,20 +18,16 @@ const UPDATE_TAGGING_BY_FILEHASH_STMT = DB.prepare(
 
 const DELETE_FILENAME_TAGGING_STMT = DB.prepare(`DELETE FROM ${TAGGING_TABLE_NAME} WHERE fileName=?`);
 const GET_TAGGING_ROWID_FROM_FILENAME_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE fileName=?;`);
-GET_TAGGING_ROWID_FROM_FILENAME_STMT.safeIntegers(true);
 const GET_NEXT_ROWID_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE ROWID > ? ORDER BY ROWID ASC LIMIT 1`);
-GET_NEXT_ROWID_STMT.safeIntegers(true);
 const GET_PREV_ROWID_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE ROWID < ? ORDER BY ROWID DESC LIMIT 1`);
-GET_PREV_ROWID_STMT.safeIntegers(true);
 const GET_MAX_ROWID_STMT = DB.prepare(`SELECT MAX(ROWID) AS rowid FROM ${TAGGING_TABLE_NAME}`);
-GET_MAX_ROWID_STMT.safeIntegers(true);
 const GET_MIN_ROWID_STMT = DB.prepare(`SELECT MIN(ROWID) AS rowid FROM ${TAGGING_TABLE_NAME}`);
-GET_MIN_ROWID_STMT.safeIntegers(true);
 const GET_TAGGING_ROW_COUNT = DB.prepare(`SELECT COUNT(*) AS rownum FROM ${TAGGING_TABLE_NAME}`);
 
 const GET_N_RAND_TAGGING_FILENAMES_STMT = DB.prepare(
   `SELECT fileName FROM ${TAGGING_TABLE_NAME} WHERE rowid > (ABS(RANDOM()) % (SELECT max(rowid) FROM ${TAGGING_TABLE_NAME})) LIMIT ?;`
 );
+
 const GET_N_RAND_TAGGING_ENTRIES_WITH_FACES_STMT = DB.prepare(
   `SELECT * FROM ${TAGGING_TABLE_NAME} 
    WHERE LENGTH(faceDescriptors) > 2 
@@ -72,7 +68,7 @@ exports.Get_ROWID_From_Filename = Get_ROWID_From_Filename;
 
 function Get_Tagging_ROWID_From_FileHash_BigInt(fileHash) {
   const GET_TAGGING_ROWID_FROM_FILEHASH_STMT = DB.prepare(`SELECT ROWID FROM ${TAGGING_TABLE_NAME} WHERE fileHash=?;`);
-  GET_TAGGING_ROWID_FROM_FILEHASH_STMT.safeIntegers(true); // Safe integers ON
+
   return GET_TAGGING_ROWID_FROM_FILEHASH_STMT.get(fileHash).rowid;
 }
 
@@ -85,7 +81,6 @@ function Get_Tagging_Records_From_ROWIDs_BigInt(rowids) {
 
   const placeholders = rowids.map(() => '?').join(', ');
   return DB.prepare(`SELECT *, ROWID FROM ${TAGGING_TABLE_NAME} WHERE ROWID IN (${placeholders})`)
-    .safeIntegers(true)
     .all(...rowids)
     .map((entry) => Get_Obj_Fields_From_Record(entry));
 }
