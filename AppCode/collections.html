@@ -479,8 +479,8 @@
         <div id="modal-search-add-memes-top-grid-div-id">
           <!-- search button -->
           <div id="modal-search-add-memes-main-button-container-div-id">
-            <button type="button" class="fun-button-blue" id="modal-search-add-memes-main-button-id">SEARCH BUTTON</button>
-            <button type="button" class="fun-button-red" id="modal-search-add-memes-reset-button-id">RESET FIELDS</button>
+            <button type="button" class="btn btn-primary ms-2 me-2 mt-2 mb-2" id="modal-search-add-memes-main-button-id">SEARCH</button>
+            <button type="button" class="btn btn-danger ms-2 me-2 mt-2 mb-2" id="modal-search-add-memes-reset-button-id">RESET FIELDS</button>
           </div>
 
           <!-- image tag entry -->
@@ -513,7 +513,7 @@
           <!-- add emotion/value entry -->
           <div id="modal-search-add-memes-emotion-entry-top-div-id">
             <div id="grid-emotion-area-1-id">
-              <button type="button" class="fun-button-blue" id="modal-search-add-memes-emotion-entry-button-id">+</button>
+              <button type="button" class="btn btn-primary ms-1 me-1 mt-1 mb-1" id="modal-search-add-memes-emotion-entry-button-id">+</button>
             </div>
 
             <div id="grid-emotion-area-2-id">
@@ -525,12 +525,12 @@
                   name="search-modal-emotion-tag-textarea"
                   oninput="this.value = this.value.replace(/[ \n]/g,'')"
                 ></textarea>
-                <input id="modal-search-add-memes-emotion-value-range-entry-id" type="range" min="-100" max="100" value="0" />
+                <input class="ms-3 me-3" id="modal-search-add-memes-emotion-value-range-entry-id" type="range" min="-100" max="100" value="0" />
               </div>
             </div>
 
             <div id="grid-emotion-area-1-idb">
-              <button type="button" class="fun-button-blue" id="modal-search-add-memes-emotion-meme-entry-button-id">+</button>
+              <button type="button" class="btn btn-primary ms-1 me-1 mt-1 mb-1" id="modal-search-add-memes-emotion-meme-entry-button-id">+</button>
             </div>
 
             <div id="grid-emotion-area-2-idb">
@@ -542,12 +542,12 @@
                   name="search-modal-emotion-tag-textarea"
                   oninput="this.value = this.value.replace(/[ \n]/g,'')"
                 ></textarea>
-                <input id="modal-search-add-memes-emotion-meme-value-range-entry-id" type="range" min="-100" max="100" value="0" />
+                <input class="ms-3 me-3" id="modal-search-add-memes-emotion-meme-value-range-entry-id" type="range" min="-100" max="100" value="0" />
               </div>
             </div>
             <!-- the emotion label and value tuples displayed for the images of the search -->
             <div id="grid-emotion-area-3-id">
-              <div id="modal-search-add-memes-emotion-label-value-display-container-div-id">
+              <div class="ms-1 me-1" id="modal-search-add-memes-emotion-label-value-display-container-div-id">
                 <!-- <span id="modal-search-add-memes-emotion-label-value-span-id-EMOTIONKEY" style="white-space:nowrap">
 							<img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-remove-button-id-EMOTIONKEY" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
 								onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
@@ -557,7 +557,7 @@
             </div>
             <!-- the emotion label and value tuples displayed for the MEMES of the images of the search -->
             <div id="grid-emotion-area-3-idb">
-              <div id="modal-search-add-memes-emotion-meme-label-value-display-container-div-id">
+              <div class="ms-1 me-0" id="modal-search-add-memes-emotion-meme-label-value-display-container-div-id">
                 <!-- <span id="modal-search-add-memes-emotion-meme-label-value-span-id-EMOTIONKEY" style="white-space:nowrap">
 							<img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-meme-remove-button-id-EMOTIONKEY" onmouseover="this.src='taga-ui-icons/CloseRed.png';"
 								onmouseout="this.src='taga-ui-icons/CloseBlack.png';" src="taga-ui-icons/CloseBlack.png" title="close" />
@@ -570,7 +570,7 @@
           <!-- IMAGE SEARCH RESULTS START -->
           <div id="modal-search-add-memes-images-results-display-id">
             <div id="modal-search-add-memes-images-results-button-div-id">
-              <button type="button" class="fun-button-blue" id="modal-search-add-memes-images-results-select-images-order-button-id">
+              <button type="button" class="btn btn-primary ms-2 me-1 mt-1 mb-1" id="modal-search-add-memes-images-results-select-images-order-button-id">
                 Select Toggled Images as Memes
               </button>
             </div>

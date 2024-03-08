@@ -1,3 +1,11 @@
+textarea {
+  resize: none;
+}
+textarea:focus {
+  outline: none;
+  resize: none;
+}
+
 #modal-search-add-memes-top-grid-div-id {
   width: 100%;
   display: grid;
@@ -16,7 +24,7 @@
 
 /* TOP SEARCH BUTTON and RESET BUTTON START */
 #modal-search-add-memes-main-button-container-div-id {
-  background-color: var(--primary-300);
+  /* background-color: var(--primary-300); */
   grid-area: modal-search-add-memes-main-button-container-div-id;
   display: flex;
   justify-content: center;
@@ -26,38 +34,40 @@
 #modal-search-add-memes-main-button-id {
   display: block;
   width: 50%;
-  height: 90%;
+  height: 80%;
   /* background-color: #1884ff; */
   /* border-radius: 15%; */
-  font-weight: bold;
-  font-size: 2.5vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+  border-radius: 0.5rem;
 }
 
 #modal-search-add-memes-reset-button-id {
   display: inline-block;
   text-align: center; /*width: 30%;*/
-  height: 75%;
+  height: 80%;
   /* background-color: #ad2021; */
   /* border-radius: 25%; */
-  font-weight: bold;
-  font-size: 2.5vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+  border-radius: 0.5rem;
 }
 
 /* TOP SEARCH BUTTON and RESET BUTTON  */
 
 /* TAG SEARCH START */
 #modal-search-add-memes-tag-entry-container-div-id {
-  background-color: var(--primary-300);
+  /* background-color: var(--primary-300); */
   grid-area: modal-search-tag-entry-container-div-id;
   box-sizing: border-box;
   min-height: 0; /* NEW */
   min-width: 0; /* NEW; needed for Firefox */
   display: flex;
+  height: 3.2vmin;
 }
 
 #modal-search-add-memes-tag-label-id {
   white-space: nowrap;
-  font-size: 3vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+
   font-weight: bold;
   padding-left: 3px;
   vertical-align: middle;
@@ -69,9 +79,10 @@
 }
 
 #modal-search-add-memes-tag-textarea-entry-id {
-  height: 3vmin;
+  height: 3.2vmin;
   overflow: hidden;
-  font-size: 2.75vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+
   border-radius: 5px;
   white-space: nowrap;
   width: 99%;
@@ -81,7 +92,7 @@
 
 /* EMOTION FIELD SEARCH START */
 #modal-search-add-memes-emotion-entry-top-div-id {
-  background-color: var(--primary-300);
+  /* background-color: var(--primary-300); */
   grid-area: modal-search-emotion-entry-top-div-id;
   /* display: flex;
 		align-items: center; */
@@ -95,8 +106,7 @@
   /* justify-content: center; */
 }
 
-.modal-search-add-memes-emotion-remove-button-class {
-  height: 2.5vmin;
+.emotion-span {
 }
 
 #grid-emotion-area-1-id {
@@ -106,12 +116,13 @@
 #modal-search-add-memes-emotion-entry-button-id {
   display: inline-block;
   text-align: center;
-  height: 90%;
+  height: 80%;
   width: 100%;
-  background-color: var(--info);
-  border-radius: 15%;
+  border-radius: 0.5rem;
   font-weight: bold;
-  font-size: 5vmin;
+  font-size: clamp(0.75rem, 3vmin, 3rem);
+  padding: 0.05rem 0.05rem; /* Reduced padding, adjust values as needed */
+  line-height: 1; /* Adjust for vertical alignment */
 }
 
 #grid-emotion-area-2-id {
@@ -134,10 +145,11 @@
   grid-area: modal-search-add-memes-emotion-label-value-textarea-entry-id;
   height: 2.75vmin;
   overflow: hidden;
-  font-size: 2.75vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   border-radius: 5px;
   white-space: nowrap;
   display: inline-block;
+  margin-left: 3px;
   /* width: 30%; */
 }
 
@@ -154,7 +166,7 @@
 
 #modal-search-add-memes-emotion-label-value-display-container-div-id {
   bottom: 0;
-  padding-left: 1.5vmin;
+  /* padding-left: 1.5vmin; */
   padding-bottom: 2.5vmin;
   /* margin: auto; */
   /* max-width: 40vmin; or whatever width you want. */
@@ -162,7 +174,8 @@
   width: 95%;
   height: 90%;
   height: 5vmin;
-  font-size: 2.75vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+
   overflow-x: scroll;
   overflow-y: hidden;
   white-space: nowrap;
@@ -180,9 +193,11 @@
   height: 90%;
   width: 100%;
   background-color: var(--info);
-  border-radius: 15%;
+  border-radius: 0.5rem;
   font-weight: bold;
-  font-size: 5vmin;
+  font-size: clamp(0.75rem, 3vmin, 3rem);
+  padding: 0.05rem 0.05rem; /* Reduced padding, adjust values as needed */
+  line-height: 1; /* Adjust for vertical alignment */
 }
 
 #grid-emotion-area-2-idb {
@@ -203,13 +218,14 @@
 
 #modal-search-add-memes-emotion-meme-label-value-textarea-entry-id {
   grid-area: modal-search-add-memes-emotion-label-value-textarea-entry-idb;
+
   height: 2.75vmin;
   overflow: hidden;
-  font-size: 2.75vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   border-radius: 5px;
   white-space: nowrap;
   display: inline-block;
-  /* width: 30%; */
+  margin-left: 3px;
 }
 
 #modal-search-add-memes-emotion-meme-value-range-entry-id {
@@ -225,15 +241,15 @@
 
 #modal-search-add-memes-emotion-meme-label-value-display-container-div-id {
   bottom: 0;
-  padding-left: 1.5vmin;
+  /* padding-left: 1.5vmin; */
   padding-bottom: 2.5vmin;
-  /* margin: auto; */
   /* max-width: 40vmin; or whatever width you want. */
   display: inline-block;
   width: 95%;
   height: 90%;
   height: 5vmin;
-  font-size: 2.75vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+
   overflow-x: scroll;
   overflow-y: hidden;
   white-space: nowrap;
@@ -243,7 +259,7 @@
 
 /* MEME TAG LIST START */
 #modal-search-add-memes-tag-entry-top-div-id {
-  background-color: var(--primary-300);
+  /* background-color: var(--primary-300); */
   grid-area: modal-search-meme-tag-entry-top-div-id;
   box-sizing: border-box;
   min-height: 0; /* NEW */
@@ -269,7 +285,8 @@
 #modal-search-add-memes-tag-textarea-memes-entry-id {
   height: 3vmin;
   overflow: hidden;
-  font-size: 2.75vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+
   border-radius: 5px;
   white-space: nowrap;
   width: 99%;
@@ -307,12 +324,9 @@
 #modal-search-add-memes-images-results-select-images-order-button-id {
   background-color: var(--info);
   /* height: 70%; */
-  border-radius: 10%;
   width: 70%;
-  margin: 2px;
-  font-size: 2.75vmin;
-  font-weight: bold;
-  border-right: 2px var(--primary-300) solid;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+  border-radius: 0.5rem;
 }
 
 #modal-search-add-memes-images-results-grid-div-area-id {

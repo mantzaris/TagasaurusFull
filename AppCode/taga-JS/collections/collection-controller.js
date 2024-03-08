@@ -903,7 +903,7 @@ async function Change_Profile_Image() {
       let emotions_html_tmp = '';
       Object.keys(collection_profile_search_obj['emotions']).forEach((emotion_key) => {
         emotions_html_tmp += `
-                                            <span id="modal-search-profileimage-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
+                                            <span class="emotion-span" id="modal-search-profileimage-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
                                                 <img class="modal-search-profileimage-emotion-remove-button-class" id="modal-search-profileimage-emotion-remove-button-id-${emotion_key}"
                                                 src="${CLOSE_ICON_BLACK}" title="close" />
                                                 (${emotion_key},${collection_profile_search_obj['emotions'][emotion_key]})
@@ -1126,7 +1126,7 @@ async function Add_Gallery_Images() {
       let emotions_html_tmp = '';
       Object.keys(collection_gallery_search_obj['emotions']).forEach((emotion_key) => {
         emotions_html_tmp += `
-                                            <span id="modal-search-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
+                                            <span class="emotion-span" id="modal-search-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
                                                 <img class="modal-search-emotion-remove-button-class" id="modal-search-emotion-remove-button-id-${emotion_key}"
                                                 src="${CLOSE_ICON_BLACK}" title="close" />
                                                 (${emotion_key},${collection_gallery_search_obj['emotions'][emotion_key]})
@@ -1497,7 +1497,7 @@ async function Add_Meme_Images() {
       let emotions_html_tmp = '';
       Object.keys(collection_meme_search_obj['emotions']).forEach((emotion_key) => {
         emotions_html_tmp += `
-                                            <span id="modal-search-add-memes-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
+                                            <span class="emotion-span" id="modal-search-add-memes-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
                                                 <img class="modal-search-emotion-remove-button-class" id="modal-search-add-memes-emotion-remove-button-id-${emotion_key}"
                                                 src="${CLOSE_ICON_BLACK}" title="close" />
                                                 (${emotion_key},${collection_meme_search_obj['emotions'][emotion_key]})
@@ -1530,7 +1530,7 @@ async function Add_Meme_Images() {
       let emotions_html_tmp = '';
       Object.keys(collection_meme_search_obj['meme_emotions']).forEach((emotion_key) => {
         emotions_html_tmp += `
-                                            <span id="modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}" style="white-space:nowrap">
+                                            <span class="emotion-span" id="modal-search-add-memes-emotion-meme-label-value-span-id-${emotion_key}" style="white-space:nowrap">
                                                 <img class="modal-search-emotion-remove-button-class" id="modal-search-add-memes-emotion-meme-remove-button-id-${emotion_key}"
                                                 src="${CLOSE_ICON_BLACK}" title="close" />
                                                 (${emotion_key},${collection_meme_search_obj['meme_emotions'][emotion_key]})
@@ -1889,7 +1889,7 @@ async function Search_Collections() {
       emotions_html_tmp = '';
       Object.keys(collection_search_obj['emotions']).forEach((emotion_key) => {
         emotions_html_tmp += `
-                                            <span id="collections-modal-search-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
+                                            <span class="emotion-span" id="collections-modal-search-emotion-label-value-span-id-${emotion_key}" style="white-space:nowrap">
                                                 <img class="collections-modal-search-emotion-remove-button-class" id="collections-modal-search-emotion-remove-button-id-${emotion_key}"
                                                 src="${CLOSE_ICON_BLACK}" title="close" />
                                                 (${emotion_key},${collection_search_obj['emotions'][emotion_key]})

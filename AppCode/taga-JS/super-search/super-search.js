@@ -191,8 +191,8 @@ document.getElementById('use-webcam-button-id').onclick = function () {
       if (!streaming) {
         height = video.videoHeight;
         width = video.videoWidth;
-        video.setAttribute('width', width);
-        video.setAttribute('height', height);
+        // video.setAttribute('width', width); //needed to be commented out so that the CSS scalling works instead
+        // video.setAttribute('height', height);
         canvas.setAttribute('width', width);
         canvas.setAttribute('height', height);
         streaming = true;
@@ -268,6 +268,7 @@ document.getElementById('use-webcam-button-id').onclick = function () {
     select_capture_button.style.display = 'none';
     captured = false;
     document.getElementById('webcam-video-id').style.display = 'block';
+
     document.getElementById('back-capture-button-id').style.display = 'none';
     canvas.style.display = 'none';
   };
