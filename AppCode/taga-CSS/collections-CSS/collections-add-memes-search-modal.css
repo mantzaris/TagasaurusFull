@@ -79,7 +79,7 @@ textarea:focus {
 }
 
 #modal-search-add-memes-tag-textarea-entry-id {
-  height: 3.2vmin;
+  height: 3.75vmin;
   overflow: hidden;
   font-size: clamp(0.75rem, 2vmin, 3rem);
 
@@ -283,7 +283,7 @@ textarea:focus {
 }
 
 #modal-search-add-memes-tag-textarea-memes-entry-id {
-  height: 3vmin;
+  height: 3.75vmin;
   overflow: hidden;
   font-size: clamp(0.75rem, 2vmin, 3rem);
 
@@ -296,9 +296,9 @@ textarea:focus {
 
 /* IMAGE SEARCH RESULTS START */
 #modal-search-add-memes-images-results-display-id {
-  background-color: var(--primary-300);
+  /* background-color: var(--primary-300); */
   grid-area: modal-search-images-results-display-id;
-  border-top: 6px solid var(--primary);
+  /* border-top: 6px solid var(--primary); */
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 11fr;
@@ -313,7 +313,7 @@ textarea:focus {
 }
 
 #modal-search-add-memes-images-results-button-div-id {
-  background-color: var(--primary-300);
+  /* background-color: var(--primary-300); */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -330,7 +330,8 @@ textarea:focus {
 }
 
 #modal-search-add-memes-images-results-grid-div-area-id {
-  background-color: var(--primary);
+  background-color: var(--primary-300);
+  /* background-color: var(--primary); */
   overflow-y: scroll;
   border-top: 3px solid var(--primary);
   /* max-height: 100%; */
@@ -349,7 +350,8 @@ textarea:focus {
 }
 
 #modal-search-add-memes-meme-images-results-grid-div-area-id {
-  background-color: var(--primary);
+  /* background-color: var(--primary); */
+  background-color: var(--primary-300);
   border-top: 3px solid var(--primary);
   /* height: 100%; */
   overflow-y: scroll;

@@ -356,8 +356,8 @@
         <div id="modal-search-top-grid-div-id">
           <!-- search button -->
           <div id="modal-search-main-button-container-div-id">
-            <button type="button" class="fun-button-blue" id="modal-search-main-button-id">SEARCH BUTTON</button>
-            <button type="button" class="fun-button-red" id="modal-search-main-reset-button-id">RESET FIELDS</button>
+            <button type="button" class="btn btn-primary ms-2 me-2 mt-2 mb-2" id="modal-search-main-button-id">SEARCH</button>
+            <button type="button" class="btn btn-danger ms-2 me-2 mt-2 mb-2" id="modal-search-main-reset-button-id">RESET FIELDS</button>
           </div>
 
           <!-- image tag entry -->
@@ -390,7 +390,7 @@
           <!-- add emotion/value entry -->
           <div id="modal-search-emotion-entry-top-div-id">
             <!-- <div id="grid-emotion-area-1-id"></div> -->
-            <button type="button" class="fun-button-blue" id="modal-search-emotion-entry-button-id">INCLUDE EMOTION</button>
+            <button type="button" class="btn btn-primary ms-2 me-1 p-0 custom-button" id="modal-search-emotion-entry-button-id">ADD EMOTION</button>
             <!-- </div> -->
 
             <!-- <div id="grid-emotion-area-2-id"> -->
@@ -402,7 +402,7 @@
                 name="search-modal-emotion-tag-textarea"
                 oninput="this.value = this.value.replace(/[ \n]/g,'')"
               ></textarea>
-              <input id="modal-search-emotion-value-range-entry-id" type="range" min="-100" max="100" value="0" />
+              <input class="ms-2 mb-2" id="modal-search-emotion-value-range-entry-id" type="range" min="-100" max="100" value="0" />
             </div>
             <!-- </div> -->
 
@@ -420,7 +420,7 @@
           <!-- IMAGE SEARCH RESULTS START -->
           <div id="modal-search-images-results-display-id">
             <div id="modal-search-images-results-button-div-id">
-              <button type="button" class="fun-button-blue" id="modal-search-images-results-select-images-order-button-id">Select Toggled Images</button>
+              <button type="button" class="btn btn-primary ms-2 me-1 mt-1 mb-1" id="modal-search-images-results-select-images-order-button-id">Select Toggled Images</button>
             </div>
             <!-- for the image annotation matches -->
             <div id="modal-search-images-results-grid-div-area-id">

@@ -15,7 +15,7 @@
 
 /* SEARCH BUTTON START */
 #modal-search-main-button-container-div-id {
-  background-color: var(--primary-300);
+  /* background-color: var(--primary-300); */
   grid-area: modal-search-main-button-container-div-id;
   display: flex;
   justify-content: center;
@@ -24,26 +24,22 @@
 #modal-search-main-button-id {
   display: block;
   width: 50%;
-  height: 90%;
-  /* background-color: #1884ff; */
-  /* border-radius: 15%; */
-  font-weight: bold;
-  font-size: 2.5vmin;
+  height: 80%;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+  border-radius: 0.5rem;
 }
 #modal-search-main-reset-button-id {
   display: inline-block;
   text-align: center; /*width: 30%;*/
-  height: 75%;
-  /* background-color: #ad2021; */
-  /* border-radius: 25%; */
-  font-weight: bold;
-  font-size: 2.5vmin;
+  height: 80%;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+  border-radius: 0.5rem;
 }
 /* SEARCH BUTTON END */
 
 /* TAG SEARCH START */
 #modal-search-tag-entry-container-div-id {
-  background-color: var(--primary-300);
+  /* background-color: var(--primary-300); */
   grid-area: modal-search-tag-entry-container-div-id;
   box-sizing: border-box;
   min-height: 0; /* NEW */
@@ -62,21 +58,24 @@
   flex-grow: 20;
 }
 #modal-search-tag-textarea-entry-id {
-  height: 3vmin;
   overflow: hidden;
-  font-size: 2.75vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   border-radius: 5px;
   white-space: nowrap;
-  width: 99%;
+  width: 98%;
+  height: 90%;
 }
 /* TAG SEARCH END */
 
 /* EMOTION FIELD SEARCH START */
 #modal-search-emotion-entry-top-div-id {
-  background-color: var(--primary-300);
+  /* background-color: var(--primary-300); */
   grid-area: modal-search-emotion-entry-top-div-id;
-  /* display: flex;
-    align-items: center; */
+
+  min-height: 0;
+  min-width: 0;
+  height: 100%;
+  width: 100%;
   display: grid;
   grid-template-columns: 3fr 3fr 8fr;
   grid-template-areas:
@@ -87,22 +86,27 @@
 }
 #grid-emotion-area-1-id {
   grid-template-areas: grid-emotion-area-1-id;
+  min-height: 10px;
+  /* background-color: rgb(51, 184, 95); */
 }
-#modal-search-emotion-entry-button-id {
+
+#modal-search-emotion-entry-button-id,
+.custom-button {
   display: inline-block;
   text-align: center;
-  height: 90%;
-  /* background-color: #1884ff; */
-  /* border-radius: 15%; */
-  font-weight: bold;
-  font-size: 2.5vmin;
+  font-size: clamp(0.5rem, 1.7vmin, 3rem);
+  height: 80%;
+  border-radius: 0.5rem;
+  line-height: 1vmin !important;
+  padding: 1px 1px !important;
 }
+
 #grid-emotion-area-2-id {
   grid-template-areas: grid-emotion-area-2-id;
 }
 #modal-search-emotion-label-and-value-entry-container-div-id {
   display: grid;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: 5fr 7fr;
   /* height: 100%; */
   box-sizing: border-box;
   padding: 0%;
@@ -112,21 +116,43 @@
 }
 #modal-search-emotion-label-value-textarea-entry-id {
   grid-area: modal-search-emotion-label-value-textarea-entry-id;
-  height: 2.75vmin;
+  height: 2.85vmin;
   overflow: hidden;
-  font-size: 2.75vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   border-radius: 5px;
   white-space: nowrap;
   display: inline-block;
   /* width: 30%; */
 }
-#modal-search-emotion-value-range-entry-id {
-  /* width: 20%vmin; */
+
+#search-emotion-label-and-value-entry-container-div-id {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
   grid-area: modal-search-emotion-value-range-entry-id;
-  display: inline-block;
+  resize: none;
 }
+
+#modal-search-emotion-value-range-entry-id {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: end; /* Align items to the end of the container */
+  width: 80%;
+  margin-top: auto; /* Pushes the slider to the bottom */
+}
+
+/* #modal-search-emotion-value-range-entry-id {
+  grid-area: modal-search-emotion-value-range-entry-id;
+  width: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: red;
+} */
+
 #grid-emotion-area-3-id {
   grid-template-areas: grid-emotion-area-3-id;
+  /* background-color: gold; */
 }
 #modal-search-emotion-label-value-display-container-div-id {
   bottom: 0;
@@ -136,12 +162,13 @@
   /* max-width: 40vmin; or whatever width you want. */
   display: inline-block;
   width: 95%;
-  height: 90%;
-  height: 5vmin;
+  height: 95%;
+  /* height: 5vmin; */
   font-size: 2.75vmin;
   overflow-x: scroll;
   overflow-y: hidden;
   white-space: nowrap;
+  /* background-color: violet; */
 }
 .modal-search-emotion-remove-button-class {
   height: 2.5vmin;
@@ -150,7 +177,7 @@
 
 /* MEME TAG LIST START */
 #modal-search-meme-tag-entry-top-div-id {
-  background-color: var(--primary-300);
+  /* background-color: var(--primary-300); */
   grid-area: modal-search-meme-tag-entry-top-div-id;
   box-sizing: border-box;
   min-height: 0; /* NEW */
@@ -170,20 +197,21 @@
   flex-grow: 20;
 }
 #modal-search-meme-tag-textarea-entry-id {
-  height: 3vmin;
+  /* height: 3vmin; */
   overflow: hidden;
-  font-size: 2.75vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   border-radius: 5px;
   white-space: nowrap;
-  width: 99%;
+  width: 98%;
+  height: 90%;
 }
 /* MEME TAG LIST END */
 
 /* IMAGE SEARCH RESULTS START */
 #modal-search-images-results-display-id {
-  background-color: var(--primary-300);
+  /* background-color: var(--primary-300); */
   grid-area: modal-search-images-results-display-id;
-  border-top: 6px solid var(--primary);
+  /* border-top: 6px solid var(--primary); */
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 11fr;
@@ -198,8 +226,8 @@
 }
 
 #modal-search-images-results-button-div-id {
-  background-color: var(--primary-300);
-  border-right: solid 6px var(--primary);
+  /* background-color: var(--primary-300); */
+  /* border-right: solid 6px var(--primary); */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -208,17 +236,14 @@
 }
 #modal-search-images-results-select-images-order-button-id {
   background-color: var(--info);
-  /* height: 70%; */
-  /* border-radius: 10%; */
   width: 70%;
-  /* margin: 2px; */
-  font-size: 2.75vmin;
-  font-weight: bold;
-  /* border-right: 2px #00c600 solid; */
+
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+  border-radius: 0.5rem;
 }
 #modal-search-images-memes-results-button-div-id {
+  /* background-color: var(--primary-300); */
   background-color: var(--primary-300);
-
   /* height: 100%; */
   display: flex;
   align-items: center;
@@ -236,7 +261,8 @@
   /* border-left: 2px #00c600 solid; */
 }
 #modal-search-images-results-grid-div-area-id {
-  background-color: var(--primary);
+  background-color: var(--primary-300);
+  /* background-color: var(--primary); */
   overflow-y: scroll;
   border-top: 3px solid var(--primary);
   /* max-height: 100%; */
@@ -254,7 +280,8 @@
 }
 
 #modal-search-meme-images-results-grid-div-area-id {
-  background-color: var(--primary);
+  /* background-color: var(--primary); */
+  background-color: var(--primary-300);
   border-top: 3px solid var(--primary);
   /* height: 100%; */
   overflow-y: scroll;
