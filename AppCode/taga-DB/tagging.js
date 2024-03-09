@@ -253,7 +253,8 @@ exports.Tagging_Random_DB_FileNames = Tagging_Random_DB_FileNames;
 function Tagging_Random_DB_Records_With_Faces(request_num) {
   let entries = [];
   let seen = new Set();
-  let attempts = 0;
+  let attempts = 0n;
+  request_num = BigInt(request_num);
 
   if (record_num_tagging < request_num) {
     request_num = record_num_tagging;
@@ -268,9 +269,9 @@ function Tagging_Random_DB_Records_With_Faces(request_num) {
       entries.push(entry);
     }
 
-    attempts++;
+    attempts = attempts + BigInt(1);
 
-    if (attempts > request_num * 2) {
+    if (attempts > request_num * BigInt(2)) {
       break;
     }
   }
