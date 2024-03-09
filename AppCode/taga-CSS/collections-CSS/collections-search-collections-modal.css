@@ -133,7 +133,7 @@
   /* max-width: 40vmin; or whatever width you want. */
   display: inline-block;
   width: 95%;
-  height: 90%;
+  height: 95%;
   height: 5vmin;
   font-size: clamp(0.75rem, 2vmin, 3rem);
   overflow-x: scroll;
@@ -209,9 +209,8 @@
   /* height: 70%; */
   /* border-radius: 10%; */
   width: 70%;
-  /* margin: 2px; */
-  font-size: 3vmin;
-  font-weight: bold;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+  border-radius: 0.5rem;
   /* border-right: 2px #00c600 solid; */
 }
 

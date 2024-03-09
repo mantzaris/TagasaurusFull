@@ -29,6 +29,10 @@
     <!-- style sheet for the processing message modal -->
     <link rel="stylesheet" href="./taga-CSS/processing-message-modal.css" />
 
+    <script src="../Assets/bootstrap/popper.min.js" defer></script>
+    <script src="../Assets/bootstrap/bootstrap.min.js" defer></script>
+    <link href="../Assets/bootstrap/bootstrap.min.css" rel="stylesheet" >
+
     <!-- something to do with security -->
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
   </head>
@@ -53,7 +57,7 @@
         </div>
         <div id="collection-profile-image-div-id">
           <div id="profile-image-select-button-div-id">
-            <button type="button" class="fun-button-blue" id="profile-image-select-button-id">(REQUIRED) CHOOSE PROFILE IMAGE</button>
+            <button type="button" class="btn btn-primary" id="profile-image-select-button-id">PROFILE IMAGE (REQUIRED)</button>
           </div>
           <div id="profile-image-display-div-id">
             <img id="profile-image-display-id" src="" title="candidate profile image" alt="" />
@@ -65,8 +69,8 @@
         <div id="step2-gallery-choose-div-id">
           <div id="step2-gallerychoose-label-div-id">IMAGE GALLERY (OPTIONAL)</div>
           <div id="step2-gallerychoose-buttons-div-id">
-            <button type="button" class="fun-button-blue" id="gallery-images-search-button-id">ADD IMAGES</button>
-            <button type="button" class="fun-button-blue" id="gallery-save-changes-button-id">SAVE CHANGES</button>
+            <button type="button" class="btn btn-primary ms-1 me-1 mt-1 mb-1" id="gallery-images-search-button-id">ADD IMAGES</button>
+            <button type="button" class="btn btn-primary ms-1 me-1 mt-1 mb-1" id="gallery-save-changes-button-id">SAVE CHANGES</button>
           </div>
           <div id="step2-gallerygrid-div-id">
             <!-- taken from the collection page gallery display -->
@@ -150,16 +154,16 @@
                   oninput="this.value = this.value.replace(/[ \n]/g,'')"
                 ></textarea>
               </div>
-              <div id="collection-image-annotation-emotions-new-entry-emotion-value-range-div-id">
+              <div class="mb-2" id="collection-image-annotation-emotions-new-entry-emotion-value-range-div-id">
                 <span id="collection-image-annotation-emotions-new-entry-emotion-value-label-min-id">-100</span>
                 <span id="collection-image-annotation-emotions-new-entry-emotion-value-label-max-id">100</span>
                 <input id="collection-image-annotation-emotions-new-entry-emotion-value-range-slider-id" type="range" min="-100" max="100" value="0" />
               </div>
               <div id="collection-image-annotation-emotions-new-entry-emotion-button-div-id">
-                <button type="button" class="fun-button-blue" id="collection-image-annotation-emotions-new-entry-add-emotion-button-id">ADD EMOTION</button>
+                <button type="button" class="btn btn-primary ms-1 me-1 mt-1 mb-1" id="collection-image-annotation-emotions-new-entry-add-emotion-button-id">ADD EMOTION</button>
               </div>
               <div id="collection-image-annotation-emotions-save-button-div-id">
-                <button type="button" class="fun-button-blue" id="collection-image-annotation-emotions-save-emotion-button-id">SAVE</button>
+                <button type="button" class="btn btn-primary ms-1 me-1 mt-1 mb-1" id="collection-image-annotation-emotions-save-emotion-button-id">SAVE</button>
               </div>
             </div>
           </div>
@@ -178,8 +182,8 @@
         <div id="step5-meme-div-id">
           <div id="step5-meme-label-div-id">MEMES (OPTIONAL)</div>
           <div id="step5-meme-buttons-div-id">
-            <button type="button" class="fun-button-blue" id="step5-memes-add-button-id">ADD MEMES</button>
-            <button type="button" class="fun-button-blue" id="step5-memes-save-changes-button-id">SAVE CHANGES</button>
+            <button type="button" class="btn btn-primary ms-1 me-1 mt-1 mb-1" id="step5-memes-add-button-id">ADD MEMES</button>
+            <button type="button" class="btn btn-primary ms-1 me-1 mt-1 mb-1" id="step5-memes-save-changes-button-id">SAVE CHANGES</button>
           </div>
           <div id="step5-memegrid-div-id">
             <div class="collection-image-annotation-memes-grid-wrapper-class">
@@ -217,9 +221,9 @@
     <!-- END OF ANNOTATION STEPS -->
 
     <div id="bottom-div-id">
-      <button class="fun-button-blue" id="creation-back-button-id">BACK</button>
-      <button class="fun-button-blue" id="creation-next-button-id">NEXT</button>
-      <button onclick="location.href='./collections.html'" class="fun-button-red" id="creation-cancel-button-id">CANCEL</button>
+      <button class="btn btn-primary mb-1 me-2" id="creation-back-button-id">BACK</button>
+      <button class="btn btn-primary mb-1" id="creation-next-button-id">NEXT</button>
+      <button onclick="location.href='./collections.html'" class="btn btn-danger mb-1" id="creation-cancel-button-id">CANCEL</button>
     </div>
 
     <!-- MODALS BEGIN -->
@@ -242,8 +246,8 @@
         <div id="modal-search-profileimage-top-grid-div-id">
           <!-- search-profileimage button -->
           <div id="modal-search-profileimage-main-button-container-div-id">
-            <button type="button" class="fun-button-blue" id="modal-search-profileimage-main-button-id">SEARCH BUTTON</button>
-            <button type="button" class="fun-button-red" id="modal-search-profileimage-main-reset-button-id">RESET FIELDS</button>
+            <button type="button" class="btn btn-primary ms-2 me-1 mt-1 mb-1" id="modal-search-profileimage-main-button-id">SEARCH</button>
+            <button type="button" class="btn btn-danger ms-2 me-1 mt-1 mb-1" id="modal-search-profileimage-main-reset-button-id">RESET FIELDS</button>
           </div>
 
           <!-- image tag entry -->
@@ -276,7 +280,7 @@
           <!-- add emotion/value entry -->
           <div id="modal-search-profileimage-emotion-entry-top-div-id">
             <!-- <div id="grid-emotion-area-1-id"></div> -->
-            <button type="button" class="fun-button-blue" id="modal-search-profileimage-emotion-entry-button-id">INCLUDE EMOTION</button>
+            <button type="button" class="btn btn-primary ms-2 me-1 mt-1 mb-1" id="modal-search-profileimage-emotion-entry-button-id">INCLUDE EMOTION</button>
             <!-- </div> -->
 
             <!-- <div id="grid-emotion-area-2-id"> -->
@@ -353,8 +357,8 @@
         <div id="modal-search-top-grid-div-id">
           <!-- search button -->
           <div id="modal-search-main-button-container-div-id">
-            <button type="button" class="fun-button-blue" id="modal-search-main-button-id">SEARCH BUTTON</button>
-            <button type="button" class="fun-button-red" id="modal-search-main-reset-button-id">RESET FIELDS</button>
+            <button type="button" class="btn btn-primary ms-1 me-1 mt-1 mb-1" id="modal-search-main-button-id">SEARCH</button>
+            <button type="button" class="btn btn-danger ms-2 me-1 mt-1 mb-1" id="modal-search-main-reset-button-id">RESET FIELDS</button>
           </div>
 
           <!-- image tag entry -->
@@ -387,7 +391,7 @@
           <!-- add emotion/value entry -->
           <div id="modal-search-emotion-entry-top-div-id">
             <!-- <div id="grid-emotion-area-1-id"></div> -->
-            <button type="button" class="fun-button-blue" id="modal-search-emotion-entry-button-id">INCLUDE EMOTION</button>
+            <button type="button" class="btn btn-primary ms-1 me-1 mt-1 mb-1" id="modal-search-emotion-entry-button-id">INCLUDE EMOTION</button>
             <!-- </div> -->
 
             <!-- <div id="grid-emotion-area-2-id"> -->
@@ -417,7 +421,7 @@
           <!-- IMAGE SEARCH RESULTS START -->
           <div id="modal-search-images-results-display-id">
             <div id="modal-search-images-results-button-div-id">
-              <button type="button" class="fun-button-blue" id="modal-search-images-results-select-images-order-button-id">Select Toggled Images</button>
+              <button type="button" class="btn btn-primary ms-1 me-1 mt-1 mb-1" id="modal-search-images-results-select-images-order-button-id">Select Toggled Images</button>
             </div>
             <!-- for the image annotation matches -->
             <div id="modal-search-images-results-grid-div-area-id">
@@ -478,8 +482,8 @@
         <div id="modal-search-add-memes-top-grid-div-id">
           <!-- search button -->
           <div id="modal-search-add-memes-main-button-container-div-id">
-            <button type="button" class="fun-button-blue" id="modal-search-add-memes-main-button-id">SEARCH BUTTON</button>
-            <button type="button" class="fun-button-red" id="modal-search-add-memes-reset-button-id">RESET FIELDS</button>
+            <button type="button" class="btn btn-primary ms-1 me-1 mt-1 mb-1" id="modal-search-add-memes-main-button-id">SEARCH</button>
+            <button type="button" class="btn btn-danger ms-1 me-1 mt-1 mb-1" id="modal-search-add-memes-reset-button-id">RESET FIELDS</button>
           </div>
 
           <!-- image tag entry -->
@@ -569,7 +573,7 @@
           <!-- IMAGE SEARCH RESULTS START -->
           <div id="modal-search-add-memes-images-results-display-id">
             <div id="modal-search-add-memes-images-results-button-div-id">
-              <button type="button" class="fun-button-blue" id="modal-search-add-memes-images-results-select-images-order-button-id">
+              <button type="button" class="btn btn-primary ms-1 me-1 mt-1 mb-1" id="modal-search-add-memes-images-results-select-images-order-button-id">
                 Select Toggled Images as Memes
               </button>
             </div>

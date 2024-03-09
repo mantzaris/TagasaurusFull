@@ -163,8 +163,8 @@
   display: inline-block;
   width: 95%;
   height: 95%;
-  /* height: 5vmin; */
-  font-size: 2.75vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+
   overflow-x: scroll;
   overflow-y: hidden;
   white-space: nowrap;

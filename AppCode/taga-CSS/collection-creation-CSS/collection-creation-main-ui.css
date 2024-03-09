@@ -94,8 +94,7 @@ body {
 }
 #collection-name-label-id {
   grid-area: nameLabel;
-  font-size: 3.5vmin;
-  font-weight: bold;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
 }
 #collection-name-textarea-div-id {
   grid-area: nameTextArea;
@@ -132,7 +131,8 @@ body {
 #profile-image-select-button-id {
   margin-top: 5px;
   height: 100%;
-  font-size: 3vmin;
+  font-size: clamp(0.75rem, 2.5vmin, 3.5rem);
+  border-radius: 0.5rem;
 }
 #profile-image-display-div-id {
   grid-area: profileImage;
@@ -222,8 +222,8 @@ body {
 }
 #step2-gallerychoose-label-div-id {
   grid-area: galleryLabel;
-  font-weight: bold;
-  font-size: 3.5vmin;
+
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -237,12 +237,12 @@ body {
 }
 #gallery-images-search-button-id {
   font-weight: bold;
-  font-size: 3vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   padding: 4px;
 }
 #gallery-save-changes-button-id {
   font-weight: bold;
-  font-size: 3vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   padding: 4px;
 }
 #step2-gallerygrid-div-id {
@@ -538,6 +538,7 @@ input:checked + .slider:before {
 #collection-image-annotation-emotions-labels-show-div-id {
   grid-area: collection-image-annotation-emotions-labels-show-div-id;
   overflow-y: auto;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   /* min-height: 0;  essential for the auto height be disabled and stop it expanding */
   /* height: 100%; */
 }
@@ -545,6 +546,7 @@ input:checked + .slider:before {
   display: flex;
   gap: 0.5rem;
   margin-top: 10px;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
 }
 .emotion-list-class div {
   display: flex;
@@ -561,7 +563,7 @@ input:checked + .slider:before {
 .emotion-label-view-class {
   /* font-size: 2.75vmin; */
   word-break: break-all;
-  font-size: 1.8rem;
+  font-size: clamp(0.75rem, 3.25vmin, 4rem);
 }
 .emotion-range-slider-class {
   max-width: 40%;
@@ -583,18 +585,21 @@ input:checked + .slider:before {
   grid-area: collection-image-annotation-emotions-new-entry-emotion-textlabel-div-id;
   width: 100%;
   margin-top: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 #collection-image-annotation-emotions-new-entry-emotion-textarea-id {
-  height: 3vmin;
+  height: clamp(1.5rem, 3.5vmin, 4.5rem);
   overflow: hidden;
   margin-top: 0.3rem;
-  font-size: 3vmin;
+  font-size: clamp(0.75rem, 2.5vmin, 3rem);
   border-radius: 2px;
   white-space: nowrap;
-  display: inline-block;
+
   resize: none;
   width: 100%;
-  border-width: 3px;
+  border-width: 2px;
   border-color: black;
 }
 #collection-image-annotation-emotions-new-entry-emotion-button-div-id {
@@ -604,7 +609,8 @@ input:checked + .slider:before {
   text-align: center;
 }
 #collection-image-annotation-emotions-new-entry-add-emotion-button-id {
-  font-size: 2.4vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+  border-radius: 0.5rem;
   height: 80%;
   width: 90%;
 }
@@ -615,7 +621,8 @@ input:checked + .slider:before {
   text-align: center;
 }
 #collection-image-annotation-emotions-save-emotion-button-id {
-  font-size: 2.4vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+  border-radius: 0.5rem;
   height: 80%;
   width: 90%;
 }
@@ -624,6 +631,7 @@ input:checked + .slider:before {
   width: 100%;
   margin-left: 5%;
   margin-top: 1vmin;
+  margin-bottom: 3px;
 }
 #collection-image-annotation-emotions-new-entry-emotion-value-label-min-id {
   box-sizing: border-box;
@@ -729,14 +737,13 @@ input:checked + .slider:before {
   justify-content: space-evenly;
 }
 #step5-memes-add-button-id {
-  font-weight: bold;
-  font-size: 3vmin;
-  padding: 4px;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+  border-radius: 0.5rem;
+  /* padding: 4px; */
 }
 #step5-memes-save-changes-button-id {
-  font-weight: bold;
-  font-size: 3vmin;
-  padding: 4px;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+  border-radius: 0.5rem;
 }
 #step5-memegrid-div-id {
   grid-area: memeStepGallery;
@@ -849,17 +856,23 @@ input:checked + .slider:before {
 }
 #creation-back-button-id {
   grid-area: prev-button;
-  font-size: 3vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+  border-radius: 0.5rem;
+
   margin: 3px;
 }
 #creation-next-button-id {
   grid-area: next-button;
-  font-size: 3vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+  border-radius: 0.5rem;
+
   margin: 3px;
 }
 #creation-cancel-button-id {
   grid-area: cancel-button;
-  font-size: 3vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+  border-radius: 0.5rem;
+
   margin: 3px;
 }
 /* BOTTOM END */

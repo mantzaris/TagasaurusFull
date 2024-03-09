@@ -154,7 +154,7 @@
   width: 95%;
   height: 95%;
 
-  font-size: 2.75vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   overflow-x: scroll;
   overflow-y: hidden;
   white-space: nowrap;
@@ -245,6 +245,7 @@ min-height: 1px;
   max-width: 100%;
   cursor: pointer;
   margin-bottom: 4px;
+  margin-left: 5px;
 }
 /* #modal-search-profileimage-images-results-grid-div-area-id > div {
   overflow: hidden;
