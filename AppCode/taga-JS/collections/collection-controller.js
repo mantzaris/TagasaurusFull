@@ -1951,7 +1951,7 @@ async function Search_Collections() {
       search_display_inner_tmp += `
                                         <div class="collection-view-container-class" id="collection-selection-option-id-${collectionName_tmp}">
                                             <div class="collection-selection-preview-single">
-                                                <div class="collection-name-result-div-class"> ${collectionName_tmp} </div>
+                                                <div class="collection-name-result-div-class "> ${collectionName_tmp} </div>
                                                 <div class="collection-profileimage-search-div">
                                                     ${await GENERAL_HELPER_FNS.Create_Media_Thumbnail(
                                                       collection_tmp.collectionImage,

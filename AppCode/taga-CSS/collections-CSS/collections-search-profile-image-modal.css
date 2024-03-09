@@ -17,38 +17,36 @@
 /* SEARCH BUTTON START */
 #modal-search-profileimage-main-button-container-div-id,
 #modal-search-profileimage-main-button-container-div-id {
-  background-color: var(--primary-300);
+  /* background-color: var(--primary-300); */
   grid-area: modal-search-profileimage-main-button-container-div-id;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-#modal-search-profileimage-main-button-id,
+
 #modal-search-profileimage-main-button-id {
   display: block;
   width: 50%;
-  height: 90%;
-  /* background-color: #1884ff; */
-  /* border-radius: 15%; */
-  font-weight: bold;
-  font-size: 2.5vmin;
+  height: 80%;
+
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+  border-radius: 0.5rem;
 }
-#modal-search-profileimage-main-reset-button-id,
+
 #modal-search-profileimage-main-reset-button-id {
   display: inline-block;
   text-align: center; /*width: 30%;*/
-  height: 75%;
-  /* background-color: #ad2021; */
-  /* border-radius: 25%; */
-  font-weight: bold;
-  font-size: 2.5vmin;
+  height: 80%;
+
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+  border-radius: 0.5rem;
 }
 /* SEARCH BUTTON END */
 
 /* TAG SEARCH START */
 #modal-search-profileimage-tag-entry-container-div-id,
 #modal-search-profileimage-tag-entry-container-div-id {
-  background-color: var(--primary-300);
+  /* background-color: var(--primary-300); */
   grid-area: modal-search-profileimage-tag-entry-container-div-id;
   box-sizing: border-box;
   min-height: 0; /* NEW */
@@ -68,21 +66,23 @@
 #modal-search-profileimage-tag-textarea-entry-div-id {
   flex-grow: 20;
 }
-#modal-search-profileimage-tag-textarea-entry-id,
+
 #modal-search-profileimage-tag-textarea-entry-id {
-  height: 3vmin;
+  resize: none;
+
   overflow: hidden;
-  font-size: 2.75vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   border-radius: 5px;
   white-space: nowrap;
-  width: 99%;
+  width: 98%;
+  height: 90%;
 }
 /* TAG SEARCH END */
 
 /* EMOTION FIELD SEARCH START */
 #modal-search-profileimage-emotion-entry-top-div-id,
 #modal-search-profileimage-emotion-entry-top-div-id {
-  background-color: var(--primary-300);
+  /* background-color: var(--primary-300); */
   grid-area: modal-search-profileimage-emotion-entry-top-div-id;
   /* display: flex;
     align-items: center; */
@@ -97,15 +97,15 @@
 #grid-emotion-area-1-id {
   grid-template-areas: grid-emotion-area-1-id;
 }
-#modal-search-profileimage-emotion-entry-button-id,
+
 #modal-search-profileimage-emotion-entry-button-id {
   display: inline-block;
   text-align: center;
-  height: 90%;
-  /* background-color: #1884ff; */
-  /* border-radius: 15%; */
-  font-weight: bold;
-  font-size: 2.5vmin;
+  font-size: clamp(0.5rem, 1.7vmin, 3rem);
+  height: 80%;
+  border-radius: 0.5rem;
+  line-height: 1vmin !important;
+  padding: 1px 1px !important;
 }
 #grid-emotion-area-2-id {
   grid-template-areas: grid-emotion-area-2-id;
@@ -121,18 +121,20 @@
     'modal-search-profileimage-emotion-label-value-textarea-entry-id'
     'modal-search-profileimage-emotion-value-range-entry-id';
 }
-#modal-search-profileimage-emotion-label-value-textarea-entry-id,
+
 #modal-search-profileimage-emotion-label-value-textarea-entry-id {
   grid-area: modal-search-profileimage-emotion-label-value-textarea-entry-id;
-  height: 2.75vmin;
+  resize: none;
+
+  height: 2.85vmin;
   overflow: hidden;
-  font-size: 2.75vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   border-radius: 5px;
   white-space: nowrap;
   display: inline-block;
   /* width: 30%; */
 }
-#modal-search-profileimage-emotion-value-range-entry-id,
+
 #modal-search-profileimage-emotion-value-range-entry-id {
   /* width: 20%vmin; */
   grid-area: modal-search-profileimage-emotion-value-range-entry-id;
@@ -141,7 +143,7 @@
 #grid-emotion-area-3-id {
   grid-template-areas: grid-emotion-area-3-id;
 }
-#modal-search-profileimage-emotion-label-value-display-container-div-id,
+
 #modal-search-profileimage-emotion-label-value-display-container-div-id {
   bottom: 0;
   padding-left: 1.5vmin;
@@ -150,8 +152,8 @@
   /* max-width: 40vmin; or whatever width you want. */
   display: inline-block;
   width: 95%;
-  height: 90%;
-  height: 5vmin;
+  height: 95%;
+
   font-size: 2.75vmin;
   overflow-x: scroll;
   overflow-y: hidden;
@@ -165,7 +167,7 @@
 /* MEME TAG LIST START */
 #modal-search-profileimage-meme-tag-entry-top-div-id,
 #modal-search-profileimage-meme-tag-entry-top-div-id {
-  background-color: var(--primary-300);
+  /* background-color: var(--primary-300); */
   grid-area: modal-search-profileimage-meme-tag-entry-top-div-id;
   box-sizing: border-box;
   min-height: 0; /* NEW */
@@ -186,14 +188,16 @@
 #modal-search-profileimage-meme-tag-textarea-entry-div-id {
   flex-grow: 20;
 }
-#modal-search-profileimage-meme-tag-textarea-entry-id,
+
 #modal-search-profileimage-meme-tag-textarea-entry-id {
-  height: 3vmin;
   overflow: hidden;
-  font-size: 2.75vmin;
+  resize: none;
+
+  font-size: clamp(0.75rem, 2vmin, 3rem);
   border-radius: 5px;
   white-space: nowrap;
-  width: 99%;
+  width: 98%;
+  height: 90%;
 }
 /* MEME TAG LIST END */
 
@@ -201,7 +205,7 @@
 #modal-search-profileimage-images-results-display-id {
   background-color: var(--primary-300);
   grid-area: modal-search-profileimage-images-results-display-id;
-  border-top: 6px solid var(--primary);
+  /* border-top: 6px solid var(--primary); */
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr 11fr;
@@ -218,7 +222,7 @@ min-height: 1px;
 }
 
 #modal-search-profileimage-images-results-title-div-id {
-  background-color: var(--primary-300);
+  background-color: var(--bg);
   /* border-right: solid 6px #005000; */
   display: flex;
   align-items: center;
@@ -230,7 +234,7 @@ min-height: 1px;
 }
 
 #modal-search-profileimage-images-results-grid-div-area-id {
-  background-color: var(--primary);
+  /* background-color: var(--primary); */
   border-top: 3px solid var(--primary);
   grid-area: modal-search-profileimage-images-results-grid-div-area-id;
   overflow-y: auto;
@@ -239,6 +243,8 @@ min-height: 1px;
 .profile-thumb-div {
   max-height: 25vh;
   max-width: 100%;
+  cursor: pointer;
+  margin-bottom: 4px;
 }
 /* #modal-search-profileimage-images-results-grid-div-area-id > div {
   overflow: hidden;
