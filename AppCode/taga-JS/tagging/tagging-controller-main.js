@@ -1342,7 +1342,7 @@ async function Add_New_Meme() {
       const emotions_div = document.getElementById('modal-search-add-memes-emotion-label-value-display-container-div-id');
       emotions_div.innerHTML = '';
 
-      for (const key of emotion_keys) {
+      for (const key of Object.keys(meme_tagging_search_obj.emotions)) {
         emotions_div.innerHTML += `
               <span id="modal-search-add-memes-emotion-label-value-span-id-${key}" style="white-space:nowrap">
               <img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-remove-button-id-${key}"
@@ -1380,7 +1380,7 @@ async function Add_New_Meme() {
       const emotions_div = document.getElementById('modal-search-add-memes-emotion-meme-label-value-display-container-div-id');
       emotions_div.innerHTML = '';
 
-      for (const key of emotion_keys) {
+      for (const key of Object.keys(meme_tagging_search_obj.meme_emotions)) {
         emotions_div.innerHTML += `
                 <span id="modal-search-add-memes-emotion-meme-label-value-span-id-${key}" style="white-space:nowrap">
                     <img class="modal-search-add-memes-emotion-remove-button-class" id="modal-search-add-memes-emotion-meme-remove-button-id-${key}"
