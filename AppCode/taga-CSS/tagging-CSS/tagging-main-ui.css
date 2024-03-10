@@ -28,7 +28,7 @@
   background-color: var(--bg);
   grid-area: emotions-gridbox-id;
   display: grid;
-  grid-template-rows: 2fr 6fr 14fr;
+  grid-template-rows: 3fr 7fr 14fr;
   box-sizing: border-box;
   grid-template-areas:
     'emotions-innerbox-label-id'
@@ -75,33 +75,37 @@
 }
 
 #emotion-entry-spacer-div-id {
-  height: 1vmin;
+  height: 0.25rem;
 }
 
 #add-new-emotion-button-id {
-  background-color: var(--info);
+  /* background-color: var(--info); */
   display: block;
   width: 95%;
-  margin-top: 0em;
-  border-radius: 12px;
-  font-size: 1.6vmin;
+  font-size: clamp(0.75rem, 1.5vmin, 3rem);
+  line-height: 1.2;
+  border-radius: 0.5rem;
   margin-left: auto;
   margin-right: auto;
+  padding: 0;
   cursor: pointer;
 }
 
 #emotions-new-emotion-textarea-id {
   width: 95%;
   max-width: 95%;
-  height: 1.8vmin;
+
+  height: clamp(1rem, 3vmin, 3.5rem);
   overflow: hidden;
-  font-size: 1.7vmin;
+  font-size: clamp(0.75rem, 1.75vmin, 3rem);
+
   display: block;
   margin-left: auto;
   margin-right: auto;
   margin-top: 0em;
   border-radius: 5px;
   resize: none;
+  outline: none;
 }
 
 #emotion-text-range-value-label-left-id {
@@ -138,16 +142,17 @@
   display: inline-block;
 
   width: 75%;
-  margin-top: 0em;
-  border-radius: 12px;
-  font-size: 1.6vmin;
+  line-height: 0.9;
+  font-size: clamp(0.75rem, 1.2vmin, 3rem);
+  border-radius: 0.5rem;
   margin-left: auto;
   margin-right: auto;
+  padding: 0;
   cursor: pointer;
 }
 
 #auto-fill-emotions-check-box-label-id {
-  font-size: 2vmin;
+  font-size: clamp(0.75rem, 1.7vmin, 3rem);
 }
 #auto-fill-emotions-check-box-id {
   display: inline-block;
@@ -220,8 +225,9 @@
   display: block;
   width: 95%;
   margin-top: 0.1em;
-  border-radius: 12px;
-  font-size: 2vmin;
+  font-size: clamp(0.75rem, 1.5vmin, 3rem);
+  border-radius: 0.5rem;
+  line-height: 0.5;
   margin-left: auto;
   margin-right: auto;
   cursor: pointer;
@@ -296,7 +302,7 @@ input:checked + .slider:before {
   grid-area: description-gridbox;
   background-color: var(--bg);
   display: grid;
-  grid-template-rows: 1fr 15fr 2fr;
+  grid-template-rows: 1fr 12fr 1fr;
   box-sizing: border-box;
   grid-template-areas:
     'description-label-div-gridarea-textentry-id'
@@ -312,6 +318,7 @@ input:checked + .slider:before {
   margin-top: -0.1em;
 }
 #description-text-label-id {
+  margin-bottom: 2px;
 }
 #description-div-gridarea-textentry-id {
   grid-area: description-div-gridarea-textentry-id;
@@ -334,13 +341,17 @@ input:checked + .slider:before {
 #buttons-div-gridarea-textentry-id {
   grid-area: buttons-div-gridarea-textentry;
   height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 #save-button-id {
   width: 40%;
   height: 95%;
-  font-weight: bold;
-  font-size: 2vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+  border-radius: 0.5rem;
   vertical-align: middle;
+
   /*border-radius: 10%;
   background-color: #1884ff;
   cursor: pointer; */
@@ -349,8 +360,8 @@ input:checked + .slider:before {
   width: 40%;
   height: 95%;
   display: inline-block;
-  font-weight: bold;
-  font-size: 2vmin;
+  font-size: clamp(0.75rem, 2vmin, 3rem);
+  border-radius: 0.5rem;
   vertical-align: middle;
   /* border-radius: 10%;
   background-color: #ad2021;
@@ -434,16 +445,21 @@ input:checked + .slider:before {
   height: 100%;
   cursor: pointer;
 }
+
+#load-webcam-input-button-id,
 #search-images-button-id,
 #load-new-image-button-id,
-#return-to-main-button-id,
-#left-gallery-image-button-id,
-#right-gallery-image-button-id {
-  background-color: var(--info);
+#return-to-main-button-id {
+  font-size: clamp(0.75rem, 2.25vmin, 3rem);
+  border-radius: 0.5rem;
+  line-height: 1;
 }
 #delete-image-button-id {
-  background-color: var(--warning);
+  font-size: clamp(0.75rem, 2.25vmin, 3rem);
+  border-radius: 0.5rem;
+  line-height: 1;
 }
+
 #center-button-area-div-id {
   grid-area: center-button-area-div-id;
   background-color: var(--bg);
@@ -469,12 +485,16 @@ input:checked + .slider:before {
 #left-gallery-image-button-id {
   grid-area: left-gallery-image-button-id;
   margin-right: 5px;
-  background-color: var(--info);
+  border-top-left-radius: 1rem; /* Adjust this value to increase/decrease the curvature */
+  border-bottom-left-radius: 1rem;
+  font-size: clamp(0.75rem, 2.25vmin, 3rem);
 }
 #right-gallery-image-button-id {
   grid-area: right-gallery-image-button-id;
   margin-left: 5px;
-  background-color: var(--info);
+  border-top-right-radius: 1rem; /* Adjust this value to increase/decrease the curvature */
+  border-bottom-right-radius: 1rem;
+  font-size: clamp(0.75rem, 2.25vmin, 3rem);
 }
 #center-gallery-area-div-id {
   grid-area: center-gallery-area-div-id;
