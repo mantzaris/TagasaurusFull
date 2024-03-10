@@ -22,7 +22,7 @@
   padding: 0%;
   border: 4px solid var(--primary);
   width: 80%; /* Could be more or less, depending on screen size */
-  height: 80%;
+  height: 85%;
 }
 
 .modal-close-button-class {
