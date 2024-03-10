@@ -1,7 +1,7 @@
 #modal-facesearch-top-grid-div-id {
   width: 100%;
   display: grid;
-  grid-template-rows: 3fr 24fr;
+  grid-template-rows: 2fr 22fr;
   height: 100%;
   /* box-sizing: border-box; */
   padding: 0%;
@@ -12,7 +12,7 @@
 
 /* SEARCH BUTTON START */
 #modal-facesearch-main-button-container-div-id {
-  background-color: var(--primary-300);
+  /* background-color: var(--primary-300); */
   grid-area: modal-facesearch-main-button-container-div-id;
   display: flex;
   justify-content: space-evenly;
@@ -64,25 +64,25 @@
 
 /* IMAGE SEARCH RESULTS START */
 #modal-facesearch-images-results-display-id {
-  background-color: var(--primary-300);
+  /* background-color: var(--primary-300); */
   grid-area: modal-facesearch-images-results-display-id;
-  border-top: 6px solid var(--primary);
+  border-top: 5px solid var(--primary);
+
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 1fr 11fr;
+  grid-template-rows: 11fr;
   /* height: 100%; */
   min-height: 1px;
   /* max-width: 100%; */
   /* overflow-y: scroll; */
   box-sizing: border-box;
-  grid-template-areas:
-    'modal-facesearch-images-results-button-div-id'
-    'modal-facesearch-images-results-grid-div-area-id';
+  grid-template-areas: 'modal-facesearch-images-results-grid-div-area-id';
 }
 
 #modal-facesearch-images-results-grid-div-area-id {
-  background-color: var(--primary);
-  overflow-y: scroll;
+  background-color: var(--primary-300);
+  overflow-y: auto;
+  overflow-x: hidden;
   border-top: 3px solid var(--primary);
   /* max-height: 100%; */
   /* overflow-y: scroll; */
@@ -95,6 +95,7 @@
 .modal-image-facesearch-result-single-image-img-obj-class {
   max-height: 25vh;
   max-width: 50vw;
+  margin-top: 3px;
   cursor: pointer;
 }
 #modal-facesearch-meme-tag-label-id {
