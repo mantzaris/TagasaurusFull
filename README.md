@@ -1,16 +1,36 @@
-## This application presents for users a way of uniquely annotating a locally stored collection of images.
+## This application presents for users a way of uniquely annotating a locally stored collection of media (image/gif/audio/video/pdf).
 
-A key feature is that emotions are stored by the user's explicit input over a set of values for a set of different emotions. This is in contrast to many models where emoticons represent a small set of specific emotions a user must choose from rather than _tune_. Another key feature is the ability for any image to become a meme of another image. Collections of images with memes for a collection can also be made. The user has the ability to search through images and collections based upon the annotation information overlaps, and also find relevant memes through the use of a search on the bi-partite graph. That is 'which images are memes to images with such criteria?'. The current version 1.4.0 is now compatible with the webapp (www.tagyourplanet.com) where data can be exported and imported between those apps and from different platforms.
+A key feature is that emotions are stored by the user's explicit input over a set of values for a set of different emotions. This is in contrast to many models where emoticons represent a small set of specific emotions a user must choose from rather than _tune_. Another key feature is the ability for any image (or any media file) to become a meme of another image. Collections of media content with memes can also be made. The user has the ability to search through images and collections based upon the annotation information overlaps, and also find relevant memes through the use of a search on the bi-partite graph. That is 'which images are memes to images with such criteria?'. The current version 1.5.0 is now compatible with the webapp (www.tagyourplanet.com) where data can be exported and imported between those apps and from different platforms.
+
+The YouTube channel, [https://www.youtube.com/@tagasaurus_app](https://www.youtube.com/@tagasaurus_app), has tutorials and more.
+
+
+![tagging](/TagasaurusReflections/screenshot1.png)
+
+![search](/TagasaurusReflections/screenshot2.png)
+
+![collections](/TagasaurusReflections/screenshot3.png)
+
 
 # Downloads
 
 ## Windows
+- executable "tagasaurus-1.5.0-win.zip" (unzip and run the executable file): [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.5.0/tagasaurus-1.5.0-win.zip)
+sha256 hash: 6a31da45fe42a403e647c58555991daac257ae0543d0db5725425634bebb2aea
 
-- Zip (unzip and run the executable file): [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.4.0/tagasaurus-1.4.0-win.zip) sha256 hash: e732bfb1977d60bf68aa0bfe9c422ae20a14ea992b56744216e14649cde77b71
+- installer "tagasaurus Setup 1.5.0.exe": [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.5.0/tagasaurus.Setup.1.5.0.exe)
+sha256 hash: 980d871ce60249a2beb41f67e8b09d255c7ea8ddc1fb72de83f87167161cab58
 
 ## Linux
+- (generic) tagasaurus-1.5.0.zip:[download](https://github.com/mantzaris/Tagasaurus/releases/download/1.5.0/tagasaurus-1.5.0.zip)
+sha256 hash: a17df7f609cdb2399a16bca659376a08b64b6b5a6f091f0c8822a1d00693ac52
 
-- Linux Zip: [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.4.0/tagasaurus-1.4.0-Linux.zip) sha256 hash: f0ad3754e14128452f260fa6ae6677e4d2a687bf354b5220a58600c27cbad474
+- Debian Flavors tagasaurus_1.5.0_amd64.deb: [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.5.0/tagasaurus_1.5.0_amd64.deb)
+sha256 hash: 97c368518b5ada77ab41a889c5ebe68c72fcac0a6e388edcd51bb05bb1c296c6
+
+- Fedora Flavors (untested) tagasaurus-1.5.0.x86_64.rpm: [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.5.0/tagasaurus-1.5.0.x86_64.rpm)
+sha256 hash: 096962bbcb29e70d2f6a34c47585e344d3415340da9eeaf8cdf20e2a1f181ab9
+
 
 ## Using Tagasaurus
 
@@ -30,9 +50,7 @@ A key feature is that emotions are stored by the user's explicit input over a se
 
 This is developed using ElectronJS
 
-It is hoped that the flat level GUI will be intuitive. The welcome screen presents the options to tag images, create entities and also export the data. Tagging individual images involves the user loading in images and providing manually insterted annotations. The entity creation process has a similar workflow with the ability to group together images as a collective entity under the new label that is user provided. Representative images are chosen for the collectives. A wizard is there to assist in the creation of the entities. The export facility produces a JSON with all the image file annotations and entity collection information, with a directory of all the image resources used.
-
-Annotations of image taggings involve inputing a textual description from which 'tags' are then produced, then emotional values along different dimensions are taken from the user and there are image links (also known as memes) which the user can choose from. For tagging images, the user is not required to insert any specific information, but for the entity creation there are requirements. When creating an entity via the wizard if there is missing information which is required a notification is presented with a message.
+Annotations of image taggings involve inputing a textual description from which 'tags' are then produced, then emotional values along different dimensions are taken from the user and there are image links (also known as memes) which the user can choose from. For tagging images, the user is not required to insert any specific information, but for the collection creations there are requirements. When creating a collection via the wizard, if there is missing information which is required a notification is presented with a message.
 
 The purpose is to streamline the annotation process with the necessary emotional granulatiry required for training ML. This tool is expected to allow teams to produce datasets as training and validation datasets where the annotations are easily organized.
 
@@ -50,16 +68,9 @@ Mantzaris AV, Pandohie R, Hopwood M, Pho P, Ehling D, Walker TG.
 Technologies. 2021; 9(3):45. https://doi.org/10.3390/technologies9030045
 ```
 
-![tagging](/TagasaurusReflections/screenshot1.png)
-
-![search](/TagasaurusReflections/screenshot2.png)
-
-![collections](/TagasaurusReflections/screenshot3.png)
-
 Connect on the social
 
 - https://twitter.com/Tagasaurus_app
-- https://www.patreon.com/tagasaurus
 - https://www.facebook.com/TagasaurusApp/
 
 ### (**Check out cool comic books and more from the author Vasexandros at [amazon](https://www.amazon.com/Vasexandros/e/B010RI6W0G%3Fref=dbs_a_mng_rwt_scns_share)**)
