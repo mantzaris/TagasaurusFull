@@ -11,7 +11,7 @@ const { TAGA_DATA_DIRECTORY, TAGA_FILES_DIRECTORY } = require(PATH.join(__dirnam
 //const DB_MODULE = require(PATH2.join(__dirname,'taga-DB','db-fns.js')) // require(PATH2.resolve()+PATH2.sep+'AppCode'+PATH2.sep+'taga-DB'+PATH2.sep+'db-fns.js');
 
 const export_button = document.getElementById('export-button-id');
-export_button.disabled = true;
+export_button.disabled = false;
 
 const db_toggle = document.getElementById('dbExport');
 const json_toggle = document.getElementById('jsonExport');
@@ -26,7 +26,7 @@ function Get_All_Tagging_Records_From_DB() {
 
 document.getElementById('checkbox-group').addEventListener('change', (event) => {
   if (!db_toggle.checked && !json_toggle.checked) {
-    export_button.disabled = true;
+    export_button.disabled = false;
   } else {
     export_button.disabled = false;
   }
