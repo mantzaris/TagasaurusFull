@@ -11,6 +11,11 @@ const APP_PATH = app.getAppPath();
 let mainWindow;
 let processing = true;
 
+
+// Append command line switches to force the use of X11
+app.commandLine.appendSwitch('enable-features', 'UseOzonePlatform');
+app.commandLine.appendSwitch('ozone-platform', 'x11');
+
 //for the main.js set up
 //const {  } = require(PATH.join(__dirname, 'AppCode', 'taga-MAIN', 'main-setup.js'));
 
