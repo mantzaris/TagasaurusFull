@@ -182,6 +182,8 @@ document.getElementById('use-webcam-button-id').onclick = function () {
     })
     .catch(function (err) {
       console.log('An error occurred: ' + err);
+      alert('Could not access the webcam. Please check if it is connected and try again.');
+      Close_Modal();
     });
 
   let streaming;
