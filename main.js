@@ -8,32 +8,42 @@ const { GetFileTypeFromFileName } = require(PATH.join(__dirname, 'AppCode', 'tag
 
 const APP_PATH = app.getAppPath();
 
-let mainWindow;
-let processing = true;
-
-
-// Append command line switches to force the use of X11
-app.commandLine.appendSwitch('enable-features', 'UseOzonePlatform');
-app.commandLine.appendSwitch('ozone-platform', 'x11');
-
-//for the main.js set up
-//const {  } = require(PATH.join(__dirname, 'AppCode', 'taga-MAIN', 'main-setup.js'));
-
 //const BUILD_INSTALLER = false; //process.env.build_installer === 'true';
 const INSTALLER_CONFIG = JSON.parse(FS.readFileSync(PATH.join(__dirname, 'config.json'), 'utf-8'));
 const { BUILD_INSTALLER, DEBUG_BUILD, DEV } = INSTALLER_CONFIG;
 
+const isWindows = process.platform === 'win32';
+console.log(`process.platform = ${process.platform}, DEV = ${DEV}`);
+
+
+let mainWindow;
+let processing = true;
+let linuxDisplayType = undefined;
+
+
+// Append command line switches to force the use of X11
+if( !isWindows ) {
+  try {
+    linuxDisplayType = systemX11orWayland();
+    if( linuxDisplayType == 'wayland' ) {
+      app.commandLine.appendSwitch('enable-features', 'UseOzonePlatform');
+      app.commandLine.appendSwitch('ozone-platform', 'x11');
+    }
+  } catch (e) {
+    console.log(`cannot get linux display type, ${e}`);
+  }
+}
+
+console.log(`linux display type: ${linuxDisplayType}`)
+
+
 ////////////////////////////////////////////////////////////////////////////////////
 //Dynamically Link the unpacked faiss-napi .so files from the node_modules
 ////////////////////////////////////////////////////////////////////////////////////
-// TODO: make sure this works for windows TEST!
-console.log(`process.platform = ${process.platform}, DEV = ${DEV}`);
 
 if (!DEV) {
   const unpackedPath = PATH.join(APP_PATH, '..', 'app.asar.unpacked');
   const soDir = PATH.join(unpackedPath, 'node_modules', 'faiss-napi', 'build', 'Release');
-
-  const isWindows = process.platform === 'win32';
 
   if (isWindows) {
     const dllDir = PATH.join(unpackedPath, 'node_modules', 'faiss-napi', 'build', 'Release');
@@ -428,6 +438,28 @@ ipcMain.handle('getCaptureID', async (_) => {
     };
   });
 });
+
+ipcMain.handle('get-linux-display-type', async () => {
+  return linuxDisplayType;
+});
+
+ipcMain.handle('is-windows', async () => {
+  return isWindows;
+});
+
+//to find the display type on Linux
+function systemX11orWayland() {
+  if (process.env.XDG_SESSION_TYPE) {
+    return process.env.XDG_SESSION_TYPE;
+  } else if (process.env.WAYLAND_DISPLAY) {
+    return 'wayland';
+  } else if (process.env.DISPLAY) {
+    return 'x11';
+  } else {
+    console.warn('Unable to determine display server. Defaulting to Wayland.');
+    return 'wayland';
+  }
+}
 
 ///////////////////////////////////////
 //
