@@ -427,16 +427,24 @@ ipcMain.handle('ffmpegDecode', async (_, options) => {
 
 //for the screen capture of the stream search
 ipcMain.handle('getCaptureID', async (_) => {
-  const sources = await desktopCapturer.getSources({
-    types: ['window', 'screen'],
-  });
-  return sources.map((image) => {
-    return {
+  try {
+    const sources = await desktopCapturer.getSources({
+      types: ['window', 'screen'],
+    });
+
+    if (!sources || sources.length === 0) {
+      throw new Error('No sources available');
+    }
+    
+    return sources.map((image) => ({
       id: image.id,
       name: image.name,
       thumbnail: image.thumbnail.toDataURL(),
-    };
-  });
+    }));
+  } catch (error) {
+    console.error('Error getting capture sources:', error);
+    return null;
+  }
 });
 
 ipcMain.handle('get-linux-display-type', async () => {

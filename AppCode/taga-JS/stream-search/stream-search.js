@@ -12,6 +12,8 @@ const selection_mode = {
   memes: false,
 };
 
+let is_wayland = undefined;
+
 let kind = 'webcam'; //default video source
 
 let video_el = document.getElementById('inputVideo');
@@ -176,22 +178,43 @@ canvas_el.onclick = async (event) => {
 };
 
 //runs on page/window load
-ipcRenderer.invoke('getCaptureID').then((sources) => {
-  selection_sources = document.getElementById('source-type');
-  const src = document.createElement('option');
-  src.setAttribute('default', 'webcam');
-  src.innerHTML = 'Webcam';
-  src.value = 'webcam';
-  selection_sources.appendChild(src);
-
-  for (const source of sources) {
-    const src = document.createElement('option');
-    src.innerHTML = source.name;
-    src.value = source.id;
-    selection_sources.appendChild(src);
+ipcRenderer.invoke('getCaptureID').then(async (sources) => {
+  //get the wayland state
+  try {
+    const isWindows = await ipcRenderer.invoke('is-windows');
+    const linuxDisplayType = await ipcRenderer.invoke('get-linux-display-type');
+    is_wayland = (!isWindows && linuxDisplayType === 'wayland');
+  } catch (e) {
+    console.log(`cannot get wayland state of OS, ${e}`);
   }
 
-  start_btn.classList.remove('disabled');
+  // Check for webcam availability
+  const devices = await navigator.mediaDevices.enumerateDevices();
+  const videoDevices = devices.filter(device => device.kind === 'videoinput');
+
+  selection_sources = document.getElementById('source-type');
+
+  if (videoDevices?.length > 0) {
+    videoDevices.forEach((device, index) => {
+      const src = document.createElement('option');
+      src.innerHTML = device.label || `Webcam ${index + 1}`;
+      src.value = device.deviceId || `webcam_${index}`;
+      selection_sources.appendChild(src);
+    });
+  }
+
+  if (sources && sources.length > 0) {
+    for (const source of sources) {
+      const src = document.createElement('option');
+      src.innerHTML = source.name;
+      src.value = source.id;
+      selection_sources.appendChild(src);
+    }
+  }
+
+  if (sources?.length > 0 || videoDevices?.length > 0) {
+    start_btn.classList.remove('disabled');
+  }
 });
 
 start_btn.onclick = async () => {
