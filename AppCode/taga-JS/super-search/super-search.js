@@ -139,7 +139,7 @@ document.getElementById('return-to-main-button-id').onclick = function () {
 };
 
 //using the WEBCAM
-document.getElementById('use-webcam-button-id').onclick = function () {
+document.getElementById('use-webcam-button-id').onclick = async function () {
   let modal_meme_click_top_id_element = document.getElementById('modal-meme-clicked-top-id');
   modal_meme_click_top_id_element.style.display = 'block';
   document.getElementById('webcam-video-id').style.display = 'block';
@@ -173,18 +173,38 @@ document.getElementById('use-webcam-button-id').onclick = function () {
 
   let captured = false;
 
-  navigator.mediaDevices
-    .getUserMedia({ video: true, audio: false })
-    .then(function (s) {
-      stream = s;
-      video.srcObject = stream;
-      video.play();
-    })
-    .catch(function (err) {
-      console.log('An error occurred: ' + err);
-      alert('Could not access the webcam. Please check if it is connected and try again.');
-      Close_Modal();
-    });
+  // navigator.mediaDevices
+  //   .getUserMedia({ video: true, audio: false })
+  //   .then(function (s) {
+  //     stream = s;
+  //     video.srcObject = stream;
+  //     video.play();
+  //   })
+  //   .catch(function (err) {
+  //     console.log('An error occurred: ' + err);
+  //     alert('Could not access the webcam. Please check if it is connected and try again.');
+  //     Close_Modal();
+  //   });
+
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const videoDevices = devices.filter(device => device.kind === 'videoinput');
+
+    if (videoDevices.length === 0) {
+      throw new Error('No webcams found.');
+    }
+
+    const firstWebcamId = videoDevices[0].deviceId;
+    stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: firstWebcamId } }, audio: false });
+    video.srcObject = stream;
+    video.play();
+  } catch (err) {
+    console.log('An error occurred: ' + err);
+    alert('Could not access the webcam. Please check if it is connected and try again.');
+    Close_Modal();
+    return;
+  }
+
 
   let streaming;
   video.addEventListener(
