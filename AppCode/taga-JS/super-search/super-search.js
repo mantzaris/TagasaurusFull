@@ -167,10 +167,9 @@ document.getElementById('use-webcam-button-id').onclick = async function () {
 
   let width;
   let height;
-
   let data;
   let stream;
-
+  let streaming = false;
   let captured = false;
 
   // navigator.mediaDevices
@@ -186,27 +185,29 @@ document.getElementById('use-webcam-button-id').onclick = async function () {
   //     Close_Modal();
   //   });
 
-  try {
-    const devices = await navigator.mediaDevices.enumerateDevices();
+  navigator.mediaDevices
+  .enumerateDevices()
+  .then(devices => {
     const videoDevices = devices.filter(device => device.kind === 'videoinput');
-
     if (videoDevices.length === 0) {
       throw new Error('No webcams found.');
     }
 
     const firstWebcamId = videoDevices[0].deviceId;
-    stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: firstWebcamId } }, audio: false });
+    return navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: firstWebcamId } }, audio: false });
+  })
+  .then(function (s) {
+    stream = s;
     video.srcObject = stream;
     video.play();
-  } catch (err) {
+  })
+  .catch(function (err) {
     console.log('An error occurred: ' + err);
     alert('Could not access the webcam. Please check if it is connected and try again.');
     Close_Modal();
-    return;
-  }
+  });
 
-
-  let streaming;
+  
   video.addEventListener(
     'canplay',
     function (ev) {
@@ -243,6 +244,7 @@ document.getElementById('use-webcam-button-id').onclick = async function () {
     data = canvas.toDataURL('image/png');
     photo.setAttribute('src', data);
   }
+
   function Take_Picture(ev) {
     ev.preventDefault();
     const context = canvas.getContext('2d');
@@ -278,6 +280,7 @@ document.getElementById('use-webcam-button-id').onclick = async function () {
         track.stop();
       });
     }
+
     streaming = false;
     captured = false;
     select_capture_button.style.display = 'none';
