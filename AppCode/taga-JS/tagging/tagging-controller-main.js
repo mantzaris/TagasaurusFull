@@ -969,13 +969,29 @@ document.getElementById('load-webcam-input-button-id').onclick = async function 
     //   video: true,
     //   audio: true,
     // });
+    // try {
+    //   return await navigator.mediaDevices.getUserMedia({
+    //     video: true,
+    //     audio: true,
+    //   });
+    // } catch (error) {
+    //   throw new Error('Could not access media devices.');
+    // }
     try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(device => device.kind === 'videoinput');
+  
+      if (videoDevices.length === 0) {
+        throw new Error('No webcams found.');
+      }
+  
+      const firstWebcamId = videoDevices[0].deviceId;
       return await navigator.mediaDevices.getUserMedia({
-        video: true,
+        video: { deviceId: { exact: firstWebcamId } },
         audio: true,
       });
     } catch (error) {
-      throw new Error('Could not access media devices.');
+      throw new Error('Could not access media devices: ' + error.message);
     }
   }
 
