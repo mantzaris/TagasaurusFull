@@ -21,14 +21,14 @@ sha256 hash: 6a31da45fe42a403e647c58555991daac257ae0543d0db5725425634bebb2aea
 sha256 hash: 980d871ce60249a2beb41f67e8b09d255c7ea8ddc1fb72de83f87167161cab58
 
 ## Linux
-- (generic) tagasaurus-1.5.0.zip:[download](https://github.com/mantzaris/Tagasaurus/releases/download/1.5.1/tagasaurus-1.5.1.zip)
-sha256 hash: 30480c4a72e18e8a8ddcb86e0291a922c5e75f93a729e77fc784677d37d1cdd8
+- (generic) tagasaurus-1.5.1.zip:[download](https://github.com/mantzaris/Tagasaurus/releases/download/1.5.1/tagasaurus-1.5.1.zip)
+sha256 hash: 84fe0208198533ae3f26c03aae6b5ae9a398f3711e68d8e71e364903f2307e4c
 
-- Debian Flavors tagasaurus_1.5.0_amd64.deb: [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.5.1/tagasaurus_1.5.1_amd64.deb)
-sha256 hash: ff88c07422838fa16b3b27864957817d74d8692593e6a6d28d790946691fee08
+- Debian Flavors tagasaurus_1.5.1_amd64.deb: [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.5.1/tagasaurus_1.5.1_amd64.deb)
+sha256 hash: c654a6fde035bcad819d7f020b3c3e552cf15235bf572a7d15f3ef50428c4998
 
-- Fedora Flavors (untested) tagasaurus-1.5.0.x86_64.rpm: [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.5.1/tagasaurus-1.5.1.x86_64.rpm)
-sha256 hash: 7bedfdb54b6d104bf5595e5878f2a14c5a3d97c37ad36e876cf81e318367dce1
+- Fedora Flavors (untested) tagasaurus-1.5.1.x86_64.rpm: [download](https://github.com/mantzaris/Tagasaurus/releases/download/1.5.1/tagasaurus-1.5.1.x86_64.rpm)
+sha256 hash: 69aa94aee2469ac1458b930fdf6aa827fd383e06ae605fff453c0e4b366541d3
 
 
 ## Using Tagasaurus
