@@ -180,14 +180,16 @@ canvas_el.onclick = async (event) => {
 //runs on page/window load
 (async () => {
   try {
+    let sources = []; //declare sources globally in this fn
+
     // Get the Wayland state
     const isWindows = await ipcRenderer.invoke('is-windows');
     const linuxDisplayType = await ipcRenderer.invoke('get-linux-display-type');
-    is_wayland = (!isWindows && linuxDisplayType === 'wayland');
+    is_wayland = !isWindows && linuxDisplayType === 'wayland';
 
     // Check for webcam availability
     const devices = await navigator.mediaDevices.enumerateDevices();
-    const videoDevices = devices.filter(device => device.kind === 'videoinput');
+    const videoDevices = devices.filter((device) => device.kind === 'videoinput');
 
     selection_sources = document.getElementById('source-type');
 
@@ -208,7 +210,8 @@ canvas_el.onclick = async (event) => {
       selection_sources.appendChild(src);
     } else {
       // For non-Wayland, get screen/window sources immediately
-      const sources = await ipcRenderer.invoke('getCaptureID');
+      sources = await ipcRenderer.invoke('getCaptureID');
+
       if (sources && sources.length > 0) {
         for (const source of sources) {
           const src = document.createElement('option');
@@ -219,10 +222,9 @@ canvas_el.onclick = async (event) => {
       }
     }
 
-    if (videoDevices?.length > 0 || is_wayland || sources?.length > 0) {
-      start_btn.classList.remove('disabled');
+    if (videoDevices?.length > 0 || is_wayland || (sources && sources.length > 0)) {
+      document.getElementById('start-btn').classList.remove('disabled');
     }
-
   } catch (e) {
     console.log(`Error during initialization: ${e}`);
   }
@@ -265,31 +267,28 @@ start_btn.onclick = async () => {
   }
 };
 
-
 async function GetMediaStream(source) {
-  const video_setup =
-    source.startsWith('webcam')
-      ? { video: { deviceId: { exact: source.replace('webcam_', '') } } } //remove prefix for deviceId
-      : {
-          video: {
-            mandatory: {
-              width: { ideal: 1280 },
-              height: { ideal: 720 },
-              frameRate: { ideal: 16, max: 24 },
-              chromeMediaSource: 'desktop',
-              chromeMediaSourceId: source,
-              minWidth: 1280,
-              maxWidth: 1280,
-              minHeight: 720,
-              maxHeight: 720,
-            },
+  const video_setup = source.startsWith('webcam')
+    ? { video: { deviceId: { exact: source.replace('webcam_', '') } } } //remove prefix for deviceId
+    : {
+        video: {
+          mandatory: {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            frameRate: { ideal: 16, max: 24 },
+            chromeMediaSource: 'desktop',
+            chromeMediaSourceId: source,
+            minWidth: 1280,
+            maxWidth: 1280,
+            minHeight: 720,
+            maxHeight: 720,
           },
-          audio: false,
-        };
+        },
+        audio: false,
+      };
 
   return await navigator.mediaDevices.getUserMedia(video_setup);
 }
-
 
 function SetUpVideo() {
   height = video_el.videoHeight;

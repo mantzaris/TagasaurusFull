@@ -878,13 +878,12 @@ document.getElementById('load-webcam-input-button-id').onclick = async function 
   let canceled = false;
   let streaming;
 
-
   try {
     stream = await capture_media_devices();
     video.srcObject = stream;
     video.play();
   } catch (error) {
-    console.error('Error accessing webcam:', error);
+    console.warn('Handled error accessing webcam:', error.message);
     alert('Could not access the webcam. Please check if it is connected and try again.');
     outer_modal.style.display = 'none';
     return; // Exit if webcam fails
@@ -979,12 +978,12 @@ document.getElementById('load-webcam-input-button-id').onclick = async function 
     // }
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
-      const videoDevices = devices.filter(device => device.kind === 'videoinput');
-  
+      const videoDevices = devices.filter((device) => device.kind === 'videoinput');
+
       if (videoDevices.length === 0) {
         throw new Error('No webcams found.');
       }
-  
+
       const firstWebcamId = videoDevices[0].deviceId;
       return await navigator.mediaDevices.getUserMedia({
         video: { deviceId: { exact: firstWebcamId } },
