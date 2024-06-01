@@ -873,13 +873,24 @@ document.getElementById('load-webcam-input-button-id').onclick = async function 
   let height;
   let data;
   let recording = false;
-  let stream = await capture_media_devices();
+  let stream; //stream = await capture_media_devices();
   let recorder = null;
   let canceled = false;
   let streaming;
 
-  video.srcObject = stream;
-  video.play();
+  try {
+    stream = await capture_media_devices();
+    video.srcObject = stream;
+    video.play();
+  } catch (error) {
+    console.warn('Handled error accessing webcam:', error.message);
+    alert('Could not access the webcam. Please check if it is connected and try again.');
+    outer_modal.style.display = 'none';
+    return; // Exit if webcam fails
+  }
+
+  //video.srcObject = stream;
+  //video.play();
   canvas.style.display = 'none';
   record_video_btn.onclick = record_video;
   stop_video_btn.onclick = stop_recording_video;
@@ -937,16 +948,50 @@ document.getElementById('load-webcam-input-button-id').onclick = async function 
     canceled = true;
     recording = false;
     recorder.stream.getTracks().forEach((track) => track.stop());
-    stream = await capture_media_devices();
-    video.srcObject = stream;
-    video.play();
+
+    //stream = await capture_media_devices();
+    //video.srcObject = stream;
+    //video.play();
+    try {
+      stream = await capture_media_devices();
+      video.srcObject = stream;
+      video.play();
+    } catch (error) {
+      console.error('Error accessing webcam:', error);
+      alert('Could not access the webcam. Please check if it is connected and try again.');
+      outer_modal.style.display = 'none';
+    }
   };
 
   async function capture_media_devices() {
-    return await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
+    // return await navigator.mediaDevices.getUserMedia({
+    //   video: true,
+    //   audio: true,
+    // });
+    // try {
+    //   return await navigator.mediaDevices.getUserMedia({
+    //     video: true,
+    //     audio: true,
+    //   });
+    // } catch (error) {
+    //   throw new Error('Could not access media devices.');
+    // }
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter((device) => device.kind === 'videoinput');
+
+      if (videoDevices.length === 0) {
+        throw new Error('No webcams found.');
+      }
+
+      const firstWebcamId = videoDevices[0].deviceId;
+      return await navigator.mediaDevices.getUserMedia({
+        video: { deviceId: { exact: firstWebcamId } },
+        audio: true,
+      });
+    } catch (error) {
+      throw new Error('Could not access media devices: ' + error.message);
+    }
   }
 
   function clearphoto() {

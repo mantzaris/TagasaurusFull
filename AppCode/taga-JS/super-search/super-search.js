@@ -139,7 +139,7 @@ document.getElementById('return-to-main-button-id').onclick = function () {
 };
 
 //using the WEBCAM
-document.getElementById('use-webcam-button-id').onclick = function () {
+document.getElementById('use-webcam-button-id').onclick = async function () {
   let modal_meme_click_top_id_element = document.getElementById('modal-meme-clicked-top-id');
   modal_meme_click_top_id_element.style.display = 'block';
   document.getElementById('webcam-video-id').style.display = 'block';
@@ -167,24 +167,47 @@ document.getElementById('use-webcam-button-id').onclick = function () {
 
   let width;
   let height;
-
   let data;
   let stream;
-
+  let streaming = false;
   let captured = false;
 
-  navigator.mediaDevices
-    .getUserMedia({ video: true, audio: false })
-    .then(function (s) {
-      stream = s;
-      video.srcObject = stream;
-      video.play();
-    })
-    .catch(function (err) {
-      console.log('An error occurred: ' + err);
-    });
+  // navigator.mediaDevices
+  //   .getUserMedia({ video: true, audio: false })
+  //   .then(function (s) {
+  //     stream = s;
+  //     video.srcObject = stream;
+  //     video.play();
+  //   })
+  //   .catch(function (err) {
+  //     console.log('An error occurred: ' + err);
+  //     alert('Could not access the webcam. Please check if it is connected and try again.');
+  //     Close_Modal();
+  //   });
 
-  let streaming;
+  navigator.mediaDevices
+  .enumerateDevices()
+  .then(devices => {
+    const videoDevices = devices.filter(device => device.kind === 'videoinput');
+    if (videoDevices.length === 0) {
+      throw new Error('No webcams found.');
+    }
+
+    const firstWebcamId = videoDevices[0].deviceId;
+    return navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: firstWebcamId } }, audio: false });
+  })
+  .then(function (s) {
+    stream = s;
+    video.srcObject = stream;
+    video.play();
+  })
+  .catch(function (err) {
+    console.log('An error occurred: ' + err);
+    alert('Could not access the webcam. Please check if it is connected and try again.');
+    Close_Modal();
+  });
+
+  
   video.addEventListener(
     'canplay',
     function (ev) {
@@ -221,6 +244,7 @@ document.getElementById('use-webcam-button-id').onclick = function () {
     data = canvas.toDataURL('image/png');
     photo.setAttribute('src', data);
   }
+
   function Take_Picture(ev) {
     ev.preventDefault();
     const context = canvas.getContext('2d');
@@ -256,6 +280,7 @@ document.getElementById('use-webcam-button-id').onclick = function () {
         track.stop();
       });
     }
+
     streaming = false;
     captured = false;
     select_capture_button.style.display = 'none';

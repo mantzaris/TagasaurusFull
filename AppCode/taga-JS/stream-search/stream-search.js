@@ -12,7 +12,9 @@ const selection_mode = {
   memes: false,
 };
 
-let kind = 'webcam'; //default video source
+let is_wayland = undefined;
+
+//let kind = 'webcam'; //default video source
 
 let video_el = document.getElementById('inputVideo');
 let canvas_el = document.getElementById('canvas-stream');
@@ -176,29 +178,71 @@ canvas_el.onclick = async (event) => {
 };
 
 //runs on page/window load
-ipcRenderer.invoke('getCaptureID').then((sources) => {
-  selection_sources = document.getElementById('source-type');
-  const src = document.createElement('option');
-  src.setAttribute('default', 'webcam');
-  src.innerHTML = 'Webcam';
-  src.value = 'webcam';
-  selection_sources.appendChild(src);
+(async () => {
+  try {
+    let sources = []; //declare sources globally in this fn
 
-  for (const source of sources) {
-    const src = document.createElement('option');
-    src.innerHTML = source.name;
-    src.value = source.id;
-    selection_sources.appendChild(src);
+    // Get the Wayland state
+    const isWindows = await ipcRenderer.invoke('is-windows');
+    const linuxDisplayType = await ipcRenderer.invoke('get-linux-display-type');
+    is_wayland = !isWindows && linuxDisplayType === 'wayland';
+
+    // Check for webcam availability
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const videoDevices = devices.filter((device) => device.kind === 'videoinput');
+
+    selection_sources = document.getElementById('source-type');
+
+    if (videoDevices?.length > 0) {
+      videoDevices.forEach((device, index) => {
+        const src = document.createElement('option');
+        src.innerHTML = device.label || `Webcam ${index + 1}`;
+        src.value = `webcam_${device.deviceId}`; //value contains 'webcam' to pick up in GetMediaStream function
+        selection_sources.appendChild(src);
+      });
+    }
+
+    // For Wayland, add a 'Screen or Window' option
+    if (is_wayland) {
+      const src = document.createElement('option');
+      src.innerHTML = 'Screen or Window';
+      src.value = 'screen_or_window';
+      selection_sources.appendChild(src);
+    } else {
+      // For non-Wayland, get screen/window sources immediately
+      sources = await ipcRenderer.invoke('getCaptureID');
+
+      if (sources && sources.length > 0) {
+        for (const source of sources) {
+          const src = document.createElement('option');
+          src.innerHTML = source.name;
+          src.value = source.id;
+          selection_sources.appendChild(src);
+        }
+      }
+    }
+
+    if (videoDevices?.length > 0 || is_wayland || (sources && sources.length > 0)) {
+      document.getElementById('start-btn').classList.remove('disabled');
+    }
+  } catch (e) {
+    console.log(`Error during initialization: ${e}`);
   }
-
-  start_btn.classList.remove('disabled');
-});
+})();
 
 start_btn.onclick = async () => {
   try {
-    kind = selection_sources.value;
+    const kind = selection_sources.value;
 
-    media_source = await GetMediaStream(kind);
+    if (is_wayland && kind === 'screen_or_window') {
+      // For Wayland, prompt the user for screen/window selection
+      const sources = await ipcRenderer.invoke('getCaptureID');
+      const userSelectedSource = sources[0]; // Handle user selection here
+      media_source = await GetMediaStream(userSelectedSource.id);
+    } else {
+      media_source = await GetMediaStream(kind);
+    }
+
     video_el.srcObject = media_source;
     video_el.play();
     video_el.style.display = 'none';
@@ -213,8 +257,6 @@ start_btn.onclick = async () => {
         if (!streaming) {
           SetUpVideo();
           streaming = true;
-
-          //await PullTaggingClusters();
           await MainLoop();
         }
       },
@@ -226,10 +268,10 @@ start_btn.onclick = async () => {
 };
 
 async function GetMediaStream(source) {
-  const video_setup =
-    'webcam' == source
-      ? true
-      : {
+  const video_setup = source.startsWith('webcam')
+    ? { video: { deviceId: { exact: source.replace('webcam_', '') } } } //remove prefix for deviceId
+    : {
+        video: {
           mandatory: {
             width: { ideal: 1280 },
             height: { ideal: 720 },
@@ -241,12 +283,11 @@ async function GetMediaStream(source) {
             minHeight: 720,
             maxHeight: 720,
           },
-        };
+        },
+        audio: false,
+      };
 
-  return await navigator.mediaDevices.getUserMedia({
-    video: video_setup,
-    audio: false,
-  });
+  return await navigator.mediaDevices.getUserMedia(video_setup);
 }
 
 function SetUpVideo() {
