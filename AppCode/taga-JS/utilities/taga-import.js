@@ -9,7 +9,6 @@ const ft = require('file-type');
 const extract = require('extract-zip');
 const { existsSync, mkdirSync, readFileSync } = require('fs-extra');
 const { copyFileSync, rmdirSync } = require('fs');
-const EventEmitter = require('events');
 const TAGA_DATA_destination = PATH.join(USER_DATA_PATH, 'TagasaurusFiles', 'files'); // PATH.resolve(TAGA_FILES_DIRECTORY,'data');
 
 //db path that holds the import db
@@ -22,6 +21,8 @@ let tagging_import;
 let meme_import;
 let temp_dir;
 
+console.clear();
+console.log("HELLO")
 //functionality for the export of all the information, init() function
 //called at the start from the user
 async function Import_User_Annotation_Data() {
@@ -61,26 +62,26 @@ async function Import_User_Annotation_Data() {
     return Hide_Loading_Spinner();
   }
 
-  const ev = new EventEmitter();
-
-  ev.once('ready', HandleImport);
 
   try {
     const tagging = readFileSync(PATH.join(temp_dir, 'tagging.json'), 'utf-8');
     const memes = readFileSync(PATH.join(temp_dir, 'memes.json'), 'utf-8');
 
     tagging_import = JSON.parse(tagging);
+    console.log(tagging_import)
     meme_import = JSON.parse(memes);
+    HandleImport()
   } catch (e) {
     console.log(e);
     alert('could not read tagging.json and/or memes.json in import');
     return Hide_Loading_Spinner();
-  } finally {
-    ev.emit('ready');
   }
 }
 
 async function HandleImport() {
+  let processed = 0;
+  let total_operations = tagging_import.length + meme_import.length
+
   const tagging_names_map = new Map();
   const file_hash_to_name_map = new Map();
 
@@ -114,6 +115,11 @@ async function HandleImport() {
     let meme_choices_filenames = meme_choices_hashes.map((m) => file_hash_to_name_map.get(m));
     incoming.meme_choices_filenames = meme_choices_filenames;
 
+
+    processed += 1;
+    console.log(`processed = ${processed}, total_operations = ${total_operations}, completed = ${(processed/total_operations).toFixed(3)}`)
+    
+
     if (existing_record) {
       existing_record.taggingMemeChoices = MergeArrays(existing_record.taggingMemeChoices, meme_choices_filenames);
       existing_record.taggingEmotions = AverageEmotions(existing_record.taggingEmotions, emotions);
@@ -142,13 +148,19 @@ async function HandleImport() {
 
       IPC_Renderer3.invoke('faiss-add', descriptors, rowid);
     }
+
   }
+
 
   for (const incoming_meme of meme_import) {
     const { file_hash, connected_to_hashes } = incoming_meme;
 
     const existing_record = await DB_MODULE.Get_or_Create_Tagging_MEME_Record_From_DB(file_hash_to_name_map.get(file_hash));
     incoming_meme.connected_to_filenames = connected_to_hashes.map((m) => file_hash_to_name_map.get(m));
+
+    processed += 1;
+    console.log(`processed = ${processed}, total_operations = ${total_operations}, completed = ${(processed/total_operations).toFixed(3)}`)
+    
 
     if (existing_record) {
       existing_record.fileNames = MergeArrays(incoming_meme.connected_to_filenames, existing_record.fileNames);
@@ -179,12 +191,20 @@ async function HandleImport() {
   }
 
   if (handle_collections) {
+
+    total_operations += collection_import.length + collection_memes_import.length + collection_gallery_import.length
+
+
     for (const incoming of collection_import) {
       const { name, thumbnail, gallery_hashes, description, tags, memes_hashes, emotions } = incoming;
       const existing_collection = DB_MODULE.Get_Collection_Record_From_DB(name);
       const thumbnail_filename = file_hash_to_name_map.get(thumbnail);
       const gallery_filenames = gallery_hashes.map((i) => file_hash_to_name_map.get(i));
       const memes_filenames = memes_hashes.map((i) => file_hash_to_name_map.get(i));
+
+      processed += 1;
+      console.log(`processed = ${processed}, total_operations = ${total_operations}, completed = ${(processed/total_operations).toFixed(3)}`)
+    
 
       if (existing_collection) {
         existing_collection.collectionMemes = MergeArrays(existing_collection.collectionMemes, memes_filenames);
@@ -210,10 +230,16 @@ async function HandleImport() {
       DB_MODULE.Insert_Collection_Record_Into_DB(entry);
     }
 
+    
+
     for (const incoming of collection_memes_import) {
       const { file_hash, collection_names } = incoming;
       const file_name = file_hash_to_name_map.get(file_hash);
       const entry_orig = DB_MODULE.Get_Collection_MEME_Record_From_DB(file_name);
+
+      processed += 1;
+      console.log(`processed = ${processed}, total_operations = ${total_operations}, completed = ${(processed/total_operations).toFixed(3)}`)
+    
 
       if (entry_orig) {
         entry_orig.collectionNames = MergeArrays(entry_orig.collectionNames, collection_names);
@@ -233,6 +259,10 @@ async function HandleImport() {
       const { file_hash, collection_names } = incoming;
       const file_name = file_hash_to_name_map.get(file_hash);
       const entry_orig = DB_MODULE.Get_Collection_IMAGE_Record_From_DB(file_name);
+
+      processed += 1;
+      console.log(`processed = ${processed}, total_operations = ${total_operations}, completed = ${(processed/total_operations).toFixed(3)}`)
+    
 
       if (entry_orig) {
         entry_orig.collectionNames = MergeArrays(entry_orig.collectionNames, collection_names);
