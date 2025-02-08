@@ -32,3 +32,7 @@ body {
 #text-description {
   margin-top: 20vh;
 }
+
+#importProgressModal {
+  z-index: 900 !important;
+}

@@ -52,9 +52,28 @@
         </div>
       </div>
 
+      <div class="modal" id="importProgressModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importProgressModalLabel">Import Progress</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="progress" style="height: 30px;">
+                        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated"
+                            role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">0%
+                        </div>
+                    </div>
+                    <p class="mt-3"><span id="import-processed"></span> / <span id="import-total"></span> import tasks completed</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     </div>
   </body>
 
-  <script src="./taga-JS/utilities/taga-import.js"></script>
+  <script src="./taga-JS/import/taga-import.js"></script>
   <!-- <script src="./taga-JS/utilities/general-helper-fns.js"></script> -->
 </html>

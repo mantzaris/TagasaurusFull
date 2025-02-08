@@ -20,25 +20,57 @@ import_button.onclick = Import_User_Annotation_Data;
 let tagging_import;
 let meme_import;
 let temp_dir;
+let importProgressModal;
 
 console.clear();
 console.log("HELLO")
+
 //functionality for the export of all the information, init() function
 //called at the start from the user
+async function Update_Import_Progress(progress_modal, options) {
+  const {progress_modal_id, processed, total, progress_bar_id, processed_id, total_id} = options;
+  
+  // if(!progress_modal) {
+  //   progress_modal = await Show_Import_Progress(progress_modal_id);
+  // }
+
+  const percentage = Math.round( (processed/total) * 100 );
+  const bar = document.getElementById(progress_bar_id);
+  bar.style.width = `${percentage}%`;
+  bar.setAttribute("aria-valuenow", percentage);
+  bar.textContent = `${percentage}%`;
+
+  document.getElementById(processed_id).innerText = processed;
+  document.getElementById(total_id).innerText = total;
+
+  await new Promise( r => setTimeout(r,30) )
+}
+
+async function Show_Import_Progress(progress_modal_id) {
+  const modal = new bootstrap.Modal(document.getElementById(progress_modal_id));
+
+  modal.show();
+  return modal;
+}
+
+async function Hide_Import_Progress(modal) {
+  modal.hide();
+  return modal;
+}
+
 async function Import_User_Annotation_Data() {
   const path_chosen = await IPC_Renderer3.invoke('dialog:importDB');
 
   //create a db from the import path
   if (path_chosen.canceled) return;
 
-  Show_Loading_Spinner();
 
   DB_import_path = path_chosen.filePaths[0];
-  const ft_res = await ft.fromFile(DB_import_path);
+  const ft_res = await ft.fromFile(DB_import_path); //file-type
 
   if (!ft_res.mime.includes('zip')) {
     alert('expected imported file format was not a zip');
-    return Hide_Loading_Spinner();
+    return;
   }
 
   temp_dir = PATH.join(USER_DATA_PATH, 'TagasaurusFiles', 'temp');
@@ -59,26 +91,27 @@ async function Import_User_Annotation_Data() {
   } catch (e) {
     console.log(e);
     alert('something went wrong, cannot extract specified file');
-    return Hide_Loading_Spinner();
+    return;
   }
 
 
   try {
     const tagging = readFileSync(PATH.join(temp_dir, 'tagging.json'), 'utf-8');
-    const memes = readFileSync(PATH.join(temp_dir, 'memes.json'), 'utf-8');
+    const memes = readFileSync(PATH.join(temp_dir, 'memes.json'), 'utf-8'); //needs memes.json even if empty
 
     tagging_import = JSON.parse(tagging);
-    console.log(tagging_import)
+
     meme_import = JSON.parse(memes);
     HandleImport()
   } catch (e) {
     console.log(e);
     alert('could not read tagging.json and/or memes.json in import');
-    return Hide_Loading_Spinner();
+    return;
   }
 }
 
 async function HandleImport() {
+  importProgressModal = await Show_Import_Progress("importProgressModal")
   let processed = 0;
   let total_operations = tagging_import.length + meme_import.length
 
@@ -117,8 +150,15 @@ async function HandleImport() {
 
 
     processed += 1;
-    console.log(`processed = ${processed}, total_operations = ${total_operations}, completed = ${(processed/total_operations).toFixed(3)}`)
-    
+    // console.log(`processed = ${processed}, total_operations = ${total_operations}, completed = ${(processed/total_operations).toFixed(3)}`)
+    await Update_Import_Progress(importProgressModal, {
+      progress_modal_id: "importProgressModal", 
+      progress_bar_id: "progressBar",
+      processed_id: "import-processed",
+      total_id: "import-total",
+      processed, 
+      total: total_operations      
+    })
 
     if (existing_record) {
       existing_record.taggingMemeChoices = MergeArrays(existing_record.taggingMemeChoices, meme_choices_filenames);
@@ -134,6 +174,7 @@ async function HandleImport() {
 
     const file_name = file_hash_to_name_map.get(file_hash);
 
+    // TODO: check if the file is actually there
     copyFileSync(PATH.join(temp_dir, 'files', incoming.file_name), PATH.join(TAGA_DATA_destination, file_name));
     incoming.file_name = file_name;
 
@@ -285,7 +326,7 @@ async function HandleImport() {
     force: true,
   });
 
-  Hide_Loading_Spinner();
+  Hide_Import_Progress(importProgressModal);
   alert('successfully imported');
 }
 
