@@ -68,6 +68,10 @@ Connect on the social
 
 ### (**Check out cool comic books and more from the author Vasexandros at [amazon](https://www.amazon.com/Vasexandros/e/B010RI6W0G%3Fref=dbs_a_mng_rwt_scns_share)**)
 
+
+### Dev note
+
+run `./node_modules/.bin/electron-rebuild` from project root to set up some of the libraries
 <!---
 
 _also, the books by the author vasexandros are really worth the read_ [link](https://www.amazon.com/Vasexandros/e/B010RI6W0G%3Fref=dbs_a_mng_rwt_scns_share)
